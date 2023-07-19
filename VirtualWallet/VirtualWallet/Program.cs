@@ -1,9 +1,14 @@
+using VirtualWallet.Models;
+
 var builder = WebApplication.CreateBuilder(args);
+
 
 // Add services to the container.
 builder.Services.AddRazorPages();
 
 var app = builder.Build();
+
+builder.Services.AddAutoMapper(typeof(CustomAutoMapper).Assembly);
 
 // Configure the HTTP request pipeline.
 
