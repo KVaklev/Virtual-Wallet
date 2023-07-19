@@ -1,6 +1,8 @@
 ﻿using DataAccess.Models.Contracts;
+using DataAccess.Models.Enums;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
@@ -15,15 +17,13 @@ namespace DataAccess.Models.Models
 
         public int SenderId { get; set; } //FK
 
-        public IUser Sender { get; set; }
+        public User Sender { get; set; }
 
         public int RecipientId { get; set;} // FK
 
-        public IUser Recipient { get; set; }
+        public User Recipient { get; set; }
 
-        [MinLength(2, ErrorMessage = "The {0} must be \"in\" or \"out\".")]
-        [MaxLength(3, ErrorMessage = "The {0} must be \"in\" or \"out\".")]
-        public string Direction { get; set; }
+        public DirectionType Direction { get; set; }
 
         public decimal Amount { get; set; }
 
@@ -31,6 +31,6 @@ namespace DataAccess.Models.Models
 
         public int CurrencyId { get; set; } //FK
 
-        public ICurrency Currency { get; set; }
+        public Currency Currency { get; set; }
     }
 }
