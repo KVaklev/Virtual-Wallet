@@ -1,5 +1,8 @@
 ﻿using DataAccess.Models.Contracts;
+using Microsoft.AspNetCore.Http;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DataAccess.Models.Models
 {
@@ -33,5 +36,9 @@ namespace DataAccess.Models.Models
 
         public string ProfilePhotoPath { get; set; }
         public string ProfilePhotoFileName { get; set; }
+
+        [NotMapped]
+        [DisplayName("Upload File")]
+        public IFormFile ImageFile { get; set; }
     }
 }

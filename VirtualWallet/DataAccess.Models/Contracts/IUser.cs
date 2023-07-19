@@ -1,7 +1,4 @@
-﻿using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Xml.Linq;
+﻿using Microsoft.AspNetCore.Http;
 
 namespace DataAccess.Models.Contracts
 {
@@ -18,10 +15,7 @@ namespace DataAccess.Models.Contracts
         public bool IsAdmin { get; set; }
         public string ProfilePhotoPath { get; set; }
         public string ProfilePhotoFileName { get; set; }
-
-        //[NotMapped]
-        //[DisplayName("Upload File")]
-        //public IFormFile? ImageFile { get; set; }
+        public IFormFile ImageFile { get; set; }
 
         // public Card WalletCard { get; set; }
 
