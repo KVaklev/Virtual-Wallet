@@ -6,10 +6,22 @@ builder.Services.AddRazorPages();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (!app.Environment.IsDevelopment())
+
+//if (!app.Environment.IsDevelopment())
+//{
+//    app.UseExceptionHandler("/Error");
+//}
+
+app.UseDeveloperExceptionPage();
+app.UseRouting();
+app.UseSession();
+
+if (app.Environment.IsDevelopment())
 {
-    app.UseExceptionHandler("/Error");
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
+
 app.UseStaticFiles();
 
 app.UseRouting();
