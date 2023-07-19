@@ -9,15 +9,15 @@ namespace DataAccess.Models.Contracts
 {
     public interface ITransfer
     {
-        public int ID { get; set; }
+        public int Id { get; set; }
 
         public DateTime Date { get; set; }
 
         public decimal BalanceAmount { get; set; }
 
-        public int UserID { get; set; }
+        public int UserId { get; set; }
 
-        public int CurrencyID { get; set; }
+        public int CurrencyId { get; set; }
 
         public decimal DepositAmount { get; set; }
 

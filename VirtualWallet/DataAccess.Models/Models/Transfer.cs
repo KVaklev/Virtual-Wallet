@@ -12,17 +12,17 @@ namespace DataAccess.Models.Models
     {
 
         [Range(1, double.MaxValue)]
-        public int ID { get ; set ; }
+        public int Id { get ; set ; }
         public DateTime Date { get ; set ; }
 
         [Range(0, double.MaxValue)]
         public decimal BalanceAmount { get ; set ; }
 
         [Range(1, double.MaxValue)]
-        public int UserID { get ; set ; }
+        public int UserId { get ; set ; }
 
         [Range(1, double.MaxValue)]
-        public int CurrencyID { get ; set ; }
+        public int CurrencyId { get ; set ; }
 
         [Range(0, double.MaxValue)]
         public decimal DepositAmount { get ; set ; }
