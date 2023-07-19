@@ -1,46 +1,51 @@
 using DataAccess.Repositories.Data;
 using Microsoft.EntityFrameworkCore;
-
 using VirtualWallet.Models;
 
-var builder = WebApplication.CreateBuilder(args);
-
-builder.Services.AddDbContext<ApplicationContext>(options =>
+namespace VirtualWallet
 {
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
-    options.EnableSensitiveDataLogging();
-});
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-builder.Services.AddRazorPages();
+            builder.Services.AddDbContext<ApplicationContext>(options =>
+            {
+                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+                options.EnableSensitiveDataLogging();
+            });
 
-var app = builder.Build();
+            // Add services to the container.
+            builder.Services.AddRazorPages();
 
-builder.Services.AddAutoMapper(typeof(CustomAutoMapper).Assembly);
+            var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+            builder.Services.AddAutoMapper(typeof(CustomAutoMapper).Assembly);
 
-//if (!app.Environment.IsDevelopment())
-//{
-//    app.UseExceptionHandler("/Error");
-//}
+            // Configure the HTTP request pipeline.
 
-app.UseDeveloperExceptionPage();
-app.UseRouting();
-app.UseSession();
+            //if (!app.Environment.IsDevelopment())
+            //{
+            //    app.UseExceptionHandler("/Error");
+            //}
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
+            app.UseDeveloperExceptionPage();
+            app.UseRouting();
+            app.UseSession();
+
+            if (app.Environment.IsDevelopment())
+            {
+                app.UseSwagger();
+                app.UseSwaggerUI();
+            }
+
+            app.UseStaticFiles();
+            app.UseAuthorization();
+            app.MapDefaultControllerRoute();
+            app.MapRazorPages();
+            app.Run();
+
+        }
+    }
 }
-
-app.UseStaticFiles();
-
-app.UseRouting();
-
-app.UseAuthorization();
-
-app.MapRazorPages();
-
-app.Run();

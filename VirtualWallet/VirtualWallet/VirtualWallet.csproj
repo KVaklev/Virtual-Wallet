@@ -23,11 +23,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\DataAccess.Repositories\DataAccess.Repositories.csproj" />
+    <ProjectReference Include="..\Business.Services\Business.Services.csproj" />
+    <ProjectReference Include="..\Business.ViewModels\Business.ViewModels.csproj" />
+    <ProjectReference Include="..\Presentation.Helpers\Presentation.Helpers.csproj" />
   </ItemGroup>
-
-	<ItemGroup>
-	  <ProjectReference Include="..\Business.Mapper\Business.Mapper.csproj" />
-	</ItemGroup>
 
 </Project>
