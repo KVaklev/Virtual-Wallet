@@ -40,5 +40,10 @@ namespace DataAccess.Models.Models
         [NotMapped]
         [DisplayName("Upload File")]
         public IFormFile ImageFile { get; set; }
+
+        public List<Transaction> TransactionsSender { get; set; } = new List<Transaction>();
+        public List<Transaction> TransactionsRecipiend { get; set; } = new List<Transaction>();
+
+
     }
 }

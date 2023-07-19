@@ -16,7 +16,7 @@ namespace DataAccess.Models.Models
         public DateTime Date { get ; set ; }
 
         [Range(0, double.MaxValue)]
-        public decimal BalanceAmount { get ; set ; }
+        public double BalanceAmount { get ; set ; }
 
         [Range(1, double.MaxValue)]
         public int UserId { get ; set ; }
@@ -25,9 +25,9 @@ namespace DataAccess.Models.Models
         public int CurrencyId { get ; set ; }
 
         [Range(0, double.MaxValue)]
-        public decimal DepositAmount { get ; set ; }
+        public double DepositAmount { get ; set ; }
 
         [Range(0, double.MaxValue)]
-        public decimal WithdrawalAmount { get ; set ; }
+        public double WithdrawalAmount { get ; set ; }
     }
 }

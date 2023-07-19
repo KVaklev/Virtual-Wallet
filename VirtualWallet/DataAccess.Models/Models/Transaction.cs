@@ -25,7 +25,7 @@ namespace DataAccess.Models.Models
 
         public DirectionType Direction { get; set; }
 
-        public decimal Amount { get; set; }
+        public double Amount { get; set; }
 
         public DateTime date { get; set; }
 
