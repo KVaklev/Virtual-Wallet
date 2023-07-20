@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace DataAccess.Models.Contracts
 {
-    internal interface ITransaction
+    public interface ITransaction
     {
         public int Id { get; set; }
 

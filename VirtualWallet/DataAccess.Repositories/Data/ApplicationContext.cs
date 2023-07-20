@@ -1,4 +1,5 @@
-﻿using DataAccess.Models.Models;
+﻿using DataAccess.Models.Contracts;
+using DataAccess.Models.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -21,11 +22,11 @@ namespace DataAccess.Repositories.Data
         }
 
         //Configure DB tables 
-        public DbSet<User> users { get; set; }
-        public DbSet<Currency> currencies { get; set; }
-        public DbSet<Transaction> transactions { get; set; }
-        public DbSet<Transfer> transfers { get; set; }
-        public DbSet<Card> cards { get; set; }
+        public DbSet<IUser> Users { get; set; }
+        public DbSet<ICurrency> Currencies { get; set; }
+        public DbSet<ITransaction> Transactions { get; set; }
+        public DbSet<ITransfer> Transfers { get; set; }
+        public DbSet<ICard> Cards { get; set; }
 
         //Seed database
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -48,17 +49,17 @@ namespace DataAccess.Repositories.Data
             {
             };
             modelBuilder.Entity<Transaction>().HasData(transactions);
-            modelBuilder.Entity<Transaction>()
-            .HasOne(c => c.Sender)
-            .WithMany(u => u.TransactionsSender)
-            .HasForeignKey(c => c.SenderId)
-            .OnDelete(DeleteBehavior.NoAction);
+            //modelBuilder.Entity<Transaction>()
+            //.HasOne(c => c.Sender)
+            //.WithMany(u => u.TransactionsSender)
+            //.HasForeignKey(c => c.SenderId)
+            //.OnDelete(DeleteBehavior.NoAction);
 
-            modelBuilder.Entity<Transaction>()
-                .HasOne(c => c.Recipient)
-                .WithMany(u => u.TransactionsRecipiend)
-                .HasForeignKey(c => c.RecipientId)
-                .OnDelete(DeleteBehavior.NoAction);
+            //modelBuilder.Entity<Transaction>()
+            //    .HasOne(c => c.Recipient)
+            //    .WithMany(u => u.TransactionsRecipiend)
+            //    .HasForeignKey(c => c.RecipientId)
+            //    .OnDelete(DeleteBehavior.NoAction);
 
             List<Transfer> transfers = new List<Transfer>()
             {

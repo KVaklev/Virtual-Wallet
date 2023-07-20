@@ -41,9 +41,8 @@ namespace DataAccess.Models.Models
         [DisplayName("Upload File")]
         public IFormFile ImageFile { get; set; }
 
-        public List<Transaction> TransactionsSender { get; set; } = new List<Transaction>();
-        public List<Transaction> TransactionsRecipiend { get; set; } = new List<Transaction>();
-
-
+        public List<ITransaction> TransactionsSender { get; set; } = new List<ITransaction>();
+        public List<ITransaction> TransactionsRecipiend { get; set; } = new List<ITransaction>();
+        public List<ICard> Cards { get; set; } = new List<ICard>();
     }
 }
