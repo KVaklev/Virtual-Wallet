@@ -18,10 +18,13 @@ namespace VirtualWallet
 
             // Add services to the container.
             builder.Services.AddRazorPages();
-
+            builder.Services.AddSwaggerGen();
+            builder.Services.AddControllers();
+           
+            builder.Services.AddAutoMapper(typeof(CustomAutoMapper).Assembly);
+            builder.Services.AddSwaggerGen();
             var app = builder.Build();
 
-            builder.Services.AddAutoMapper(typeof(CustomAutoMapper).Assembly);
 
             // Configure the HTTP request pipeline.
 
@@ -32,7 +35,7 @@ namespace VirtualWallet
 
             app.UseDeveloperExceptionPage();
             app.UseRouting();
-            app.UseSession();
+          //  app.UseSession();
 
             if (app.Environment.IsDevelopment())
             {
