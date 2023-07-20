@@ -48,6 +48,17 @@ namespace DataAccess.Repositories.Data
             {
             };
             modelBuilder.Entity<Transaction>().HasData(transactions);
+            modelBuilder.Entity<Transaction>()
+            .HasOne(c => c.Sender)
+            .WithMany(u => u.TransactionsSender)
+            .HasForeignKey(c => c.SenderId)
+            .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<Transaction>()
+                .HasOne(c => c.Recipient)
+                .WithMany(u => u.TransactionsRecipiend)
+                .HasForeignKey(c => c.RecipientId)
+                .OnDelete(DeleteBehavior.NoAction);
 
             List<Transfer> transfers = new List<Transfer>()
             {

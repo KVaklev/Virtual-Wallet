@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DataAccess.Models.Models;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -13,20 +14,20 @@ namespace DataAccess.Models.Contracts
 
         public int SenderId { get; set; }
 
-        public IUser Sender { get; set; }
+        public User Sender { get; set; }
 
         public int RecipientId { get; set; }
 
-        public IUser Recipient { get; set; }
+        public User Recipient { get; set; }
 
         public string Direction { get; set; }
 
-        public decimal Amount { get; set; }
+        public double Amount { get; set; }
 
         public DateTime date { get; set; }
 
         public int CurrencyId { get; set; }
 
-        public ICurrency  Currency {get; set;}
+        public Currency  Currency {get; set;}
     }
 }

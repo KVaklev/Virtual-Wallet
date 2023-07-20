@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿//using Microsoft.AspNetCore.Http;
 
 namespace DataAccess.Models.Contracts
 {
@@ -15,7 +15,7 @@ namespace DataAccess.Models.Contracts
         public bool IsAdmin { get; set; }
         public string ProfilePhotoPath { get; set; }
         public string ProfilePhotoFileName { get; set; }
-        public IFormFile ImageFile { get; set; }
+      //  public IFormFile ImageFile { get; set; }
 
         // public Card WalletCard { get; set; }
 
