@@ -1,4 +1,5 @@
 ﻿using DataAccess.Models.Contracts;
+using DataAccess.Models.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -12,22 +13,22 @@ namespace DataAccess.Models.Models
     {
 
         [Range(1, double.MaxValue)]
-        public int Id { get ; set ; }
-        public DateTime Date { get ; set ; }
+        public int Id { get; set; }
+        public DateTime Date { get; set; }
 
         [Range(0, double.MaxValue)]
-        public double BalanceAmount { get ; set ; }
+        public double BalanceAmount { get; set; }
 
         [Range(1, double.MaxValue)]
-        public int UserId { get ; set ; }
+        public int UserId { get; set; }
 
         [Range(1, double.MaxValue)]
-        public int CurrencyId { get ; set ; }
+        public int CurrencyId { get; set; }
+       
+        [Range(0, double.MaxValue)]
+        public double DepositAmount { get; set; }
 
         [Range(0, double.MaxValue)]
-        public double DepositAmount { get ; set ; }
-
-        [Range(0, double.MaxValue)]
-        public double WithdrawalAmount { get ; set ; }
+        public double WithdrawalAmount { get; set; }
     }
 }
