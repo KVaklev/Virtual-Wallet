@@ -17,7 +17,11 @@ namespace DataAccess.Models.Contracts
 
         public int UserId { get; set; }
 
+        //public IUser User { get; set; }
+
         public int CurrencyId { get; set; }
+
+        //public ICurrency Currency { get; set; } 
 
         public double DepositAmount { get; set; }
 
