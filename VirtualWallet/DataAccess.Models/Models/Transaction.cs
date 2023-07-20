@@ -27,10 +27,12 @@ namespace DataAccess.Models.Models
 
         public double Amount { get; set; }
 
-        public DateTime date { get; set; }
+        public DateTime Date { get; set; }
 
         public int CurrencyId { get; set; } //FK
 
         public Currency Currency { get; set; }
+
+        public bool IsExecute { get; set; }
     }
 }
