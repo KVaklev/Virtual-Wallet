@@ -19,9 +19,10 @@ namespace VirtualWallet
             // Add services to the container.
             builder.Services.AddRazorPages();
 
+            builder.Services.AddAutoMapper(typeof(CustomAutoMapper).Assembly);
+
             var app = builder.Build();
 
-            builder.Services.AddAutoMapper(typeof(CustomAutoMapper).Assembly);
 
             // Configure the HTTP request pipeline.
 

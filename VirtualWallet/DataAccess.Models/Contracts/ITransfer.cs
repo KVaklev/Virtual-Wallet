@@ -13,14 +13,18 @@ namespace DataAccess.Models.Contracts
 
         public DateTime Date { get; set; }
 
-        public decimal BalanceAmount { get; set; }
+        public double BalanceAmount { get; set; }
 
         public int UserId { get; set; }
 
+        //public IUser User { get; set; }
+
         public int CurrencyId { get; set; }
 
-        public decimal DepositAmount { get; set; }
+        //public ICurrency Currency { get; set; } 
 
-        public decimal WithdrawalAmount { get; set; }
+        public double DepositAmount { get; set; }
+
+        public double WithdrawalAmount { get; set; }
     }
 }
