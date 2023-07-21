@@ -24,7 +24,7 @@ namespace DataAccess.Models.Contracts
 
         public double Amount { get; set; }
 
-        public DateTime date { get; set; }
+        public DateTime Date { get; set; }
 
         public int CurrencyId { get; set; }
 
