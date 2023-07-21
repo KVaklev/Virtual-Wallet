@@ -21,6 +21,7 @@ namespace DataAccess.Repositories.Data
         public DbSet<Transaction> Transactions { get; set; }
         public DbSet<Transfer> Transfers { get; set; }
         public DbSet<Card> Cards { get; set; }
+        public DbSet<Account> Accounts { get; set; }
 
         //Seed database
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -33,6 +34,11 @@ namespace DataAccess.Repositories.Data
             {
             };
             modelBuilder.Entity<User>().HasData(users);
+
+            List<Account> accounts = new List<Account>()
+            {
+            };
+            modelBuilder.Entity<Account>().HasData(accounts);
 
             List<Currency> currencies = new List<Currency>()
             {
