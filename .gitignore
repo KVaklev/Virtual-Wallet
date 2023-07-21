@@ -362,3 +362,4 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 /ForumManagementSystem/DataAccess.Repositories/Migrations/20230620114647_init.Designer.cs
+/VirtualWallet/DataAccess.Repositories/Migrations
