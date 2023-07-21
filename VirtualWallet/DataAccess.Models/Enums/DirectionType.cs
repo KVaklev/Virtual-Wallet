@@ -1,14 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace DataAccess.Models.Enums
+﻿namespace DataAccess.Models.Enums
 {
     public enum DirectionType
     {
-        IN,
-        OUT
+        In,
+        Out
     }
 }

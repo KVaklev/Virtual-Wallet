@@ -1,12 +1,4 @@
-﻿using DataAccess.Models.Contracts;
-using DataAccess.Models.Enums;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using DataAccess.Models.Enums;
 
 namespace DataAccess.Models.Models
 {
@@ -33,6 +25,6 @@ namespace DataAccess.Models.Models
 
         public Currency Currency { get; set; }
 
-        public bool IsExecute { get; set; }
+        public bool IsExecuted { get; set; }
     }
 }

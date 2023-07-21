@@ -1,11 +1,5 @@
-﻿using DataAccess.Models.Contracts;
-using DataAccess.Models.Models;
+﻿using DataAccess.Models.Models;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DataAccess.Repositories.Data
 {
@@ -22,11 +16,11 @@ namespace DataAccess.Repositories.Data
         }
 
         //Configure DB tables 
-        public DbSet<IUser> Users { get; set; }
-        public DbSet<ICurrency> Currencies { get; set; }
-        public DbSet<ITransaction> Transactions { get; set; }
+        public DbSet<User> Users { get; set; }
+        public DbSet<Currency> Currencies { get; set; }
+        public DbSet<Transaction> Transactions { get; set; }
         public DbSet<Transfer> Transfers { get; set; }
-        public DbSet<ICard> Cards { get; set; }
+        public DbSet<Card> Cards { get; set; }
 
         //Seed database
         protected override void OnModelCreating(ModelBuilder modelBuilder)

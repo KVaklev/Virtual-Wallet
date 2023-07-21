@@ -1,23 +1,17 @@
-﻿using DataAccess.Models.Contracts;
-using DataAccess.Models.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using DataAccess.Models.Models;
 
 namespace DataAccess.Repositories.Contracts
 {
     public interface ITransactionRepository
     {
-        ITransaction Create(Transaction trasaction);
+        Transaction Create(Transaction trasaction);
 
-        ITransaction GetById(int id);
+        Transaction GetById(int id);
 
-        ITransaction Update(int id, Transaction transaction);
+        Transaction Update(int id, Transaction transaction);
 
-        ITransaction Delete(int id);
+        Transaction Delete(int id);
 
-        List<ITransaction> GetAll();
+        List<Transaction> GetAll();
     }
 }

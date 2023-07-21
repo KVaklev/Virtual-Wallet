@@ -1,14 +1,8 @@
-﻿using DataAccess.Models.Contracts;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace DataAccess.Models.Models
 {
-    public class Currency:ICurrency
+    public class Currency
     {
         public int Id { get; set; }
 

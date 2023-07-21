@@ -1,14 +1,7 @@
 ﻿using Business.Exceptions;
 using DataAccess.Models.Models;
-using DataAccess.Models.Contracts;
 using DataAccess.Repositories.Data;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 using DataAccess.Repositories.Contracts;
 
 namespace DataAccess.Repositories.Models
@@ -25,16 +18,16 @@ namespace DataAccess.Repositories.Models
         public Transaction Create(Transaction trasaction)
         {
             trasaction.Date = DateTime.Now;
-            trasaction.IsExecute = false;
+            trasaction.IsExecuted = false;
             context.Add(trasaction);
             context.SaveChanges();
 
             return trasaction;
         }
         
-        public ITransaction GetById(int id) 
+        public Transaction GetById(int id) 
         {
-            ITransaction transaction = context.Transactions
+            Transaction transaction = context.Transactions
                 .Include(s =>s.Sender)
                 .Include(r =>r.Recipient)
                 .Include(c =>c.Currency)
@@ -44,7 +37,7 @@ namespace DataAccess.Repositories.Models
         }
 
 
-        public ITransaction Update(int id, Transaction transaction)
+        public Transaction Update(int id, Transaction transaction)
         {
             var transactionToUpdate = GetById(id);
             transactionToUpdate.RecipientId = transaction.RecipientId;
@@ -62,14 +55,19 @@ namespace DataAccess.Repositories.Models
             return true;
         }
 
-        public List<ITransaction> GetAll()
+        public List<Transaction> GetAll()
         {
-            List<ITransaction> result = context.Transactions
+            List<Transaction> result = context.Transactions
                     .Include(s =>s.Sender)
                     .Include(r =>r.Recipient)
                     .Include(c => c.Currency)
                     .ToList();
             return result ?? throw new EntityNotFoundException("There are any transactions!");
+        }
+
+        Transaction ITransactionRepository.Delete(int id)
+        {
+            throw new NotImplementedException();
         }
     }
 }

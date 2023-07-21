@@ -1,9 +1,9 @@
 ﻿using Business.Exceptions;
 using Business.Services.Contracts;
-using DataAccess.Models.Contracts;
 using DataAccess.Models.Models;
 using DataAccess.Repositories.Contracts;
 using Business.Services.Helpers;
+using Business.QueryParameters;
 
 namespace Business.Services.Models
 {
@@ -16,23 +16,27 @@ namespace Business.Services.Models
             this.repository = repository;
         }
 
-        public List<IUser> GetAll()
+        public List<User> GetAll()
         {
             return this.repository.GetAll();
         }
-        public IUser GetById(int id)
+        public List<User> FilterBy(UserQueryParameters filterParameters)
+        {
+            return this.repository.FilterBy(filterParameters);
+        }
+        public User GetById(int id)
         {
             return this.repository.GetById(id);
         }
-        public IUser GetByUsername(string username)
+        public User GetByUsername(string username)
         {
             return this.repository.GetByUsername(username);
         }
-        public IUser GetByEmail(string email)
+        public User GetByEmail(string email)
         {
             return this.repository.GetByEmail(email);
         }
-        public IUser GetByPhoneNumber(int pnoneNumber)
+        public User GetByPhoneNumber(int pnoneNumber)
         {
             return this.repository.GetByPhoneNumber(pnoneNumber);
         }
@@ -41,7 +45,7 @@ namespace Business.Services.Models
         //{
         //    return this.repository.FilterBy(filterParameters);
         //}
-        public IUser Create(IUser user)
+        public User Create(User user)
         {
             if (UsernameExists(user.Username))
             {
@@ -58,14 +62,14 @@ namespace Business.Services.Models
                 throw new DuplicateEntityException($"User with phone number '{user.PhoneNumber}' already exists.");
             }
 
-            IUser createdUser = this.repository.Create(user);
+            User createdUser = this.repository.Create(user);
 
             return createdUser;
 
         }
-        public IUser Update(int id, IUser user, IUser loggedUser)
+        public User Update(int id, User user, User loggedUser)
         {
-            IUser userToUpdate = this.repository.GetById(id);
+            User userToUpdate = this.repository.GetById(id);
 
             if (!IsAuthorized(userToUpdate, loggedUser))
             {
@@ -91,9 +95,9 @@ namespace Business.Services.Models
             userToUpdate = this.repository.Update(id, user, loggedUser);
             return userToUpdate;
         }
-        public void Delete(int id, IUser loggedUser)
+        public void Delete(int id, User loggedUser)
         {
-            IUser user = repository.GetById(id);
+            User user = repository.GetById(id);
 
             if (!IsAuthorized(user, loggedUser))
             {
@@ -101,15 +105,15 @@ namespace Business.Services.Models
             }
             this.repository.Delete(id);
         }
-        public IUser Promote(IUser user)
+        public User Promote(User user)
         {
             return this.repository.Promote(user);
         }
-        public IUser BlockUser(IUser user)
+        public User BlockUser(User user)
         {
             return this.repository.BlockUser(user);
         }
-        public IUser UnblockUser(IUser user)
+        public User UnblockUser(User user)
         {
             return this.repository.UnblockUser(user);
         }
@@ -125,7 +129,7 @@ namespace Business.Services.Models
         {
             return this.repository.PhoneNumberExists(phoneNumber);
         }
-        public bool IsAuthorized(IUser user, IUser loggedUser)
+        public bool IsAuthorized(User user, User loggedUser)
         {
             bool isAuthorized = false;
 
@@ -134,6 +138,6 @@ namespace Business.Services.Models
                 isAuthorized = true;
             }
             return isAuthorized;
-        }        
+        }
     }
 }

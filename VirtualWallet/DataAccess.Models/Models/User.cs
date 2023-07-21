@@ -1,12 +1,11 @@
-﻿using DataAccess.Models.Contracts;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DataAccess.Models.Models
 {
-    public class User : IUser
+    public class User 
     {
         public int Id { get; set; }
 
@@ -41,8 +40,8 @@ namespace DataAccess.Models.Models
         [DisplayName("Upload File")]
         public IFormFile ImageFile { get; set; }
 
-        public List<ITransaction> TransactionsSender { get; set; } = new List<ITransaction>();
-        public List<ITransaction> TransactionsRecipiend { get; set; } = new List<ITransaction>();
-        public List<ICard> Cards { get; set; } = new List<ICard>();
+        public List<Transaction> TransactionsSender { get; set; } = new List<Transaction>();
+        public List<Transaction> TransactionsRecipient { get; set; } = new List<Transaction>();
+        public List<Card> Cards { get; set; } = new List<Card>();
     }
 }

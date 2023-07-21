@@ -1,8 +1,6 @@
-﻿using DataAccess.Models.Contracts;
-
-namespace DataAccess.Models.Models
+﻿namespace DataAccess.Models.Models
 {
-    public class History : IHistory
+    public class History 
     {
         public int Id { get; set; } 
         public string Description { get; set; }

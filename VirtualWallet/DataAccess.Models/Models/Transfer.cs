@@ -1,15 +1,8 @@
-﻿using DataAccess.Models.Contracts;
-using DataAccess.Models.Enums;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace DataAccess.Models.Models
 {
-    public class Transfer : ITransfer
+    public class Transfer
     {
 
         [Range(1, double.MaxValue)]
@@ -18,11 +11,11 @@ namespace DataAccess.Models.Models
 
         [Range(1, double.MaxValue)]
         public int UserId { get; set; }
-        public IUser User { get; set; }
+        public User User { get; set; }
 
         [Range(1, double.MaxValue)]
         public int CurrencyId { get; set; }
-        public ICurrency Currency { get; set; }
+        public Currency Currency { get; set; }
 
         [Range(0, double.MaxValue)]
         public double DepositAmount { get; set; }

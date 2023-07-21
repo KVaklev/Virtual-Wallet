@@ -1,8 +1,8 @@
 ﻿namespace DataAccess.Models.Enums
 {
-    public enum ICardType
+    public enum CardType
     {
-        debit,
-        credit
+        Debit,
+        Credit
     }
 }

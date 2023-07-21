@@ -1,24 +1,27 @@
-﻿using DataAccess.Models.Contracts;
+﻿using Business.QueryParameters;
+using DataAccess.Models.Models;
 
 namespace Business.Services.Contracts
 {
     public interface IUserService
     {
-        List<IUser> GetAll();
-       // PaginatedList<IUser> FilterBy(UserQueryParameters filterParameters);
-        IUser GetById(int id);
-        IUser GetByUsername(string username);
-        IUser GetByEmail(string email);
-        IUser GetByPhoneNumber(int phoneNumber);
-        IUser Create(IUser user);
-        IUser Update(int id, IUser user, IUser loggedUser);
-        void Delete(int id, IUser loggedUser);
-        IUser Promote(IUser user);
-        IUser BlockUser(IUser user);
-        IUser UnblockUser(IUser user); 
+        List<User> GetAll();
+
+        List<User> FilterBy(UserQueryParameters filterParameters);
+        //PaginatedList<IUser> FilterBy(UserQueryParameters filterParameters);
+        User GetById(int id);
+        User GetByUsername(string username);
+        User GetByEmail(string email);
+        User GetByPhoneNumber(int phoneNumber);
+        User Create(User user);
+        User Update(int id, User user, User loggedUser);
+        void Delete(int id, User loggedUser);
+        User Promote(User user);
+        User BlockUser(User user);
+        User UnblockUser(User user); 
         bool UsernameExists(string username);
         bool EmailExists(string email);
         bool PhoneNumberExists(int phoneNumber);
-        bool IsAuthorized(IUser user, IUser loggedUser);
+        bool IsAuthorized(User user, User loggedUser);
     }
 }

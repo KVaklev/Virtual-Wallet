@@ -1,5 +1,6 @@
 ﻿using Business.Exceptions;
-using DataAccess.Models.Contracts;
+using Business.QueryParameters;
+using DataAccess.Models.Models;
 using DataAccess.Repositories.Contracts;
 using DataAccess.Repositories.Data;
 
@@ -7,40 +8,81 @@ namespace DataAccess.Repositories.Models
 {
     public class UserRepository : IUserRepository
     {
+
         private readonly ApplicationContext context;
 
         public UserRepository(ApplicationContext context)
         {
             this.context = context;
         }
-        public List<IUser> GetAll()
+        public List<User> GetAll()
         {
             return context.Users.ToList();
         }
-        public IUser GetById(int id)
+        public List<User> FilterBy(UserQueryParameters filterParameters)
         {
-            IUser? user = context.Users
+            List<User> result = this.context.Users.ToList();
+
+            if (!string.IsNullOrEmpty(filterParameters.Username))
+            {
+                result = result.FindAll(user => user.Username.Contains(filterParameters.Username));
+            }
+            if (!string.IsNullOrEmpty(filterParameters.Email))
+            {
+                result = result.FindAll(user => user.Email.Contains(filterParameters.Email));
+            }
+            if (!string.IsNullOrEmpty(filterParameters.PhoneNumber))
+            {
+                result = result.FindAll(user => user.PhoneNumber.ToString().Contains(filterParameters.PhoneNumber));
+            }
+
+            if (!string.IsNullOrEmpty(filterParameters.SortBy))
+            {
+                if (filterParameters.SortBy.Equals("username", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    result = result.OrderBy(user => user.Username).ToList();
+                }
+                else if (filterParameters.SortBy.Equals("email", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    result = result.OrderBy(user => user.Email).ToList();
+                }
+                else if (filterParameters.SortBy.Equals("phoneNumber", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    result = result.OrderBy(user => user.PhoneNumber).ToList();
+                }
+
+                if (!string.IsNullOrEmpty(filterParameters.SortOrder) && filterParameters.SortOrder.Equals("desc", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    result.Reverse();
+                }
+            }
+
+            return result;
+        }
+        public User GetById(int id)
+        {
+            User? user = context.Users
                 .Where(users => users.Id == id)
                 .FirstOrDefault();
             return user ?? throw new EntityNotFoundException($"User with ID = {id} doesn't exist.");
         }
-        public IUser GetByUsername(string username)
+        public User GetByUsername(string username)
         {
-            IUser? user = context.Users
+            User? user = context.Users
                 .Where(users => users.Username == username)
                 .FirstOrDefault();
             return user ?? throw new EntityNotFoundException($"User with username '{username}' doesn't exist.");
         }
-        public IUser GetByEmail(string email)
+        public User GetByEmail(string email)
         {
-            IUser? user = context.Users
+            User? user = context.Users
                 .Where(users => users.Email == email)
                 .FirstOrDefault();
             return user ?? throw new EntityNotFoundException($"User with email '{email}' doesn't exist.");
         }
-        public IUser GetByPhoneNumber(int phoneNumber)
+        public User GetByPhoneNumber(int phoneNumber)
         {
-            IUser? user = context.Users
+            User? user = context.Users
                 .Where(users => users.PhoneNumber == phoneNumber)
                 .FirstOrDefault();
             return user ?? throw new EntityNotFoundException($"User with pnone number '{phoneNumber}' doesn't exist.");
@@ -49,15 +91,15 @@ namespace DataAccess.Repositories.Models
         //{
         //    return this.repository.FilterBy(filterParameters);
         //}
-        public IUser Create(IUser user)
+        public User Create(User user)
         {
             context.Users.Add(user);
             context.SaveChanges();
             return user;
         }
-        public IUser Update(int id, IUser user, IUser loggedUser)
+        public User Update(int id, User user, User loggedUser)
         {
-            IUser userToUpdate = this.GetById(id);
+            User userToUpdate = this.GetById(id);
 
             userToUpdate.FirstName = user.FirstName ?? userToUpdate.FirstName;
             userToUpdate.LastName = user.LastName ?? userToUpdate.LastName;
@@ -71,9 +113,9 @@ namespace DataAccess.Repositories.Models
             context.SaveChanges();
             return userToUpdate;
         }
-        public IUser Delete(int id)
+        public User Delete(int id)
         {
-            IUser userToDelete = this.GetById(id);
+            User userToDelete = this.GetById(id);
             //userToDelete = context.Users
             //    .Include(u => u.Cards)
             //    .FirstOrDefault(u => u.Id == id);
@@ -82,14 +124,14 @@ namespace DataAccess.Repositories.Models
             context.SaveChanges();
             return userToDelete;
         }
-        public void UpdatePhoneNumber(IUser user, IUser userToUpdate)
+        public void UpdatePhoneNumber(User user, User userToUpdate)
         {
             if (user?.PhoneNumber != null)
             {
                 userToUpdate.PhoneNumber = user.PhoneNumber;
             }
         }
-        public void UpdateAdminStatus(IUser user, IUser userToUpdate)
+        public void UpdateAdminStatus(User user, User userToUpdate)
         {
             if (!userToUpdate.IsAdmin)
             {
@@ -100,7 +142,7 @@ namespace DataAccess.Repositories.Models
                 userToUpdate.IsAdmin = true;
             }
         }
-        public IUser Promote(IUser user)
+        public User Promote(User user)
         {
             if (!user.IsAdmin)
             {
@@ -109,7 +151,7 @@ namespace DataAccess.Repositories.Models
             context.SaveChanges();
             return user;
         }
-        public IUser BlockUser(IUser user)
+        public User BlockUser(User user)
         {
             if (!user.IsBlocked)
             {
@@ -118,7 +160,7 @@ namespace DataAccess.Repositories.Models
             context.SaveChanges();
             return user;
         }
-        public IUser UnblockUser(IUser user)
+        public User UnblockUser(User user)
         {
             if (user.IsBlocked)
             {
