@@ -25,7 +25,7 @@ namespace DataAccess.Repositories.Data
         public DbSet<IUser> Users { get; set; }
         public DbSet<ICurrency> Currencies { get; set; }
         public DbSet<ITransaction> Transactions { get; set; }
-        public DbSet<ITransfer> Transfers { get; set; }
+        public DbSet<Transfer> Transfers { get; set; }
         public DbSet<ICard> Cards { get; set; }
 
         //Seed database
