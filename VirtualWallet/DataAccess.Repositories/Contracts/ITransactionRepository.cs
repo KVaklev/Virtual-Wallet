@@ -1,4 +1,12 @@
-﻿using DataAccess.Models.Models;
+﻿using Business.QueryParameters;
+using DataAccess.Models.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Transactions;
+using Transaction = DataAccess.Models.Models.Transaction;
 
 namespace DataAccess.Repositories.Contracts
 {
@@ -10,8 +18,11 @@ namespace DataAccess.Repositories.Contracts
 
         Transaction Update(int id, Transaction transaction);
 
-        Transaction Delete(int id);
+        bool Delete(int id);
 
-        List<Transaction> GetAll();
+        IQueryable<Transaction> GetAll();
+
+        PaginatedList<Transaction> FilterBy(TransactionQueryParameters filterParameters);
+
     }
 }
