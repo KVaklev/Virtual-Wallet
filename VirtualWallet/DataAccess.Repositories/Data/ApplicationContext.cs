@@ -125,6 +125,7 @@ namespace DataAccess.Repositories.Data
                      IsBlocked = false
                 },
             };
+
             modelBuilder.Entity<User>().HasData(users);
             modelBuilder.Entity<User>()
                 .HasMany(u => u.TransactionsSender)
@@ -138,19 +139,34 @@ namespace DataAccess.Repositories.Data
                 .HasForeignKey(t => t.RecipientId)
                 .OnDelete(DeleteBehavior.NoAction);
 
+            modelBuilder.Entity<User>()
+                .HasOne(u => u.Account)
+                .WithOne(a => a.User)
+                .HasForeignKey<Account>(a => a.UserId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            //Seed accounts
+
             List<Account> accounts = new List<Account>()
             {
             };
+
             modelBuilder.Entity<Account>().HasData(accounts);
+
+            //Seed currencies
 
             List<Currency> currencies = new List<Currency>()
             {
             };
+
             modelBuilder.Entity<Currency>().HasData(currencies);
+
+            //Seed transactions
 
             List<Transaction> transactions = new List<Transaction>()
             {
             };
+
             modelBuilder.Entity<Transaction>().HasData(transactions);
 
             modelBuilder.Entity<Transaction>()
@@ -165,9 +181,12 @@ namespace DataAccess.Repositories.Data
                 .HasForeignKey(c => c.RecipientId)
                 .OnDelete(DeleteBehavior.NoAction);
 
+            //Seed transfers
+
             List<Transfer> transfers = new List<Transfer>()
             {
             };
+
             modelBuilder.Entity<Transfer>().HasData(transfers);
 
             modelBuilder.Entity<Transfer>()
@@ -176,16 +195,20 @@ namespace DataAccess.Repositories.Data
                 .HasForeignKey(u=>u.UserId)
                 .OnDelete(DeleteBehavior.NoAction);
                     
-
+            //Seed cards
 
             List<Card> cards = new List<Card>()
             {
             };
+
             modelBuilder.Entity<Card>().HasData(cards);
+
+            //Seed history
 
             List<History> history = new List<History>()
             {
             };
+
             modelBuilder.Entity<History>().HasData(history);
 
             modelBuilder.Entity<History>()

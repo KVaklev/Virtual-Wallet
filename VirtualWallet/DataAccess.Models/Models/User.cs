@@ -45,5 +45,7 @@ namespace DataAccess.Models.Models
 
         public List<Transfer> Transfers { get; set; } = new List<Transfer>();
         public List<Card> Cards { get; set; } = new List<Card>();
+        public Account? Account { get; set; }
+        public int? AccountId { get; set; }
     }
 }
