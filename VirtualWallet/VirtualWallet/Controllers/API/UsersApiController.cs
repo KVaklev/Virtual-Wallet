@@ -91,33 +91,35 @@ namespace VirtualWallet.Controllers.API
             }
         }
 
-        [HttpDelete("{id}")]
-        public IActionResult DeleteUser(int id, [FromHeader] string credentials)
+        [HttpDelete("{id}"), Authorize]
+        public IActionResult DeleteUser(int id)
         {
             try
             {
-                User user = authManager.TryGetUser(credentials);
+                var loggedUsersUsername = User.Claims.FirstOrDefault(claim => claim.Type == "Username").Value;
+                var loggedUser = authManager.TryGetUserByUsername(loggedUsersUsername);
 
-                userService.Delete(id, user);
+                userService.Delete(id, loggedUser);
 
                 return StatusCode(StatusCodes.Status200OK);
-            }
-            catch (UnauthorizedOperationException e)
-            {
-                return StatusCode(StatusCodes.Status401Unauthorized, e.Message);
             }
             catch (EntityNotFoundException e)
             {
                 return StatusCode(StatusCodes.Status404NotFound, e.Message);
             }
+            catch (UnauthorizedOperationException e)
+            {
+                return StatusCode(StatusCodes.Status401Unauthorized, e.Message);
+            }
         }
 
-        [HttpPut("{id}/promote")]
-        public IActionResult Promote(int id, [FromHeader] string credentials)
+        [HttpPut("{id}/promote"), Authorize]//Not corrected
+        public IActionResult Promote(int id)
         {
             try
             {
-                User loggedUser = authManager.TryGetUser(credentials);
+                var loggedUsersUsername = User.Claims.FirstOrDefault(claim => claim.Type == "Username").Value;
+                var loggedUser = authManager.TryGetUserByUsername(loggedUsersUsername);
 
                 if (loggedUser.IsAdmin)
                 {
@@ -139,7 +141,7 @@ namespace VirtualWallet.Controllers.API
             }
         }
 
-        [HttpPut("{id}/block")]
+        [HttpPut("{id}/block")]//Not corrected
         public IActionResult BlockUser(int id, [FromHeader] string credentials)
         {
             try
@@ -166,7 +168,7 @@ namespace VirtualWallet.Controllers.API
             }
         }
 
-        [HttpPut("{id}/unblock")]
+        [HttpPut("{id}/unblock")]//Not corrected
         public IActionResult UnblockUser(int id, [FromHeader] string credentials)
         {
             try

@@ -11,7 +11,7 @@ namespace DataAccess.Repositories.Contracts
         User GetById(int id);
         User GetByUsername(string username);
         User GetByEmail(string email);
-        User GetByPhoneNumber(int phoneNumber);
+        User GetByPhoneNumber(string phoneNumber);
         User Create(User user);
         User Update(int id, User user, User loggedUser);
         User Delete(int id);
@@ -22,6 +22,6 @@ namespace DataAccess.Repositories.Contracts
         void UpdatePhoneNumber(User user, User userToUpdate);
         bool UsernameExists(string username);
         bool EmailExists(string email);
-        bool PhoneNumberExists(int phoneNumber);
+        bool PhoneNumberExists(string phoneNumber);
     }
 }

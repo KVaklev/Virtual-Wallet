@@ -41,6 +41,7 @@ namespace DataAccess.Repositories.Data
                      Email = "i.draganov@gmail.com",
                      Username = "ivanchoDraganchov",
                      Password = "MTIz",
+                     PhoneNumber = "1234567890",
                      IsAdmin = true,
                      IsBlocked = false
                 },
@@ -53,6 +54,7 @@ namespace DataAccess.Repositories.Data
                      Email = "m.petrova@gmail.com",
                      Username = "mariicheto",
                      Password = "MTIz",
+                     PhoneNumber = "1134567890",
                      IsAdmin = false,
                      IsBlocked = false
                 },
@@ -65,6 +67,7 @@ namespace DataAccess.Repositories.Data
                      Email = "m.dobreva@gmail.com",
                      Username = "marcheto",
                      Password = "MTIz",
+                     PhoneNumber = "1214567890",
                      IsAdmin = false,
                      IsBlocked = true
                 },
@@ -77,6 +80,7 @@ namespace DataAccess.Repositories.Data
                      Email = "a.sokolov@gmail.com",
                      Username = "sokolov",
                      Password = "MTIz",
+                     PhoneNumber = "1234167890",
                      IsAdmin = true,
                      IsBlocked = false
                 },
@@ -88,6 +92,7 @@ namespace DataAccess.Repositories.Data
                      Email = "marg89@gmail.com",
                      Username = "margIvanova",
                      Password = "MTIz",
+                     PhoneNumber = "1234561890",
                      IsAdmin = false,
                      IsBlocked = false
                 },
@@ -99,6 +104,7 @@ namespace DataAccess.Repositories.Data
                      Email = "dim@gmail.com",
                      Username = "dimitarDimitrov",
                      Password = "MTIz",
+                     PhoneNumber = "1234567810",
                      IsAdmin = false,
                      IsBlocked = false
                 },
@@ -110,6 +116,7 @@ namespace DataAccess.Repositories.Data
                      Email = "Apostolche@gmail.com",
                      Username = "IApostolov99",
                      Password = "MTIz",
+                     PhoneNumber = "2234567890",
                      IsAdmin = true,
                      IsBlocked = false
                 },
@@ -121,6 +128,7 @@ namespace DataAccess.Repositories.Data
                      Email = "AtansovGerey@gmail.com",
                      Username = "DreamerTillX",
                      Password = "MTIz",
+                     PhoneNumber = "1234527890",
                      IsAdmin = false,
                      IsBlocked = false
                 },

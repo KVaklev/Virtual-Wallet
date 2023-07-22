@@ -15,7 +15,8 @@ namespace Business.Dto
         public string Email { get; set; }
 
         [Required]
-        [Range(10, 10, ErrorMessage = "Phone number must be exactly {0} digits long.")]
+        [PhoneNumber(ErrorMessage = "The phone number must contain only digits.")]
+        [StringLength(10, ErrorMessage = "The {0} must be {1} characters long.")]
         public string PhoneNumber { get; set; }
 
         [Required]

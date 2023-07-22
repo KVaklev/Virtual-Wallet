@@ -12,7 +12,7 @@ namespace Business.Services.Contracts
         User GetById(int id);
         User GetByUsername(string username);
         User GetByEmail(string email);
-        User GetByPhoneNumber(int phoneNumber);
+        User GetByPhoneNumber(string phoneNumber);
         User Create(User user);
         User Update(int id, User user, User loggedUser);
         void Delete(int id, User loggedUser);
@@ -21,7 +21,7 @@ namespace Business.Services.Contracts
         User UnblockUser(User user); 
         bool UsernameExists(string username);
         bool EmailExists(string email);
-        bool PhoneNumberExists(int phoneNumber);
+        bool PhoneNumberExists(string phoneNumber);
         bool IsAuthorized(User user, User loggedUser);
     }
 }

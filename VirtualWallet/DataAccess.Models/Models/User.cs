@@ -11,11 +11,11 @@ namespace DataAccess.Models.Models
 
         [MinLength(2, ErrorMessage = "The {0} must be at least {1} characters long.")]
         [MaxLength(32, ErrorMessage = "The {0} must be no more than {1} characters long.")]
-        public string FirstName { get; set; }
+        public string? FirstName { get; set; }
 
         [MinLength(2, ErrorMessage = "The {0} must be at least {1} characters long.")]
         [MaxLength(32, ErrorMessage = "The {0} must be no more than {1} characters long.")]
-        public string LastName { get; set; }
+        public string? LastName { get; set; }
         
         [MinLength(2, ErrorMessage = "The {0} must be at least {1} characters long.")]
         [MaxLength(20, ErrorMessage = "The {0} must be no more than {1} characters long.")]
@@ -27,8 +27,9 @@ namespace DataAccess.Models.Models
         [Password]
         public string Password { get; set; }
 
-        [Range(10, 10, ErrorMessage = "Phone number must be exactly {0} digits long.")]
-        public int PhoneNumber { get; set; }
+        [PhoneNumber(ErrorMessage = "The phone number must contain only digits.")]
+        [StringLength(10, ErrorMessage = "The {0} must be {1} characters long.")]
+        public string PhoneNumber { get; set; }
 
         public bool IsBlocked { get; set; }
         public bool IsAdmin { get; set; }

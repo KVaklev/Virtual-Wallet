@@ -80,7 +80,7 @@ namespace DataAccess.Repositories.Models
                 .FirstOrDefault();
             return user ?? throw new EntityNotFoundException($"User with email '{email}' doesn't exist.");
         }
-        public User GetByPhoneNumber(int phoneNumber)
+        public User GetByPhoneNumber(string phoneNumber)
         {
             User? user = context.Users
                 .Where(users => users.PhoneNumber == phoneNumber)
@@ -177,7 +177,7 @@ namespace DataAccess.Repositories.Models
         {
             return context.Users.Any(u => u.Username == username);
         }
-        public bool PhoneNumberExists(int phoneNumber)
+        public bool PhoneNumberExists(string phoneNumber)
         {
             return context.Users.Any(u => u.PhoneNumber == phoneNumber);
         }

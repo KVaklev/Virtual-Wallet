@@ -36,7 +36,7 @@ namespace Business.Services.Models
         {
             return this.repository.GetByEmail(email);
         }
-        public User GetByPhoneNumber(int pnoneNumber)
+        public User GetByPhoneNumber(string pnoneNumber)
         {
             return this.repository.GetByPhoneNumber(pnoneNumber);
         }
@@ -97,9 +97,7 @@ namespace Business.Services.Models
         }
         public void Delete(int id, User loggedUser)
         {
-            User user = repository.GetById(id);
-
-            if (!IsAuthorized(user, loggedUser))
+            if (!loggedUser.IsAdmin) 
             {
                 throw new UnauthorizedOperationException(Constants.ModifyUserErrorMessage);
             }
@@ -125,7 +123,7 @@ namespace Business.Services.Models
         {
             return this.repository.UsernameExists(username);
         }
-        public bool PhoneNumberExists(int phoneNumber)
+        public bool PhoneNumberExists(string phoneNumber)
         {
             return this.repository.PhoneNumberExists(phoneNumber);
         }
