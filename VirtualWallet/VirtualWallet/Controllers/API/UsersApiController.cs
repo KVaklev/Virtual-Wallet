@@ -7,6 +7,7 @@ using DataAccess.Models.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Presentation.Helpers;
+using System.Security.Claims;
 
 namespace VirtualWallet.Controllers.API
 {
@@ -36,26 +37,15 @@ namespace VirtualWallet.Controllers.API
             return StatusCode(StatusCodes.Status200OK, userDtos);
         }
 
-        [HttpGet("id")]
-        public IActionResult GetUserById([FromHeader] string credentials, int id)
+        [HttpGet("id"),Authorize]
+        public IActionResult GetUserById(int id)
         {
             try
             {
-                User loggedUser = authManager.TryGetUser(credentials);
-
-                if (loggedUser == null || !loggedUser.IsAdmin)
-                {
-                    return StatusCode(StatusCodes.Status401Unauthorized);
-                }
                 User user = userService.GetById(id);
-
                 GetUserDto userDto = mapper.Map<GetUserDto>(user);
 
                 return StatusCode(StatusCodes.Status200OK, userDto);
-            }
-            catch (UnauthorizedOperationException e)
-            {
-                return StatusCode(StatusCodes.Status401Unauthorized, e.Message);
             }
             catch (EntityNotFoundException ex)
             {
@@ -69,7 +59,6 @@ namespace VirtualWallet.Controllers.API
             try
             {
                 User user = mapper.Map<User>(createUserDto);
-
                 User createdUser = userService.Create(user);
 
                 return StatusCode(StatusCodes.Status201Created, createdUser);
@@ -80,15 +69,14 @@ namespace VirtualWallet.Controllers.API
             }
         }
 
-        [HttpPut("{id}")]
-        public IActionResult UpdateUser(int id, [FromHeader] string credentials, [FromBody] UpdateUserDto updateUserDto)
+        [HttpPut("{id}"), Authorize]
+        public IActionResult UpdateUser(int id, [FromBody] UpdateUserDto updateUserDto)
         {
             try
             {
-                User loggedUser = authManager.TryGetUser(credentials);
-
+                var loggedUsersUsername = User.Claims.FirstOrDefault(claim => claim.Type == "Username").Value;
+                var loggedUser = authManager.TryGetUserByUsername(loggedUsersUsername);
                 User user = mapper.Map<User>(updateUserDto);
-
                 User updatedUser = userService.Update(id, user, loggedUser);
 
                 return StatusCode(StatusCodes.Status200OK, updatedUser);
@@ -96,14 +84,6 @@ namespace VirtualWallet.Controllers.API
             catch (UnauthorizedOperationException e)
             {
                 return StatusCode(StatusCodes.Status401Unauthorized, e.Message);
-            }
-            catch (InvalidOperationException e)
-            {
-                return StatusCode(StatusCodes.Status400BadRequest, e.Message);
-            }
-            catch (EntityNotFoundException e)
-            {
-                return StatusCode(StatusCodes.Status404NotFound, e.Message);
             }
             catch (DuplicateEntityException e)
             {

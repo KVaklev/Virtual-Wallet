@@ -1,4 +1,7 @@
-﻿using Business.Exceptions;
+﻿using AutoMapper;
+using Business.Dto;
+using Business.Exceptions;
+using Business.Services.Contracts;
 using DataAccess.Models.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -15,10 +18,14 @@ namespace VirtualWallet.Controllers.API
     public class AuthApiController : Controller
     {
         private readonly IAuthManager authManager;
+        private readonly IMapper mapper;
+        private readonly IUserService userService;
 
-        public AuthApiController(IAuthManager authManager)
+        public AuthApiController(IAuthManager authManager, IMapper mapper, IUserService userService)
         {
             this.authManager = authManager;
+            this.mapper = mapper;
+            this.userService = userService;
         }
 
         [AllowAnonymous]
@@ -45,6 +52,21 @@ namespace VirtualWallet.Controllers.API
             catch
             {
                 return BadRequest("An error occurred in generating the token");
+            }
+        }
+        [AllowAnonymous]
+        [HttpPost]
+        public IActionResult Register([FromBody] CreateUserDto createUserDto)
+        {
+            try
+            {
+                var user = this.mapper.Map<User>(createUserDto);
+                var createdUser = this.userService.Create(user);
+                return StatusCode(StatusCodes.Status201Created, createdUser);
+            }
+            catch (DuplicateEntityException ex)
+            {
+                return StatusCode(StatusCodes.Status409Conflict, ex.Message);
             }
         }
 
