@@ -14,7 +14,7 @@ using System.Text;
 namespace VirtualWallet.Controllers.API
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/auth")]
     public class AuthApiController : Controller
     {
         private readonly IAuthManager authManager;
@@ -29,7 +29,7 @@ namespace VirtualWallet.Controllers.API
         }
 
         [AllowAnonymous]
-        [HttpPost]
+        [HttpPost("login")]
         public IActionResult Login(string username, string password)
         {
             try
@@ -42,6 +42,7 @@ namespace VirtualWallet.Controllers.API
                 }
 
                 string token = CreateApiToken(loggedUser);
+
                 return Ok("Logged in successfully. Token: " + token);
 
             }
@@ -54,8 +55,9 @@ namespace VirtualWallet.Controllers.API
                 return BadRequest("An error occurred in generating the token");
             }
         }
+
         [AllowAnonymous]
-        [HttpPost]
+        [HttpPost("register")]
         public IActionResult Register([FromBody] CreateUserDto createUserDto)
         {
             try

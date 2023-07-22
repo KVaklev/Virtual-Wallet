@@ -11,7 +11,7 @@ using System.Security.Claims;
 
 namespace VirtualWallet.Controllers.API
 {
-    [Authorize]
+
     [ApiController]
     [Route("api/users")]
     public class UsersApiController : Controller
