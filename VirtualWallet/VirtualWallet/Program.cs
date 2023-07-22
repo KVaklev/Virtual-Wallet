@@ -1,5 +1,14 @@
+using Business.Services.Contracts;
+using Business.Services.Models;
+using DataAccess.Repositories.Contracts;
 using DataAccess.Repositories.Data;
+using DataAccess.Repositories.Models;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+using Presentation.Helpers;
+using System.Text;
 using VirtualWallet.Models;
 
 namespace VirtualWallet
@@ -16,13 +25,47 @@ namespace VirtualWallet
                 options.EnableSensitiveDataLogging();
             });
 
-            // Add services to the container.
+
             builder.Services.AddRazorPages();
-            builder.Services.AddSwaggerGen();
             builder.Services.AddControllers();
-           
             builder.Services.AddAutoMapper(typeof(CustomAutoMapper).Assembly);
+            builder.Services.AddAuthorization();
+
+            //Repositories
+            builder.Services.AddScoped<IUserRepository, UserRepository>();
+
+            //Services
+            builder.Services.AddScoped<IUserService, UserService>();
+
+            //Helpers
+            builder.Services.AddScoped<CustomAutoMapper>();
+            builder.Services.AddScoped<IAuthManager, AuthManager>();
+            builder.Services.AddScoped<AuthManager>();
             builder.Services.AddSwaggerGen();
+           
+
+            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+             .AddJwtBearer(options =>
+             {
+                 options.TokenValidationParameters = new TokenValidationParameters
+                 {
+                     ValidateIssuer = true,
+                     ValidateAudience = true,
+                     ValidateLifetime = true,
+                     ValidateIssuerSigningKey = true,
+                     ValidIssuer = builder.Configuration["Jwt:Issuer"],
+                     ValidAudience = builder.Configuration["Jwt:Audience"],
+                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+                 };
+                 options.Events = new JwtBearerEvents
+                 {
+                     OnMessageReceived = context => {
+                         context.Token = context.Request.Cookies["Cookie_JWT"];
+                         return Task.CompletedTask;
+                     }
+                 };
+             });
+
             var app = builder.Build();
 
 
@@ -35,6 +78,14 @@ namespace VirtualWallet
 
             app.UseDeveloperExceptionPage();
             app.UseRouting();
+
+            app.UseAuthentication();
+            app.UseAuthorization();
+
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapDefaultControllerRoute().RequireAuthorization();
+            });
           //  app.UseSession();
 
             if (app.Environment.IsDevelopment())
@@ -44,11 +95,10 @@ namespace VirtualWallet
             }
 
             app.UseStaticFiles();
-            app.UseAuthorization();
+           
             app.MapDefaultControllerRoute();
             app.MapRazorPages();
             app.Run();
-
         }
     }
 }

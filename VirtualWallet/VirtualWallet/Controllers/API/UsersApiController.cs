@@ -4,11 +4,13 @@ using Business.Exceptions;
 using Business.QueryParameters;
 using Business.Services.Contracts;
 using DataAccess.Models.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Presentation.Helpers;
 
 namespace VirtualWallet.Controllers.API
 {
+    [Authorize]
     [ApiController]
     [Route("api/users")]
     public class UsersApiController : Controller
@@ -23,21 +25,15 @@ namespace VirtualWallet.Controllers.API
             this.mapper = mapper;
             this.authManager = authManager;
         }
-        [HttpGet("")]
-        public IActionResult GetUsers([FromHeader] string credentials, [FromQuery] UserQueryParameters userQueryParameters)
+        [HttpGet(""),Authorize]
+        public IActionResult GetUsers([FromQuery] UserQueryParameters userQueryParameters)
         {
-            User loggedUser = authManager.TryGetUser(credentials);
+            List<User> result = userService.FilterBy(userQueryParameters);
+            List<GetUserDto> userDtos = result
+                .Select(user => mapper.Map<GetUserDto>(user))
+                .ToList();
 
-            if (loggedUser == null || !loggedUser.IsAdmin)
-            {
-                return StatusCode(StatusCodes.Status401Unauthorized);
-            }
-
-            //List<User> result = userService.FilterBy(userQueryParameters);
-
-            // List<GetUserDto> userDtos = result.Select(user => mapper.Map<GetUserDto>(user)).ToList();
-
-            return StatusCode(StatusCodes.Status200OK);//, userDtos);
+            return StatusCode(StatusCodes.Status200OK, userDtos);
         }
 
         [HttpGet("id")]

@@ -10,7 +10,7 @@ namespace DataAccess.Models.Models
         public DateTime Date { get; set; }
 
         [Range(1, double.MaxValue)]
-        public int UserId { get; set; }
+        public int? UserId { get; set; }
         public User User { get; set; }
 
         [Range(1, double.MaxValue)]

@@ -33,8 +33,8 @@ namespace DataAccess.Models.Models
         public bool IsBlocked { get; set; }
         public bool IsAdmin { get; set; }
 
-        public string ProfilePhotoPath { get; set; }
-        public string ProfilePhotoFileName { get; set; }
+        public string? ProfilePhotoPath { get; set; }
+        public string? ProfilePhotoFileName { get; set; }
 
         [NotMapped]
         [DisplayName("Upload File")]
