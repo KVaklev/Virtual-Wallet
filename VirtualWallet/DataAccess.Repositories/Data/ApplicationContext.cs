@@ -21,6 +21,8 @@ namespace DataAccess.Repositories.Data
         public DbSet<Transaction> Transactions { get; set; }
         public DbSet<Transfer> Transfers { get; set; }
         public DbSet<Card> Cards { get; set; }
+        public DbSet<Account> Accounts { get; set; }
+        public DbSet<History> History { get; set; }
 
         //Seed database
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -136,6 +138,11 @@ namespace DataAccess.Repositories.Data
                 .HasForeignKey(t => t.RecipientId)
                 .OnDelete(DeleteBehavior.NoAction);
 
+            List<Account> accounts = new List<Account>()
+            {
+            };
+            modelBuilder.Entity<Account>().HasData(accounts);
+
             List<Currency> currencies = new List<Currency>()
             {
             };
@@ -145,6 +152,7 @@ namespace DataAccess.Repositories.Data
             {
             };
             modelBuilder.Entity<Transaction>().HasData(transactions);
+
             modelBuilder.Entity<Transaction>()
             .HasOne(c => c.Sender)
             .WithMany(u => u.TransactionsSender)
@@ -168,6 +176,11 @@ namespace DataAccess.Repositories.Data
             {
             };
             modelBuilder.Entity<Card>().HasData(cards);
+
+            List<History> history = new List<History>()
+            {
+            };
+            modelBuilder.Entity<History>().HasData(history);
         }
     }
 }

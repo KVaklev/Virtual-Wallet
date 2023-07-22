@@ -22,6 +22,7 @@
     <ProjectReference Include="..\Business.Dto\Business.Dto.csproj" />
     <ProjectReference Include="..\Business.Mapper\Business.Mapper.csproj" />
     <ProjectReference Include="..\Business.QueryParameters\Business.QueryParameters.csproj" />
+    <ProjectReference Include="..\DataAccess.Models\DataAccess.Models.csproj" />
     <ProjectReference Include="..\DataAccess.Repositories\DataAccess.Repositories.csproj" />
   </ItemGroup>
 

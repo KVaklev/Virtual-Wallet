@@ -23,6 +23,8 @@ namespace DataAccess.Models.Models
         [Range(0, double.MaxValue)]
         public double WithdrawalAmount { get; set; }
 
+        [Range(1, double.MaxValue)]
+        public int CardId { get; set; }
         public Card Card { get; set; }
 
         public bool IsTransferred { get; set; }
