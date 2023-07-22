@@ -25,6 +25,8 @@ namespace DataAccess.Repositories.Contracts
 
         Account WithdrawalFromBalance(Account account, int amount);
 
+        Account CheckBalance(Account account, int amount);
+
 
     }
 }

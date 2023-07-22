@@ -28,5 +28,7 @@ namespace DataAccess.Models.Models
         public Card Card { get; set; }
 
         public bool IsTransferred { get; set; }
+
+        public List<History>? TransferHistories { get; set; } = new List<History>();
     }
 }

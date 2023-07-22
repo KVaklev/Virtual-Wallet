@@ -169,7 +169,13 @@ namespace DataAccess.Repositories.Data
             {
             };
             modelBuilder.Entity<Transfer>().HasData(transfers);
-           
+
+            modelBuilder.Entity<Transfer>()
+                .HasOne(u=>u.User)
+                .WithMany(t=>t.Transfers)
+                .HasForeignKey(u=>u.UserId)
+                .OnDelete(DeleteBehavior.NoAction);
+                    
 
 
             List<Card> cards = new List<Card>()
@@ -181,6 +187,18 @@ namespace DataAccess.Repositories.Data
             {
             };
             modelBuilder.Entity<History>().HasData(history);
+
+            modelBuilder.Entity<History>()
+                .HasOne(c => c.Transfer)
+                .WithMany(u => u.TransferHistories)
+                .HasForeignKey(c => c.TransferId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<History>()
+                .HasOne(c => c.Transaction)
+                .WithMany(u => u.TransactionHistories)
+                .HasForeignKey(c => c.TransactionId)
+                .OnDelete(DeleteBehavior.NoAction);
         }
     }
 }

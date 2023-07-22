@@ -1,4 +1,6 @@
-﻿namespace DataAccess.Models.Models
+﻿using System.Security.Principal;
+
+namespace DataAccess.Models.Models
 {
     public class Account
     {
@@ -10,6 +12,9 @@
         public decimal DailyLimit { get; set; }
         public int CurrencyId { get; set; }
         public Currency Currency { get; set; }
-        public string InvitationCode { get; set; }
+        public int CardId { get; set; }
+        public Card Card { get; set; }
+
+        //public string InvitationCode { get; set; }
     }
 }
