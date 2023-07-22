@@ -21,6 +21,7 @@ namespace DataAccess.Repositories.Data
         public DbSet<Transaction> Transactions { get; set; }
         public DbSet<Transfer> Transfers { get; set; }
         public DbSet<Card> Cards { get; set; }
+        public DbSet<History> History { get; set; }
 
         //Seed database
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -43,17 +44,18 @@ namespace DataAccess.Repositories.Data
             {
             };
             modelBuilder.Entity<Transaction>().HasData(transactions);
-            //modelBuilder.Entity<Transaction>()
-            //.HasOne(c => c.Sender)
-            //.WithMany(u => u.TransactionsSender)
-            //.HasForeignKey(c => c.SenderId)
-            //.OnDelete(DeleteBehavior.NoAction);
 
-            //modelBuilder.Entity<Transaction>()
-            //    .HasOne(c => c.Recipient)
-            //    .WithMany(u => u.TransactionsRecipiend)
-            //    .HasForeignKey(c => c.RecipientId)
-            //    .OnDelete(DeleteBehavior.NoAction);
+            modelBuilder.Entity<Transaction>()
+            .HasOne(c => c.Sender)
+            .WithMany(u => u.TransactionsSender)
+            .HasForeignKey(c => c.SenderId)
+            .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<Transaction>()
+                .HasOne(c => c.Recipient)
+                .WithMany(u => u.TransactionsRecipient)
+                .HasForeignKey(c => c.RecipientId)
+                .OnDelete(DeleteBehavior.NoAction);
 
             List<Transfer> transfers = new List<Transfer>()
             {
@@ -64,6 +66,11 @@ namespace DataAccess.Repositories.Data
             {
             };
             modelBuilder.Entity<Card>().HasData(cards);
+
+            List<History> history = new List<History>()
+            {
+            };
+            modelBuilder.Entity<History>().HasData(history);
         }
     }
 }

@@ -7,10 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Contracts\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.20">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -21,6 +17,7 @@
     <ProjectReference Include="..\Business.Dto\Business.Dto.csproj" />
     <ProjectReference Include="..\Business.Mapper\Business.Mapper.csproj" />
     <ProjectReference Include="..\Business.QueryParameters\Business.QueryParameters.csproj" />
+    <ProjectReference Include="..\DataAccess.Models\DataAccess.Models.csproj" />
     <ProjectReference Include="..\DataAccess.Repositories\DataAccess.Repositories.csproj" />
   </ItemGroup>
 
