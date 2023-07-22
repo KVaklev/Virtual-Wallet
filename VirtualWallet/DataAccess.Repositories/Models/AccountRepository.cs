@@ -72,7 +72,7 @@ namespace DataAccess.Repositories.Models
         public Account GetByUserId(int id)
         {
             Account account = context.Accounts
-                .Where(a=> a.UserId == id) 
+                .Where(a => a.UserId == id)
                 .FirstOrDefault();
 
             return account ?? throw new EntityNotFoundException($"Account with UserID = {id} does not exist.");
@@ -86,7 +86,7 @@ namespace DataAccess.Repositories.Models
 
             return accountToDepositTo;
         }
-            
+
 
         public Account WithdrawalFromBalance(Account account, int amount)
         {
@@ -96,5 +96,18 @@ namespace DataAccess.Repositories.Models
 
             return accountToWithdrawFrom;
         }
+
+        public bool CheckBalance(Account account, int amount)
+        {
+            Account accountToCheck = this.GetById(account.Id);
+
+            if (accountToCheck.Balance < amount)
+            {
+                return false;
+            }
+            return true;
+        }
+
+        
     }
 }

@@ -42,6 +42,8 @@ namespace DataAccess.Models.Models
 
         public List<Transaction> TransactionsSender { get; set; } = new List<Transaction>();
         public List<Transaction> TransactionsRecipient { get; set; } = new List<Transaction>();
+
+        public List<Transfer> Transfers { get; set; } = new List<Transfer>();
         public List<Card> Cards { get; set; } = new List<Card>();
     }
 }

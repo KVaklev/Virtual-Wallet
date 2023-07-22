@@ -39,5 +39,7 @@ namespace DataAccess.Models.Models
         public bool IsExecuted { get; set; }
 
         public bool IsDeleted { get; set; }
+
+        public List<History>? TransactionHistories { get; set; } = new List<History>();
     }
 }
