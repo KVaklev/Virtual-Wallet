@@ -2,7 +2,7 @@
 
 namespace DataAccess.Models.Models
 {
-    public class PhoneNumberAttribute : ValidationAttribute
+    public class CardCheckNumberAttribute : ValidationAttribute
     {
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
@@ -11,19 +11,15 @@ namespace DataAccess.Models.Models
                 return ValidationResult.Success;
             }
 
-            string phoneNumber = value.ToString();
-
-            if (string.IsNullOrEmpty(phoneNumber))
+            if (value is string checkNumber)
             {
-                return new ValidationResult("The phone number must not be empty.");
+                if (IsDigitsOnly(checkNumber))
+                {
+                    return ValidationResult.Success;
+                }
             }
 
-            if (!IsDigitsOnly(phoneNumber))
-            {
-                return new ValidationResult("The phone number must contain only digits.");
-            }
-
-            return ValidationResult.Success;
+            return new ValidationResult(ErrorMessage);
         }
 
         private bool IsDigitsOnly(string value)
@@ -35,6 +31,7 @@ namespace DataAccess.Models.Models
                     return false;
                 }
             }
+
             return true;
         }
     }
