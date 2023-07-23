@@ -15,7 +15,7 @@ namespace DataAccess.Models.Models
         public int CurrencyId { get; set; }
         public Currency Currency { get; set; }
         public int CardId { get; set; }
-        public List<Card> Cards { get; set; }
+        public List<Card> Cards { get; set; } = new List<Card>();
 
         //public string InvitationCode { get; set; }
     }

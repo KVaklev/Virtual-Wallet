@@ -202,7 +202,13 @@ namespace DataAccess.Repositories.Data
                 .WithMany(t=>t.Transfers)
                 .HasForeignKey(u=>u.UserId)
                 .OnDelete(DeleteBehavior.NoAction);
-                    
+
+            modelBuilder.Entity<Transfer>()
+                .HasOne(t => t.Currency)
+                .WithMany()
+                .HasForeignKey(t => t.CurrencyId)
+                .OnDelete(DeleteBehavior.NoAction);
+
             //Seed cards
 
             List<Card> cards = new List<Card>()

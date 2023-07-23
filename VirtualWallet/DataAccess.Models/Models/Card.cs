@@ -27,7 +27,7 @@ namespace DataAccess.Models.Models
         public CardType CardType { get; set; }
         public int UserId { get; set; }
 
-        //public int AccountId { get; set; }
+        public int AccountId { get; set; }
        // public decimal Amount { get; set; }
     }
 }
