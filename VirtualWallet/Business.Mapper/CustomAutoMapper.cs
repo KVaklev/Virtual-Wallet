@@ -23,6 +23,22 @@ namespace VirtualWallet.Models
             CreateMap<User, CreateUserDto>();
             CreateMap<User, UpdateUserDto>();
             CreateMap<UpdateUserDto, User>();
+
+            //Transfers
+            //DTO
+
+            CreateMap<TransferDepositDto, Transfer>();
+            CreateMap<Transfer, TransferDepositDto>();
+            CreateMap<TransferWithdrawalDto, Transfer>();
+            CreateMap<Transfer, TransferWithdrawalDto>();
+
+            //Accounts
+            //DTO
+
+            CreateMap<AccountDto, Account>();
+            CreateMap<Account, AccountDto>();
+
+
         }
     }
 }
