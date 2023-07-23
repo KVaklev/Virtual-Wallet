@@ -10,6 +10,7 @@ namespace DataAccess.Models.Models
         public User User { get; set; }
         public decimal Balance { get; set; }
         public decimal DailyLimit { get; set; }
+        public string AccountNumber { get; set; }
         public int CurrencyId { get; set; }
         public Currency Currency { get; set; }
         public int CardId { get; set; }

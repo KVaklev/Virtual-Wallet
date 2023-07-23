@@ -6,10 +6,9 @@ using System.Threading.Tasks;
 
 namespace Business.QueryParameters
 {
-    public class TransferQueryParameters
+    public class AccountQueryParameters
     {
         public string? Username { get; set; }
-        public string? AccountNumber { get; set; }
         public DateTime? FromDate { get; set; }
         public DateTime? ToDate { get; set; }
         public string? SortBy { get; set; }
