@@ -97,23 +97,23 @@ namespace Business.Services.Models
         }
         public void Delete(int id, User loggedUser)
         {
-            if (!loggedUser.IsAdmin) 
-            {
-                throw new UnauthorizedOperationException(Constants.ModifyUserErrorMessage);
-            }
+            EnsureAdminAuthorization(loggedUser);
             this.repository.Delete(id);
         }
-        public User Promote(User user)
+        public User Promote(int id, User loggedUser)
         {
-            return this.repository.Promote(user);
+            EnsureAdminAuthorization(loggedUser);
+            return this.repository.Promote(id);
         }
-        public User BlockUser(User user)
+        public User BlockUser(int id, User loggedUser)
         {
-            return this.repository.BlockUser(user);
+            EnsureAdminAuthorization(loggedUser);
+            return this.repository.BlockUser(id);
         }
-        public User UnblockUser(User user)
+        public User UnblockUser(int id, User loggedUser)
         {
-            return this.repository.UnblockUser(user);
+            EnsureAdminAuthorization(loggedUser);
+            return this.repository.UnblockUser(id);
         }
         public bool EmailExists(string email)
         {
@@ -136,6 +136,13 @@ namespace Business.Services.Models
                 isAuthorized = true;
             }
             return isAuthorized;
+        }
+        public void EnsureAdminAuthorization(User loggedUser)
+        {
+            if (!loggedUser.IsAdmin)
+            {
+                throw new UnauthorizedOperationException(Constants.ModifyUserErrorMessage);
+            }
         }
     }
 }

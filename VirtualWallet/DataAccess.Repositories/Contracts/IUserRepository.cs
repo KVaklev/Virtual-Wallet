@@ -15,9 +15,9 @@ namespace DataAccess.Repositories.Contracts
         User Create(User user);
         User Update(int id, User user, User loggedUser);
         User Delete(int id);
-        User Promote(User user);
-        User BlockUser(User user);
-        User UnblockUser(User user);
+        User Promote(int id);
+        User BlockUser(int id);
+        User UnblockUser(int id);
         void UpdateAdminStatus(User user, User userToUpdate);
         void UpdatePhoneNumber(User user, User userToUpdate);
         bool UsernameExists(string username);

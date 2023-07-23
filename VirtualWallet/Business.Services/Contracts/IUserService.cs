@@ -16,9 +16,9 @@ namespace Business.Services.Contracts
         User Create(User user);
         User Update(int id, User user, User loggedUser);
         void Delete(int id, User loggedUser);
-        User Promote(User user);
-        User BlockUser(User user);
-        User UnblockUser(User user); 
+        User Promote(int id, User loggedUser);
+        User BlockUser(int id, User loggedUser);
+        User UnblockUser(int id, User loggedUser); 
         bool UsernameExists(string username);
         bool EmailExists(string email);
         bool PhoneNumberExists(string phoneNumber);

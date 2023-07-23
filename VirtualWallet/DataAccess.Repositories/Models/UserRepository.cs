@@ -124,6 +124,36 @@ namespace DataAccess.Repositories.Models
             context.SaveChanges();
             return userToDelete;
         }
+        public User Promote(int id)
+        {
+            User userToPromote = this.GetById(id);
+            if (!userToPromote.IsAdmin)
+            {
+                userToPromote.IsAdmin = true;
+            }
+            context.SaveChanges();
+            return userToPromote;
+        }
+        public User BlockUser(int id)
+        {
+            User userToBlock = this.GetById(id);
+            if (!userToBlock.IsBlocked)
+            {
+                userToBlock.IsBlocked = true;
+            }
+            context.SaveChanges();
+            return userToBlock;
+        }
+        public User UnblockUser(int id)
+        {
+            User userToUnblock = this.GetById(id);
+            if (userToUnblock.IsBlocked)
+            {
+                userToUnblock.IsBlocked = false;
+            }
+            context.SaveChanges();
+            return userToUnblock;
+        }
         public void UpdatePhoneNumber(User user, User userToUpdate)
         {
             if (user?.PhoneNumber != null)
@@ -141,33 +171,6 @@ namespace DataAccess.Repositories.Models
             {
                 userToUpdate.IsAdmin = true;
             }
-        }
-        public User Promote(User user)
-        {
-            if (!user.IsAdmin)
-            {
-                user.IsAdmin = true;
-            }
-            context.SaveChanges();
-            return user;
-        }
-        public User BlockUser(User user)
-        {
-            if (!user.IsBlocked)
-            {
-                user.IsBlocked = true;
-            }
-            context.SaveChanges();
-            return user;
-        }
-        public User UnblockUser(User user)
-        {
-            if (user.IsBlocked)
-            {
-                user.IsBlocked = false;
-            }
-            context.SaveChanges();
-            return user;
         }
         public bool EmailExists(string email)
         {

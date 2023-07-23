@@ -7,7 +7,6 @@ using DataAccess.Models.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Presentation.Helpers;
-using System.Security.Claims;
 
 namespace VirtualWallet.Controllers.API
 {
@@ -74,8 +73,7 @@ namespace VirtualWallet.Controllers.API
         {
             try
             {
-                var loggedUsersUsername = User.Claims.FirstOrDefault(claim => claim.Type == "Username").Value;
-                var loggedUser = authManager.TryGetUserByUsername(loggedUsersUsername);
+                User loggedUser = FindLoggedUser();
                 User user = mapper.Map<User>(updateUserDto);
                 User updatedUser = userService.Update(id, user, loggedUser);
 
@@ -91,17 +89,16 @@ namespace VirtualWallet.Controllers.API
             }
         }
 
+
         [HttpDelete("{id}"), Authorize]
         public IActionResult DeleteUser(int id)
         {
             try
             {
-                var loggedUsersUsername = User.Claims.FirstOrDefault(claim => claim.Type == "Username").Value;
-                var loggedUser = authManager.TryGetUserByUsername(loggedUsersUsername);
-
+                User loggedUser = FindLoggedUser();
                 userService.Delete(id, loggedUser);
 
-                return StatusCode(StatusCodes.Status200OK);
+                return StatusCode(StatusCodes.Status200OK, "User was successfully deleted.");
             }
             catch (EntityNotFoundException e)
             {
@@ -113,87 +110,70 @@ namespace VirtualWallet.Controllers.API
             }
         }
 
-        [HttpPut("{id}/promote"), Authorize]//Not corrected
+        [HttpPut("{id}/promote"), Authorize]
         public IActionResult Promote(int id)
         {
             try
             {
-                var loggedUsersUsername = User.Claims.FirstOrDefault(claim => claim.Type == "Username").Value;
-                var loggedUser = authManager.TryGetUserByUsername(loggedUsersUsername);
+                User loggedUser = FindLoggedUser();
+                var promotedUser = userService.Promote(id, loggedUser);
 
-                if (loggedUser.IsAdmin)
-                {
-                    User user = userService.GetById(id);
-
-                    User promotedUser = userService.Promote(user);
-
-                    return StatusCode(StatusCodes.Status200OK, promotedUser);
-                }
-                return StatusCode(StatusCodes.Status405MethodNotAllowed);
-            }
-            catch (UnauthorizedOperationException e)
-            {
-                return StatusCode(StatusCodes.Status401Unauthorized, e.Message);
+                return StatusCode(StatusCodes.Status200OK, "User was successfully promoted with admin rights.");
             }
             catch (EntityNotFoundException e)
             {
                 return StatusCode(StatusCodes.Status404NotFound, e.Message);
+            }
+            catch (UnauthorizedOperationException e)
+            {
+                return StatusCode(StatusCodes.Status401Unauthorized, e.Message);
             }
         }
 
-        [HttpPut("{id}/block")]//Not corrected
-        public IActionResult BlockUser(int id, [FromHeader] string credentials)
+        [HttpPut("{id}/block")]
+        public IActionResult BlockUser(int id)
         {
             try
             {
-                User loggedUser = authManager.TryGetUser(credentials);
+                User loggedUser = FindLoggedUser();
+                var blockedUser = userService.BlockUser(id, loggedUser);
 
-                if (loggedUser.IsAdmin)
-                {
-                    var user = userService.GetById(id);
-
-                    var promotedUser = userService.BlockUser(user);
-
-                    return StatusCode(StatusCodes.Status200OK, promotedUser);
-                }
-                return StatusCode(StatusCodes.Status405MethodNotAllowed);
-            }
-            catch (UnauthorizedOperationException e)
-            {
-                return StatusCode(StatusCodes.Status401Unauthorized, e.Message);
+                return StatusCode(StatusCodes.Status200OK, "User was successfully blocked.");
             }
             catch (EntityNotFoundException e)
             {
                 return StatusCode(StatusCodes.Status404NotFound, e.Message);
+            }
+            catch (UnauthorizedOperationException e)
+            {
+                return StatusCode(StatusCodes.Status401Unauthorized, e.Message);
             }
         }
 
-        [HttpPut("{id}/unblock")]//Not corrected
-        public IActionResult UnblockUser(int id, [FromHeader] string credentials)
+        [HttpPut("{id}/unblock")]
+        public IActionResult UnblockUser(int id)
         {
             try
             {
-                var loggedUser = authManager.TryGetUser(credentials);
+                User loggedUser = FindLoggedUser();
+                var unblockedUser = userService.UnblockUser(id, loggedUser);
 
-                if (loggedUser.IsAdmin)
-                {
-                    User user = userService.GetById(id);
-
-                    User promotedUser = userService.UnblockUser(user);
-
-                    return StatusCode(StatusCodes.Status200OK, promotedUser);
-                }
-
-                return StatusCode(StatusCodes.Status405MethodNotAllowed);
-            }
-            catch (UnauthorizedOperationException e)
-            {
-                return StatusCode(StatusCodes.Status401Unauthorized, e.Message);
+                return StatusCode(StatusCodes.Status200OK, "User was successfully unblocked.");
             }
             catch (EntityNotFoundException e)
             {
                 return StatusCode(StatusCodes.Status404NotFound, e.Message);
             }
+            catch (UnauthorizedOperationException e)
+            {
+                return StatusCode(StatusCodes.Status401Unauthorized, e.Message);
+            }
+        }
+        private User FindLoggedUser()
+        {
+            var loggedUsersUsername = User.Claims.FirstOrDefault(claim => claim.Type == "Username").Value;
+            var loggedUser = authManager.TryGetUserByUsername(loggedUsersUsername);
+            return loggedUser;
         }
     }
 }
