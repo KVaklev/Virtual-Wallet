@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Business.Dto
 {
-    public class TransferWithdrawalDto
+    public class TransferDto
     {
         public DateTime Date { get; set; }
 
@@ -15,6 +15,6 @@ namespace Business.Dto
 
         public Currency Currency { get; set; }
 
-        public double WithdrawalAmount { get; set; }
+        public double Amount { get; set; }
     }
 }

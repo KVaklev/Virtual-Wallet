@@ -27,10 +27,9 @@ namespace VirtualWallet.Models
             //Transfers
             //DTO
 
-            CreateMap<TransferDepositDto, Transfer>();
-            CreateMap<Transfer, TransferDepositDto>();
-            CreateMap<TransferWithdrawalDto, Transfer>();
-            CreateMap<Transfer, TransferWithdrawalDto>();
+            CreateMap<TransferDto, Transfer>();
+            CreateMap<Transfer, TransferDto>();
+            
 
             //Accounts
             //DTO

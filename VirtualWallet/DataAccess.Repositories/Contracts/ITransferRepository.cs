@@ -4,7 +4,7 @@ namespace DataAccess.Repositories.Contracts
 {
     public interface ITransferRepository
     {
-        List<Transfer> GetAll();
+        IQueryable<Transfer> GetAll();
         //paginated list
 
         Transfer GetById(int id);

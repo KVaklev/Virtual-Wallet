@@ -15,16 +15,16 @@ namespace DataAccess.Repositories.Models
             this.context = context;
         }
 
-        public List<Transfer> GetAll()
+        public IQueryable<Transfer> GetAll()
         {
-            List<Transfer> result = context.Transfers
+            IQueryable<Transfer> result = context.Transfers
                 .Include(u => u.User)
-                .Include (t => t.DepositAmount)
-                .Include(t => t.WithdrawalAmount)
-                .ToList();
-
+                .Include(t => t.Amount);
+                
+                
             return result ?? throw new EntityNotFoundException("There are no transfers!");
         }
+
         public Transfer Create(Transfer transfer)
         {
             transfer.Date = DateTime.Now;
@@ -68,8 +68,8 @@ namespace DataAccess.Repositories.Models
         public Transfer Update(int id, Transfer transfer)
         {
             var transferToUpdate = GetById(id);
-            transferToUpdate.DepositAmount = transfer.DepositAmount;
-            transferToUpdate.WithdrawalAmount = transfer.WithdrawalAmount;
+            transferToUpdate.Amount = transfer.Amount;
+            
 
             context.SaveChanges();
             return transferToUpdate;

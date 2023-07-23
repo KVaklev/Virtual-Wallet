@@ -18,10 +18,7 @@ namespace DataAccess.Models.Models
         public Currency Currency { get; set; }
 
         [Range(0, double.MaxValue)]
-        public double DepositAmount { get; set; }
-
-        [Range(0, double.MaxValue)]
-        public double WithdrawalAmount { get; set; }
+        public double Amount { get; set; }
 
         [Range(1, double.MaxValue)]
         public int CardId { get; set; }
@@ -29,6 +26,6 @@ namespace DataAccess.Models.Models
 
         public bool IsTransferred { get; set; }
 
-        public List<History>? TransferHistories { get; set; } = new List<History>();
+        public List<History>? TransferHistories { get; set; } = new List<History>();// possibly to remove
     }
 }

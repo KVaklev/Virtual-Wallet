@@ -10,7 +10,7 @@ namespace Business.Dto
     {
         public string  Username { get; set; }
 
-        public string AccountNumber { get; set; }
+        //public string AccountNumber { get; set; }
 
         public string Currency { get; set; }
 
