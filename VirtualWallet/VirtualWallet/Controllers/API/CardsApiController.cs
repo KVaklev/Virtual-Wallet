@@ -16,9 +16,7 @@ namespace VirtualWallet.Controllers.API
             this.mapper = mapper;
             this.authManager = authManager;
         }
-        //public IActionResult Index()
-        //{
-        //    return View();
-        //}
+
+
     }
 }
