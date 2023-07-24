@@ -33,11 +33,13 @@ namespace VirtualWallet
 
             //Repositories
             builder.Services.AddScoped<IUserRepository, UserRepository>();
+            builder.Services.AddScoped<ICardRepository, CardRepository>();
             builder.Services.AddScoped<ITransferRepository, TransferRepository>();
 
 
             //Services
             builder.Services.AddScoped<IUserService, UserService>();
+            builder.Services.AddScoped<ICardService, CardService>();
             builder.Services.AddScoped<ITransferService, TransferService>();
 
             //Helpers
