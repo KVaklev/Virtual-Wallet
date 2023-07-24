@@ -37,6 +37,12 @@ namespace VirtualWallet.Models
             CreateMap<AccountDto, Account>();
             CreateMap<Account, AccountDto>();
 
+            //Transactions
+            //DTO
+
+            CreateMap<Transaction, CreateTransactionDto>()
+                .ForMember(r => r.RecepiendUsername, u => u.MapFrom(c => c.AccountRecepient.User.Username))
+                .ForMember(c => c.Currency, u => u.MapFrom(a => a.Currency.Аbbreviation));
 
         }
     }

@@ -20,6 +20,7 @@ namespace Business.Services.Models
         private readonly HistoryRepository historyRepository;
         private readonly UserRepository userRepository;
         private readonly ApplicationContext context;
+        private readonly AccountRepository accountRepository;
 
         public TransactionService(
             TransactionRepository transactionRepository,
@@ -32,6 +33,7 @@ namespace Business.Services.Models
             this.historyRepository = historyRepository;
             this.userRepository = userRepository;
             this.context = context;
+            this.accountRepository = accountRepository;
         }
 
         public Transaction Create(Transaction transaction, User user)
@@ -40,6 +42,7 @@ namespace Business.Services.Models
             {
                 throw new UnauthorizedOperationException(Constants.ModifyTransactionErrorMessage);
             }
+            
             var newTransaction = this.transactionRepository.Create(transaction);
 
             //Todo - check the balance
@@ -105,7 +108,7 @@ namespace Business.Services.Models
         {
             var history = new History()
             {
-                EventTime = transaction.Date,
+                EventTime = DateTime.Now,
                 TransactionId = transaction.Id
             };
 

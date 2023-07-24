@@ -38,5 +38,5 @@ namespace DataAccess.Models.Models
 
         public bool IsDeleted { get; set; }
 
-            }
+    }
 }
