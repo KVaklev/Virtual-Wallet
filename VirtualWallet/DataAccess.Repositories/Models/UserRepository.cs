@@ -21,44 +21,29 @@ namespace DataAccess.Repositories.Models
         }
         public List<User> FilterBy(UserQueryParameters filterParameters)
         {
-            List<User> result = this.context.Users.ToList();
+            IQueryable<User> result = context.Users;
 
-            if (!string.IsNullOrEmpty(filterParameters.Username))
-            {
-                result = result.FindAll(user => user.Username.Contains(filterParameters.Username));
-            }
-            if (!string.IsNullOrEmpty(filterParameters.Email))
-            {
-                result = result.FindAll(user => user.Email.Contains(filterParameters.Email));
-            }
-            if (!string.IsNullOrEmpty(filterParameters.PhoneNumber))
-            {
-                result = result.FindAll(user => user.PhoneNumber.ToString().Contains(filterParameters.PhoneNumber));
-            }
+            result = FilterByUsername(result, filterParameters.Username);
+            result = FilterByEmail(result, filterParameters.Email);
+            result = FilterByPhoneNumber(result, filterParameters.PhoneNumber);
+            result = SortBy(result, filterParameters.SortBy);
+            result = SortOrder(result, filterParameters.SortOrder);
 
-            if (!string.IsNullOrEmpty(filterParameters.SortBy))
-            {
-                if (filterParameters.SortBy.Equals("username", StringComparison.InvariantCultureIgnoreCase))
-                {
-                    result = result.OrderBy(user => user.Username).ToList();
-                }
-                else if (filterParameters.SortBy.Equals("email", StringComparison.InvariantCultureIgnoreCase))
-                {
-                    result = result.OrderBy(user => user.Email).ToList();
-                }
-                else if (filterParameters.SortBy.Equals("phoneNumber", StringComparison.InvariantCultureIgnoreCase))
-                {
-                    result = result.OrderBy(user => user.PhoneNumber).ToList();
-                }
+            List<User> filteredAndSortedUsers = result.ToList();
 
-                if (!string.IsNullOrEmpty(filterParameters.SortOrder) && filterParameters.SortOrder.Equals("desc", StringComparison.InvariantCultureIgnoreCase))
-                {
-                    result.Reverse();
-                }
+            if (filteredAndSortedUsers.Count == 0)
+            {
+                throw new EntityNotFoundException("No users match the specified filter criteria.");
             }
 
-            return result;
+            return filteredAndSortedUsers;
         }
+
+
+        //public PaginatedList<User> FilterBy(UserQueryParameters filterParameters)
+        //{
+        //    return this.repository.FilterBy(filterParameters);
+        //}
         public User GetById(int id)
         {
             User? user = context.Users
@@ -87,10 +72,6 @@ namespace DataAccess.Repositories.Models
                 .FirstOrDefault();
             return user ?? throw new EntityNotFoundException($"User with pnone number '{phoneNumber}' doesn't exist.");
         }
-        //public PaginatedList<User> FilterBy(UserQueryParameters filterParameters)
-        //{
-        //    return this.repository.FilterBy(filterParameters);
-        //}
         public User Create(User user)
         {
             context.Users.Add(user);
@@ -183,6 +164,60 @@ namespace DataAccess.Repositories.Models
         public bool PhoneNumberExists(string phoneNumber)
         {
             return context.Users.Any(u => u.PhoneNumber == phoneNumber);
+        }
+        private IQueryable<User> FilterByUsername(IQueryable<User> result, string? username)
+        {
+            if (!string.IsNullOrEmpty(username))
+            {
+                result = result.Where(user => user.Username != null 
+                                   && user.Username== username);
+            }
+
+            return result;
+        }
+        private IQueryable<User> FilterByEmail(IQueryable<User> result, string? email)
+        {
+            if (!string.IsNullOrEmpty(email))
+            {
+                result = result.Where(user => user.Email != null
+                                   && user.Email == email);
+            }
+
+            return result;
+        }
+        private IQueryable<User> FilterByPhoneNumber(IQueryable<User> result, string? phoneNumber)
+        {
+            if (!string.IsNullOrEmpty(phoneNumber))
+            {
+                result = result.Where(user => user.PhoneNumber != null
+                                   && user.Email == phoneNumber);
+            }
+
+            return result;
+        }
+        private IQueryable<User> SortBy(IQueryable<User> result, string? sortCriteria)
+        {
+            switch (sortCriteria)
+            {
+                case "username":
+                    return result.OrderBy(user => user.Username);
+                case "email":
+                    return result.OrderBy(user => user.Email);
+                case "phoneNumber":
+                    return result.OrderBy(user => user.PhoneNumber);
+                default:
+                    return result;
+            }
+        }
+        private IQueryable<User> SortOrder(IQueryable<User> result, string? sortOrder)
+        {
+            switch (sortOrder)
+            {
+                case "desc":
+                    return result.Reverse();
+                default:
+                    return result;
+            }
         }
     }
 }

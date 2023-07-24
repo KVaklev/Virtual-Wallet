@@ -23,11 +23,13 @@ namespace DataAccess.Models.Models
         [Required(ErrorMessage = "The {0} field is required")]
         [CardCheckNumber(ErrorMessage = "The card check number must contain only digits.")]
         [StringLength(3, ErrorMessage = "The {0} must be exactly {1} characters long.")]
-        public int CheckNumber { get; set; }
+        public string CheckNumber { get; set; }
         public CardType CardType { get; set; }
         public int UserId { get; set; }
-
+        public User user { get; set; }
         public int AccountId { get; set; }
-       // public decimal Amount { get; set; }
+        public Account Account { get; set; }
+        public decimal Balance { get; set; }
+        public decimal? CreditLimit { get; set; }
     }
 }
