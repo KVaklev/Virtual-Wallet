@@ -2,6 +2,7 @@
 using Business.Services.Contracts;
 using Business.Services.Helpers;
 using DataAccess.Models.Models;
+using DataAccess.Repositories.Contracts;
 using DataAccess.Repositories.Models;
 using System;
 using System.Collections.Generic;
@@ -13,9 +14,9 @@ namespace Business.Services.Models
 {
     public class CurrencyService : ICurrencyService
     {
-        private readonly CurrencyRepository currencyRepository;
+        private readonly ICurrencyRepository currencyRepository;
 
-            public CurrencyService(CurrencyRepository currencyRepository)
+            public CurrencyService(ICurrencyRepository currencyRepository)
         {
             this.currencyRepository = currencyRepository;
         }

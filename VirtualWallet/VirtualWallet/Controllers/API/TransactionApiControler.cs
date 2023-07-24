@@ -18,7 +18,7 @@ namespace VirtualWallet.Controllers.API
         private readonly ITransactionService transactionService;
         private readonly IAccountService accountService;
         private readonly IUserService userService;
-        private readonly IHelpersApi helpersApi;
+        private readonly HelpersApi helpersApi;
 
         public TransactionApiControler(
             IMapper mapper, 
@@ -26,7 +26,7 @@ namespace VirtualWallet.Controllers.API
             ITransactionService transactionService,
             IAccountService accountService,
             IUserService userService,
-            IHelpersApi helpersApi
+            HelpersApi helpersApi
             )
         {
             this.mapper = mapper;

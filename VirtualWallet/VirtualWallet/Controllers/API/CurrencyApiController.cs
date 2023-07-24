@@ -16,13 +16,13 @@ namespace VirtualWallet.Controllers.API
         private readonly ICurrencyService currencyService;
         private readonly IMapper mapper;
         private readonly IUserService userService;
-        private readonly IHelpersApi helpersApi;
+        private readonly HelpersApi helpersApi;
 
         public CurrencyApiController(
             ICurrencyService currencyService,
             IMapper mapper,
             IUserService userService,
-            IHelpersApi helpersApi)
+            HelpersApi helpersApi)
         {
             this.currencyService = currencyService;
             this.mapper = mapper;
