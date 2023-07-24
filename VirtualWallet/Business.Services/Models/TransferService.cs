@@ -69,7 +69,7 @@ namespace Business.Services.Models
 
             Transfer transferToUpdate = this.transferRepository.GetById(id);
 
-            if(transferToUpdate.UserId != userId)
+            if(transferToUpdate.Account.User.Id != userId)
             {
                 isAuthorized = false;
             }

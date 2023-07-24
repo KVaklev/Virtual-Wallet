@@ -129,7 +129,7 @@ namespace Business.Services.Models
             
             Transaction transactionToUpdate = this.transactionRepository.GetById(id);
 
-            if (transactionToUpdate.SenderId != userId)
+            if (transactionToUpdate.AccountSender.User.Id != userId)
             {
                 isUserUnauthorized = false;
             }

@@ -20,7 +20,7 @@ namespace VirtualWallet.Controllers.API
         {
 
             var transfers = transferService.GetAll()
-                .Where(u => u.UserId == id)
+                .Where(u => u.Id == id)
                                 .ToList();
 
             var json = JsonSerializer.Serialize(transfers);

@@ -10,8 +10,8 @@ namespace DataAccess.Models.Models
         public DateTime Date { get; set; }
 
         [Range(1, double.MaxValue)]
-        public int? UserId { get; set; }
-        public User User { get; set; }
+        public int? AccountId { get; set; }
+        public Account Account { get; set; }
 
         [Range(1, double.MaxValue)]
         public int CurrencyId { get; set; }
@@ -26,6 +26,6 @@ namespace DataAccess.Models.Models
 
         public bool IsTransferred { get; set; }
 
-        public List<History>? TransferHistories { get; set; } = new List<History>();// possibly to remove
+       
     }
 }

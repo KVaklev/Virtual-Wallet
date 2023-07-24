@@ -12,15 +12,13 @@ namespace DataAccess.Models.Models
 
         [Required(ErrorMessage = "The {0} field is required")]
         [Range(1, int.MaxValue, ErrorMessage = "The {0} field must be in the range from {1} to {2}.")]
-        public int SenderId { get; set; } //FK
+        public int AccountSenderId { get; set; } //FK
 
-        public User Sender { get; set; }
+        public Account AccountSender { get; set; }
 
-        [Required(ErrorMessage = "The {0} field is required")]
-        [Range(1, int.MaxValue, ErrorMessage = "The {0} field must be in the range from {1} to {2}.")]
-        public int RecipientId { get; set;} // FK
+        public int AccountRecepientId { get; set; } //FK
 
-        public User Recipient { get; set; }
+        public Account AccountRecepient { get; set; }
 
         public DirectionType Direction { get; set; }
 
@@ -40,6 +38,5 @@ namespace DataAccess.Models.Models
 
         public bool IsDeleted { get; set; }
 
-        public List<History>? TransactionHistories { get; set; } = new List<History>();
-    }
+            }
 }

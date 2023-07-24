@@ -31,8 +31,8 @@ namespace DataAccess.Repositories.Models
         public Transaction GetById(int id) 
         {
             Transaction transaction = context.Transactions
-                .Include(s =>s.Sender)
-                .Include(r =>r.Recipient)
+                .Include(s =>s.AccountSender)
+                .Include(r =>r.AccountRecepient)
                 .Include(c =>c.Currency)
                 .FirstOrDefault(t => t.Id == id);
 
@@ -42,7 +42,7 @@ namespace DataAccess.Repositories.Models
         public Transaction Update(int id, Transaction transaction)
         {
             var transactionToUpdate = this.GetById(id);
-            transactionToUpdate.RecipientId = transaction.RecipientId;
+            transactionToUpdate.AccountRecepientId = transaction.AccountRecepientId;
             transactionToUpdate.Amount = transaction.Amount;
             transactionToUpdate.CurrencyId = transaction.CurrencyId;
             transactionToUpdate.Date = transaction.Date;
@@ -62,9 +62,11 @@ namespace DataAccess.Repositories.Models
         public IQueryable<Transaction> GetAll()
         {
             IQueryable<Transaction> result = context.Transactions
-                    .Include(s =>s.Sender)
-                    .Include(r =>r.Recipient)
+                    .Include(s => s.AccountSender)
+                    .Include(r => r.AccountRecepient)
+                    .ThenInclude(u =>u.User)
                     .Include(c => c.Currency);
+                   
 
             return result ?? throw new EntityNotFoundException("There are any transactions!");
         }
@@ -98,7 +100,7 @@ namespace DataAccess.Repositories.Models
         {
             if (!string.IsNullOrEmpty(username))
             {
-                return transactions.Where(t => t.Recipient.Username == username);
+                return transactions.Where(t => t.AccountRecepient.User.Username == username);
             }
             else
             {

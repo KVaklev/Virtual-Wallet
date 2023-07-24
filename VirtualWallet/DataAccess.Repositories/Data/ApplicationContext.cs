@@ -135,17 +135,7 @@ namespace DataAccess.Repositories.Data
             };
 
             modelBuilder.Entity<User>().HasData(users);
-            modelBuilder.Entity<User>()
-                .HasMany(u => u.TransactionsSender)
-                .WithOne(t => t.Sender)
-                .HasForeignKey(t => t.SenderId)
-                .OnDelete(DeleteBehavior.NoAction);
 
-            modelBuilder.Entity<User>()
-                .HasMany(u => u.TransactionsRecipient)
-                .WithOne(t => t.Recipient)
-                .HasForeignKey(t => t.RecipientId)
-                .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<User>()
                 .HasOne(u => u.Account)
@@ -160,6 +150,17 @@ namespace DataAccess.Repositories.Data
             };
 
             modelBuilder.Entity<Account>().HasData(accounts);
+            modelBuilder.Entity<Account>()
+                .HasMany(u => u.TransactionsSender)
+                .WithOne(t => t.AccountSender)
+                .HasForeignKey(t => t.AccountSenderId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<Account>()
+                .HasMany(u => u.TransactionsRecipient)
+                .WithOne(t => t.AccountRecepient)
+                .HasForeignKey(t => t.AccountRecepientId)
+                .OnDelete(DeleteBehavior.NoAction);
 
             //Seed currencies
 
@@ -178,15 +179,15 @@ namespace DataAccess.Repositories.Data
             modelBuilder.Entity<Transaction>().HasData(transactions);
 
             modelBuilder.Entity<Transaction>()
-            .HasOne(c => c.Sender)
+            .HasOne(c => c.AccountSender)
             .WithMany(u => u.TransactionsSender)
-            .HasForeignKey(c => c.SenderId)
+            .HasForeignKey(c => c.AccountSenderId)
             .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<Transaction>()
-                .HasOne(c => c.Recipient)
+                .HasOne(c => c.AccountRecepient)
                 .WithMany(u => u.TransactionsRecipient)
-                .HasForeignKey(c => c.RecipientId)
+                .HasForeignKey(c => c.AccountRecepientId)
                 .OnDelete(DeleteBehavior.NoAction);
 
             //Seed transfers
@@ -198,9 +199,9 @@ namespace DataAccess.Repositories.Data
             modelBuilder.Entity<Transfer>().HasData(transfers);
 
             modelBuilder.Entity<Transfer>()
-                .HasOne(u=>u.User)
-                .WithMany(t=>t.Transfers)
-                .HasForeignKey(u=>u.UserId)
+                .HasOne(a => a.Account)
+                .WithMany(t => t.Transfers)
+                .HasForeignKey(a => a.AccountId)
                 .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<Transfer>()
@@ -224,18 +225,25 @@ namespace DataAccess.Repositories.Data
             };
 
             modelBuilder.Entity<History>().HasData(history);
+            modelBuilder.Entity<History>()
+                .HasOne(a => a.Account)
+                .WithMany()
+                .HasForeignKey(a => a.AccountId)
+            .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<History>()
-                .HasOne(c => c.Transfer)
-                .WithMany(u => u.TransferHistories)
-                .HasForeignKey(c => c.TransferId)
-                .OnDelete(DeleteBehavior.NoAction);
+                .HasOne(a => a.Transfer)
+                .WithMany()
+                .HasForeignKey(a => a.TransferId)
+            .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<History>()
-                .HasOne(c => c.Transaction)
-                .WithMany(u => u.TransactionHistories)
-                .HasForeignKey(c => c.TransactionId)
-                .OnDelete(DeleteBehavior.NoAction);
+                .HasOne(a => a.Transaction)
+                .WithMany()
+                .HasForeignKey(a => a.TransactionId)
+            .OnDelete(DeleteBehavior.NoAction);
+
+
         }
     }
 }

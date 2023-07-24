@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DataAccess.Models.Models
 {
-    public class User 
+    public class User
     {
         public int Id { get; set; }
 
@@ -44,12 +44,6 @@ namespace DataAccess.Models.Models
         [NotMapped]
         [DisplayName("Upload File")]
         public IFormFile ImageFile { get; set; }
-
-        public List<Transaction> TransactionsSender { get; set; } = new List<Transaction>();
-        public List<Transaction> TransactionsRecipient { get; set; } = new List<Transaction>();
-
-        public List<Transfer> Transfers { get; set; } = new List<Transfer>();
-        public List<Card> Cards { get; set; } = new List<Card>();
         public Account? Account { get; set; }
         public int? AccountId { get; set; }
     }

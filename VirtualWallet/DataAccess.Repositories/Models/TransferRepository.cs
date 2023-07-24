@@ -18,7 +18,8 @@ namespace DataAccess.Repositories.Models
         public IQueryable<Transfer> GetAll()
         {
             IQueryable<Transfer> result = context.Transfers
-                .Include(u => u.User)
+                .Include(a => a.Account)
+                .ThenInclude(u=> u.User)
                 .Include(t => t.Amount);
                 
                 
@@ -48,7 +49,8 @@ namespace DataAccess.Repositories.Models
         public Transfer GetById(int id)
         {
             Transfer transfer = context.Transfers
-                .Include(t => t.User)
+                .Include(t => t.Account)
+                .ThenInclude(u => u.User)
                 .Include(t => t.Currency)
                 .FirstOrDefault(t => t.Id == id);
 
@@ -59,8 +61,9 @@ namespace DataAccess.Repositories.Models
         public Transfer GetByUserId(int userId)
         {
             Transfer transfer = context.Transfers
-                .Include(t => t.User)
-                .FirstOrDefault(t => t.UserId == userId);
+                .Include(a => a.Account)
+                .ThenInclude(u => u.User)
+                .FirstOrDefault(t => t.Account.User.Id == userId);
 
             return transfer ?? throw new EntityNotFoundException($"Transfer with UserId = {userId} does not exist");
         }
