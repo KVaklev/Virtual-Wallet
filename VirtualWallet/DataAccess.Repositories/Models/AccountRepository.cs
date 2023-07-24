@@ -78,6 +78,15 @@ namespace DataAccess.Repositories.Models
             return account ?? throw new EntityNotFoundException($"Account with UserID = {id} does not exist.");
         }
 
+        public Account GetByUsername(string username)
+        {
+            Account account = context.Accounts
+                .Where(a => a.User.Username == username)
+                .FirstOrDefault();
+
+            return account ?? throw new EntityNotFoundException($"Account with Username = {username} does not exist.");
+        }
+
         public Account DepositToBalance(Account account, int amount)
         {
             Account accountToDepositTo = this.GetById(account.Id);

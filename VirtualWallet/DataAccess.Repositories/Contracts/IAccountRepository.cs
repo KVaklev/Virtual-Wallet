@@ -15,6 +15,8 @@ namespace DataAccess.Repositories.Contracts
 
         Account GetByUserId(int id);
 
+        Account GetByUsername(string username);
+
         Account Create(Account account, User user);
 
         Account Update(int id, Account account);
