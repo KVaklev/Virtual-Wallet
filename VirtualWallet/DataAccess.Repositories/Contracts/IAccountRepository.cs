@@ -1,4 +1,5 @@
-﻿using DataAccess.Models.Models;
+﻿using Business.QueryParameters;
+using DataAccess.Models.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,6 +12,8 @@ namespace DataAccess.Repositories.Contracts
     {
         List<Account> GetAll();
 
+        PaginatedList<Transaction> FilterBy(TransactionQueryParameters filterParameters);
+
         Account GetById(int id);
 
         Account GetByUserId(int id);
@@ -21,13 +24,13 @@ namespace DataAccess.Repositories.Contracts
 
         Account Update(int id, Account account);
 
-        Account Delete(int id);
+        bool Delete(int id);
 
-        Account DepositToBalance(Account account, int amount);
+        Account IncreaseBalance(int id, int amount);
 
-        Account WithdrawalFromBalance(Account account, int amount);
+        Account DecreaseBalance(int id, int amount);
 
-        bool CheckBalance(Account account, int amount);
+        bool CheckBalance(int id, int amount);
 
 
     }

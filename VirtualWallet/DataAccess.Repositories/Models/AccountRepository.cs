@@ -1,4 +1,5 @@
 ﻿using Business.Exceptions;
+using Business.QueryParameters;
 using DataAccess.Models.Models;
 using DataAccess.Repositories.Contracts;
 using DataAccess.Repositories.Data;
@@ -41,13 +42,18 @@ namespace DataAccess.Repositories.Models
             return account;
         }
 
-        public Account Delete(int id)
+        public bool Delete(int id)
         {
             Account accountToDelete = this.GetById(id);
-            context.Accounts.Remove(accountToDelete);
-            context.SaveChanges();
 
-            return accountToDelete;
+            if (accountToDelete != null)
+            {
+                context.Accounts.Remove(accountToDelete);
+                context.SaveChanges();
+
+                return true;
+            }
+            return false;
         }
 
         public Account Update(int id, Account account)
@@ -55,7 +61,6 @@ namespace DataAccess.Repositories.Models
             var accountToUpdate = this.GetById(id);
             accountToUpdate.Balance = account.Balance;
             accountToUpdate.Currency = account.Currency;
-            accountToUpdate.DailyLimit = account.DailyLimit;
             context.SaveChanges();
             return accountToUpdate;
         }
@@ -87,9 +92,9 @@ namespace DataAccess.Repositories.Models
             return account ?? throw new EntityNotFoundException($"Account with Username = {username} does not exist.");
         }
 
-        public Account DepositToBalance(Account account, int amount)
+        public Account IncreaseBalance(int id, int amount)
         {
-            Account accountToDepositTo = this.GetById(account.Id);
+            Account accountToDepositTo = this.GetById(id);
 
             accountToDepositTo.Balance += amount;
 
@@ -97,18 +102,18 @@ namespace DataAccess.Repositories.Models
         }
 
 
-        public Account WithdrawalFromBalance(Account account, int amount)
+        public Account DecreaseBalance(int id, int amount)
         {
-            Account accountToWithdrawFrom = this.GetById(account.Id);
+            Account accountToWithdrawFrom = this.GetById(id);
 
             accountToWithdrawFrom.Balance -= amount;
 
             return accountToWithdrawFrom;
         }
 
-        public bool CheckBalance(Account account, int amount)
+        public bool CheckBalance(int id, int amount)
         {
-            Account accountToCheck = this.GetById(account.Id);
+            Account accountToCheck = this.GetById(id);
 
             if (accountToCheck.Balance < amount)
             {
@@ -117,6 +122,9 @@ namespace DataAccess.Repositories.Models
             return true;
         }
 
-        
+        public PaginatedList<Transaction> FilterBy(TransactionQueryParameters filterParameters)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
