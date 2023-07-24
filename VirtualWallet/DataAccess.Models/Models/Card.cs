@@ -25,8 +25,6 @@ namespace DataAccess.Models.Models
         [StringLength(3, ErrorMessage = "The {0} must be exactly {1} characters long.")]
         public string CheckNumber { get; set; }
         public CardType CardType { get; set; }
-        public int UserId { get; set; }
-        public User user { get; set; }
         public int AccountId { get; set; }
         public Account Account { get; set; }
         public decimal Balance { get; set; }

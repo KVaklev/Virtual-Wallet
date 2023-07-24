@@ -29,30 +29,30 @@ namespace DataAccess.Repositories.Models
 
             return card;
         }
-        public List<Card> GetByUserId(int userId)
-        {
-            List<Card> cards = context.Cards
-                .Where(card => card.UserId == userId)
-                .ToList();
+        //public List<Card> GetByUserId(int userId)
+        //{
+        //    List<Card> cards = context.Cards
+        //        .Where(card => card.UserId == userId)
+        //        .ToList();
 
-            return cards ?? throw new EntityNotFoundException($"User with ID = {userId} doesn't have any cards.");
-        }
-        public Card Add(int userId, int accountId, Card card)
-        {
-            User user = context.Users
-                .FirstOrDefault(u => u.Id == userId)
-                ?? throw new EntityNotFoundException($"User with ID = {userId} doesn't exist.");
-            Account account = context.Accounts
-                .FirstOrDefault(a => a.Id == accountId && a.UserId == userId)
-                ?? throw new EntityNotFoundException($"Account with ID = {accountId} doesn't exist or doesn't belong to the user.");
+        //    return cards ?? throw new EntityNotFoundException($"User with ID = {userId} doesn't have any cards.");
+        //}
+        //public Card Add(int userId, int accountId, Card card)
+        //{
+        //    User user = context.Users
+        //        .FirstOrDefault(u => u.Id == userId)
+        //        ?? throw new EntityNotFoundException($"User with ID = {userId} doesn't exist.");
+        //    Account account = context.Accounts
+        //        .FirstOrDefault(a => a.Id == accountId && a.UserId == userId)
+        //        ?? throw new EntityNotFoundException($"Account with ID = {accountId} doesn't exist or doesn't belong to the user.");
 
-            card.AccountId = accountId;
-            card.UserId = userId;
-            context.Cards.Add(card);
-            context.SaveChanges();
+        //    card.AccountId = accountId;
+        //    card.UserId = userId;
+        //    context.Cards.Add(card);
+        //    context.SaveChanges();
 
-            return card;
-        }
+        //    return card;
+        //}
 
         public Card Update(int id, Card card)
         {
@@ -66,7 +66,7 @@ namespace DataAccess.Repositories.Models
             cardToUpdate.CheckNumber = card.CheckNumber;
             cardToUpdate.CardType = card.CardType;
             cardToUpdate.AccountId = card.AccountId;
-            cardToUpdate.UserId = card.UserId;
+            //cardToUpdate.UserId = card.UserId;
 
             context.SaveChanges();
             return cardToUpdate;

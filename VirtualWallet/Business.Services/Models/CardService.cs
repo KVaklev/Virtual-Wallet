@@ -17,13 +17,13 @@ namespace Business.Services.Models
         {
             return this.repository.GetAll();
         }
-        public List<Card> GetByUserId(int userId)
-        {
-            return this.repository.GetByUserId(userId);
-        }
+        //public List<Card> GetByUserId(int userId)
+        //{
+        //    return this.repository.GetByUserId(userId);
+        //}
         public List<Card> FilterBy(CardQueryParameters filterParameters)
         {
-            throw new NotImplementedException();
+            return this.repository.FilterBy(filterParameters);
         }
         public Card Add(int userId, Card card)
         {

@@ -1,5 +1,7 @@
-﻿using DataAccess.Models.Models;
+﻿using DataAccess.Models.Enums;
+using DataAccess.Models.Models;
 using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 
 namespace DataAccess.Repositories.Data
 {
@@ -147,6 +149,15 @@ namespace DataAccess.Repositories.Data
 
             List<Account> accounts = new List<Account>()
             {
+                new Account()
+                {
+                    Id = 1
+                },
+
+                new Account()
+                {
+                    Id = 2
+                }
             };
 
             modelBuilder.Entity<Account>().HasData(accounts);
@@ -214,6 +225,42 @@ namespace DataAccess.Repositories.Data
 
             List<Card> cards = new List<Card>()
             {
+                 new Card
+                {
+                     Id = 1,
+                     CardNumber = "1234567891011121",
+                     CardHolder = "Ivancho Draganchov",
+                     CheckNumber = "005",
+                     ExpirationDate = DateTime.Now.AddMonths(7),
+                     CardType = CardType.Debit,
+                     AccountId = 1,
+                     Balance = 750
+                 },
+
+                new Card
+                {
+                     Id = 2,
+                     CardNumber = "2232567891011121",
+                     CardHolder = "Mariq Andreeva",
+                     CheckNumber = "015",
+                     ExpirationDate = DateTime.Now.AddMonths(6),
+                     CardType = CardType.Debit,
+                     AccountId = 2,
+                     Balance = 1000
+                },
+
+                new Card
+                {
+                     Id = 3,
+                     CardNumber = "2232565891011121",
+                     CardHolder = "Mariq Andreeva",
+                     CheckNumber = "025",
+                     ExpirationDate = DateTime.Now.AddMonths(6),
+                     CardType = CardType.Credit,
+                     AccountId = 2,
+                     Balance = 800,
+                     CreditLimit = 1000
+                }
             };
 
             modelBuilder.Entity<Card>().HasData(cards);
