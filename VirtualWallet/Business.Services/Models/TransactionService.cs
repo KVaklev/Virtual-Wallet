@@ -2,6 +2,7 @@
 using Business.QueryParameters;
 using Business.Services.Contracts;
 using Business.Services.Helpers;
+using DataAccess.Models.Enums;
 using DataAccess.Models.Models;
 using DataAccess.Repositories.Contracts;
 using DataAccess.Repositories.Data;
@@ -42,7 +43,7 @@ namespace Business.Services.Models
             {
                 throw new UnauthorizedOperationException(Constants.ModifyTransactionErrorMessage);
             }
-            
+            transaction.Direction = DirectionType.Out;
             var newTransaction = this.transactionRepository.Create(transaction);
 
             //Todo - check the balance

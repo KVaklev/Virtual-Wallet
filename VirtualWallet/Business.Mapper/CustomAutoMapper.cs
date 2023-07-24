@@ -44,6 +44,12 @@ namespace VirtualWallet.Models
                 .ForMember(r => r.RecepiendUsername, u => u.MapFrom(c => c.AccountRecepient.User.Username))
                 .ForMember(c => c.Currency, u => u.MapFrom(a => a.Currency.Аbbreviation));
 
+            //Currencies
+            //DTO
+
+            CreateMap<CurrencyDto, Currency>();
+            CreateMap<Currency, CurrencyDto>();
+
         }
     }
 }

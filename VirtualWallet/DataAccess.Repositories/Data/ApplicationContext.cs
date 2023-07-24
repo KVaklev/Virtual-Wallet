@@ -166,6 +166,23 @@ namespace DataAccess.Repositories.Data
 
             List<Currency> currencies = new List<Currency>()
             {
+                new Currency()
+                {
+                Id=1,
+                Name = "Български лев",
+                Аbbreviation="BGN",
+                IsDeleted=false
+                },
+
+                new Currency()
+                { 
+                Id = 2,
+                Name = "Американски долар",
+                Аbbreviation = "USD",
+                IsDeleted=false
+                }
+
+
             };
 
             modelBuilder.Entity<Currency>().HasData(currencies);
