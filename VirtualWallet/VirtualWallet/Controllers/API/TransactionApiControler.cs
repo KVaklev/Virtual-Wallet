@@ -10,8 +10,8 @@ using Microsoft.AspNetCore.Authorization;
 namespace VirtualWallet.Controllers.API
 {
     [ApiController]
-    [Route("api/transactions")]
-    public class TransactionApiControler : Controller
+    [Route("api/transaction")]
+    public class TransactionApiControler : ControllerBase
     {
         private readonly IMapper mapper;
         private readonly IAuthManager authManager;

@@ -10,8 +10,8 @@ using VirtualWallet.Helpers;
 namespace VirtualWallet.Controllers.API
 {
     [ApiController]
-    [Route("api/currencies")]
-    public class CurrencyApiController : Controller
+    [Route("api/currency")]
+    public class CurrencyApiController : ControllerBase
     {
         private readonly ICurrencyService currencyService;
         private readonly IMapper mapper;

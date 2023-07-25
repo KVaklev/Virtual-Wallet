@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace DataAccess.Models.Models
+namespace DataAccess.Models.ValidationAttributes
 {
     public class PasswordAttribute : ValidationAttribute
     {

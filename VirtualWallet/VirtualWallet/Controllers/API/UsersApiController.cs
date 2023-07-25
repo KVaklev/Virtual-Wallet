@@ -13,7 +13,7 @@ namespace VirtualWallet.Controllers.API
 
     [ApiController]
     [Route("api/users")]
-    public class UsersApiController : Controller
+    public class UsersApiController : ControllerBase
     {
         private readonly IUserService userService;
         private readonly IMapper mapper;
