@@ -10,7 +10,7 @@ using VirtualWallet.Helpers;
 namespace VirtualWallet.Controllers.API
 {
     [ApiController]
-    [Route("api/currency")]
+    [Route("api/currencies")]
     public class CurrencyApiController : Controller
     {
         private readonly ICurrencyService currencyService;
@@ -54,8 +54,25 @@ namespace VirtualWallet.Controllers.API
         {
             try
             {
-                var currencies = this.currencyService.GetAll();
-                return StatusCode(StatusCodes.Status200OK, currencies);
+                List<Currency> currencies = this.currencyService.GetAll();
+                List<CurrencyDto> currenciesDto = currencies
+                    .Select(currency => mapper.Map<CurrencyDto>(currency)).ToList();
+                return StatusCode(StatusCodes.Status200OK, currenciesDto);
+            }
+            catch (EntityNotFoundException ex)
+            {
+                return StatusCode(StatusCodes.Status404NotFound, ex.Message);
+            }
+        }
+
+        [HttpGet("{id}")]
+        public IActionResult GetById([FromRoute] int id)
+        {
+            try
+            {
+                var currency = this.currencyService.GetById(id);
+                var currencyDto = this.mapper.Map<CurrencyDto>(currency);
+                return StatusCode(StatusCodes.Status200OK, currencyDto);
             }
             catch (EntityNotFoundException ex)
             {
