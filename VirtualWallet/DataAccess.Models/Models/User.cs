@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using DataAccess.Models.ValidationAttributes;
+using Microsoft.AspNetCore.Http;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -9,30 +10,30 @@ namespace DataAccess.Models.Models
     {
         public int Id { get; set; }
 
-        [MinLength(2, ErrorMessage = "The {0} must be at least {1} characters long.")]
-        [MaxLength(32, ErrorMessage = "The {0} must be no more than {1} characters long.")]
+        [MinLength(Constants.NameMinLength, ErrorMessage = Constants.NameMinLengthErrorMessage)]
+        [MaxLength(Constants.NameMaxLength, ErrorMessage = Constants.NameMaxLengthErrorMessage)]
         public string? FirstName { get; set; }
 
-        [MinLength(2, ErrorMessage = "The {0} must be at least {1} characters long.")]
-        [MaxLength(32, ErrorMessage = "The {0} must be no more than {1} characters long.")]
+        [MinLength(Constants.NameMinLength, ErrorMessage = Constants.NameMinLengthErrorMessage)]
+        [MaxLength(Constants.NameMaxLength, ErrorMessage = Constants.NameMaxLengthErrorMessage)]
         public string? LastName { get; set; }
 
-        [Required(ErrorMessage = "The {0} field is required")]
-        [MinLength(2, ErrorMessage = "The {0} must be at least {1} characters long.")]
-        [MaxLength(20, ErrorMessage = "The {0} must be no more than {1} characters long.")]
+        [Required(ErrorMessage = Constants.EmptyFieldErrorMessage)]
+        [MinLength(Constants.UsernameMinLength, ErrorMessage = Constants.UsernameMinLengthErrorMessage)]
+        [MaxLength(Constants.UsernameMaxLength, ErrorMessage = Constants.UsernameMaxLengthErrorMessage)]
         public string Username { get; set; }
 
-        [Required(ErrorMessage = "The {0} field is required")]
-        [EmailAddress(ErrorMessage = "Please provide a valid email.")]
+        [Required(ErrorMessage = Constants.EmptyFieldErrorMessage)]
+        [EmailAddress(ErrorMessage = Constants.EmailFieldErrorMessage)]
         public string Email { get; set; }
 
-        [Required(ErrorMessage = "The {0} field is required")]
+        [Required(ErrorMessage = Constants.EmptyFieldErrorMessage)]
         [Password]
         public string Password { get; set; }
 
-        [Required(ErrorMessage = "The {0} field is required")]
-        [PhoneNumber(ErrorMessage = "The phone number must contain only digits.")]
-        [StringLength(10, ErrorMessage = "The {0} must be exactly {1} characters long.")]
+        [Required(ErrorMessage = Constants.EmptyFieldErrorMessage)]
+        [PhoneNumber(ErrorMessage = Constants.PhoneNumberFieldErroMessage)]
+        [StringLength(Constants.PhoneNumberLength, ErrorMessage = Constants.PhoneNumberLengthErrorMessage)]
         public string PhoneNumber { get; set; }
 
         public bool IsBlocked { get; set; }
@@ -42,7 +43,7 @@ namespace DataAccess.Models.Models
         public string? ProfilePhotoFileName { get; set; }
 
         [NotMapped]
-        [DisplayName("Upload File")]
+        [DisplayName(Constants.ImageFileFieldErrorMessage)]
         public IFormFile ImageFile { get; set; }
         public Account? Account { get; set; }
         public int? AccountId { get; set; }

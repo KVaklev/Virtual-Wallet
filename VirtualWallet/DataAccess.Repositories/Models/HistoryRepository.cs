@@ -12,11 +12,11 @@ namespace DataAccess.Repositories.Models
 {
     public class HistoryRepository: DataAccess.Repositories.Contracts.IHistoryRepository
     {
-        ApplicationContext context;
+        private readonly ApplicationContext context;
 
         public HistoryRepository(ApplicationContext context) 
         {
-        this.context=context;
+             this.context=context;
         }
 
         public History Ctraete(History history)

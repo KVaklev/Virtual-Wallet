@@ -9,6 +9,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Presentation.Helpers;
 using System.Text;
+using VirtualWallet.Helpers;
 using VirtualWallet.Models;
 
 namespace VirtualWallet
@@ -33,18 +34,29 @@ namespace VirtualWallet
 
             //Repositories
             builder.Services.AddScoped<IUserRepository, UserRepository>();
+            builder.Services.AddScoped<ICardRepository, CardRepository>();
             builder.Services.AddScoped<ITransferRepository, TransferRepository>();
+            builder.Services.AddScoped<IAccountRepository, AccountRepository>();
+            builder.Services.AddScoped<ICurrencyRepository, CurrencyRepository>();
+            builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
+            builder.Services.AddScoped<IHistoryRepository, HistoryRepository>();
 
 
             //Services
             builder.Services.AddScoped<IUserService, UserService>();
+            builder.Services.AddScoped<ICardService, CardService>();
             builder.Services.AddScoped<ITransferService, TransferService>();
+            builder.Services.AddScoped<IAccountService, AccountService>();
+            builder.Services.AddScoped<ICurrencyService, CurrencyService>();
+            builder.Services.AddScoped<ITransactionService, TransactionService>();
 
             //Helpers
             builder.Services.AddScoped<CustomAutoMapper>();
             builder.Services.AddScoped<IAuthManager, AuthManager>();
             builder.Services.AddScoped<AuthManager>();
+            builder.Services.AddScoped<HelpersApi>();
             builder.Services.AddSwaggerGen();
+            
 
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
              .AddJwtBearer(options =>

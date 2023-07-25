@@ -22,6 +22,7 @@ namespace DataAccess.Repositories.Models
         {
             trasaction.Date = DateTime.Now;
             trasaction.IsExecuted = false;
+            trasaction.IsDeleted = false;
             context.Add(trasaction);
             context.SaveChanges();
 
@@ -45,7 +46,7 @@ namespace DataAccess.Repositories.Models
             transactionToUpdate.AccountRecepientId = transaction.AccountRecepientId;
             transactionToUpdate.Amount = transaction.Amount;
             transactionToUpdate.CurrencyId = transaction.CurrencyId;
-            transactionToUpdate.Date = transaction.Date;
+            transactionToUpdate.Date = DateTime.Now;
 
             context.SaveChanges();
             return transactionToUpdate;

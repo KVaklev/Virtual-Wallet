@@ -2,7 +2,9 @@
 using Business.QueryParameters;
 using Business.Services.Contracts;
 using Business.Services.Helpers;
+using DataAccess.Models.Enums;
 using DataAccess.Models.Models;
+using DataAccess.Repositories.Data;
 using DataAccess.Repositories.Contracts;
 using DataAccess.Repositories.Data;
 using DataAccess.Repositories.Models;
@@ -16,15 +18,16 @@ namespace Business.Services.Models
 {
     public class TransactionService : ITransactionService
     {
-        private readonly TransactionRepository transactionRepository;
-        private readonly HistoryRepository historyRepository;
-        private readonly UserRepository userRepository;
+        private readonly ITransactionRepository transactionRepository;
+        private readonly IHistoryRepository historyRepository;
+        private readonly IUserRepository userRepository;
         private readonly ApplicationContext context;
+        private readonly IAccountRepository accountRepository;
 
         public TransactionService(
-            TransactionRepository transactionRepository,
-            HistoryRepository historyRepository,
-            UserRepository userRepository,
+            ITransactionRepository transactionRepository,
+            IHistoryRepository historyRepository,
+            IUserRepository userRepository,
             ApplicationContext context
             )
         {
@@ -32,6 +35,7 @@ namespace Business.Services.Models
             this.historyRepository = historyRepository;
             this.userRepository = userRepository;
             this.context = context;
+            this.accountRepository = accountRepository;
         }
 
         public Transaction Create(Transaction transaction, User user)
@@ -40,6 +44,7 @@ namespace Business.Services.Models
             {
                 throw new UnauthorizedOperationException(Constants.ModifyTransactionErrorMessage);
             }
+            transaction.Direction = DirectionType.Out;
             var newTransaction = this.transactionRepository.Create(transaction);
 
             //Todo - check the balance
@@ -105,7 +110,7 @@ namespace Business.Services.Models
         {
             var history = new History()
             {
-                EventTime = transaction.Date,
+                EventTime = DateTime.Now,
                 TransactionId = transaction.Id
             };
 

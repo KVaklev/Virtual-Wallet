@@ -10,11 +10,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VirtualWallet", "VirtualWal
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Business", "Business", "{A1AF3D17-77E4-4610-94C8-FE86171D0D91}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Business.Dto", "Business.Dto\Business.Dto.csproj", "{83199DC7-DAFD-4B41-8D55-42DCFD675763}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Business.DTOs", "Business.Dto\Business.DTOs.csproj", "{83199DC7-DAFD-4B41-8D55-42DCFD675763}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Business.Exceptions", "Business.Exceptions\Business.Exceptions.csproj", "{EA294377-058D-4694-949A-BEC906906AC9}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Business.Mapper", "Business.Mapper\Business.Mapper.csproj", "{2FCEA647-F51F-46F5-8BCE-D320295ADDFE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Business.Mappers", "Business.Mapper\Business.Mappers.csproj", "{2FCEA647-F51F-46F5-8BCE-D320295ADDFE}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Business.QueryParameters", "Business.QueryParameters\Business.QueryParameters.csproj", "{6FD11AE7-430C-41AF-AB14-75253D9AC8F3}"
 EndProject
