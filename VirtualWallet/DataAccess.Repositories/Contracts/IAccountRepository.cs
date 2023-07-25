@@ -10,7 +10,7 @@ namespace DataAccess.Repositories.Contracts
 {
     public interface IAccountRepository
     {
-        List<Account> GetAll();
+        IQueryable<Account> GetAll();
 
         PaginatedList<Transaction> FilterBy(TransactionQueryParameters filterParameters);
 
@@ -22,7 +22,9 @@ namespace DataAccess.Repositories.Contracts
 
         Account Create(Account account, User user);
 
-        Account Update(int id, Account account);
+        bool AddCard(int id, Card card);
+
+        bool RemoveCard(int id , Card card);
 
         bool Delete(int id);
 
@@ -31,6 +33,12 @@ namespace DataAccess.Repositories.Contracts
         Account DecreaseBalance(int id, int amount);
 
         bool CheckBalance(int id, int amount);
+
+        public bool CardExists(string cardNumber);
+
+        public bool AccountExists(int id);
+       
+        // bool AccountExists(int id);
 
 
     }
