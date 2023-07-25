@@ -1,4 +1,5 @@
 ﻿using DataAccess.Models.Enums;
+using DataAccess.Models.ValidationAttributes;
 using System.ComponentModel.DataAnnotations;
 
 namespace DataAccess.Models.Models

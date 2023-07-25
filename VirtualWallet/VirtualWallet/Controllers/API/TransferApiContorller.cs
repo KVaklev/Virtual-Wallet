@@ -7,7 +7,7 @@ namespace VirtualWallet.Controllers.API
 {
     [ApiController]
     [Route("api/transfer")]
-    public class TransferApiContorller : Controller
+    public class TransferApiContorller : ControllerBase
     {
         private readonly ITransferService transferService;
 

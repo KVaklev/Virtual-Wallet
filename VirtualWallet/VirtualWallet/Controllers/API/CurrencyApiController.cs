@@ -11,7 +11,7 @@ namespace VirtualWallet.Controllers.API
 {
     [ApiController]
     [Route("api/currency")]
-    public class CurrencyApiController : Controller
+    public class CurrencyApiController : ControllerBase
     {
         private readonly ICurrencyService currencyService;
         private readonly IMapper mapper;

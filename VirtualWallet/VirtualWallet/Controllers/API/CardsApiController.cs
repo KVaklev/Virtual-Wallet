@@ -13,7 +13,7 @@ namespace VirtualWallet.Controllers.API
 {
     [ApiController]
     [Route("api/cards")]
-    public class CardsApiController : Controller
+    public class CardsApiController : ControllerBase
     {
         private readonly IMapper mapper;
         private readonly IAuthManager authManager;
@@ -26,7 +26,7 @@ namespace VirtualWallet.Controllers.API
             this.cardService = cardService;
         }
 
-        [HttpGet(""), Authorize]
+        [HttpGet, Authorize]
         public IActionResult GetCards([FromQuery] CardQueryParameters cardQueryParameters)
         {
             try

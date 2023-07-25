@@ -36,6 +36,7 @@ namespace VirtualWallet
             builder.Services.AddScoped<IUserRepository, UserRepository>();
             builder.Services.AddScoped<ICardRepository, CardRepository>();
             builder.Services.AddScoped<ITransferRepository, TransferRepository>();
+            builder.Services.AddScoped<IAccountRepository, AccountRepository>();
             builder.Services.AddScoped<ICurrencyRepository, CurrencyRepository>();
             builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
             builder.Services.AddScoped<IHistoryRepository, HistoryRepository>();
@@ -45,6 +46,7 @@ namespace VirtualWallet
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<ICardService, CardService>();
             builder.Services.AddScoped<ITransferService, TransferService>();
+            builder.Services.AddScoped<IAccountService, AccountService>();
             builder.Services.AddScoped<ICurrencyService, CurrencyService>();
             builder.Services.AddScoped<ITransactionService, TransactionService>();
 

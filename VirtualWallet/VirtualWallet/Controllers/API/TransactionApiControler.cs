@@ -11,7 +11,7 @@ namespace VirtualWallet.Controllers.API
 {
     [ApiController]
     [Route("api/transaction")]
-    public class TransactionApiControler : Controller
+    public class TransactionApiControler : ControllerBase
     {
         private readonly IMapper mapper;
         private readonly IAuthManager authManager;

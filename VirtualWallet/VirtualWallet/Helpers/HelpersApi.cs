@@ -1,17 +1,10 @@
 ﻿using DataAccess.Models.Models;
 using Presentation.Helpers;
-using AutoMapper;
-using Business.Dto;
-using Business.Exceptions;
-using Business.QueryParameters;
-using Business.Services.Contracts;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 
 namespace VirtualWallet.Helpers
 {
-    public class HelpersApi : Controller
+    public class HelpersApi : ControllerBase
     {
         private readonly AuthManager authManager;
 

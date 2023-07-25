@@ -16,7 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Business.Dto\Business.Dto.csproj" />
+    <ProjectReference Include="..\Business.Dto\Business.DTOs.csproj" />
     <ProjectReference Include="..\Business.ViewModels\Business.ViewModels.csproj" />
     <ProjectReference Include="..\DataAccess.Models\DataAccess.Models.csproj" />
     <ProjectReference Include="..\DataAccess.Repositories\DataAccess.Repositories.csproj" />
