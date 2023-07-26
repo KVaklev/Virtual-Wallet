@@ -48,7 +48,7 @@ namespace VirtualWallet.Controllers.API
             }
         }
 
-        [HttpGet("")]
+        [HttpGet]
         public IActionResult GetAll()
         {
             try

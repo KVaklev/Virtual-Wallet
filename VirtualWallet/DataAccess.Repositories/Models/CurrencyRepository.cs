@@ -38,6 +38,7 @@ namespace DataAccess.Repositories.Models
             var currencyToUpdate = this.GetById(id);
             currencyToUpdate.Name = currency.Name;
             currencyToUpdate.Аbbreviation = currency.Аbbreviation;
+            context.SaveChanges();
 
             return currencyToUpdate;
         }
@@ -46,6 +47,8 @@ namespace DataAccess.Repositories.Models
         {
             var currencyToDelete = this.GetById(id);
             currencyToDelete.IsDeleted = true;
+            context.SaveChanges();
+
             return currencyToDelete.IsDeleted;
         }
 

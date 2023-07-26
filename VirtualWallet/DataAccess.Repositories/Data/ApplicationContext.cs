@@ -133,7 +133,7 @@ namespace DataAccess.Repositories.Data
                      PhoneNumber = "1234527890",
                      IsAdmin = false,
                      IsBlocked = false,
-                     AccountId=1
+                     AccountId=2
                 },
             };
 

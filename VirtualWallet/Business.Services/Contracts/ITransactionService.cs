@@ -12,10 +12,10 @@ namespace Business.Services.Contracts
     {
         Transaction Create(Transaction transaction, User user);
         Transaction GetById(int id, User user);
-        Transaction Update(int id, int userId, Transaction transaction);
-        bool Delete(int id, int userId);
+        Transaction Update(int id, User user, Transaction transaction);
+        bool Delete(int id, User user);
         IQueryable<Transaction> GetAll(string username);
         PaginatedList<Transaction> FilterBy(TransactionQueryParameters filterParameters, User user);
-        public bool Execute(int transactionId, int userId);
+        public bool Execute(int transactionId, User user);
     }
 }
