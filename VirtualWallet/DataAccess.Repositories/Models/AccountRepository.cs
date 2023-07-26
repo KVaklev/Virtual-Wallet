@@ -113,25 +113,17 @@ namespace DataAccess.Repositories.Models
             return account ?? throw new EntityNotFoundException($"Account with ID ={id} does not exist.");
         }
 
-        public Account GetByUserId(int id)
-        {
-            Account account = context.Accounts
-                .Where(a => a.UserId == id)
-                .FirstOrDefault();
-
-            return account ?? throw new EntityNotFoundException($"Account with UserID = {id} does not exist.");
-        }
-
         public Account GetByUsername(string username)
         {
             Account account = context.Accounts
                 .Where(a => a.User.Username == username)
                 .FirstOrDefault();
 
-            return account ?? throw new EntityNotFoundException($"Account with Username = {username} does not exist.");
+            return account ?? throw new EntityNotFoundException($"Account with username = {username} does not exist.");
         }
 
-        public Account IncreaseBalance(int id, int amount)
+       
+        public Account IncreaseBalance(int id, decimal amount)
         {
             Account accountToDepositTo = this.GetById(id);
 
@@ -142,7 +134,7 @@ namespace DataAccess.Repositories.Models
             return accountToDepositTo;
         }
 
-        public Account DecreaseBalance(int id, int amount)
+        public Account DecreaseBalance(int id, decimal amount)
         {
             Account accountToWithdrawFrom = this.GetById(id);
 
@@ -153,7 +145,7 @@ namespace DataAccess.Repositories.Models
             return accountToWithdrawFrom;
         }
 
-        public bool CheckBalance(int id, int amount)
+        public bool CheckBalance(int id, decimal amount)
         {
             Account accountToCheck = this.GetById(id);
 
@@ -164,11 +156,90 @@ namespace DataAccess.Repositories.Models
             return true;
         }
 
-        public PaginatedList<Transaction> FilterBy(TransactionQueryParameters filterParameters)
+        public PaginatedList<Account> FilterBy(AccountQueryParameters filterParameters)
         {
-            throw new NotImplementedException();
+            IQueryable<Account> result = context.Accounts;
+               
+            result = FilterByUsername(result, filterParameters.Username);
+            result = FilterByFromDate(result, filterParameters.FromDate);
+            result = FilterByToDate(result, filterParameters.ToDate);
+            result = FilterByCurrencyAbbrev(result, filterParameters.Currencyabbrev);
+
+            int totalPages = (result.Count() + filterParameters.PageSize -1) / filterParameters.PageSize;
+
+            result = Paginate(result, filterParameters.PageNumber, filterParameters.PageSize);
+
+            return new PaginatedList<Account>(result.ToList(), totalPages, filterParameters.PageNumber);
+
+
         }
 
+        public static IQueryable<Account> Paginate(IQueryable<Account> result, int pageNumber, int pageSize)
+        {
+            return result
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize);
+        }
+
+
+
+        public IQueryable<Account> FilterByUsername(IQueryable<Account> accounts, string? username)
+        {
+            if (!string.IsNullOrEmpty(username))
+            {
+                accounts = accounts.Where(a => a.User.Username == username);
+            }
+
+            return accounts;
+        }
+        private IQueryable<Account> FilterByFromDate(IQueryable<Account> accounts, string? fromDate)
+        {
+            if(!string.IsNullOrEmpty(fromDate))
+            {
+                DateTime date = DateTime.Parse(fromDate);
+
+                accounts = accounts.Where(a => a.DateCreated >= date);
+            }
+
+            return accounts;
+        }
+
+        private IQueryable<Account>FilterByToDate(IQueryable<Account> accounts, string? toDate)
+        {
+            if(!string.IsNullOrEmpty (toDate))
+            {
+                DateTime date = DateTime.Parse(toDate);
+
+                accounts = accounts.Where(a => a.DateCreated <= date);
+            }
+
+            return accounts;
+        }
+
+        private IQueryable<Account>FilterByCurrencyAbbrev(IQueryable<Account> accounts, string? currencyabbrev)
+        {
+            if (!string.IsNullOrEmpty(currencyabbrev))
+            {
+                accounts = accounts.Where(a => a.Currency.Аbbreviation == currencyabbrev);
+            }
+
+            return accounts;
+        }
+
+        private IQueryable<Account> SortBy(IQueryable<Account> accounts, string sortCriteria)
+        {
+            switch (sortCriteria)
+            {
+                case "balance":
+                    return accounts.OrderBy(a => a.Balance);
+                case "date":
+                    return accounts.OrderBy(a=>a.DateCreated);
+                case "cards":
+                    return accounts.OrderBy(a => a.Cards.Count());
+                default:
+                    return accounts;
+            }
+        }
         public bool CardExists(string cardNumber)
         {
             return context.Cards.Any(card => card.CardNumber == cardNumber);
@@ -178,6 +249,8 @@ namespace DataAccess.Repositories.Models
         {
             return context.Accounts.Any(account => account.Id == id);
         }
+
+        
 
 
 

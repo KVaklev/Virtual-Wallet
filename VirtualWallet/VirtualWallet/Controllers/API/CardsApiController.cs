@@ -1,9 +1,11 @@
 ﻿using AutoMapper;
 using Business.Dto;
 using Business.Exceptions;
+using Business.Mappers;
 using Business.QueryParameters;
 using Business.Services.Contracts;
 using Business.Services.Models;
+using DataAccess.Models.Enums;
 using DataAccess.Models.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -33,6 +35,25 @@ namespace VirtualWallet.Controllers.API
             {
                 List<Card> result = cardService.FilterBy(cardQueryParameters);
 
+                //List<GetCardDto> cardDtos = new List<GetCardDto>();
+
+                //foreach (var card in result)
+                //{
+                //    GetCardDto cardDto = new GetCardDto
+                //    {
+                //        CardNumber = card.CardNumber,
+                //        ExpirationDate = card.ExpirationDate,
+                //        CardHolder = card.CardHolder,
+                //        CheckNumber = card.CheckNumber,
+                //        CardType = card.CardType.ToString(),
+                //        AccountId = card.AccountId,
+                //        Username = card.Account.User.Username,
+                //        Balance = (decimal)card.Balance,
+                //    };
+
+                //    cardDtos.Add(cardDto);
+                //}
+
                 List<GetCardDto> cardDtos = result
                     .Select(card => mapper.Map<GetCardDto>(card))
                     .ToList();
@@ -43,7 +64,38 @@ namespace VirtualWallet.Controllers.API
             {
                 return StatusCode(StatusCodes.Status404NotFound, e.Message);
             }
-          
         }
+
+        [HttpGet("id"), Authorize]
+        public IActionResult GetById(int id)
+        {
+            try
+            {
+                Card card = cardService.GetById(id);
+                GetCardDto cardDto = mapper.Map<GetCardDto>(card);
+
+                return StatusCode(StatusCodes.Status200OK, cardDto);
+            }
+            catch (EntityNotFoundException e)
+            {
+                return StatusCode(StatusCodes.Status404NotFound, e.Message);
+            }
+        }
+
+        //[HttpGet("id"), Authorize]
+        //public IActionResult GetByAccountId(int accountId)
+        //{
+        //    try
+        //    {
+        //        Card card = cardService.GetById(id);
+        //        GetCardDto cardDto = mapper.Map<GetCardDto>(card);
+
+        //        return StatusCode(StatusCodes.Status200OK, cardDto);
+        //    }
+        //    catch (EntityNotFoundException e)
+        //    {
+        //        return StatusCode(StatusCodes.Status404NotFound, e.Message);
+        //    }
+        //}
     }
 }

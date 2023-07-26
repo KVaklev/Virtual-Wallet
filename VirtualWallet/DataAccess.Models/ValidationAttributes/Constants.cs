@@ -1,7 +1,4 @@
-﻿using System.Numerics;
-using System;
-
-namespace DataAccess.Models.ValidationAttributes
+﻿namespace DataAccess.Models.ValidationAttributes
 {
     public static class Constants
     {
@@ -20,8 +17,21 @@ namespace DataAccess.Models.ValidationAttributes
         public const string PhoneNumberLengthErrorMessage = "The {0} must be exactly {1} characters long.";
 
         public const string EmailFieldErrorMessage = "Please provide a valid email.";
-        public const string PhoneNumberFieldErroMessage = "The phone number must contain only digits.";
+        public const string PhoneNumberFieldErroMessage = "The {0} must contain only digits.";
         public const string ImageFileFieldErrorMessage = "Upload File";
+
+        //Constants for cards
+        public const int CardHolderMinLength = 2;
+        public const int CardHolderMaxLength = 30;
+        public const string CardHolderMinLengthErrorMessage = "The {0} must be at least {1} characters long.";
+        public const string CardHolderMaxLengthErrorMessage = "The {0} must be no more than {1} characters long.";
+        
+        public const string CardNumberFieldErroMessage = "The {0} must contain only digits.";
+        public const string CardNumberLengthErrorMessage = "The {0} must be exactly {1} characters long.";
+
+        public const string CardCheckNumberFieldErrorMessage = "The {0} must contain only digits.";
+        public const int CheckNumberLength = 3;
+        public const string CheckNumberLengthErrorMessage = "The {0} must be exactly {1} characters long.";
 
         //Others
         public const string EmptyFieldErrorMessage = "The field is required.";

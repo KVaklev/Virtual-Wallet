@@ -12,11 +12,11 @@ namespace Business.Services.Contracts
     {
         IQueryable<Account> GetAll();
         PaginatedList<Account> FilterBy(AccountQueryParameters accountQueryParameters);
-        Account GetById(int id);
-        Account GetByUsername(string username);
+        Account GetById(int id, User user);
+        Account GetByUsername(int id, User user);
         Account Create(Account account, User user);
-        bool AddCard(int id, Card card);
-        bool RemoveCard(int id,  Card card);
+        bool AddCard(int id, Card card, User user);
+        bool RemoveCard(int id,  Card card, User user);
         bool Delete(int id, User user);
 
        // bool AccountExists(int id);

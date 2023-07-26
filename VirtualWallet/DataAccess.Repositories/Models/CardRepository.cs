@@ -25,14 +25,6 @@ namespace DataAccess.Repositories.Models
                .ToList();
         }
 
-        public List<Card> GetByAccountId(int accountId)
-        {
-            List<Card> cards = context.Cards
-                .Where(card => card.AccountId == accountId)
-                .ToList();
-
-            return cards ?? throw new EntityNotFoundException($"Account with ID = {accountId} doesn't have any cards.");
-        }
         public Card GetById(int id)
         {
             var card = this.context.Cards
@@ -40,6 +32,14 @@ namespace DataAccess.Repositories.Models
                 ?? throw new EntityNotFoundException($"Card with ID = {id} doesn't exist.");
 
             return card;
+        }
+        public List<Card> GetByAccountId(int accountId)
+        {
+            List<Card> cards = context.Cards
+                .Where(card => card.AccountId == accountId)
+                .ToList();
+
+            return cards ?? throw new EntityNotFoundException($"Account with ID = {accountId} doesn't have any cards.");
         }
         public List<Card> FilterBy(CardQueryParameters filterParameters)
         {
@@ -63,6 +63,7 @@ namespace DataAccess.Repositories.Models
 
             return filteredAndSortedCards;
         }
+
         //public Card Add(int userId, int accountId, Card card)
         //{
         //    User user = context.Users
@@ -106,16 +107,13 @@ namespace DataAccess.Repositories.Models
 
         private static IQueryable<Card> FilterByUsername(IQueryable<Card> result, string username)
         {
+            result = result
+                .Include(c => c.Account)
+                .ThenInclude(a => a.User);
+
             if (!string.IsNullOrEmpty(username))
             {
-                result = result
-                    .Include(card => card.Account)
-                    .ThenInclude(account => account.User)
-                    .Where(card =>
-                        card.Account != null && card.Account.User != null &&
-                        card.Account.User.Username != null &&
-                        card.Account.User.Username.ToUpper().Contains(username.ToUpper())
-                    );
+                return result.Where(card => card.Account.User.Username.Contains(username.ToUpper()));
             }
 
             return result;
@@ -138,8 +136,7 @@ namespace DataAccess.Repositories.Models
         {
             if (balance.HasValue)
             {
-                result = result.Where(card => card.Account.Balance != null
-                                   && card.Account.Balance == balance.Value);
+                result = result.Where(card => card.Balance <= balance);
             }
 
             return result;
@@ -165,7 +162,7 @@ namespace DataAccess.Repositories.Models
             switch (sortOrder)
             {
                 case "desc":
-                    return result.Reverse();
+                    return result.AsEnumerable().Reverse().AsQueryable();
                 default:
                     return result;
             }
