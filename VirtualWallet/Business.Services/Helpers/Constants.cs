@@ -8,5 +8,7 @@
         public const string ModifyUsernameErrorMessage = "Username change is not allowed.";
         public const string ModifyTransactionErrorMessage = "You are not authorized.";
         public const string ModifyCurrencyErrorMessage = "You are not admin.";
+        public const string ModifyAccountErrorMessage = "Only the admin or owner of the account can delete or modify it.";
+
     }
 }

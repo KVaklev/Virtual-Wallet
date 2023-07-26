@@ -21,13 +21,12 @@ namespace DataAccess.Repositories.Models
             this.context = context;
         }
 
-        public List<Account> GetAll()
+        public IQueryable<Account> GetAll()
         {
-            List<Account> result = context.Accounts
+            IQueryable<Account> result = context.Accounts
                  .Include(a => a.User)
                  .Include(a => a.Balance)
-                 .Include(a => a.Currency)
-                 .ToList();
+                 .Include(a => a.Currency);
 
             return result ?? throw new EntityNotFoundException($"There are no accounts");
         }
@@ -56,13 +55,53 @@ namespace DataAccess.Repositories.Models
             return false;
         }
 
-        public Account Update(int id, Account account)
+        public bool AddCard(int id, Card card)
         {
-            var accountToUpdate = this.GetById(id);
-            accountToUpdate.Balance = account.Balance;
-            accountToUpdate.Currency = account.Currency;
-            context.SaveChanges();
-            return accountToUpdate;
+            var accountToAddCard = this.context.Accounts.FirstOrDefault(a => a.Id == id);
+
+            if (accountToAddCard == null)
+            {
+                throw new EntityNotFoundException($"Account with ID = {id} does not exist.");
+            }
+
+            if (!CardExists(card.CardNumber))
+            {
+                accountToAddCard.Cards.Add(card);
+
+                context.SaveChanges();
+
+                return true;
+            }
+
+            else
+            {
+                throw new EntityNotFoundException($"Card with number = {card.CardNumber} already exists.");
+            }
+        }
+
+        public bool RemoveCard(int id, Card card)
+        {
+            var accountToRemoveCard = this.context.Accounts.FirstOrDefault(a => a.Id == id);
+
+
+            if (accountToRemoveCard == null)
+            {
+                throw new EntityNotFoundException($"Account with ID = {id} does not exist.");
+            }
+
+           if (CardExists(card.CardNumber))
+            {
+                accountToRemoveCard.Cards.Remove(card);
+
+                context.SaveChanges();
+
+                return true;
+            }
+
+            else
+            {
+                throw new EntityNotFoundException($"Card with ID = {card.Id} does not exist.");
+            }
         }
 
         public Account GetById(int id)
@@ -98,15 +137,18 @@ namespace DataAccess.Repositories.Models
 
             accountToDepositTo.Balance += amount;
 
+            context.SaveChanges();
+
             return accountToDepositTo;
         }
-
 
         public Account DecreaseBalance(int id, int amount)
         {
             Account accountToWithdrawFrom = this.GetById(id);
 
             accountToWithdrawFrom.Balance -= amount;
+
+            context.SaveChanges();
 
             return accountToWithdrawFrom;
         }
@@ -126,5 +168,24 @@ namespace DataAccess.Repositories.Models
         {
             throw new NotImplementedException();
         }
+
+        public bool CardExists(string cardNumber)
+        {
+            return context.Cards.Any(card => card.CardNumber == cardNumber);
+        }
+
+        public bool AccountExists(int id)
+        {
+            return context.Accounts.Any(account => account.Id == id);
+        }
+
+
+
+        //public bool AccountExists(int id)
+        //{
+        //    return context.Accounts.Any(a => a.UserId == id);
+        //}
+
+
     }
 }
