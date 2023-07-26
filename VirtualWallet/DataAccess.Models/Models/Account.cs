@@ -9,8 +9,8 @@ namespace DataAccess.Models.Models
         public int? UserId { get; set; }
         public User? User { get; set; }
         public decimal Balance { get; set; }
-        public int CurrencyId { get; set; }
-        public Currency Currency { get; set; }
+        public int? CurrencyId { get; set; }
+        public Currency? Currency { get; set; }
         public List<Card> Cards { get; set; } = new List<Card>();
         public List<Transfer> Transfers { get; set; } = new List<Transfer>();
         public List<Transaction> TransactionsSender { get; set; } = new List<Transaction>();

@@ -30,5 +30,9 @@ namespace DataAccess.Models.Models
         public Account Account { get; set; }
         public decimal Balance { get; set; }
         public decimal? CreditLimit { get; set; }
+
+        public Currency? Currency { get; set; }
+
+        public int? CurrencyId { get; set; }
     }
 }

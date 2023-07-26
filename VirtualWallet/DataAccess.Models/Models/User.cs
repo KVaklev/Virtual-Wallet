@@ -47,5 +47,6 @@ namespace DataAccess.Models.Models
         public IFormFile ImageFile { get; set; }
         public Account? Account { get; set; }
         public int? AccountId { get; set; }
+
     }
 }

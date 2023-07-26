@@ -13,7 +13,9 @@ namespace DataAccess.Models.Models
         [StringLength(3,ErrorMessage = "The {0} must be {1} characters long.")]
         public string Аbbreviation { get; set; }
 
-        public List<Account> Accounts { get; set; }
+        public List<Account> Accounts { get; set; } = new List<Account>();
+
+        public List<Card> Cards { get; set; } = new List<Card>();
 
         public List<Transaction> Transactions { get; set; } = new List<Transaction>();
 
