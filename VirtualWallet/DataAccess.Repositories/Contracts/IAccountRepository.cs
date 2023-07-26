@@ -12,11 +12,9 @@ namespace DataAccess.Repositories.Contracts
     {
         IQueryable<Account> GetAll();
 
-        PaginatedList<Transaction> FilterBy(TransactionQueryParameters filterParameters);
+        PaginatedList<Account> FilterBy(AccountQueryParameters filterParameters);
 
         Account GetById(int id);
-
-        Account GetByUserId(int id);
 
         Account GetByUsername(string username);
 
@@ -24,20 +22,20 @@ namespace DataAccess.Repositories.Contracts
 
         bool AddCard(int id, Card card);
 
-        bool RemoveCard(int id , Card card);
+        bool RemoveCard(int id, Card card);
 
         bool Delete(int id);
 
-        Account IncreaseBalance(int id, int amount);
+        Account IncreaseBalance(int id, decimal amount);
 
-        Account DecreaseBalance(int id, int amount);
+        Account DecreaseBalance(int id, decimal amount);
 
-        bool CheckBalance(int id, int amount);
+        bool CheckBalance(int id, decimal amount);
 
         public bool CardExists(string cardNumber);
 
         public bool AccountExists(int id);
-       
+
         // bool AccountExists(int id);
 
 

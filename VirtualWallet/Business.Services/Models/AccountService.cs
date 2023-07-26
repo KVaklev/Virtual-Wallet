@@ -20,16 +20,16 @@ namespace Business.Services.Models
         {
             this.accountRepository = accountRepository;
         }
-
         public IQueryable<Account> GetAll()
         {
             return accountRepository.GetAll();
         }
 
-        public PaginatedList<Account> FilterBy(AccountQueryParameters accountQueryParameters)
+        public PaginatedList<Account> FilterBy(AccountQueryParameters filterParameters)
         {
-            throw new NotImplementedException();
+            return this.accountRepository.FilterBy(filterParameters);
         }
+                
         public Account Create(Account account, User user)
         {
             Account accountToCreate = this.accountRepository.Create(account, user);
@@ -41,9 +41,7 @@ namespace Business.Services.Models
 
         public bool Delete(int id, User user)
         {
-            var accounToDelete = this.accountRepository.GetById(id);
-
-            if (accounToDelete.UserId != user.Id || !user.IsAdmin)
+            if (!IsUserAccountOwnerOrAdminId(id, user.Id, user.IsAdmin))
             {
                 throw new UnauthorizedOperationException(Constants.ModifyAccountErrorMessage);
             }
@@ -51,26 +49,57 @@ namespace Business.Services.Models
             return this.accountRepository.Delete(id);
         }
 
-        public Account GetById(int id)
+        public Account GetById(int id, User user)
         {
+            if (!IsUserAccountOwnerOrAdminId(id, user))
+            {
+                throw new UnauthorizedOperationException(Constants.ModifyAccountErrorMessage);
+            }
             return this.accountRepository.GetById(id);
         }
 
-        public Account GetByUsername(string username)
+        public Account GetByUsername(int id, User user)
         {
-            return accountRepository.GetByUsername(username);
+            if (!IsUserAccountOwnerOrAdminId(id, user))
+            {
+                throw new UnauthorizedOperationException(Constants.ModifyAccountErrorMessage);
+            }
+            return accountRepository.GetByUsername(user.Username);
         }
 
-        public bool AddCard(int id, Card card) 
+        public bool AddCard(int id, Card card, User user)
         {
-
-          return this.accountRepository.AddCard(id, card);
+            if (!IsUserAccountOwnerOrAdminId(id, user))
+            {
+                throw new UnauthorizedOperationException(Constants.ModifyAccountCardErrorMessage);
+            }
+            return this.accountRepository.AddCard(id, card);
         }
 
-        public bool RemoveCard(int id, Card card) 
+        public bool RemoveCard(int id, Card card, User user)
         {
+            if (!IsUserAccountOwnerOrAdminId(id, user))
+            {
+                throw new UnauthorizedOperationException(Constants.ModifyAccountCardErrorMessage);
+            }
             return this.accountRepository.RemoveCard(id, card);
         }
+
+        public bool IsUserAccountOwnerOrAdminId(int id, User user)
+        {
+            bool IsUserAccountOwnerOrAdminId = false;
+
+            Account accountToGet = this.accountRepository.GetById(id);
+
+            if (accountToGet.UserId == user.Id || user.IsAdmin)
+            {
+                IsUserAccountOwnerOrAdminId = true;
+            }
+
+            return IsUserAccountOwnerOrAdminId;
+
+        }
+
 
 
         //public bool AccountExists(int id)
