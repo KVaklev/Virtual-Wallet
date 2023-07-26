@@ -86,7 +86,7 @@ namespace VirtualWallet.Controllers.API
                 new Claim(JwtRegisteredClaimNames.Email, loggedUser.Email),
                 new Claim(JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString())
         },
-            expires: DateTime.Now.AddMinutes(10),
+            expires: DateTime.Now.AddMinutes(30),
                     signingCredentials: signinCredentials
                 );
             string token = new JwtSecurityTokenHandler()

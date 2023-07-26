@@ -1,3 +1,4 @@
+using Business.Mappers;
 using Business.Services.Contracts;
 using Business.Services.Models;
 using DataAccess.Repositories.Contracts;
@@ -51,7 +52,6 @@ namespace VirtualWallet
             builder.Services.AddScoped<ITransactionService, TransactionService>();
 
             //Helpers
-            builder.Services.AddScoped<CustomAutoMapper>();
             builder.Services.AddScoped<IAuthManager, AuthManager>();
             builder.Services.AddScoped<AuthManager>();
             builder.Services.AddScoped<HelpersApi>();

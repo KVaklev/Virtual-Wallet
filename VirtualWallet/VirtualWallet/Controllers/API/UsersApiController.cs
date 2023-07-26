@@ -61,7 +61,7 @@ namespace VirtualWallet.Controllers.API
         }
 
         [HttpGet("id"),Authorize]
-        public IActionResult GetUserById(int id)
+        public IActionResult GetById(int id)
         {
             try
             {

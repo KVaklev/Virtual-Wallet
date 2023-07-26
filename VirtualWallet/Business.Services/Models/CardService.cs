@@ -17,13 +17,13 @@ namespace Business.Services.Models
         {
             return this.repository.GetAll();
         }
-        public List<Card> GetByAccountId(int accountId)
-        {
-            return this.repository.GetByAccountId(accountId);
-        }
         public Card GetById(int id)
         {
             return this.repository.GetById(id);
+        }
+        public List<Card> GetByAccountId(int accountId)
+        {
+            return this.repository.GetByAccountId(accountId);
         }
         public List<Card> FilterBy(CardQueryParameters filterParameters)
         {
