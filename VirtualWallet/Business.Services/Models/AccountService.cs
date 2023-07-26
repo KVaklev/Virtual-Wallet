@@ -41,7 +41,7 @@ namespace Business.Services.Models
 
         public bool Delete(int id, User user)
         {
-            if (!IsUserAccountOwnerOrAdminId(id, user.Id, user.IsAdmin))
+            if (!IsUserAccountOwnerOrAdminId(id, user))
             {
                 throw new UnauthorizedOperationException(Constants.ModifyAccountErrorMessage);
             }

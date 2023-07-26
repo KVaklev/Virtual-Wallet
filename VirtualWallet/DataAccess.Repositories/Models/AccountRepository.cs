@@ -25,7 +25,7 @@ namespace DataAccess.Repositories.Models
         {
             IQueryable<Account> result = context.Accounts
                  .Include(a => a.User)
-                 .Include(a => a.Balance)
+                 //.Include(a => a.Balance)
                  .Include(a => a.Currency);
 
             return result ?? throw new EntityNotFoundException($"There are no accounts");

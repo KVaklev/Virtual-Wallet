@@ -28,7 +28,10 @@ namespace DataAccess.Models.Models
 
         [Required(ErrorMessage = Constants.EmptyFieldErrorMessage)]
         public CardType CardType { get; set; }
+
         public int AccountId { get; set; }
+
+        [Required(ErrorMessage = Constants.EmptyFieldErrorMessage)]
         public Account Account { get; set; }
 
         [Required(ErrorMessage = Constants.EmptyFieldErrorMessage)]
