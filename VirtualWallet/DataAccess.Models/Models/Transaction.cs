@@ -1,5 +1,6 @@
 ﻿using DataAccess.Models.Enums;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace DataAccess.Models.Models
 {
@@ -28,10 +29,12 @@ namespace DataAccess.Models.Models
 
         public DateTime Date { get; set; }
 
+
         [Required(ErrorMessage = "The {0} field is required")]
         [Range(1, int.MaxValue, ErrorMessage = "The {0} field must be in the range from {1} to {2}.")]
         public int CurrencyId { get; set; } //FK
-
+        
+        [JsonIgnore]
         public Currency Currency { get; set; }
 
         public bool IsExecuted { get; set; }
