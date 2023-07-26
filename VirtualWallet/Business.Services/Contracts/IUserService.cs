@@ -5,9 +5,11 @@ namespace Business.Services.Contracts
 {
     public interface IUserService
     {
-        List<User> GetAll();
+        //List<User> GetAll();
+        Task<List<User>> GetAllAsync();
 
-        List<User> FilterBy(UserQueryParameters filterParameters);
+        Task<List<User>> FilterByAsync(UserQueryParameters queryParameters);
+        //List<User> FilterBy(UserQueryParameters filterParameters);
         //PaginatedList<IUser> FilterBy(UserQueryParameters filterParameters);
         User GetById(int id);
         User GetByUsername(string username);

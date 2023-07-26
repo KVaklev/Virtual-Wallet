@@ -17,29 +17,31 @@ namespace Business.Services.Models
         {
             return this.repository.GetAll();
         }
-        //public List<Card> GetByUserId(int userId)
-        //{
-        //    return this.repository.GetByUserId(userId);
-        //}
+        public List<Card> GetByAccountId(int accountId)
+        {
+            return this.repository.GetByAccountId(accountId);
+        }
+        public Card GetById(int id)
+        {
+            return this.repository.GetById(id);
+        }
         public List<Card> FilterBy(CardQueryParameters filterParameters)
         {
             return this.repository.FilterBy(filterParameters);
         }
-        public Card Add(int userId, Card card)
-        {
-            throw new NotImplementedException();
-        }
+        //public Card Add(int userId, Card card)
+        //{
+        //    throw new NotImplementedException();
+        //}
 
-        public Card Update()
-        {
-            throw new NotImplementedException();
-        }
-        public void Delete()
-        {
-            throw new NotImplementedException();
-        }
-
-
+        //public Card Update()
+        //{
+        //    throw new NotImplementedException();
+        //}
+        //public void Delete()
+        //{
+        //    throw new NotImplementedException();
+        //}
 
 
     }

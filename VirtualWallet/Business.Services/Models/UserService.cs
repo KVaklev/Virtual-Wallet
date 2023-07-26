@@ -16,14 +16,25 @@ namespace Business.Services.Models
             this.repository = repository;
         }
 
-        public List<User> GetAll()
+        //public List<User> GetAll()
+        //{
+        //    return this.repository.GetAll();
+        //}
+
+        public async Task<List<User>> GetAllAsync()
         {
-            return this.repository.GetAll();
+            return await this.repository.GetAllAsync();
         }
-        public List<User> FilterBy(UserQueryParameters filterParameters)
+        //public List<User> FilterBy(UserQueryParameters filterParameters)
+        //{
+        //    return this.repository.FilterBy(filterParameters);
+        //}
+
+        public async Task<List<User>> FilterByAsync(UserQueryParameters filterParameters)
         {
-            return this.repository.FilterBy(filterParameters);
+            return await this.repository.FilterByAsync(filterParameters);
         }
+
         public User GetById(int id)
         {
             return this.repository.GetById(id);

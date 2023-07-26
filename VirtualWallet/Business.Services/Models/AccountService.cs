@@ -1,5 +1,7 @@
-﻿using Business.QueryParameters;
+﻿using Business.Exceptions;
+using Business.QueryParameters;
 using Business.Services.Contracts;
+using Business.Services.Helpers;
 using DataAccess.Models.Models;
 using DataAccess.Repositories.Contracts;
 using System;
@@ -19,39 +21,63 @@ namespace Business.Services.Models
             this.accountRepository = accountRepository;
         }
 
-        public Account Create(Account account)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool Delete(int id)
-        {
-            throw new NotImplementedException();
-        }
-
-        public PaginatedList<Account> FilterBy(AccountQueryParameters accaountQueryParameters)
-        {
-            throw new NotImplementedException();
-        }
-
         public IQueryable<Account> GetAll()
         {
+            return accountRepository.GetAll();
+        }
+
+        public PaginatedList<Account> FilterBy(AccountQueryParameters accountQueryParameters)
+        {
             throw new NotImplementedException();
+        }
+        public Account Create(Account account, User user)
+        {
+            Account accountToCreate = this.accountRepository.Create(account, user);
+
+            accountToCreate.User = user;
+
+            return accountToCreate;
+        }
+
+        public bool Delete(int id, User user)
+        {
+            var accounToDelete = this.accountRepository.GetById(id);
+
+            if (accounToDelete.UserId != user.Id || !user.IsAdmin)
+            {
+                throw new UnauthorizedOperationException(Constants.ModifyAccountErrorMessage);
+            }
+
+            return this.accountRepository.Delete(id);
         }
 
         public Account GetById(int id)
         {
-            throw new NotImplementedException();
+            return this.accountRepository.GetById(id);
         }
 
         public Account GetByUsername(string username)
         {
-            throw new NotImplementedException();
+            return accountRepository.GetByUsername(username);
         }
 
-        public Account Update(int id, Account account)
+        public bool AddCard(int id, Card card) 
         {
-            throw new NotImplementedException();
+
+          return this.accountRepository.AddCard(id, card);
         }
+
+        public bool RemoveCard(int id, Card card) 
+        {
+            return this.accountRepository.RemoveCard(id, card);
+        }
+
+
+        //public bool AccountExists(int id)
+        //{
+        //    return this.accountRepository.AccountExists(id);
+        //}
+
+
     }
 }

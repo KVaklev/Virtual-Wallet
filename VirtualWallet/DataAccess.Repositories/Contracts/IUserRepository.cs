@@ -5,8 +5,10 @@ namespace DataAccess.Repositories.Contracts
 {
     public interface IUserRepository
     {
-        List<User> GetAll();
-        List<User> FilterBy(UserQueryParameters filterParameters);
+        //List<User> GetAll();
+        Task<List<User>> GetAllAsync();
+        //List<User> FilterBy(UserQueryParameters filterParameters);
+        Task<List<User>>FilterByAsync(UserQueryParameters queryParameters);
         // PaginatedList<IUser> FilterBy(UserQueryParameters filterParameters);
         User GetById(int id);
         User GetByUsername(string username);
