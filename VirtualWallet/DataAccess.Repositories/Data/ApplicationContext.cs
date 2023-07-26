@@ -146,36 +146,7 @@ namespace DataAccess.Repositories.Data
                 .HasForeignKey<Account>(a => a.UserId)
                 .OnDelete(DeleteBehavior.NoAction);
 
-            //Seed accounts
 
-            List<Account> accounts = new List<Account>()
-            {
-                new Account()
-                {
-                    Id = 1,
-                    UserId = 1
-
-                },
-
-                new Account()
-                {
-                    Id = 2,
-                    UserId = 2
-                }
-            };
-
-            modelBuilder.Entity<Account>().HasData(accounts);
-            modelBuilder.Entity<Account>()
-                .HasMany(u => u.TransactionsSender)
-                .WithOne(t => t.AccountSender)
-                .HasForeignKey(t => t.AccountSenderId)
-                .OnDelete(DeleteBehavior.NoAction);
-
-            modelBuilder.Entity<Account>()
-                .HasMany(u => u.TransactionsRecipient)
-                .WithOne(t => t.AccountRecepient)
-                .HasForeignKey(t => t.AccountRecepientId)
-                .OnDelete(DeleteBehavior.NoAction);
 
             //Seed currencies
 
@@ -190,7 +161,7 @@ namespace DataAccess.Repositories.Data
                 },
 
                 new Currency()
-                { 
+                {
                 Id = 2,
                 Name = "Американски долар",
                 Аbbreviation = "USD",
@@ -252,6 +223,7 @@ namespace DataAccess.Repositories.Data
                      CardNumber = "1234567891011121",
                      CardHolder = "Ivancho Draganchov",
                      CheckNumber = "005",
+                     CurrencyId = 1,
                      ExpirationDate = DateTime.Now.AddMonths(7),
                      CardType = CardType.Debit,
                      AccountId = 1,
@@ -264,6 +236,7 @@ namespace DataAccess.Repositories.Data
                      CardNumber = "2232567891011121",
                      CardHolder = "Mariq Andreeva",
                      CheckNumber = "015",
+                     CurrencyId = 2,
                      ExpirationDate = DateTime.Now.AddMonths(6),
                      CardType = CardType.Debit,
                      AccountId = 2,
@@ -276,6 +249,7 @@ namespace DataAccess.Repositories.Data
                      CardNumber = "2232565891011121",
                      CardHolder = "Mariq Andreeva",
                      CheckNumber = "025",
+                     CurrencyId = 2,
                      ExpirationDate = DateTime.Now.AddMonths(6),
                      CardType = CardType.Credit,
                      AccountId = 2,
@@ -286,16 +260,52 @@ namespace DataAccess.Repositories.Data
 
             modelBuilder.Entity<Card>().HasData(cards);
             modelBuilder.Entity<Card>()
-                .HasOne(a=>a.Currency)
-                .WithMany(a=>a.Cards)
+                .HasOne(a => a.Currency)
+                .WithMany(a => a.Cards)
                 .HasForeignKey(c => c.CurrencyId)
                 .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<Card>()
                .HasOne(a => a.Account)
-               .WithMany(a=>a.Cards)
+               .WithMany(a => a.Cards)
                .HasForeignKey(c => c.AccountId)
                .OnDelete(DeleteBehavior.NoAction);
+
+            //Seed accounts
+            List<Account> accounts = new List<Account>()
+            {
+                new Account()
+                {
+                    Id = 1,
+                    UserId = 1,
+                    Balance = 850,
+
+                },
+
+
+
+                new Account()
+                {
+                    Id = 2,
+                    UserId = 2,
+                    Balance = 1000,
+                }
+
+
+            };
+
+            modelBuilder.Entity<Account>().HasData(accounts);
+            modelBuilder.Entity<Account>()
+                .HasMany(u => u.TransactionsSender)
+                .WithOne(t => t.AccountSender)
+                .HasForeignKey(t => t.AccountSenderId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<Account>()
+                .HasMany(u => u.TransactionsRecipient)
+                .WithOne(t => t.AccountRecepient)
+                .HasForeignKey(t => t.AccountRecepientId)
+                .OnDelete(DeleteBehavior.NoAction);
 
             //Seed history
 
