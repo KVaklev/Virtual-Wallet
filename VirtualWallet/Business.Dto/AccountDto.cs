@@ -9,5 +9,7 @@
         public DateTime DateCreated { get; set; }
 
         public decimal Balance { get; set; }
+
+
     }
 }
