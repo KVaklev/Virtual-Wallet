@@ -18,5 +18,7 @@ namespace Business.Services.Contracts
         bool Delete(int id, User user);
 
         List<Currency> GetAll();
+
+        Currency GetByАbbreviation(string abbreviation);
     }
 }

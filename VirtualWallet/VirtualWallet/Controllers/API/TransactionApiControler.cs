@@ -18,7 +18,8 @@ namespace VirtualWallet.Controllers.API
         private readonly ITransactionService transactionService;
         private readonly IAccountService accountService;
         private readonly IUserService userService;
-        private readonly HelpersApi helpersApi;
+        private readonly ICurrencyService currencyService;
+      
 
         public TransactionApiControler(
             IMapper mapper, 
@@ -26,7 +27,7 @@ namespace VirtualWallet.Controllers.API
             ITransactionService transactionService,
             IAccountService accountService,
             IUserService userService,
-            HelpersApi helpersApi
+            ICurrencyService currencyService
             )
         {
             this.mapper = mapper;
@@ -34,23 +35,25 @@ namespace VirtualWallet.Controllers.API
             this.transactionService = transactionService;
             this.accountService = accountService;
             this.userService = userService;
-            this.helpersApi = helpersApi;
+            this.currencyService = currencyService;
+
             
         }
 
         [HttpPost, Authorize]
         public IActionResult Create([FromBody]CreateTransactionDto transactionDto)
         {
-            var loggedUser = this.helpersApi.FindLoggedUser();
-            //var recipientUser = this.userService
-            //    .GetAll()
-            //    .Where(u => u.Username == transactionDto.RecepiendUsername)
-            //    .FirstOrDefault();
+            //Todo map method
+            var loggedUsersUsername = User.Claims.FirstOrDefault(claim => claim.Type == "Username").Value;
+            var loggedUser = this.userService.GetByUsername(loggedUsersUsername);
+            var userRecipient = this.userService.GetByUsername(transactionDto.RecepientUsername);
+            var currency = this.currencyService.GetByАbbreviation(transactionDto.Currency);
 
             var transaction = new Transaction();
             transaction.AccountSenderId = loggedUser.Id;
-           // transaction.AccountRecepientId = recipientUser.Id;
+            transaction.AccountRecepientId = (int)userRecipient.AccountId;
             transaction.Amount = transactionDto.Amount;
+            transaction.CurrencyId = currency.Id;
             
 
             var createdTransaction=this.transactionService.Create(transaction, loggedUser);

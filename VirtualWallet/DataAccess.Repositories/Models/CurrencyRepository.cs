@@ -58,5 +58,14 @@ namespace DataAccess.Repositories.Models
             return currencies ?? throw new EntityNotFoundException("Тhere is no such currency");
         }
 
+        public Currency GetByАbbreviation(string abbreviation)
+        {
+            var currency = context.Currencies
+                    .Where(c => c.Аbbreviation == abbreviation)
+                    .FirstOrDefault();
+ 
+            return currency ?? throw new EntityNotFoundException("Тhere is no such currency");
+        }
+
     }
 }

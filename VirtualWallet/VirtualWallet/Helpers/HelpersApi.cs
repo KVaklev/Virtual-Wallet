@@ -16,6 +16,7 @@ namespace VirtualWallet.Helpers
 
         public User FindLoggedUser()
         {
+            var user = User;
             var loggedUsersUsername = User.Claims.FirstOrDefault(claim => claim.Type == "Username").Value;
             var loggedUser = authManager.TryGetUserByUsername(loggedUsersUsername);
             return loggedUser;
