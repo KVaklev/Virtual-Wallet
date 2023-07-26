@@ -132,7 +132,8 @@ namespace DataAccess.Repositories.Data
                      Password = "MTIz",
                      PhoneNumber = "1234527890",
                      IsAdmin = false,
-                     IsBlocked = false
+                     IsBlocked = false,
+                     AccountId=2
                 },
             };
 

@@ -57,18 +57,18 @@ namespace Business.Services.Models
             return this.transactionRepository.GetById(id);
         }
 
-        public Transaction Update(int id, int userId, Transaction transaction)
+        public Transaction Update(int id, User user, Transaction transaction)
         {
-            if (!IsUserUnauthorized(id, userId))
+            if (!IsUserUnauthorized(id, user.Id))
             {
                 throw new UnauthorizedOperationException(Constants.ModifyTransactionErrorMessage);
             }
             return this.transactionRepository.Update(id, transaction);
         }
 
-        public bool Delete(int id, int userId)
+        public bool Delete(int id, User user)
         {
-            if (!IsUserUnauthorized(id,userId))
+            if (!IsUserUnauthorized(id,user.Id))
             {
                 throw new UnauthorizedOperationException(Constants.ModifyTransactionErrorMessage);
             }
@@ -82,12 +82,17 @@ namespace Business.Services.Models
 
         public PaginatedList<Transaction> FilterBy(TransactionQueryParameters filterParameters, User user)
         {
-            return this.transactionRepository.FilterBy(filterParameters, user.Username);
+            var result = this.transactionRepository.FilterBy(filterParameters, user.Username);
+            if (result.Count==0)
+            {
+                throw new EntityNotFoundException(Constants.ModifyTransactionNoDataErrorMessage);
+            }
+            return result;
         }
 
-        public bool Execute(int transactionId, int userId)
+        public bool Execute(int transactionId, User user)
         {
-            if (!IsUserUnauthorized(transactionId,userId))
+            if (!IsUserUnauthorized(transactionId,user.Id))
             {
                 throw new UnauthorizedOperationException(Constants.ModifyTransactionErrorMessage);
             }

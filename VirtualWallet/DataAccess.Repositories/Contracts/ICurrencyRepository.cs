@@ -19,5 +19,7 @@ namespace DataAccess.Repositories.Contracts
         bool Delete(int id);
 
         List<Currency> GetAll();
+
+        Currency GetByАbbreviation(string abbreviation);
     }
 }

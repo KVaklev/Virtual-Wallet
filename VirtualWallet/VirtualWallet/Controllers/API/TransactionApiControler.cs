@@ -6,6 +6,9 @@ using Microsoft.AspNetCore.Mvc;
 using Presentation.Helpers;
 using VirtualWallet.Helpers;
 using Microsoft.AspNetCore.Authorization;
+using Business.Exceptions;
+using Business.DTOs;
+using Business.QueryParameters;
 
 namespace VirtualWallet.Controllers.API
 {
@@ -18,15 +21,16 @@ namespace VirtualWallet.Controllers.API
         private readonly ITransactionService transactionService;
         private readonly IAccountService accountService;
         private readonly IUserService userService;
-        private readonly HelpersApi helpersApi;
+        private readonly ICurrencyService currencyService;
+
 
         public TransactionApiControler(
-            IMapper mapper, 
+            IMapper mapper,
             IAuthManager authManager,
             ITransactionService transactionService,
             IAccountService accountService,
             IUserService userService,
-            HelpersApi helpersApi
+            ICurrencyService currencyService
             )
         {
             this.mapper = mapper;
@@ -34,28 +38,142 @@ namespace VirtualWallet.Controllers.API
             this.transactionService = transactionService;
             this.accountService = accountService;
             this.userService = userService;
-            this.helpersApi = helpersApi;
-            
+            this.currencyService = currencyService;
+
+
         }
 
         [HttpPost, Authorize]
-        public IActionResult Create([FromBody]CreateTransactionDto transactionDto)
+        public IActionResult Create([FromBody] CreateTransactionDto transactionDto)
         {
-            var loggedUser = this.helpersApi.FindLoggedUser();
-            //var recipientUser = this.userService
-            //    .GetAll()
-            //    .Where(u => u.Username == transactionDto.RecepiendUsername)
-            //    .FirstOrDefault();
+            //Todo map method
+
+            var loggedUser = FindLoggedUser();
+            var transaction = MapDtoТоTransaction(transactionDto);
+            var createdTransaction = this.transactionService.Create(transaction, loggedUser);
+            var createdTransactionDto = MapTransactionToDto(createdTransaction);
+
+            return StatusCode(StatusCodes.Status201Created, createdTransactionDto);
+        }
+
+        [HttpDelete("{id}"), Authorize]
+        public IActionResult Delete(int id)
+        {
+            try
+            {
+                var loggedUser = FindLoggedUser();
+                var isDelete = this.transactionService.Delete(id,loggedUser);
+                return StatusCode(StatusCodes.Status200OK);
+            }
+            catch (EntityNotFoundException e)
+            {
+                return StatusCode(StatusCodes.Status404NotFound, e.Message);
+            }
+            catch (UnauthorizedOperationException e)
+            {
+                return StatusCode(StatusCodes.Status401Unauthorized, e.Message);
+            }
+        }
+
+        [HttpPut("{id}"), Authorize]
+        public IActionResult Update(int id, [FromBody] CreateTransactionDto transactionDto)
+        {
+            try
+            {
+                var loggedUser = FindLoggedUser();
+                var transaction = MapDtoТоTransaction(transactionDto);
+                var updateTransaction = this.transactionService.Update(id, loggedUser, transaction);
+                var updateTransactionDto = MapTransactionToDto(updateTransaction);
+                return StatusCode(StatusCodes.Status200OK, updateTransactionDto);
+            }
+            catch (EntityNotFoundException e)
+            {
+                return StatusCode(StatusCodes.Status404NotFound, e.Message);
+            }
+            catch (UnauthorizedOperationException e)
+            {
+                return StatusCode(StatusCodes.Status401Unauthorized, e.Message);
+            }
+        }
+
+        [HttpGet("{id}"), Authorize]
+        public IActionResult GetById(int id)
+        {
+            try
+            {
+                var loggedUser = FindLoggedUser();
+                var transaction = this.transactionService.GetById(id, loggedUser);
+                var transactionDto = MapTransactionToDto(transaction);
+                return StatusCode(StatusCodes.Status200OK, transactionDto);
+            }
+            catch (EntityNotFoundException e)
+            {
+                return StatusCode(StatusCodes.Status404NotFound, e.Message);
+            }
+            catch (UnauthorizedOperationException e)
+            {
+                return StatusCode(StatusCodes.Status401Unauthorized, e.Message);
+            }
+
+        }
+
+        [HttpGet, Authorize]
+        public IActionResult GetTransactions([FromQuery] TransactionQueryParameters filterParameters)
+        {
+            try
+            {
+                var loggedUsers = FindLoggedUser();
+                var transacrions = this.transactionService.FilterBy(filterParameters, loggedUsers);
+                List<GetTransactionDto> transactionDtos = transacrions
+                    .Select(transaction => MapTransactionToDto(transaction))
+                    .ToList();
+                return StatusCode(StatusCodes.Status200OK, transactionDtos);
+            }
+            catch (EntityNotFoundException e)
+            {
+                return StatusCode(StatusCodes.Status404NotFound, e.Message);
+            }
+            catch (UnauthorizedOperationException e)
+            {
+                return StatusCode(StatusCodes.Status401Unauthorized, e.Message);
+            }
+        }
+
+        private GetTransactionDto MapTransactionToDto(Transaction transaction)
+        {
+            var accountRecipient = this.accountService.GetById(transaction.AccountRecepientId);
+            var recipient = this.userService.GetById((int)accountRecipient.UserId);
+            var currency = this.currencyService.GetById(transaction.CurrencyId);
+            var getTransactionDto = new GetTransactionDto();
+            getTransactionDto.RecipientUsername = recipient.Username;
+            getTransactionDto.Amount= transaction.Amount;
+            getTransactionDto.Date = transaction.Date;
+            getTransactionDto.Direction = transaction.Direction.ToString();
+            getTransactionDto.Аbbreviation = transaction.Currency.Аbbreviation;
+            return getTransactionDto;
+
+        }
+
+        private Transaction MapDtoТоTransaction(CreateTransactionDto transactionDto)
+        {
+            var loggedUser = FindLoggedUser();
+            var userRecipient = this.userService.GetByUsername(transactionDto.RecepientUsername);
+            var currency = this.currencyService.GetByАbbreviation(transactionDto.Currency);
 
             var transaction = new Transaction();
             transaction.AccountSenderId = loggedUser.Id;
-           // transaction.AccountRecepientId = recipientUser.Id;
+            transaction.AccountRecepientId = (int)userRecipient.AccountId;
             transaction.Amount = transactionDto.Amount;
-            
+            transaction.CurrencyId = currency.Id;
 
-            var createdTransaction=this.transactionService.Create(transaction, loggedUser);
+            return transaction;
+        }
 
-            return StatusCode(StatusCodes.Status201Created, createdTransaction);
+            private User FindLoggedUser()
+        {
+            var loggedUsersUsername = User.Claims.FirstOrDefault(claim => claim.Type == "Username").Value;
+            var loggedUser = authManager.TryGetUserByUsername(loggedUsersUsername);
+            return loggedUser;
         }
     }
 }

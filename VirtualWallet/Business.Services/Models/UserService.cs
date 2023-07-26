@@ -106,6 +106,8 @@ namespace Business.Services.Models
             userToUpdate = this.repository.Update(id, user, loggedUser);
             return userToUpdate;
         }
+
+        //todo
         public void Delete(int id, User loggedUser)
         {
             EnsureAdminAuthorization(loggedUser);

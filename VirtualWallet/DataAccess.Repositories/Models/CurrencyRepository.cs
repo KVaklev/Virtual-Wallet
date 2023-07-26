@@ -38,6 +38,7 @@ namespace DataAccess.Repositories.Models
             var currencyToUpdate = this.GetById(id);
             currencyToUpdate.Name = currency.Name;
             currencyToUpdate.Аbbreviation = currency.Аbbreviation;
+            context.SaveChanges();
 
             return currencyToUpdate;
         }
@@ -46,6 +47,8 @@ namespace DataAccess.Repositories.Models
         {
             var currencyToDelete = this.GetById(id);
             currencyToDelete.IsDeleted = true;
+            context.SaveChanges();
+
             return currencyToDelete.IsDeleted;
         }
 
@@ -56,6 +59,15 @@ namespace DataAccess.Repositories.Models
                 .OrderBy(n=>n.Name)
                 .ToList();
             return currencies ?? throw new EntityNotFoundException("Тhere is no such currency");
+        }
+
+        public Currency GetByАbbreviation(string abbreviation)
+        {
+            var currency = context.Currencies
+                    .Where(c => c.Аbbreviation == abbreviation)
+                    .FirstOrDefault();
+ 
+            return currency ?? throw new EntityNotFoundException("Тhere is no such currency");
         }
 
     }
