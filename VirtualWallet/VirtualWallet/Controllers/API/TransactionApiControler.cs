@@ -51,7 +51,7 @@ namespace VirtualWallet.Controllers.API
             var loggedUser = FindLoggedUser();
             var transaction = MapDtoТоTransaction(transactionDto);
             var createdTransaction = this.transactionService.Create(transaction, loggedUser);
-            var createdTransactionDto = MapTransactionToDto(createdTransaction);
+            var createdTransactionDto = MapTransactionToDto(createdTransaction, loggedUser);
 
             return StatusCode(StatusCodes.Status201Created, createdTransactionDto);
         }
@@ -83,7 +83,7 @@ namespace VirtualWallet.Controllers.API
                 var loggedUser = FindLoggedUser();
                 var transaction = MapDtoТоTransaction(transactionDto);
                 var updateTransaction = this.transactionService.Update(id, loggedUser, transaction);
-                var updateTransactionDto = MapTransactionToDto(updateTransaction);
+                var updateTransactionDto = MapTransactionToDto(updateTransaction,loggedUser);
                 return StatusCode(StatusCodes.Status200OK, updateTransactionDto);
             }
             catch (EntityNotFoundException e)
@@ -103,7 +103,7 @@ namespace VirtualWallet.Controllers.API
             {
                 var loggedUser = FindLoggedUser();
                 var transaction = this.transactionService.GetById(id, loggedUser);
-                var transactionDto = MapTransactionToDto(transaction);
+                var transactionDto = MapTransactionToDto(transaction, loggedUser);
                 return StatusCode(StatusCodes.Status200OK, transactionDto);
             }
             catch (EntityNotFoundException e)
@@ -122,10 +122,10 @@ namespace VirtualWallet.Controllers.API
         {
             try
             {
-                var loggedUsers = FindLoggedUser();
-                var transacrions = this.transactionService.FilterBy(filterParameters, loggedUsers);
+                var loggedUser = FindLoggedUser();
+                var transacrions = this.transactionService.FilterBy(filterParameters, loggedUser);
                 List<GetTransactionDto> transactionDtos = transacrions
-                    .Select(transaction => MapTransactionToDto(transaction))
+                    .Select(transaction => MapTransactionToDto(transaction, loggedUser))
                     .ToList();
                 return StatusCode(StatusCodes.Status200OK, transactionDtos);
             }
@@ -139,9 +139,9 @@ namespace VirtualWallet.Controllers.API
             }
         }
 
-        private GetTransactionDto MapTransactionToDto(Transaction transaction)
+        private GetTransactionDto MapTransactionToDto(Transaction transaction, User loggedUser)
         {
-            var accountRecipient = this.accountService.GetById(transaction.AccountRecepientId);
+            var accountRecipient = this.accountService.GetById(transaction.AccountRecepientId, loggedUser);
             var recipient = this.userService.GetById((int)accountRecipient.UserId);
             var currency = this.currencyService.GetById(transaction.CurrencyId);
             var getTransactionDto = new GetTransactionDto();
