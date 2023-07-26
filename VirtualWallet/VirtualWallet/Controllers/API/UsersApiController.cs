@@ -25,12 +25,29 @@ namespace VirtualWallet.Controllers.API
             this.mapper = mapper;
             this.authManager = authManager;
         }
-        [HttpGet(""),Authorize]
-        public IActionResult GetUsers([FromQuery] UserQueryParameters userQueryParameters)
+        //[HttpGet(""),Authorize]
+        //public IActionResult GetUsers([FromQuery] UserQueryParameters userQueryParameters)
+        //{
+        //    try
+        //    {
+        //        List<User> result = userService.FilterBy(userQueryParameters);
+        //        List<GetUserDto> userDtos = result
+        //            .Select(user => mapper.Map<GetUserDto>(user))
+        //            .ToList();
+
+        //        return StatusCode(StatusCodes.Status200OK, userDtos);
+        //    }
+        //    catch (EntityNotFoundException e)
+        //    {
+        //        return StatusCode(StatusCodes.Status404NotFound, e.Message);
+        //    }
+        //}
+        [HttpGet(""), Authorize]
+        public async Task<IActionResult> GetUsers([FromQuery] UserQueryParameters userQueryParameters)
         {
             try
             {
-                List<User> result = userService.FilterBy(userQueryParameters);
+                List<User> result = await userService.FilterByAsync(userQueryParameters);
                 List<GetUserDto> userDtos = result
                     .Select(user => mapper.Map<GetUserDto>(user))
                     .ToList();

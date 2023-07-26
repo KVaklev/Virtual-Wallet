@@ -18,7 +18,7 @@ namespace Business.Dto
         public string CheckNumber { get; set; }
 
         [Required]
-        public CardType CardType { get; set; }
+        public string CardType { get; set; }
 
         [Required]
         public int AccountId { get; set; }

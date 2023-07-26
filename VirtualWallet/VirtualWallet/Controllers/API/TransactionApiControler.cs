@@ -42,14 +42,14 @@ namespace VirtualWallet.Controllers.API
         public IActionResult Create([FromBody]CreateTransactionDto transactionDto)
         {
             var loggedUser = this.helpersApi.FindLoggedUser();
-            var recipientUser = this.userService
-                .GetAll()
-                .Where(u => u.Username == transactionDto.RecepiendUsername)
-                .FirstOrDefault();
+            //var recipientUser = this.userService
+            //    .GetAll()
+            //    .Where(u => u.Username == transactionDto.RecepiendUsername)
+            //    .FirstOrDefault();
 
             var transaction = new Transaction();
             transaction.AccountSenderId = loggedUser.Id;
-            transaction.AccountRecepientId = recipientUser.Id;
+           // transaction.AccountRecepientId = recipientUser.Id;
             transaction.Amount = transactionDto.Amount;
             
 

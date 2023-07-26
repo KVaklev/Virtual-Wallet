@@ -6,13 +6,13 @@ namespace Business.Services.Contracts
     public interface ICardService
     {
         List<Card> GetAll();
-
+        List<Card> GetByAccountId(int accountId);
+        Card GetById(int id);
         List<Card> FilterBy(CardQueryParameters filterParameters);
-        //PaginatedList<Card> FilterBy(UserQueryParameters filterParameters);
-        //List<Card> GetByUserId(int userId);
 
-        Card Add(int userId, Card card);
-        Card Update();
-        void Delete();
+        //PaginatedList<Card> FilterBy(UserQueryParameters filterParameters);
+        //Card Add(int userId, Card card);
+        //Card Update();
+        //void Delete();
     }
 }

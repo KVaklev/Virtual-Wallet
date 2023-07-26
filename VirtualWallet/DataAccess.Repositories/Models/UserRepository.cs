@@ -3,6 +3,7 @@ using Business.QueryParameters;
 using DataAccess.Models.Models;
 using DataAccess.Repositories.Contracts;
 using DataAccess.Repositories.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace DataAccess.Repositories.Models
 {
@@ -15,11 +16,34 @@ namespace DataAccess.Repositories.Models
         {
             this.context = context;
         }
-        public List<User> GetAll()
+        //public List<User> GetAll()
+        //{
+        //    return context.Users.ToList();
+        //}
+        public async Task<List<User>> GetAllAsync()
         {
-            return context.Users.ToList();
+            return await context.Users.ToListAsync();
         }
-        public List<User> FilterBy(UserQueryParameters filterParameters)
+        //public List<User> FilterBy(UserQueryParameters filterParameters)
+        //{
+        //    IQueryable<User> result = context.Users;
+
+        //    result = FilterByUsername(result, filterParameters.Username);
+        //    result = FilterByEmail(result, filterParameters.Email);
+        //    result = FilterByPhoneNumber(result, filterParameters.PhoneNumber);
+        //    result = SortBy(result, filterParameters.SortBy);
+        //    result = SortOrder(result, filterParameters.SortOrder);
+
+        //    List<User> filteredAndSortedUsers = result.ToList();
+
+        //    if (filteredAndSortedUsers.Count == 0)
+        //    {
+        //        throw new EntityNotFoundException("No users match the specified filter criteria.");
+        //    }
+
+        //    return filteredAndSortedUsers;
+        //}
+        public async Task<List<User>> FilterByAsync(UserQueryParameters filterParameters)
         {
             IQueryable<User> result = context.Users;
 
@@ -29,7 +53,7 @@ namespace DataAccess.Repositories.Models
             result = SortBy(result, filterParameters.SortBy);
             result = SortOrder(result, filterParameters.SortOrder);
 
-            List<User> filteredAndSortedUsers = result.ToList();
+            List<User> filteredAndSortedUsers = await result.ToListAsync();
 
             if (filteredAndSortedUsers.Count == 0)
             {
@@ -165,12 +189,21 @@ namespace DataAccess.Repositories.Models
         {
             return context.Users.Any(u => u.PhoneNumber == phoneNumber);
         }
-        private IQueryable<User> FilterByUsername(IQueryable<User> result, string? username)
+        //private IQueryable<User> FilterByUsername(IQueryable<User> result, string? username)
+        //{
+        //    if (!string.IsNullOrEmpty(username))
+        //    {
+        //        result = result.Where(user => user.Username != null 
+        //                           && user.Username== username);
+        //    }
+
+        //    return result;
+        //}
+        public IQueryable<User> FilterByUsername(IQueryable<User> result, string? username)
         {
             if (!string.IsNullOrEmpty(username))
             {
-                result = result.Where(user => user.Username != null 
-                                   && user.Username== username);
+                result = result.Where(user => user.Username != null && user.Username == username);
             }
 
             return result;
@@ -190,7 +223,7 @@ namespace DataAccess.Repositories.Models
             if (!string.IsNullOrEmpty(phoneNumber))
             {
                 result = result.Where(user => user.PhoneNumber != null
-                                   && user.Email == phoneNumber);
+                                   && user.PhoneNumber == phoneNumber);
             }
 
             return result;
@@ -218,6 +251,11 @@ namespace DataAccess.Repositories.Models
                 default:
                     return result;
             }
+        }
+
+        public Task<List<User>> FilterByAsyns(UserQueryParameters queryParameters)
+        {
+            throw new NotImplementedException();
         }
     }
 }
