@@ -14,7 +14,7 @@ namespace Business.Services.Contracts
         Transaction GetById(int id, User user);
         Transaction Update(int id, int userId, Transaction transaction);
         bool Delete(int id, int userId);
-        IQueryable<Transaction> GetAll();
+        IQueryable<Transaction> GetAll(string username);
         PaginatedList<Transaction> FilterBy(TransactionQueryParameters filterParameters, User user);
         public bool Execute(int transactionId, int userId);
     }

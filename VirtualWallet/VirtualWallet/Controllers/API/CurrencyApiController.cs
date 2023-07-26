@@ -5,12 +5,13 @@ using Business.Services.Contracts;
 using DataAccess.Models.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Presentation.Helpers;
 using VirtualWallet.Helpers;
 
 namespace VirtualWallet.Controllers.API
 {
     [ApiController]
-    [Route("api/currency")]
+    [Route("api/currencies")]
     public class CurrencyApiController : ControllerBase
     {
         private readonly ICurrencyService currencyService;
@@ -29,14 +30,15 @@ namespace VirtualWallet.Controllers.API
             this.userService = userService;
             this.helpersApi = helpersApi;
         }
-        [HttpPost(""), Authorize]
+        [HttpPost(), Authorize]
         public IActionResult Create([FromBody] CurrencyDto currencyDto)
         {
             try
             {
-                var loggUser = this.helpersApi.FindLoggedUser();
+                var loggedUsersUsername = User.Claims.FirstOrDefault(claim => claim.Type == "Username").Value;
+                var loggedUser = this.userService.GetByUsername(loggedUsersUsername);
                 var currency = this.mapper.Map<Currency>(currencyDto);
-                this.currencyService.Create(currency, loggUser);
+                this.currencyService.Create(currency, loggedUser);
                 return StatusCode(StatusCodes.Status200OK, currencyDto);
             }
             catch (EntityNotFoundException ex)

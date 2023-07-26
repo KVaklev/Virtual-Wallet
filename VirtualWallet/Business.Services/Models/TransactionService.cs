@@ -6,13 +6,6 @@ using DataAccess.Models.Enums;
 using DataAccess.Models.Models;
 using DataAccess.Repositories.Data;
 using DataAccess.Repositories.Contracts;
-using DataAccess.Repositories.Data;
-using DataAccess.Repositories.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Business.Services.Models
 {
@@ -44,10 +37,13 @@ namespace Business.Services.Models
             {
                 throw new UnauthorizedOperationException(Constants.ModifyTransactionErrorMessage);
             }
+            //if (this.accountRepository.CheckBalance(transaction.AccountSenderId, transaction.Amount))
+            //{
+            //    throw new EntityNotFoundException(Constants.ModifyTransactionAmountErrorMessage);
+            //}
             transaction.Direction = DirectionType.Out;
-            var newTransaction = this.transactionRepository.Create(transaction);
+            var newTransaction = this.transactionRepository.CreateOutTransaction(transaction);
 
-            //Todo - check the balance
             return newTransaction;
         }
 
@@ -79,16 +75,14 @@ namespace Business.Services.Models
             return this.transactionRepository.Delete(id);
         }
 
-        public IQueryable<Transaction> GetAll()
+        public IQueryable<Transaction> GetAll(string username)
         {
-            //Todo - add authorized user
-            return this.transactionRepository.GetAll();
+            return this.transactionRepository.GetAll(username);
         }
 
         public PaginatedList<Transaction> FilterBy(TransactionQueryParameters filterParameters, User user)
         {
-            //Todo - add authorized user
-            return this.transactionRepository.FilterBy(filterParameters);
+            return this.transactionRepository.FilterBy(filterParameters, user.Username);
         }
 
         public bool Execute(int transactionId, int userId)
@@ -97,13 +91,18 @@ namespace Business.Services.Models
             {
                 throw new UnauthorizedOperationException(Constants.ModifyTransactionErrorMessage);
             }
-            var transaction = this.transactionRepository.GetById(transactionId);
-            transaction.IsExecuted = true;
+            var transactionOut = this.transactionRepository.GetById(transactionId);
+            transactionOut.IsExecuted = true;
 
-            //Todo - change balance.
-            AddTransactionToHistory(transaction);
+            var transactionIn = this.transactionRepository.CreateInTransaction(transactionOut);
 
-            return transaction.IsExecuted;
+           // this.accountRepository.DecreaseBalance(transactionOut.AccountSenderId, transactionOut.Amount);
+           // this.accountRepository.IncreaseBalance(transactionIn.AccountRecepientId, transactionIn.Amount);
+
+            AddTransactionToHistory(transactionOut);
+            AddTransactionToHistory(transactionIn);
+
+            return transactionOut.IsExecuted;
         }
         
         private bool AddTransactionToHistory(Transaction transaction)
