@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Authorization;
 namespace VirtualWallet.Controllers.API
 {
     [ApiController]
-    [Route("api/transaction")]
+    [Route("api/transactions")]
     public class TransactionApiControler : ControllerBase
     {
         private readonly IMapper mapper;
@@ -38,7 +38,7 @@ namespace VirtualWallet.Controllers.API
             
         }
 
-        [HttpPost(""), Authorize]
+        [HttpPost, Authorize]
         public IActionResult Create([FromBody]CreateTransactionDto transactionDto)
         {
             var loggedUser = this.helpersApi.FindLoggedUser();

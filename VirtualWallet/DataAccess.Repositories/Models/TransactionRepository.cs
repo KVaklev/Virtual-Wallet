@@ -18,17 +18,34 @@ namespace DataAccess.Repositories.Models
             this.context = context;
         }
 
-        public Transaction Create(Transaction trasaction)
+        public Transaction CreateOutTransaction(Transaction transaction)
         {
-            trasaction.Date = DateTime.Now;
-            trasaction.IsExecuted = false;
-            trasaction.IsDeleted = false;
-            context.Add(trasaction);
+            transaction.Date = DateTime.Now;
+            transaction.IsExecuted = false;
+            transaction.IsDeleted = false;
+            context.Add(transaction);
             context.SaveChanges();
 
-            return trasaction;
+            return transaction;
         }
-        
+
+        public Transaction CreateInTransaction(Transaction transactionOut)
+        {
+            var transactionIn = new Transaction();
+            transactionIn.AccountRecepientId = transactionOut.AccountRecepientId;
+            transactionIn.AccountSenderId = transactionOut.AccountSenderId;
+            transactionIn.CurrencyId = transactionOut.CurrencyId;
+            transactionIn.Direction = DirectionType.In;
+            transactionIn.Amount = transactionOut.Amount;
+            transactionIn.Date = DateTime.Now;
+            transactionIn.IsDeleted = false;
+
+            context.Add(transactionIn);
+            context.SaveChanges();
+            return transactionIn;
+        }
+
+
         public Transaction GetById(int id) 
         {
             Transaction transaction = context.Transactions
@@ -60,21 +77,22 @@ namespace DataAccess.Repositories.Models
             return trasactions.IsDeleted;
         }
 
-        public IQueryable<Transaction> GetAll()
+        public IQueryable<Transaction> GetAll(string username)
         {
             IQueryable<Transaction> result = context.Transactions
                     .Include(s => s.AccountSender)
                     .Include(r => r.AccountRecepient)
                     .ThenInclude(u =>u.User)
                     .Include(c => c.Currency);
-                   
+
+            result = result.Where(t => t.AccountSender.User.Username == username);
 
             return result ?? throw new EntityNotFoundException("There are any transactions!");
         }
 
-        public PaginatedList<Transaction> FilterBy(TransactionQueryParameters filterParameters)
+        public PaginatedList<Transaction> FilterBy(TransactionQueryParameters filterParameters, string username)
         {
-            IQueryable<Transaction> result = this.GetAll();
+            IQueryable<Transaction> result = this.GetAll(username);
 
             result = FilterByRecipient(result, filterParameters.ResipientUsername);
             result = FilterByDirection(result, filterParameters.Direction);

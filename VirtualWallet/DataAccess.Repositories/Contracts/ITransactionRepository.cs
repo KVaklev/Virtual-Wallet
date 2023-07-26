@@ -12,17 +12,18 @@ namespace DataAccess.Repositories.Contracts
 {
     public interface ITransactionRepository
     {
-        Transaction Create(Transaction trasaction);
+        Transaction CreateOutTransaction(Transaction trasaction);
 
+        Transaction CreateInTransaction(Transaction transactionOut);
         Transaction GetById(int id);
 
         Transaction Update(int id, Transaction transaction);
 
         bool Delete(int id);
 
-        IQueryable<Transaction> GetAll();
+        IQueryable<Transaction> GetAll(string username);
 
-        PaginatedList<Transaction> FilterBy(TransactionQueryParameters filterParameters);
+        PaginatedList<Transaction> FilterBy(TransactionQueryParameters filterParameters, string username);
 
     }
 }
