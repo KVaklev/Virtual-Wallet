@@ -33,12 +33,9 @@ namespace VirtualWallet.Controllers.API
             {
                 List<Card> result = cardService.FilterBy(cardQueryParameters);
 
-
-
                 List<GetCardDto> cardDtos = result
                     .Select(card => mapper.Map<GetCardDto>(card))
                     .ToList();
-                
 
                 return StatusCode(StatusCodes.Status200OK, cardDtos);
             }

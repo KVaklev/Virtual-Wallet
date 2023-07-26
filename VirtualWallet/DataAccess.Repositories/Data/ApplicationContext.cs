@@ -283,6 +283,17 @@ namespace DataAccess.Repositories.Data
             };
 
             modelBuilder.Entity<Card>().HasData(cards);
+            modelBuilder.Entity<Card>()
+                .HasOne(a=>a.Currency)
+                .WithMany(a=>a.Cards)
+                .HasForeignKey(c => c.CurrencyId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<Card>()
+               .HasOne(a => a.Account)
+               .WithMany(a=>a.Cards)
+               .HasForeignKey(c => c.AccountId)
+               .OnDelete(DeleteBehavior.NoAction);
 
             //Seed history
 

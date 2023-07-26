@@ -9,6 +9,7 @@ namespace Business.Mappers
         public CardsMapper()
         {
             //DTO
+
             CreateMap<GetCardDto, Card>()
                 .ForPath(c => c.Account.User.Username, c => c.MapFrom(c => c.Username));
             CreateMap<Card, GetCardDto>()
