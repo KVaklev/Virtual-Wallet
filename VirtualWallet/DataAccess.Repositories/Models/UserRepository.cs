@@ -78,6 +78,7 @@ namespace DataAccess.Repositories.Models
         public User GetByUsername(string username)
         {
             User? user = context.Users
+                .Include(u => u.Account)
                 .Where(users => users.Username == username)
                 .FirstOrDefault();
             return user ?? throw new EntityNotFoundException($"User with username '{username}' doesn't exist.");
@@ -102,7 +103,7 @@ namespace DataAccess.Repositories.Models
             context.SaveChanges();
             return user;
         }
-        public User Update(int id, User user, User loggedUser)
+        public User Update(int id, User user)
         {
             User userToUpdate = this.GetById(id);
 

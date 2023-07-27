@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Business.Dto;
+using Business.DTOs;
 using Business.Exceptions;
 using Business.Mappers;
 using Business.QueryParameters;
@@ -26,6 +27,7 @@ namespace VirtualWallet.Controllers.API
             this.mapper = mapper;
             this.authManager = authManager;
             this.cardService = cardService;
+
         }
 
         [HttpGet, Authorize]
@@ -34,25 +36,6 @@ namespace VirtualWallet.Controllers.API
             try
             {
                 List<Card> result = cardService.FilterBy(cardQueryParameters);
-
-                //List<GetCardDto> cardDtos = new List<GetCardDto>();
-
-                //foreach (var card in result)
-                //{
-                //    GetCardDto cardDto = new GetCardDto
-                //    {
-                //        CardNumber = card.CardNumber,
-                //        ExpirationDate = card.ExpirationDate,
-                //        CardHolder = card.CardHolder,
-                //        CheckNumber = card.CheckNumber,
-                //        CardType = card.CardType.ToString(),
-                //        AccountId = card.AccountId,
-                //        Username = card.Account.User.Username,
-                //        Balance = (decimal)card.Balance,
-                //    };
-
-                //    cardDtos.Add(cardDto);
-                //}
 
                 List<GetCardDto> cardDtos = result
                     .Select(card => mapper.Map<GetCardDto>(card))
@@ -82,20 +65,56 @@ namespace VirtualWallet.Controllers.API
             }
         }
 
-        //[HttpGet("id"), Authorize]
-        //public IActionResult GetByAccountId(int accountId)
-        //{
-        //    try
-        //    {
-        //        Card card = cardService.GetById(id);
-        //        GetCardDto cardDto = mapper.Map<GetCardDto>(card);
+        [HttpPost, Authorize]
+        public IActionResult CreateCard([FromBody] CreateCardDto createCardDto)
+        {
+            try
+            {
+                var loggedUsersAccountId = FindLoggedUsersAccount();
+                Card createCard = mapper.Map<Card>(createCardDto);
+                Card createdCard = cardService.Create(loggedUsersAccountId, createCard);
 
-        //        return StatusCode(StatusCodes.Status200OK, cardDto);
-        //    }
-        //    catch (EntityNotFoundException e)
-        //    {
-        //        return StatusCode(StatusCodes.Status404NotFound, e.Message);
-        //    }
-        //}
+                return StatusCode(StatusCodes.Status201Created, createdCard);
+            }
+            catch (DuplicateEntityException e)
+            {
+                return StatusCode(StatusCodes.Status409Conflict, e.Message);
+            }
+        }
+
+        [HttpPut, Authorize]
+        public IActionResult UpdateCard(int id, [FromBody] UpdateCardDto updateCardDto)
+        {
+            try
+            {
+                User loggedUser = FindLoggedUser();
+                var loggedUsersAccountId = FindLoggedUsersAccount();
+                Card updateCard = mapper.Map<Card>(updateCardDto);
+                Card updatedCard = cardService.Update(id, loggedUser, updateCard);
+
+                return StatusCode(StatusCodes.Status200OK, updatedCard);
+            }
+            catch (UnauthorizedOperationException e)
+            {
+                return StatusCode(StatusCodes.Status401Unauthorized, e.Message);
+            }
+            catch (DuplicateEntityException e)
+            {
+                return StatusCode(StatusCodes.Status409Conflict, e.Message);
+            }
+        }
+        private int FindLoggedUsersAccount()
+        {
+            var loggedUsersAccountIdAsString = User.Claims.FirstOrDefault(claim => claim.Type == "UsersAccountId").Value;
+            var accountId = int.Parse(loggedUsersAccountIdAsString);
+            return accountId;
+        }
+        private User FindLoggedUser()
+        {
+            var loggedUsersUsername = User.Claims.FirstOrDefault(claim => claim.Type == "Username").Value;
+            var loggedUser = authManager.TryGetUserByUsername(loggedUsersUsername);
+            return loggedUser;
+        }
+
     }
 }

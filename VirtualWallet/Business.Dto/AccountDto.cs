@@ -4,12 +4,13 @@
     {
         public string  Username { get; set; }
                 
-        public string Currency { get; set; }
+        public string Abbreviation { get; set; }
 
-        public DateTime DateCreated { get; set; }
+        public string DateCreated { get; set; }
 
         public decimal Balance { get; set; }
 
 
     }
 }
+

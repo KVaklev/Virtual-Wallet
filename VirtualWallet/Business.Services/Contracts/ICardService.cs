@@ -9,10 +9,12 @@ namespace Business.Services.Contracts
         Card GetById(int id);
         List<Card> GetByAccountId(int accountId);
         List<Card> FilterBy(CardQueryParameters filterParameters);
-      //  Card Add(int accountId, Card card);
+        Card Create(int accountId, Card card);
+        Card Update(int id, User loggedUser, Card card);
+        bool CardNumberExists(string cardNumber);
+        bool IsAuthorized(Card card, User loggedUser);
 
         //PaginatedList<Card> FilterBy(UserQueryParameters filterParameters);
-        //Card Update();
         //void Delete();
     }
 }
