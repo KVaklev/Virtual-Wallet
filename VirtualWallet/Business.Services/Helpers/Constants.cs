@@ -15,6 +15,10 @@
 
         public const string ModifyAccountCardErrorMessage = "Only the admin or owner of the account can add or remove a card.";
 
+        public const string ModifyTransferErrorMessage = "You are not authorized to proceed with the transfer.";
+
+
+
 
 
     }

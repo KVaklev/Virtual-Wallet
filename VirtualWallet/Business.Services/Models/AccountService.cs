@@ -41,7 +41,7 @@ namespace Business.Services.Models
 
         public bool Delete(int id, User user)
         {
-            if (!IsUserAccountOwnerOrAdminId(id, user))
+            if (!IsUserAuthorized(id, user))
             {
                 throw new UnauthorizedOperationException(Constants.ModifyAccountErrorMessage);
             }
@@ -51,7 +51,7 @@ namespace Business.Services.Models
 
         public Account GetById(int id, User user)
         {
-            if (!IsUserAccountOwnerOrAdminId(id, user))
+            if (!IsUserAuthorized(id, user))
             {
                 throw new UnauthorizedOperationException(Constants.ModifyAccountErrorMessage);
             }
@@ -60,7 +60,7 @@ namespace Business.Services.Models
 
         public Account GetByUsername(int id, User user)
         {
-            if (!IsUserAccountOwnerOrAdminId(id, user))
+            if (!IsUserAuthorized(id, user))
             {
                 throw new UnauthorizedOperationException(Constants.ModifyAccountErrorMessage);
             }
@@ -69,7 +69,7 @@ namespace Business.Services.Models
 
         public bool AddCard(int id, Card card, User user)
         {
-            if (!IsUserAccountOwnerOrAdminId(id, user))
+            if (!IsUserAuthorized(id, user))
             {
                 throw new UnauthorizedOperationException(Constants.ModifyAccountCardErrorMessage);
             }
@@ -78,14 +78,14 @@ namespace Business.Services.Models
 
         public bool RemoveCard(int id, Card card, User user)
         {
-            if (!IsUserAccountOwnerOrAdminId(id, user))
+            if (!IsUserAuthorized(id, user))
             {
                 throw new UnauthorizedOperationException(Constants.ModifyAccountCardErrorMessage);
             }
             return this.accountRepository.RemoveCard(id, card);
         }
 
-        public bool IsUserAccountOwnerOrAdminId(int id, User user)
+        public bool IsUserAuthorized(int id, User user)
         {
             bool IsUserAccountOwnerOrAdminId = false;
 

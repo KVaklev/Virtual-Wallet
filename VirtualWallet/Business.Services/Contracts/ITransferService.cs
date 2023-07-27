@@ -10,7 +10,7 @@ namespace Business.Services.Contracts
 {
     public interface ITransferService
     {
-        IQueryable<Transfer> GetAll();
+        IQueryable<Transfer> GetAll(string username);
         PaginatedList<Transfer> FilterBy(TransferQueryParameters transferQueryParameters);
         Transfer GetById(int id, User user);
         Transfer Create(Transfer transfer, User user);

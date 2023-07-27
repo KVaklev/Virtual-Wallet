@@ -279,6 +279,9 @@ namespace DataAccess.Repositories.Data
                     Id = 1,
                     UserId = 1,
                     Balance = 850,
+                    DateCreated = DateTime.Now,
+                    CurrencyId = 1,
+                    
 
                 },
 
@@ -289,6 +292,10 @@ namespace DataAccess.Repositories.Data
                     Id = 2,
                     UserId = 2,
                     Balance = 1000,
+                    DateCreated = DateTime.Now.AddMonths(1),
+                    CurrencyId=2
+
+                   
                 }
 
 

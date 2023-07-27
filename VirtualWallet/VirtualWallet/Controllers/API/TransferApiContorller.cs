@@ -9,25 +9,25 @@ namespace VirtualWallet.Controllers.API
     [Route("api/transfer")]
     public class TransferApiContorller : ControllerBase
     {
-        private readonly ITransferService transferService;
+        //private readonly ITransferService transferService;
 
-        public TransferApiContorller(ITransferService transferservice)
-        {
-            this.transferService = transferservice;
-        }
-        [HttpGet]
-        public IActionResult Withdraw(int id)
-        {
+        //public TransferApiContorller(ITransferService transferservice)
+        //{
+        //    this.transferService = transferservice;
+        //}
+        //[HttpGet]
+        //public IActionResult Withdraw(int id)
+        //{
 
-            var transfers = transferService.GetAll()
-                .Where(u => u.Id == id)
-                                .ToList();
+        //    var transfers = transferService.GetAll()
+        //        .Where(u => u.Id == id)
+        //                        .ToList();
 
-            var json = JsonSerializer.Serialize(transfers);
+        //    var json = JsonSerializer.Serialize(transfers);
 
-            return Ok(json);
+        //    return Ok(json);
 
-        }
+        //}
 
     }
 }

@@ -20,6 +20,7 @@ namespace VirtualWallet.Controllers.API
         private readonly IAuthManager authManager;
         private readonly IAccountService accountService;
 
+
         public AccountApiController(IMapper mapper, IAuthManager authManager, IAccountService accountService)
         {
             this.mapper = mapper;
@@ -27,15 +28,31 @@ namespace VirtualWallet.Controllers.API
             this.accountService = accountService;
         }
 
-        [HttpGet] // filter by     
-        public async Task<ActionResult<IEnumerable<Account>>> GetAllAccounts()
-        {           
-            var accounts = this.accountService.GetAll().ToList();
+        [HttpGet, Authorize]
+        public IActionResult GatAllAcounts()
+        {
+            var loggedUser = FindLoggedUser();
 
-            return Ok(accounts);
+            var result = accountService.GetAll().ToList();
+
+            List<AccountDto> accountDtos = result.Select(account => mapper.Map<AccountDto>(account)).ToList();
+
+            return Ok(accountDtos);
+
         }
 
+        //[HttpPost, Authorize]
+        //public IActionResult Create([FromBody] AccountDto accountDto)
+        //{
 
+        //}
+
+        private User FindLoggedUser()
+        {
+            var loggedUsersUsername = User.Claims.FirstOrDefault(claim => claim.Type == "Username").Value;
+            var loggedUser = authManager.TryGetUserByUsername(loggedUsersUsername);
+            return loggedUser;
+        }
 
 
 
