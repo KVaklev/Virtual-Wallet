@@ -20,11 +20,6 @@ namespace Business.Mappers
                 .ForPath(c => c.Currency.Abbreviation, c =>c.MapFrom(c =>c.Currency))
                 .ReverseMap();
 
-            CreateMap<Card, CreateCardDto>()
-               .ForPath(c => c.AccountUsername, c => c.MapFrom(c => c.Account.User.Username))
-               .ForPath(c => c.CardType, c => c.MapFrom(c => c.CardType))
-               .ForPath(c => c.Currency, c => c.MapFrom(c => c.Currency.Abbreviation))
-               .ReverseMap();
         }
     }
 }

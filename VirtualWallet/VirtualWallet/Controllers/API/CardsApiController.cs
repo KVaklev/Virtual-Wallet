@@ -20,14 +20,12 @@ namespace VirtualWallet.Controllers.API
         private readonly IMapper mapper;
         private readonly IAuthManager authManager;
         private readonly ICardService cardService;
-        IAccountService accountService;
 
-        public CardsApiController(IMapper mapper, IAuthManager authManager, ICardService cardService, IAccountService accountService)
+        public CardsApiController(IMapper mapper, IAuthManager authManager, ICardService cardService)
         {
             this.mapper = mapper;
             this.authManager = authManager;
             this.cardService = cardService;
-            this.accountService = accountService;
 
         }
 
@@ -85,10 +83,7 @@ namespace VirtualWallet.Controllers.API
 
         private int FindLoggedUsersAccount()
         {
-            var loggedUsersAccountIdAsString = User
-                .Claims
-                .FirstOrDefault(claim => claim.Type == "UsersAccountId")
-                .Value;
+            var loggedUsersAccountIdAsString = User.Claims.FirstOrDefault(claim => claim.Type == "UsersAccountId").Value;
             var accountId = int.Parse(loggedUsersAccountIdAsString);
             return accountId;
         }

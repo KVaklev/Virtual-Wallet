@@ -9,8 +9,8 @@ namespace Business.Services.Contracts
         Card GetById(int id);
         List<Card> GetByAccountId(int accountId);
         List<Card> FilterBy(CardQueryParameters filterParameters);
-
         Card Create(int accountId, Card card);
+        bool CardNumberExists(string cardNumber);
 
         //PaginatedList<Card> FilterBy(UserQueryParameters filterParameters);
         //Card Update();

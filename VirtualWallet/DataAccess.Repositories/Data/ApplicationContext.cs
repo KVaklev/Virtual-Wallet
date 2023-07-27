@@ -284,15 +284,12 @@ namespace DataAccess.Repositories.Data
 
                 },
 
-
-
                 new Account()
                 {
                     Id = 2,
                     UserId = 2,
                     Balance = 1000,
                 }
-
 
             };
 

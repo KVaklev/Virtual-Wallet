@@ -1,6 +1,7 @@
 ﻿using DataAccess.Models.Enums;
 using DataAccess.Models.ValidationAttributes;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace DataAccess.Models.Models
 {
@@ -29,18 +30,20 @@ namespace DataAccess.Models.Models
         [Required(ErrorMessage = Constants.EmptyFieldErrorMessage)]
         public CardType CardType { get; set; }
 
+        [Required(ErrorMessage = Constants.EmptyFieldErrorMessage)]
         public int AccountId { get; set; }
 
-        [Required(ErrorMessage = Constants.EmptyFieldErrorMessage)]
-        public Account Account { get; set; }
+        [JsonIgnore]
+        public Account? Account { get; set; }
 
         [Required(ErrorMessage = Constants.EmptyFieldErrorMessage)]
         public decimal? Balance { get; set; }
         public decimal? CreditLimit { get; set; }
 
-        [Required(ErrorMessage = Constants.EmptyFieldErrorMessage)]
+        [JsonIgnore]
         public Currency? Currency { get; set; }
 
+        [Required(ErrorMessage = Constants.EmptyFieldErrorMessage)]
         public int? CurrencyId { get; set; }
     }
 }

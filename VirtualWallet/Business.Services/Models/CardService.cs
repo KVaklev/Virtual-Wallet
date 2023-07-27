@@ -1,4 +1,5 @@
-﻿using Business.QueryParameters;
+﻿using Business.Exceptions;
+using Business.QueryParameters;
 using Business.Services.Contracts;
 using DataAccess.Models.Models;
 using DataAccess.Repositories.Contracts;
@@ -33,9 +34,18 @@ namespace Business.Services.Models
         }
         public Card Create(int accountId, Card card)
         {
-           var createdCard = this.repository.CreateCard(card);
-           createdCard = this.repository.AddCardToAccount(accountId, createdCard);
+            if (CardNumberExists(card.CardNumber))
+            {
+                throw new DuplicateEntityException($"Card with card number '{card.CardNumber}' already exists.");
+            }
+
+           var createdCard = this.repository.CreateCard(accountId, card);
            return createdCard;
+        }
+
+        public bool CardNumberExists(string cardNumber)
+        {
+            return this.repository.CardNumberExists(cardNumber);
         }
 
         //public Card Update()

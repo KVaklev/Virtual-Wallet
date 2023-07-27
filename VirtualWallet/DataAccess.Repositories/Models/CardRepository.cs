@@ -11,10 +11,12 @@ namespace DataAccess.Repositories.Models
     public class CardRepository : ICardRepository
     {
         private readonly ApplicationContext context;
+        private readonly ICurrencyRepository currencyRepository;
 
-        public CardRepository(ApplicationContext context)
+        public CardRepository(ApplicationContext context, ICurrencyRepository currencyRepository)
         {
             this.context = context;
+            this.currencyRepository = currencyRepository;
         }
 
         public List<Card> GetAll()
@@ -65,63 +67,26 @@ namespace DataAccess.Repositories.Models
 
             return filteredAndSortedCards;
         }
-        public Card CreateCard(Card card)
+        public Card CreateCard(int accountId, Card card)
         {
-            context.Cards.Add(card);
+            var carToCreate = new Card();
+            var currency = currencyRepository.GetByАbbreviation(card.Currency.Abbreviation);
+
+            carToCreate.AccountId = accountId;
+            carToCreate.CardNumber = card.CardNumber;
+            carToCreate.CardType = card.CardType;
+            carToCreate.Balance = card.Balance;
+            carToCreate.CardHolder = card.CardHolder;
+            carToCreate.ExpirationDate = card.ExpirationDate;
+            carToCreate.CheckNumber = card.CheckNumber;
+            carToCreate.CreditLimit = card.CreditLimit;
+            carToCreate.CurrencyId = currency.Id;
+
+            context.Cards.Add(carToCreate);
             context.SaveChanges();
 
-            return card;
+            return carToCreate;
         }
-        public Card AddCardToAccount(int accountId, Card createdCard)
-        {
-            createdCard.AccountId = accountId;
-            createdCard.Account.Cards.Add(createdCard);
-            context.SaveChanges();
-
-            return createdCard;
-        }
-
-        //public Card Add(int userId, int accountId, Card card)
-        //{
-        //    User user = context.Users
-        //        .FirstOrDefault(u => u.Id == userId)
-        //        ?? throw new EntityNotFoundException($"User with ID = {userId} doesn't exist.");
-        //    Account account = context.Accounts
-        //        .FirstOrDefault(a => a.Id == accountId && a.UserId == userId)
-        //        ?? throw new EntityNotFoundException($"Account with ID = {accountId} doesn't exist or doesn't belong to the user.");
-
-        //    card.AccountId = accountId;
-        //    card.UserId = userId;
-        //    context.Cards.Add(card);
-        //    context.SaveChanges();
-
-        //    return card;
-        //}
-
-        //public Card Update(int id, Card card)
-        //{
-        //    Card cardToUpdate = context.Cards
-        //        .FirstOrDefault(c => c.Id == id)
-        //        ?? throw new EntityNotFoundException($"Card with ID = {id} doesn't exist.");
-
-        //    cardToUpdate.CardNumber = card.CardNumber ?? cardToUpdate.CardNumber;
-        //    cardToUpdate.CardHolder = card.CardHolder ?? cardToUpdate.CardHolder;
-        //    cardToUpdate.ExpirationDate = card.ExpirationDate;
-        //    cardToUpdate.CheckNumber = card.CheckNumber;
-        //    cardToUpdate.CardType = card.CardType;
-        //    cardToUpdate.AccountId = card.AccountId;
-        //    //cardToUpdate.UserId = card.UserId;
-
-        //    context.SaveChanges();
-        //    return cardToUpdate;
-        //}
-        //public void Delete(int id)
-        //{
-        //    Card cardToDelete = this.GetById(id);
-        //    context.Cards.Remove(cardToDelete);
-        //    context.SaveChanges();
-        //}
-
         private static IQueryable<Card> FilterByUsername(IQueryable<Card> result, string username)
         {
             result = result
@@ -184,6 +149,9 @@ namespace DataAccess.Repositories.Models
                     return result;
             }
         }
-
+        public bool CardNumberExists(string cardNumber)
+        {
+            return context.Cards.Any(u => u.CardNumber == cardNumber);
+        }
     }
 }
