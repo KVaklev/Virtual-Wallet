@@ -74,6 +74,7 @@ namespace DataAccess.Repositories.Models
             var trasactions = this.GetById(id);
             trasactions.IsDeleted = true;
 
+            context.SaveChanges();
             return trasactions.IsDeleted;
         }
 
@@ -102,7 +103,6 @@ namespace DataAccess.Repositories.Models
 
             int totalPages = (result.Count() + filterParameters.PageSize - 1) / filterParameters.PageSize;
 
-            
             result = Paginate(result, filterParameters.PageNumber, filterParameters.PageSize);
 
             return new PaginatedList<Transaction>(result.ToList(), totalPages, filterParameters.PageNumber);

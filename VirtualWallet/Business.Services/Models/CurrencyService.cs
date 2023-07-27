@@ -58,5 +58,10 @@ namespace Business.Services.Models
             }
             return this.currencyRepository.Update(id, currency);
         }
+
+        public Currency GetByАbbreviation(string abbreviation)
+        {
+            return this.currencyRepository.GetByАbbreviation(abbreviation);
+        }
     }
 }
