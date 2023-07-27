@@ -7,7 +7,6 @@ namespace Business.Services.Contracts
     {
         //List<User> GetAll();
         Task<List<User>> GetAllAsync();
-
         Task<List<User>> FilterByAsync(UserQueryParameters queryParameters);
         //List<User> FilterBy(UserQueryParameters filterParameters);
         //PaginatedList<IUser> FilterBy(UserQueryParameters filterParameters);
@@ -17,7 +16,7 @@ namespace Business.Services.Contracts
         User GetByPhoneNumber(string phoneNumber);
         User Create(User user);
         User Update(int id, User user, User loggedUser);
-        void Delete(int id, User loggedUser);
+        bool Delete(int id, User loggedUser);
         User Promote(int id, User loggedUser);
         User BlockUser(int id, User loggedUser);
         User UnblockUser(int id, User loggedUser); 

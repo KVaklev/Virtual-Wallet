@@ -22,11 +22,14 @@ namespace DataAccess.Repositories.Models
         //}
         public async Task<List<User>> GetAllAsync()
         {
-            return await context.Users.ToListAsync();
+            return await context.Users
+                .Where(u=>u.IsDeleted==false)
+                .ToListAsync();
         }
         //public List<User> FilterBy(UserQueryParameters filterParameters)
         //{
-        //    IQueryable<User> result = context.Users;
+        //    IQueryable<User> result = context.Users
+        //                  .Where(u=>u.IsDeleted==false);
 
         //    result = FilterByUsername(result, filterParameters.Username);
         //    result = FilterByEmail(result, filterParameters.Email);
@@ -45,7 +48,8 @@ namespace DataAccess.Repositories.Models
         //}
         public async Task<List<User>> FilterByAsync(UserQueryParameters filterParameters)
         {
-            IQueryable<User> result = context.Users;
+            IQueryable<User> result = context.Users
+                .Where(u => u.IsDeleted == false);
 
             result = FilterByUsername(result, filterParameters.Username);
             result = FilterByEmail(result, filterParameters.Email);
@@ -71,6 +75,7 @@ namespace DataAccess.Repositories.Models
         public User GetById(int id)
         {
             User? user = context.Users
+                .Where(u => u.IsDeleted == false)
                 .Where(users => users.Id == id)
                 .FirstOrDefault();
             return user ?? throw new EntityNotFoundException($"User with ID = {id} doesn't exist.");
@@ -78,6 +83,7 @@ namespace DataAccess.Repositories.Models
         public User GetByUsername(string username)
         {
             User? user = context.Users
+                .Where(u => u.IsDeleted == false)
                 .Include(u => u.Account)
                 .Where(users => users.Username == username)
                 .FirstOrDefault();
@@ -86,6 +92,7 @@ namespace DataAccess.Repositories.Models
         public User GetByEmail(string email)
         {
             User? user = context.Users
+                .Where(u => u.IsDeleted == false)
                 .Where(users => users.Email == email)
                 .FirstOrDefault();
             return user ?? throw new EntityNotFoundException($"User with email '{email}' doesn't exist.");
@@ -93,6 +100,7 @@ namespace DataAccess.Repositories.Models
         public User GetByPhoneNumber(string phoneNumber)
         {
             User? user = context.Users
+                .Where(u => u.IsDeleted == false)
                 .Where(users => users.PhoneNumber == phoneNumber)
                 .FirstOrDefault();
             return user ?? throw new EntityNotFoundException($"User with pnone number '{phoneNumber}' doesn't exist.");
@@ -119,16 +127,13 @@ namespace DataAccess.Repositories.Models
             context.SaveChanges();
             return userToUpdate;
         }
-        public User Delete(int id)
+        public bool Delete(int id)
         {
             User userToDelete = this.GetById(id);
-            //userToDelete = context.Users
-            //    .Include(u => u.Cards)
-            //    .FirstOrDefault(u => u.Id == id);
-            // context.Cards.RemoveRange(userToDelete.Cards);
-            context.Users.Remove(userToDelete);
+            userToDelete.IsDeleted = true;
+
             context.SaveChanges();
-            return userToDelete;
+            return userToDelete.IsDeleted;
         }
         public User Promote(int id)
         {

@@ -10,10 +10,12 @@ namespace Business.Services.Models
     public class UserService : IUserService
     {
         private readonly IUserRepository repository;
+        private readonly IAccountRepository accountRepository;
 
-        public UserService(IUserRepository repository)
+        public UserService(IUserRepository repository, IAccountRepository accountRepository)
         {
             this.repository = repository;
+            this.accountRepository = accountRepository;
         }
 
         //public List<User> GetAll()
@@ -107,25 +109,42 @@ namespace Business.Services.Models
             return userToUpdate;
         }
 
-        //todo
-        public void Delete(int id, User loggedUser)
+        public bool Delete(int id, User loggedUser)
         {
-            EnsureAdminAuthorization(loggedUser);
-            this.repository.Delete(id);
+            User userToDelete = this.repository.GetById(id);
+
+            if (!IsAuthorized(userToDelete, loggedUser))
+            {
+                throw new UnauthorizedOperationException(Constants.ModifyUserErrorMessage);
+            } 
+            
+            var accountToDelete = this.accountRepository.GetById((int)userToDelete.AccountId);
+            this.accountRepository.Delete(accountToDelete.Id);
+
+            return this.repository.Delete(id);
         }
         public User Promote(int id, User loggedUser)
         {
-            EnsureAdminAuthorization(loggedUser);
+            if (!IsAdmin(loggedUser))
+            {
+                throw new UnauthorizedOperationException(Constants.ModifyUserErrorMessage);
+            }
             return this.repository.Promote(id);
         }
         public User BlockUser(int id, User loggedUser)
         {
-            EnsureAdminAuthorization(loggedUser);
+            if (!IsAdmin(loggedUser))
+            {
+                throw new UnauthorizedOperationException(Constants.ModifyUserErrorMessage);
+            }
             return this.repository.BlockUser(id);
         }
         public User UnblockUser(int id, User loggedUser)
         {
-            EnsureAdminAuthorization(loggedUser);
+            if (!IsAdmin(loggedUser))
+            {
+                throw new UnauthorizedOperationException(Constants.ModifyUserErrorMessage);
+            }
             return this.repository.UnblockUser(id);
         }
         public bool EmailExists(string email)
@@ -150,12 +169,13 @@ namespace Business.Services.Models
             }
             return isAuthorized;
         }
-        public void EnsureAdminAuthorization(User loggedUser)
+        public bool IsAdmin(User loggedUser)
         {
             if (!loggedUser.IsAdmin)
             {
-                throw new UnauthorizedOperationException(Constants.ModifyUserErrorMessage);
+                return false;
             }
+            return true;
         }
     }
 }

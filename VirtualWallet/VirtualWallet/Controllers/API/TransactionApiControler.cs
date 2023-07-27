@@ -62,7 +62,7 @@ namespace VirtualWallet.Controllers.API
             try
             {
                 var loggedUser = FindLoggedUser();
-                var isDelete = this.transactionService.Delete(id,loggedUser);
+                var isDeleted = this.transactionService.Delete(id,loggedUser);
                 return StatusCode(StatusCodes.Status200OK);
             }
             catch (EntityNotFoundException e)

@@ -15,10 +15,12 @@ namespace Business.Services.Models
     public class AccountService : IAccountService
     {
         private readonly IAccountRepository accountRepository;
+        private readonly ICardRepository cardRepository;
 
-        public AccountService(IAccountRepository accountRepository)
+        public AccountService(IAccountRepository accountRepository, ICardRepository cardRepository)
         {
             this.accountRepository = accountRepository;
+            this.cardRepository = cardRepository;   
         }
         public IQueryable<Account> GetAll()
         {
@@ -39,9 +41,9 @@ namespace Business.Services.Models
             return accountToCreate;
         }
 
-        public bool Delete(int id, User user)
+        public bool Delete(int id, User loggedUser)
         {
-            if (!IsUserAuthorized(id, user))
+            if (!IsUserAuthorized(id, loggedUser))
             {
                 throw new UnauthorizedOperationException(Constants.ModifyAccountErrorMessage);
             }

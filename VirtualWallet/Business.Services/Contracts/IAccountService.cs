@@ -17,7 +17,7 @@ namespace Business.Services.Contracts
         Account Create(Account account, User user);
         bool AddCard(int id, Card card, User user);
         bool RemoveCard(int id,  Card card, User user);
-        bool Delete(int id, User user);
+        bool Delete(int id, User loggedUser);
 
        // bool AccountExists(int id);
 

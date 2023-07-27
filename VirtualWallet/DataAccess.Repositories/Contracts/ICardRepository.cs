@@ -14,7 +14,7 @@ namespace DataAccess.Repositories.Contracts
         bool CardNumberExists(string cardNumber);
         Card IncreaseBalance(int id, decimal amount);
         Card DecreaseBalance(int id, decimal amount);
-
+        bool Delete (int id);
 
         //Card Update(int id, Card card);
         //void Delete(int id);

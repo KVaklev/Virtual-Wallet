@@ -16,7 +16,7 @@ namespace DataAccess.Repositories.Contracts
         User GetByPhoneNumber(string phoneNumber);
         User Create(User user);
         User Update(int id, User user);
-        User Delete(int id);
+        bool Delete(int id);
         User Promote(int id);
         User BlockUser(int id);
         User UnblockUser(int id);

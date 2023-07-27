@@ -23,6 +23,7 @@ namespace DataAccess.Repositories.Models
         public List<Card> GetAll()
         {
             return this.context.Cards
+               .Where(c=>c.IsDeleted==false)
                .Include(c=>c.Account)
                .ThenInclude(c=>c.User)
                .ToList();
@@ -31,6 +32,7 @@ namespace DataAccess.Repositories.Models
         public Card GetById(int id)
         {
             var card = this.context.Cards
+                .Where(c => c.IsDeleted == false)
                 .Include(c => c.Account)
                 .ThenInclude(a => a.User)
                 .FirstOrDefault(c => c.Id == id)
@@ -41,6 +43,7 @@ namespace DataAccess.Repositories.Models
         public List<Card> GetByAccountId(int accountId)
         {
             List<Card> cards = context.Cards
+                .Where(c=>c.IsDeleted==false)
                 .Where(card => card.AccountId == accountId)
                 .ToList();
 
@@ -49,6 +52,7 @@ namespace DataAccess.Repositories.Models
         public List<Card> FilterBy(CardQueryParameters filterParameters)
         {
             IQueryable<Card> result = context.Cards
+                .Where(c=>c.IsDeleted==false)
                 .Include(c => c.Account)
                 .ThenInclude(a => a.User);
 
@@ -111,6 +115,14 @@ namespace DataAccess.Repositories.Models
             {
                 cardToUpdate.CurrencyId = currency.Id;
             }
+        }
+        public bool Delete(int id)
+        {
+            var cardToDelete = this.GetById(id);
+            cardToDelete.IsDeleted = true;
+
+            context.SaveChanges();
+            return cardToDelete.IsDeleted;
         }
 
         private static IQueryable<Card> FilterByUsername(IQueryable<Card> result, string username)
