@@ -6,6 +6,7 @@ using DataAccess.Repositories.Contracts;
 using System.Text;
 using DataAccess.Models.Enums;
 using Business.QueryParameters;
+using DataAccess.Models.ValidationAttributes;
 
 namespace DataAccess.Repositories.Models
 {
@@ -54,12 +55,18 @@ namespace DataAccess.Repositories.Models
                 .Include(c =>c.Currency)
                 .FirstOrDefault(t => t.Id == id);
 
-            return transaction ?? throw new EntityNotFoundException($"Transaction with ID = {id} doesn't exist.");
+            return transaction ?? throw new EntityNotFoundException("Transaction doesn't exist.");
         }
 
         public Transaction Update(int id, Transaction transaction)
         {
             var transactionToUpdate = this.GetById(id);
+
+            if (transactionToUpdate.IsExecuted)
+            {
+                throw new UnauthorizedOperationException("You are not authorized to modify the transaction.");
+            }
+
             transactionToUpdate.AccountRecepientId = transaction.AccountRecepientId;
             transactionToUpdate.Amount = transaction.Amount;
             transactionToUpdate.CurrencyId = transaction.CurrencyId;
@@ -88,7 +95,7 @@ namespace DataAccess.Repositories.Models
 
             result = result.Where(t => t.AccountSender.User.Username == username);
 
-            return result ?? throw new EntityNotFoundException("There are any transactions!");
+            return result ?? throw new EntityNotFoundException("Тhere are no transactions!");
         }
 
         public PaginatedList<Transaction> FilterBy(TransactionQueryParameters filterParameters, string username)

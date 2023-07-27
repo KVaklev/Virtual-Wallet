@@ -1,4 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using DataAccess.Models.Enums;
+using System.ComponentModel.DataAnnotations;
+using System.Reflection.Emit;
 
 namespace DataAccess.Models.Models
 {
@@ -13,6 +15,8 @@ namespace DataAccess.Models.Models
         public int AccountId { get; set; }
 
         public Account Account { get; set; }
+
+        public NameOperation NameOperation { get; set; }
 
         [Required(ErrorMessage = "The {0} field is required")]
         [Range(1, int.MaxValue, ErrorMessage = "The {0} field must be in the range from {1} to {2}.")]

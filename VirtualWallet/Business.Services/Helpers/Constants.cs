@@ -6,9 +6,15 @@
 
         public const string ModifyUserErrorMessage = "Only an admin is authorized to perform the specified action.";
         public const string ModifyUsernameErrorMessage = "Username change is not allowed.";
+
+
+        //Constants for transaction
         public const string ModifyTransactionErrorMessage = "You are not authorized.";
         public const string ModifyTransactionAmountErrorMessage = "Not enough balance.";
         public const string ModifyTransactionNoDataErrorMessage = "No data with these parameters.";
+
+        //Constants for currency
+
         public const string ModifyCurrencyErrorMessage = "You are not admin.";
               
         public const string ModifyAccountErrorMessage = "Only the admin or owner of the account can access, delete or modify it.";

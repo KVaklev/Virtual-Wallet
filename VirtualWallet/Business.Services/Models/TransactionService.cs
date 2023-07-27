@@ -13,20 +13,18 @@ namespace Business.Services.Models
     {
         private readonly ITransactionRepository transactionRepository;
         private readonly IHistoryRepository historyRepository;
-        private readonly IUserRepository userRepository;
         private readonly ApplicationContext context;
         private readonly IAccountRepository accountRepository;
 
         public TransactionService(
             ITransactionRepository transactionRepository,
             IHistoryRepository historyRepository,
-            IUserRepository userRepository,
-            ApplicationContext context
+            ApplicationContext context,
+            IAccountRepository accountRepository
             )
         {
             this.transactionRepository = transactionRepository;
             this.historyRepository = historyRepository;
-            this.userRepository = userRepository;
             this.context = context;
             this.accountRepository = accountRepository;
         }
@@ -37,10 +35,10 @@ namespace Business.Services.Models
             {
                 throw new UnauthorizedOperationException(Constants.ModifyTransactionErrorMessage);
             }
-            //if (this.accountRepository.CheckBalance(transaction.AccountSenderId, transaction.Amount))
-            //{
-            //    throw new EntityNotFoundException(Constants.ModifyTransactionAmountErrorMessage);
-            //}
+            if (this.accountRepository.CheckBalance(transaction.AccountSenderId, transaction.Amount))
+            {
+                throw new EntityNotFoundException(Constants.ModifyTransactionAmountErrorMessage);
+            }
             transaction.Direction = DirectionType.Out;
             var newTransaction = this.transactionRepository.CreateOutTransaction(transaction);
 
@@ -63,6 +61,7 @@ namespace Business.Services.Models
             {
                 throw new UnauthorizedOperationException(Constants.ModifyTransactionErrorMessage);
             }
+            
             return this.transactionRepository.Update(id, transaction);
         }
 
@@ -98,11 +97,12 @@ namespace Business.Services.Models
             }
             var transactionOut = this.transactionRepository.GetById(transactionId);
             transactionOut.IsExecuted = true;
+            transactionOut.Date = DateTime.Now;
 
             var transactionIn = this.transactionRepository.CreateInTransaction(transactionOut);
 
-           // this.accountRepository.DecreaseBalance(transactionOut.AccountSenderId, transactionOut.Amount);
-           // this.accountRepository.IncreaseBalance(transactionIn.AccountRecepientId, transactionIn.Amount);
+            this.accountRepository.DecreaseBalance(transactionOut.AccountSenderId, transactionOut.Amount);
+            this.accountRepository.IncreaseBalance(transactionIn.AccountRecepientId, transactionIn.Amount);
 
             AddTransactionToHistory(transactionOut);
             AddTransactionToHistory(transactionIn);
@@ -112,12 +112,19 @@ namespace Business.Services.Models
         
         private bool AddTransactionToHistory(Transaction transaction)
         {
-            var history = new History()
+            var history = new History();
+            history.EventTime = DateTime.Now;
+            history.TransactionId = transaction.Id;
+            history.NameOperation = NameOperation.Transaction;
+           
+            if (transaction.Direction==DirectionType.Out)
             {
-                EventTime = DateTime.Now,
-                TransactionId = transaction.Id
-            };
-
+                history.AccountId = transaction.AccountSenderId;
+            }
+            else
+            {
+                history.AccountId = transaction.AccountRecepientId;
+            }
             int historyCount = this.context.History.Count();
             this.historyRepository.Ctraete(history);
             int newHistoryCount = this.context.History.Count();

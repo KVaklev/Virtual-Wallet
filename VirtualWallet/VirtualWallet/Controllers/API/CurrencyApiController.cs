@@ -5,6 +5,7 @@ using Business.Services.Contracts;
 using DataAccess.Models.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Presentation.Helpers;
 using VirtualWallet.Helpers;
 
 namespace VirtualWallet.Controllers.API
@@ -16,24 +17,28 @@ namespace VirtualWallet.Controllers.API
         private readonly ICurrencyService currencyService;
         private readonly IMapper mapper;
         private readonly IUserService userService;
+        private readonly IAuthManager authManager;
 
         public CurrencyApiController(
             ICurrencyService currencyService,
             IMapper mapper,
             IUserService userService,
-            HelpersApi helpersApi)
+            IAuthManager authManager
+
+            )
         {
             this.currencyService = currencyService;
             this.mapper = mapper;
             this.userService = userService;
+            this.authManager = authManager;
         }
+
         [HttpPost, Authorize]
         public IActionResult Create([FromBody] CurrencyDto currencyDto)
         {
             try
             {
-                var loggedUsersUsername = User.Claims.FirstOrDefault(claim => claim.Type == "Username").Value;
-                var loggedUser = this.userService.GetByUsername(loggedUsersUsername);
+                var loggedUser = FindLoggedUser();
                 var currency = this.mapper.Map<Currency>(currencyDto);
                 this.currencyService.Create(currency, loggedUser);
                 return StatusCode(StatusCodes.Status200OK, currencyDto);
@@ -84,8 +89,7 @@ namespace VirtualWallet.Controllers.API
         {
             try
             {
-                var loggedUsersUsername = User.Claims.FirstOrDefault(claim => claim.Type == "Username").Value;
-                var loggedUser = this.userService.GetByUsername(loggedUsersUsername);
+                var loggedUser = FindLoggedUser();
                 var currency = this.mapper.Map<Currency>(currencyDto);
                 var updateCurency = this.currencyService.Update(id, currency, loggedUser);
                 var currencyUpdateDto = this.mapper.Map<CurrencyDto>(updateCurency);
@@ -106,8 +110,7 @@ namespace VirtualWallet.Controllers.API
         {
             try
             {
-                var loggedUsersUsername = User.Claims.FirstOrDefault(claim => claim.Type == "Username").Value;
-                var loggedUser = this.userService.GetByUsername(loggedUsersUsername);
+                var loggedUser = FindLoggedUser();
                 var isDeleted = this.currencyService.Delete(id, loggedUser);
                 return StatusCode(StatusCodes.Status200OK, isDeleted);
             }
@@ -120,6 +123,12 @@ namespace VirtualWallet.Controllers.API
                 return StatusCode(StatusCodes.Status401Unauthorized, ex.Message);
             }
 
+        }
+        private User FindLoggedUser()
+        {
+            var loggedUsersUsername = User.Claims.FirstOrDefault(claim => claim.Type == "Username").Value;
+            var loggedUser = authManager.TryGetUserByUsername(loggedUsersUsername);
+            return loggedUser;
         }
     }
 }
