@@ -5,16 +5,19 @@ using DataAccess.Models.Models;
 using DataAccess.Repositories.Contracts;
 using DataAccess.Repositories.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders.Physical;
 
 namespace DataAccess.Repositories.Models
 {
     public class CardRepository : ICardRepository
     {
         private readonly ApplicationContext context;
+        private readonly ICurrencyRepository currencyRepository;
 
-        public CardRepository(ApplicationContext context)
+        public CardRepository(ApplicationContext context, ICurrencyRepository currencyRepository)
         {
             this.context = context;
+            this.currencyRepository = currencyRepository;
         }
 
         public List<Card> GetAll()
@@ -28,6 +31,8 @@ namespace DataAccess.Repositories.Models
         public Card GetById(int id)
         {
             var card = this.context.Cards
+                .Include(c => c.Account)
+                .ThenInclude(a => a.User)
                 .FirstOrDefault(c => c.Id == id)
                 ?? throw new EntityNotFoundException($"Card with ID = {id} doesn't exist.");
 
@@ -63,47 +68,50 @@ namespace DataAccess.Repositories.Models
 
             return filteredAndSortedCards;
         }
+        public Card Create(int accountId, Card card)
+        {
+            var carToCreate = new Card();
+            var currency = currencyRepository.GetByАbbreviation(card.Currency.Abbreviation);
 
-        //public Card Add(int userId, int accountId, Card card)
-        //{
-        //    User user = context.Users
-        //        .FirstOrDefault(u => u.Id == userId)
-        //        ?? throw new EntityNotFoundException($"User with ID = {userId} doesn't exist.");
-        //    Account account = context.Accounts
-        //        .FirstOrDefault(a => a.Id == accountId && a.UserId == userId)
-        //        ?? throw new EntityNotFoundException($"Account with ID = {accountId} doesn't exist or doesn't belong to the user.");
+            carToCreate.AccountId = accountId;
+            carToCreate.CardNumber = card.CardNumber;
+            carToCreate.CardType = card.CardType;
+            carToCreate.Balance = card.Balance;
+            carToCreate.CardHolder = card.CardHolder;
+            carToCreate.ExpirationDate = card.ExpirationDate;
+            carToCreate.CheckNumber = card.CheckNumber;
+            carToCreate.CreditLimit = card.CreditLimit;
+            carToCreate.CurrencyId = currency.Id;
 
-        //    card.AccountId = accountId;
-        //    card.UserId = userId;
-        //    context.Cards.Add(card);
-        //    context.SaveChanges();
+            context.Cards.Add(carToCreate);
+            context.SaveChanges();
 
-        //    return card;
-        //}
+            return carToCreate;
+        }
+        public Card Update(int id, Card card)
+        {
+            var cardToUpdate = this.GetById(id);
+            var currency = currencyRepository.GetByАbbreviation(card.Currency.Abbreviation);
 
-        //public Card Update(int id, Card card)
-        //{
-        //    Card cardToUpdate = context.Cards
-        //        .FirstOrDefault(c => c.Id == id)
-        //        ?? throw new EntityNotFoundException($"Card with ID = {id} doesn't exist.");
+            cardToUpdate.CardNumber = card.CardNumber ?? cardToUpdate.CardNumber;
+            cardToUpdate.CheckNumber = card.CheckNumber ?? cardToUpdate.CheckNumber;
+            cardToUpdate.CardHolder = card.CardHolder ?? cardToUpdate.CardHolder;
+            cardToUpdate.CreditLimit = card.CreditLimit ?? cardToUpdate.CreditLimit;
+            UpdateCardType(card, cardToUpdate);
+            UpdateExpirationDate(card, cardToUpdate);
+            UpdateCurrency(card, cardToUpdate, currency);
 
-        //    cardToUpdate.CardNumber = card.CardNumber ?? cardToUpdate.CardNumber;
-        //    cardToUpdate.CardHolder = card.CardHolder ?? cardToUpdate.CardHolder;
-        //    cardToUpdate.ExpirationDate = card.ExpirationDate;
-        //    cardToUpdate.CheckNumber = card.CheckNumber;
-        //    cardToUpdate.CardType = card.CardType;
-        //    cardToUpdate.AccountId = card.AccountId;
-        //    //cardToUpdate.UserId = card.UserId;
+            context.SaveChanges();
+            return cardToUpdate;
+        }
 
-        //    context.SaveChanges();
-        //    return cardToUpdate;
-        //}
-        //public void Delete(int id)
-        //{
-        //    Card cardToDelete = this.GetById(id);
-        //    context.Cards.Remove(cardToDelete);
-        //    context.SaveChanges();
-        //}
+        private static void UpdateCurrency(Card card, Card cardToUpdate, Currency currency)
+        {
+            if (card.Currency != null)
+            {
+                cardToUpdate.CurrencyId = currency.Id;
+            }
+        }
 
         private static IQueryable<Card> FilterByUsername(IQueryable<Card> result, string username)
         {
@@ -166,6 +174,40 @@ namespace DataAccess.Repositories.Models
                 default:
                     return result;
             }
+        }
+        private void UpdateExpirationDate(Card card, Card cardToUpdate)
+        {
+            if (card.ExpirationDate != null)
+            {
+                cardToUpdate.ExpirationDate = card.ExpirationDate;
+            }
+        }
+        private void UpdateCardType(Card card, Card cardToUpdate)
+        {
+            if (card.CardType != null)
+            {
+                cardToUpdate.CardType = card.CardType;
+            }
+        }
+        public bool CardNumberExists(string cardNumber)
+        {
+            return context.Cards.Any(u => u.CardNumber == cardNumber);
+        }
+        public Card IncreaseBalance(int id, decimal amount)
+        {
+            Card card = this.GetById(id);
+            card.Balance += amount;
+            context.SaveChanges();
+
+            return card;
+        }
+        public Card DecreaseBalance(int id, decimal amount)
+        {
+            Card card = this.GetById(id);
+            card.Balance -= amount;
+            context.SaveChanges();
+
+            return card;
         }
 
     }

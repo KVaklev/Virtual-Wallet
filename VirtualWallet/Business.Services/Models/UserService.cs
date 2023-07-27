@@ -103,7 +103,7 @@ namespace Business.Services.Models
                 }
             }
 
-            userToUpdate = this.repository.Update(id, user, loggedUser);
+            userToUpdate = this.repository.Update(id, loggedUser);
             return userToUpdate;
         }
 

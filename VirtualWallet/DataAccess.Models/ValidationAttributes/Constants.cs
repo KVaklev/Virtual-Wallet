@@ -35,5 +35,6 @@
 
         //Others
         public const string EmptyFieldErrorMessage = "The field is required.";
+        public const string EmptyFieldCardTypeErrorMessage = "The field is required. Specify 'Debit' or 'Credit' card ";
     }
 }

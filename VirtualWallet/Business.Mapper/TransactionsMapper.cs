@@ -12,7 +12,7 @@ namespace Business.Mappers
             //DTO
             CreateMap<Transaction, CreateTransactionDto>()
                 .ForMember(r => r.RecepientUsername, u => u.MapFrom(c => c.AccountRecepient.User.Username))
-                .ForMember(c => c.Currency, u => u.MapFrom(a => a.Currency.Аbbreviation));
+                .ForMember(c => c.Currency, u => u.MapFrom(a => a.Currency.Abbreviation));
 
             CreateMap<GetTransactionDto, Transaction>();
                 

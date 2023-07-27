@@ -220,7 +220,7 @@ namespace DataAccess.Repositories.Models
         {
             if (!string.IsNullOrEmpty(currencyabbrev))
             {
-                accounts = accounts.Where(a => a.Currency.Аbbreviation == currencyabbrev);
+                accounts = accounts.Where(a => a.Currency.Abbreviation == currencyabbrev);
             }
 
             return accounts;
