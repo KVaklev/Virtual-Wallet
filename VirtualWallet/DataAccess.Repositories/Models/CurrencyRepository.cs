@@ -37,7 +37,7 @@ namespace DataAccess.Repositories.Models
         {
             var currencyToUpdate = this.GetById(id);
             currencyToUpdate.Name = currency.Name;
-            currencyToUpdate.Аbbreviation = currency.Аbbreviation;
+            currencyToUpdate.Abbreviation = currency.Abbreviation;
             context.SaveChanges();
 
             return currencyToUpdate;
@@ -64,7 +64,7 @@ namespace DataAccess.Repositories.Models
         public Currency GetByАbbreviation(string abbreviation)
         {
             var currency = context.Currencies
-                    .Where(c => c.Аbbreviation == abbreviation)
+                    .Where(c => c.Abbreviation == abbreviation)
                     .FirstOrDefault();
  
             return currency ?? throw new EntityNotFoundException("Тhere is no such currency");

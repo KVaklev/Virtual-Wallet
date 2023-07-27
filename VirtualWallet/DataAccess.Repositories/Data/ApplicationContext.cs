@@ -228,7 +228,6 @@ namespace DataAccess.Repositories.Data
                      CurrencyId = 1,
                      ExpirationDate = DateTime.Now.AddMonths(7),
                      CardType = CardType.Debit,
-                     CurrencyId = 1, 
                      AccountId = 1,
                      Balance = 750
                  },
@@ -242,7 +241,6 @@ namespace DataAccess.Repositories.Data
                      CurrencyId = 2,
                      ExpirationDate = DateTime.Now.AddMonths(6),
                      CardType = CardType.Debit,
-                     CurrencyId = 1,
                      AccountId = 2,
                      Balance = 1000
                 },
@@ -256,7 +254,6 @@ namespace DataAccess.Repositories.Data
                      CurrencyId = 2,
                      ExpirationDate = DateTime.Now.AddMonths(6),
                      CardType = CardType.Credit,
-                     CurrencyId = 1,
                      AccountId = 2,
                      Balance = 800,
                      CreditLimit = 1000

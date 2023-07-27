@@ -149,7 +149,7 @@ namespace VirtualWallet.Controllers.API
             getTransactionDto.Amount= transaction.Amount;
             getTransactionDto.Date = transaction.Date;
             getTransactionDto.Direction = transaction.Direction.ToString();
-            getTransactionDto.Аbbreviation = transaction.Currency.Аbbreviation;
+            getTransactionDto.Аbbreviation = transaction.Currency.Abbreviation;
             return getTransactionDto;
 
         }
