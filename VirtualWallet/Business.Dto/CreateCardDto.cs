@@ -15,7 +15,6 @@ namespace Business.Dto
 
         [Required(ErrorMessage = Constants.EmptyFieldErrorMessage)]
         public DateTime ExpirationDate { get; set; }
-
         [Required(ErrorMessage = Constants.EmptyFieldErrorMessage)]
         [MinLength(Constants.CardHolderMinLength, ErrorMessage = Constants.CardHolderMinLengthErrorMessage)]
         [MaxLength(Constants.CardHolderMaxLength, ErrorMessage = Constants.CardHolderMaxLengthErrorMessage)]

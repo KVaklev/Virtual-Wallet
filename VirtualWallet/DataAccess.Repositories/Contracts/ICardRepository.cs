@@ -9,8 +9,12 @@ namespace DataAccess.Repositories.Contracts
         Card GetById(int id);
         List<Card> GetByAccountId(int accountId);
         List<Card> FilterBy(CardQueryParameters filterParameters);
-        Card CreateCard(int accountId, Card card);
+        Card Create(int accountId, Card card);
+        Card Update(int id, Card card);
         bool CardNumberExists(string cardNumber);
+        Card IncreaseBalance(int id, decimal amount);
+        Card DecreaseBalance(int id, decimal amount);
+
 
         //Card Update(int id, Card card);
         //void Delete(int id);

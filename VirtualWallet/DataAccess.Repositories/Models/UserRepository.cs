@@ -103,7 +103,7 @@ namespace DataAccess.Repositories.Models
             context.SaveChanges();
             return user;
         }
-        public User Update(int id, User user, User loggedUser)
+        public User Update(int id, User user)
         {
             User userToUpdate = this.GetById(id);
 

@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Business.Dto;
+using Business.DTOs;
 using Business.Exceptions;
 using Business.Mappers;
 using Business.QueryParameters;
@@ -81,11 +82,38 @@ namespace VirtualWallet.Controllers.API
             }
         }
 
+        [HttpPut, Authorize]
+        public IActionResult UpdateCard(int id, [FromBody] UpdateCardDto updateCardDto)
+        {
+            try
+            {
+                User loggedUser = FindLoggedUser();
+                var loggedUsersAccountId = FindLoggedUsersAccount();
+                Card updateCard = mapper.Map<Card>(updateCardDto);
+                Card updatedCard = cardService.Update(id, loggedUser, updateCard);
+
+                return StatusCode(StatusCodes.Status200OK, updatedCard);
+            }
+            catch (UnauthorizedOperationException e)
+            {
+                return StatusCode(StatusCodes.Status401Unauthorized, e.Message);
+            }
+            catch (DuplicateEntityException e)
+            {
+                return StatusCode(StatusCodes.Status409Conflict, e.Message);
+            }
+        }
         private int FindLoggedUsersAccount()
         {
             var loggedUsersAccountIdAsString = User.Claims.FirstOrDefault(claim => claim.Type == "UsersAccountId").Value;
             var accountId = int.Parse(loggedUsersAccountIdAsString);
             return accountId;
+        }
+        private User FindLoggedUser()
+        {
+            var loggedUsersUsername = User.Claims.FirstOrDefault(claim => claim.Type == "Username").Value;
+            var loggedUser = authManager.TryGetUserByUsername(loggedUsersUsername);
+            return loggedUser;
         }
 
     }

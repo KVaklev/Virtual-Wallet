@@ -5,6 +5,7 @@ using DataAccess.Models.Models;
 using DataAccess.Repositories.Contracts;
 using DataAccess.Repositories.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders.Physical;
 
 namespace DataAccess.Repositories.Models
 {
@@ -67,7 +68,7 @@ namespace DataAccess.Repositories.Models
 
             return filteredAndSortedCards;
         }
-        public Card CreateCard(int accountId, Card card)
+        public Card Create(int accountId, Card card)
         {
             var carToCreate = new Card();
             var currency = currencyRepository.GetByАbbreviation(card.Currency.Abbreviation);
@@ -87,6 +88,31 @@ namespace DataAccess.Repositories.Models
 
             return carToCreate;
         }
+        public Card Update(int id, Card card)
+        {
+            var cardToUpdate = this.GetById(id);
+            var currency = currencyRepository.GetByАbbreviation(card.Currency.Abbreviation);
+
+            cardToUpdate.CardNumber = card.CardNumber ?? cardToUpdate.CardNumber;
+            cardToUpdate.CheckNumber = card.CheckNumber ?? cardToUpdate.CheckNumber;
+            cardToUpdate.CardHolder = card.CardHolder ?? cardToUpdate.CardHolder;
+            cardToUpdate.CreditLimit = card.CreditLimit ?? cardToUpdate.CreditLimit;
+            UpdateCardType(card, cardToUpdate);
+            UpdateExpirationDate(card, cardToUpdate);
+            UpdateCurrency(card, cardToUpdate, currency);
+
+            context.SaveChanges();
+            return cardToUpdate;
+        }
+
+        private static void UpdateCurrency(Card card, Card cardToUpdate, Currency currency)
+        {
+            if (card.Currency != null)
+            {
+                cardToUpdate.CurrencyId = currency.Id;
+            }
+        }
+
         private static IQueryable<Card> FilterByUsername(IQueryable<Card> result, string username)
         {
             result = result
@@ -149,9 +175,40 @@ namespace DataAccess.Repositories.Models
                     return result;
             }
         }
+        private void UpdateExpirationDate(Card card, Card cardToUpdate)
+        {
+            if (card.ExpirationDate != null)
+            {
+                cardToUpdate.ExpirationDate = card.ExpirationDate;
+            }
+        }
+        private void UpdateCardType(Card card, Card cardToUpdate)
+        {
+            if (card.CardType != null)
+            {
+                cardToUpdate.CardType = card.CardType;
+            }
+        }
         public bool CardNumberExists(string cardNumber)
         {
             return context.Cards.Any(u => u.CardNumber == cardNumber);
         }
+        public Card IncreaseBalance(int id, decimal amount)
+        {
+            Card card = this.GetById(id);
+            card.Balance += amount;
+            context.SaveChanges();
+
+            return card;
+        }
+        public Card DecreaseBalance(int id, decimal amount)
+        {
+            Card card = this.GetById(id);
+            card.Balance -= amount;
+            context.SaveChanges();
+
+            return card;
+        }
+
     }
 }
