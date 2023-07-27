@@ -8,10 +8,12 @@ namespace Business.Services.Models
     public class CardService : ICardService
     {
         private readonly ICardRepository repository;
+        private readonly IAccountRepository accountRepository;
 
-        public CardService(ICardRepository repository)
+        public CardService(ICardRepository repository, IAccountRepository accountRepository)
         {
             this.repository = repository;
+            this.accountRepository = accountRepository;
         }
         public List<Card> GetAll()
         {
@@ -29,10 +31,12 @@ namespace Business.Services.Models
         {
             return this.repository.FilterBy(filterParameters);
         }
-        //public Card Add(int userId, Card card)
-        //{
-        //    throw new NotImplementedException();
-        //}
+        public Card Create(int accountId, Card card)
+        {
+           var createdCard = this.repository.CreateCard(card);
+           createdCard = this.repository.AddCardToAccount(accountId, createdCard);
+           return createdCard;
+        }
 
         //public Card Update()
         //{

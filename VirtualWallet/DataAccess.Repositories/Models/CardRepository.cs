@@ -28,6 +28,8 @@ namespace DataAccess.Repositories.Models
         public Card GetById(int id)
         {
             var card = this.context.Cards
+                .Include(c => c.Account)
+                .ThenInclude(a => a.User)
                 .FirstOrDefault(c => c.Id == id)
                 ?? throw new EntityNotFoundException($"Card with ID = {id} doesn't exist.");
 
@@ -62,6 +64,21 @@ namespace DataAccess.Repositories.Models
             }
 
             return filteredAndSortedCards;
+        }
+        public Card CreateCard(Card card)
+        {
+            context.Cards.Add(card);
+            context.SaveChanges();
+
+            return card;
+        }
+        public Card AddCardToAccount(int accountId, Card createdCard)
+        {
+            createdCard.AccountId = accountId;
+            createdCard.Account.Cards.Add(createdCard);
+            context.SaveChanges();
+
+            return createdCard;
         }
 
         //public Card Add(int userId, int accountId, Card card)

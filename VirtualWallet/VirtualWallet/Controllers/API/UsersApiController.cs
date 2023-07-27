@@ -154,7 +154,7 @@ namespace VirtualWallet.Controllers.API
             }
         }
 
-        [HttpPut("{id}/block")]
+        [HttpPut("{id}/block"), Authorize]
         public IActionResult BlockUser(int id)
         {
             try
@@ -174,7 +174,7 @@ namespace VirtualWallet.Controllers.API
             }
         }
 
-        [HttpPut("{id}/unblock")]
+        [HttpPut("{id}/unblock"), Authorize]
         public IActionResult UnblockUser(int id)
         {
             try

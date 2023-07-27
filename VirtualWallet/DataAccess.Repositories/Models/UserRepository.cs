@@ -78,6 +78,7 @@ namespace DataAccess.Repositories.Models
         public User GetByUsername(string username)
         {
             User? user = context.Users
+                .Include(u => u.Account)
                 .Where(users => users.Username == username)
                 .FirstOrDefault();
             return user ?? throw new EntityNotFoundException($"User with username '{username}' doesn't exist.");

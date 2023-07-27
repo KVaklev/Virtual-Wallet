@@ -37,7 +37,7 @@ namespace DataAccess.Repositories.Models
         {
             var currencyToUpdate = this.GetById(id);
             currencyToUpdate.Name = currency.Name;
-            currencyToUpdate.Аbbreviation = currency.Аbbreviation;
+            currencyToUpdate.Abbreviation = currency.Abbreviation;
 
             return currencyToUpdate;
         }

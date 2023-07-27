@@ -9,7 +9,8 @@ namespace Business.Services.Contracts
         Card GetById(int id);
         List<Card> GetByAccountId(int accountId);
         List<Card> FilterBy(CardQueryParameters filterParameters);
-      //  Card Add(int accountId, Card card);
+
+        Card Create(int accountId, Card card);
 
         //PaginatedList<Card> FilterBy(UserQueryParameters filterParameters);
         //Card Update();

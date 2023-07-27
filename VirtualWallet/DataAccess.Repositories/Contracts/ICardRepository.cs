@@ -9,7 +9,8 @@ namespace DataAccess.Repositories.Contracts
         Card GetById(int id);
         List<Card> GetByAccountId(int accountId);
         List<Card> FilterBy(CardQueryParameters filterParameters);
-        //Card Add(int userId, int accountId, Card card);
+        Card CreateCard(Card card);
+        Card AddCardToAccount(int accountId, Card createdCard);
         //Card Update(int id, Card card);
         //void Delete(int id);
         //PaginatedList<Card> FilterBy(UserQueryParameters filterParameters);

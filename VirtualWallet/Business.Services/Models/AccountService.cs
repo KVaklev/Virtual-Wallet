@@ -41,10 +41,10 @@ namespace Business.Services.Models
 
         public bool Delete(int id, User user)
         {
-            if (!IsUserAccountOwnerOrAdminId(id, user.Id, user.IsAdmin))
-            {
-                throw new UnauthorizedOperationException(Constants.ModifyAccountErrorMessage);
-            }
+            //if (!IsUserAccountOwnerOrAdminId(id, user.Id, user.IsAdmin))
+            //{
+            //    throw new UnauthorizedOperationException(Constants.ModifyAccountErrorMessage);
+            //}
 
             return this.accountRepository.Delete(id);
         }

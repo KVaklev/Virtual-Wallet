@@ -8,7 +8,6 @@ namespace Business.Dto
     public class CreateCardDto
     {
 
-
         [Required(ErrorMessage = Constants.EmptyFieldErrorMessage)]
         [CardNumber(ErrorMessage = Constants.CardNumberFieldErroMessage)]
         [StringLength(16, ErrorMessage = Constants.CardNumberLengthErrorMessage)]
@@ -27,16 +26,20 @@ namespace Business.Dto
         [StringLength(Constants.CheckNumberLength, ErrorMessage = Constants.CheckNumberLengthErrorMessage)]
         public string CheckNumber { get; set; }
 
+        [Required(ErrorMessage = Constants.EmptyFieldCardTypeErrorMessage)]
+        public string CardType { get; set; }
+
         [Required(ErrorMessage = Constants.EmptyFieldErrorMessage)]
-        public CardType CardType { get; set; }
-        public int AccountId { get; set; }
+        [MinLength(Constants.UsernameMinLength, ErrorMessage = Constants.UsernameMinLengthErrorMessage)]
+        [MaxLength(Constants.UsernameMaxLength, ErrorMessage = Constants.UsernameMaxLengthErrorMessage)]
+        public string AccountUsername { get; set; }
 
         [Required(ErrorMessage = Constants.EmptyFieldErrorMessage)]
         public decimal? Balance { get; set; }
         public decimal? CreditLimit { get; set; }
 
         [Required(ErrorMessage = Constants.EmptyFieldErrorMessage)]
-        public Currency? Currency { get; set; }
+        public string Currency { get; set; }
 
     }
 }

@@ -44,6 +44,7 @@ namespace DataAccess.Repositories.Data
                      Username = "ivanchoDraganchov",
                      Password = "MTIz",
                      PhoneNumber = "1234567890",
+                     AccountId = 1,
                      IsAdmin = true,
                      IsBlocked = false
                 },
@@ -57,6 +58,7 @@ namespace DataAccess.Repositories.Data
                      Username = "mariicheto",
                      Password = "MTIz",
                      PhoneNumber = "1134567890",
+                     AccountId = 2,
                      IsAdmin = false,
                      IsBlocked = false
                 },
@@ -184,7 +186,7 @@ namespace DataAccess.Repositories.Data
                 {
                 Id=1,
                 Name = "Български лев",
-                Аbbreviation="BGN",
+                Abbreviation="BGN",
                 IsDeleted=false
                 },
 
@@ -192,7 +194,7 @@ namespace DataAccess.Repositories.Data
                 { 
                 Id = 2,
                 Name = "Американски долар",
-                Аbbreviation = "USD",
+                Abbreviation = "USD",
                 IsDeleted=false
                 }
 
@@ -253,6 +255,7 @@ namespace DataAccess.Repositories.Data
                      CheckNumber = "005",
                      ExpirationDate = DateTime.Now.AddMonths(7),
                      CardType = CardType.Debit,
+                     CurrencyId = 1, 
                      AccountId = 1,
                      Balance = 750
                  },
@@ -265,6 +268,7 @@ namespace DataAccess.Repositories.Data
                      CheckNumber = "015",
                      ExpirationDate = DateTime.Now.AddMonths(6),
                      CardType = CardType.Debit,
+                     CurrencyId = 1,
                      AccountId = 2,
                      Balance = 1000
                 },
@@ -277,6 +281,7 @@ namespace DataAccess.Repositories.Data
                      CheckNumber = "025",
                      ExpirationDate = DateTime.Now.AddMonths(6),
                      CardType = CardType.Credit,
+                     CurrencyId = 1,
                      AccountId = 2,
                      Balance = 800,
                      CreditLimit = 1000
