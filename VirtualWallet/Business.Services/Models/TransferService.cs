@@ -40,7 +40,7 @@ namespace Business.Services.Models
         {
             if (!IsUserAuthorized(id, user.Id) || user.IsAdmin != true)
             {
-                throw new UnauthorizedOperationException(Constants.ModifyTransactionErrorMessage);
+                throw new UnauthorizedOperationException(Constants.ModifyUnauthorizeErrorMessage);
             }
 
             return this.transferRepository.GetById(id);

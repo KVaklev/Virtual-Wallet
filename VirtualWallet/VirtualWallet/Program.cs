@@ -50,6 +50,7 @@ namespace VirtualWallet
             builder.Services.AddScoped<IAccountService, AccountService>();
             builder.Services.AddScoped<ICurrencyService, CurrencyService>();
             builder.Services.AddScoped<ITransactionService, TransactionService>();
+            builder.Services.AddScoped<IHistoryService, HistoryService>();
 
             //Helpers
             builder.Services.AddScoped<IAuthManager, AuthManager>();

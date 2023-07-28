@@ -10,10 +10,11 @@ using DataAccess.Repositories.Contracts;
 using Microsoft.EntityFrameworkCore;
 using Business.Exceptions;
 using Business.QueryParameters;
+using IHistoryRepository = DataAccess.Repositories.Contracts.IHistoryRepository;
 
 namespace DataAccess.Repositories.Models
 {
-    public class HistoryRepository: DataAccess.Repositories.Contracts.IHistoryRepository
+    public class HistoryRepository: IHistoryRepository
     {
         private readonly ApplicationContext context;
 
@@ -22,7 +23,7 @@ namespace DataAccess.Repositories.Models
              this.context=context;
         }
 
-        public History Ctraete(History history)
+        public History Create(History history)
         {
             this.context.Add(history);
             this.context.SaveChanges();

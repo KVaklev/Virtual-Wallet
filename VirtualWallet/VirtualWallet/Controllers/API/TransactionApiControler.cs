@@ -62,8 +62,8 @@ namespace VirtualWallet.Controllers.API
             try
             {
                 var loggedUser = FindLoggedUser();
-                var isDelete = this.transactionService.Delete(id,loggedUser);
-                return StatusCode(StatusCodes.Status200OK);
+                var isDelete = this.transactionService.Delete(id, loggedUser);
+                return StatusCode(StatusCodes.Status200OK, isDelete);
             }
             catch (EntityNotFoundException e)
             {
@@ -83,7 +83,7 @@ namespace VirtualWallet.Controllers.API
                 var loggedUser = FindLoggedUser();
                 var transaction = MapDtoТоTransaction(transactionDto);
                 var updateTransaction = this.transactionService.Update(id, loggedUser, transaction);
-                var updateTransactionDto = MapTransactionToDto(updateTransaction,loggedUser);
+                var updateTransactionDto = MapTransactionToDto(updateTransaction, loggedUser);
                 return StatusCode(StatusCodes.Status200OK, updateTransactionDto);
             }
             catch (EntityNotFoundException e)
@@ -139,6 +139,26 @@ namespace VirtualWallet.Controllers.API
             }
         }
 
+        [HttpPut("{id}/execute"), Authorize]
+        public IActionResult Execute(int id)
+        {
+            try
+            {
+                var loggedUser = FindLoggedUser();
+                var isExecute = this.transactionService.Execute(id, loggedUser);
+                return StatusCode(StatusCodes.Status200OK, isExecute);
+            }
+            catch (EntityNotFoundException e)
+            {
+                return StatusCode(StatusCodes.Status404NotFound, e.Message);
+            }
+            catch (UnauthorizedOperationException e)
+            {
+                return StatusCode(StatusCodes.Status401Unauthorized, e.Message);
+            }
+
+        }
+
         private GetTransactionDto MapTransactionToDto(Transaction transaction, User loggedUser)
         {
             var accountRecipient = this.accountService.GetById(transaction.AccountRecepientId, loggedUser);
@@ -149,7 +169,7 @@ namespace VirtualWallet.Controllers.API
             getTransactionDto.Amount= transaction.Amount;
             getTransactionDto.Date = transaction.Date;
             getTransactionDto.Direction = transaction.Direction.ToString();
-            getTransactionDto.Аbbreviation = transaction.Currency.Abbreviation;
+            getTransactionDto.Abbreviation = transaction.Currency.Abbreviation;
             return getTransactionDto;
 
         }
@@ -158,7 +178,7 @@ namespace VirtualWallet.Controllers.API
         {
             var loggedUser = FindLoggedUser();
             var userRecipient = this.userService.GetByUsername(transactionDto.RecepientUsername);
-            var currency = this.currencyService.GetByАbbreviation(transactionDto.Currency);
+            var currency = this.currencyService.GetByАbbreviation(transactionDto.Abbreviation);
 
             var transaction = new Transaction();
             transaction.AccountSenderId = loggedUser.Id;
