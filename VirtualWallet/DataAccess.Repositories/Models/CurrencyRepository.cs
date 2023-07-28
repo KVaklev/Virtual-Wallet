@@ -30,7 +30,11 @@ namespace DataAccess.Repositories.Models
         public Currency GetById(int id)
         {
             var currency = this.context.Currencies.Where(c => c.Id == id).FirstOrDefault();
-            return currency ?? throw new EntityNotFoundException("Тhere is no such currency");
+            if (currency==null || currency.IsDeleted)
+            {
+                throw new EntityNotFoundException("Тhere is no such currency");
+            }
+            return currency; 
         }
 
         public Currency Update(int id, Currency currency)

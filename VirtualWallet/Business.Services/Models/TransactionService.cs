@@ -33,9 +33,9 @@ namespace Business.Services.Models
         {
             if (user.IsBlocked)
             {
-                throw new UnauthorizedOperationException(Constants.ModifyTransactionErrorMessage);
+                throw new UnauthorizedOperationException(Constants.ModifyUnauthorizeErrorMessage);
             }
-            if (this.accountRepository.CheckBalance(transaction.AccountSenderId, transaction.Amount))
+            if (!this.accountRepository.CheckBalance(transaction.AccountSenderId, transaction.Amount))
             {
                 throw new EntityNotFoundException(Constants.ModifyTransactionAmountErrorMessage);
             }
@@ -49,7 +49,7 @@ namespace Business.Services.Models
         {
             if (!IsUserUnauthorized(id, user.Id) || user.IsAdmin != true)
             {
-                throw new UnauthorizedOperationException(Constants.ModifyTransactionErrorMessage);
+                throw new UnauthorizedOperationException(Constants.ModifyUnauthorizeErrorMessage);
             }
 
             return this.transactionRepository.GetById(id);
@@ -59,7 +59,7 @@ namespace Business.Services.Models
         {
             if (!IsUserUnauthorized(id, user.Id))
             {
-                throw new UnauthorizedOperationException(Constants.ModifyTransactionErrorMessage);
+                throw new UnauthorizedOperationException(Constants.ModifyUnauthorizeErrorMessage);
             }
             
             return this.transactionRepository.Update(id, transaction);
@@ -69,8 +69,9 @@ namespace Business.Services.Models
         {
             if (!IsUserUnauthorized(id,user.Id))
             {
-                throw new UnauthorizedOperationException(Constants.ModifyTransactionErrorMessage);
+                throw new UnauthorizedOperationException(Constants.ModifyUnauthorizeErrorMessage);
             }
+            
             return this.transactionRepository.Delete(id);
         }
 
@@ -93,9 +94,14 @@ namespace Business.Services.Models
         {
             if (!IsUserUnauthorized(transactionId,user.Id))
             {
-                throw new UnauthorizedOperationException(Constants.ModifyTransactionErrorMessage);
+                throw new UnauthorizedOperationException(Constants.ModifyUnauthorizeErrorMessage);
             }
+            
             var transactionOut = this.transactionRepository.GetById(transactionId);
+            if (transactionOut.IsExecuted || transactionOut.Direction==DirectionType.In || transactionOut.IsDeleted)
+            {
+                throw new UnauthorizedOperationException(Constants.ModifyUnauthorizeErrorMessage);
+            }
             transactionOut.IsExecuted = true;
             transactionOut.Date = DateTime.Now;
 
@@ -126,7 +132,7 @@ namespace Business.Services.Models
                 history.AccountId = transaction.AccountRecepientId;
             }
             int historyCount = this.context.History.Count();
-            this.historyRepository.Ctraete(history);
+            this.historyRepository.Create(history);
             int newHistoryCount = this.context.History.Count();
            
             if (newHistoryCount == historyCount + 1)
