@@ -10,6 +10,8 @@
         public const string ModifyUnauthorizeErrorMessage = "You are not authorized.";
         public const string ModifyTransactionAmountErrorMessage = "Not enough balance.";
         public const string ModifyTransactionNoDataErrorMessage = "No data with these parameters.";
+        public const string ModifyTransactionDeleteErrorMessage = "You can't delete a completed transaction!";
+        public const string ModifyTransactionUpdateErrorMessage = "You can't update a completed transaction.";
 
         public const string ModifyCurrencyErrorMessage = "You are not admin.";
          
