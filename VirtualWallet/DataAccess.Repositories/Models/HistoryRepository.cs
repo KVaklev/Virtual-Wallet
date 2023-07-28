@@ -37,10 +37,19 @@ namespace DataAccess.Repositories.Models
 
             return history;
         }
-        //TODO - CreateWithTransfer
+        
         public History CreateWithTransfer(Transfer transfer)
         {
-            throw new NotImplementedException();
+            var history = new History();
+            
+            history.EventTime = DateTime.Now;
+            history.TransferId = transfer.Id;
+            history.NameOperation = NameOperation.Transfer;
+            history.AccountId = transfer.AccountId;
+
+            this.context.Add(history);
+            this.context.SaveChanges();
+            return history;
         }
 
         public History GetById(int id)

@@ -129,13 +129,9 @@ namespace Business.Services.Models
         }
         public bool AddTransferToHistory(Transfer transfer)
         {
-            var history = new History();
             var historyCount = this.context.History.Count();
-            history.EventTime = DateTime.Now;
-            history.TransferId = transfer.Id;
-            history.NameOperation = NameOperation.Transfer;
 
-            this.historyRepository.Ctraete(history);
+            var history=this.historyRepository.CreateWithTransfer(transfer);
             int historyCountNewHistoryAdded = this.context.History.Count();
 
             if (historyCount + 1 == historyCountNewHistoryAdded)
