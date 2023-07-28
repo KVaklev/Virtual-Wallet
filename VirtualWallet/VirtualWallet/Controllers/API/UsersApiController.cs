@@ -26,7 +26,7 @@ namespace VirtualWallet.Controllers.API
             this.authManager = authManager;
         }
        
-        [HttpGet(""), Authorize]
+        [HttpGet, Authorize]
         public async Task<IActionResult> GetUsersAsync([FromQuery] UserQueryParameters userQueryParameters)
         {
             try
@@ -60,7 +60,7 @@ namespace VirtualWallet.Controllers.API
             }
         }
 
-        [HttpPost("")]
+        [HttpPost]
         public async Task<IActionResult> CreateUserAsync([FromBody] CreateUserDto createUserDto)
         {
             try

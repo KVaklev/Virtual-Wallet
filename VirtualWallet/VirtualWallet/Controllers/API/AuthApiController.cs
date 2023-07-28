@@ -41,7 +41,7 @@ namespace VirtualWallet.Controllers.API
                     return BadRequest("Username and/or Password not specified");
                 }
 
-                string token = CreateApiToken(loggedUser);
+                string token = await CreateApiTokenAsync(loggedUser);
 
                 return Ok("Logged in successfully. Token: " + token);
 
@@ -72,7 +72,7 @@ namespace VirtualWallet.Controllers.API
             }
         }
 
-        private string CreateApiToken(User loggedUser)
+        private async Task<string> CreateApiTokenAsync(User loggedUser)
         {
             var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("This is my secret testing key"));
             var signinCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256);
@@ -94,7 +94,7 @@ namespace VirtualWallet.Controllers.API
 
             .WriteToken(jwtSecurityToken);
             Response.Cookies.Append("Cookie_JWT", token);
-            return token;
+            return await Task.FromResult(token);
         }
     }
 }

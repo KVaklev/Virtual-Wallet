@@ -22,6 +22,7 @@ namespace DataAccess.Repositories.Models
                 .Where(u=>u.IsDeleted==false)
                 .ToListAsync();
         }
+
         public async Task<PaginatedList<User>> FilterByAsync(UserQueryParameters filterParameters)
         {
             IQueryable<User> result = context.Users
@@ -34,18 +35,15 @@ namespace DataAccess.Repositories.Models
             result = await SortOrderAsync(result, filterParameters.SortOrder);
 
             int totalItems = await result.CountAsync();
-
             if (totalItems == 0)
             {
                 throw new EntityNotFoundException("No users match the specified filter criteria.");
             }
 
             int totalPages = (result.Count() + filterParameters.PageSize - 1) / filterParameters.PageSize;
-
             result = await PaginateAsync(result, filterParameters.PageNumber, filterParameters.PageSize);
 
             return new PaginatedList<User>(result.ToList(), totalPages, filterParameters.PageNumber);
-
         }
 
         public async Task<User> GetByIdAsync(int id)
@@ -56,6 +54,7 @@ namespace DataAccess.Repositories.Models
                 .FirstOrDefaultAsync();
             return user ?? throw new EntityNotFoundException($"User with ID = {id} doesn't exist.");
         }
+
         public async Task<User> GetByUsernameAsync(string username)
         {
             User? user = await context.Users
@@ -65,6 +64,7 @@ namespace DataAccess.Repositories.Models
                 .FirstOrDefaultAsync();
             return user ?? throw new EntityNotFoundException($"User with username '{username}' doesn't exist.");
         }
+
         public async Task<User> GetByEmailAsync(string email)
         {
             User? user = await context.Users
@@ -73,6 +73,7 @@ namespace DataAccess.Repositories.Models
                 .FirstOrDefaultAsync();
             return user ?? throw new EntityNotFoundException($"User with email '{email}' doesn't exist.");
         }
+
         public async Task<User> GetByPhoneNumberAsync(string phoneNumber)
         {
             User? user = await context.Users
@@ -81,12 +82,14 @@ namespace DataAccess.Repositories.Models
                 .FirstOrDefaultAsync();
             return user ?? throw new EntityNotFoundException($"User with pnone number '{phoneNumber}' doesn't exist.");
         }
+
         public async Task<User> CreateAsync(User user)
         {
             context.Users.Add(user);
             await context.SaveChangesAsync();
             return user;
         }
+
         public async Task<User> UpdateAsync(int id, User user)
         {
             User userToUpdate = await this.GetByIdAsync(id);
@@ -103,6 +106,7 @@ namespace DataAccess.Repositories.Models
             await context.SaveChangesAsync();
             return userToUpdate;
         }
+
         public async Task<bool> DeleteAsync(int id)
         {
             User userToDelete = await this.GetByIdAsync(id);
@@ -111,6 +115,7 @@ namespace DataAccess.Repositories.Models
             await context.SaveChangesAsync();
             return userToDelete.IsDeleted;
         }
+
         public async Task<User> PromoteAsync(int id)
         {
             User userToPromote = await this.GetByIdAsync(id);
@@ -121,6 +126,7 @@ namespace DataAccess.Repositories.Models
             await context.SaveChangesAsync();
             return userToPromote;
         }
+
         public async Task<User> BlockUserAsync(int id)
         {
             User userToBlock = await this.GetByIdAsync(id);
@@ -131,6 +137,7 @@ namespace DataAccess.Repositories.Models
             await context.SaveChangesAsync();
             return userToBlock;
         }
+
         public async Task<User> UnblockUserAsync(int id)
         {
             User userToUnblock = await this.GetByIdAsync(id);
@@ -141,14 +148,37 @@ namespace DataAccess.Repositories.Models
             await context.SaveChangesAsync();
             return userToUnblock;
         }
-        public async Task UpdatePhoneNumberAsync(User user, User userToUpdate)
+
+        public async static Task<IQueryable<User>> PaginateAsync(IQueryable<User> result, int pageNumber, int pageSize)
+        {
+            return await Task.FromResult(result
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize));
+        }
+
+        public async Task<bool> PhoneNumberExistsAsync(string phoneNumber)
+        {
+            return await context.Users.AnyAsync(u => u.PhoneNumber == phoneNumber);
+        }
+
+        public async Task<bool> EmailExistsAsync(string email)
+        {
+            return await context.Users.AnyAsync(u => u.Email == email);
+        }
+
+        public async Task<bool> UsernameExistsAsync(string username)
+        {
+            return await context.Users.AnyAsync(u => u.Username == username);
+        }
+
+        private async Task UpdatePhoneNumberAsync(User user, User userToUpdate)
         {
             if (user?.PhoneNumber != null)
             {
                 userToUpdate.PhoneNumber = user.PhoneNumber;
             }
         }
-        public async Task UpdateAdminStatusAsync(User user, User userToUpdate)
+        private async Task UpdateAdminStatusAsync(User user, User userToUpdate)
         {
             if (!userToUpdate.IsAdmin)
             {
@@ -159,20 +189,7 @@ namespace DataAccess.Repositories.Models
                 userToUpdate.IsAdmin = true;
             }
         }
-        public async Task<bool> EmailExistsAsync(string email)
-        {
-            return await context.Users.AnyAsync(u => u.Email == email);
-        }
-        public async Task<bool> UsernameExistsAsync(string username)
-        {
-            return await context.Users.AnyAsync(u => u.Username == username);
-        }
-        public async Task<bool> PhoneNumberExistsAsync(string phoneNumber)
-        {
-            return await context.Users.AnyAsync(u => u.PhoneNumber == phoneNumber);
-        }
-
-        public async Task<IQueryable<User>> FilterByUsernameAsync(IQueryable<User> result, string? username)
+        private async Task<IQueryable<User>> FilterByUsernameAsync(IQueryable<User> result, string? username)
         {
             if (!string.IsNullOrEmpty(username))
             {
@@ -221,12 +238,6 @@ namespace DataAccess.Repositories.Models
             }
         }
 
-        public async static Task<IQueryable<User>> PaginateAsync(IQueryable<User> result, int pageNumber, int pageSize)
-        {
-            return await Task.FromResult(result
-                .Skip((pageNumber - 1) * pageSize)
-                .Take(pageSize));
-        }
     }
 
 
