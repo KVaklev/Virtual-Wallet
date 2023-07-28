@@ -1,6 +1,6 @@
 ﻿namespace Business.Dto
 {
-    public class AccountDto
+    public class GetAccountDto
     {
         public string  Username { get; set; }
                 

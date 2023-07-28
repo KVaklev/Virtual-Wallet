@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Business.Dto;
+using Business.DTOs;
 using DataAccess.Models.Models;
 
 namespace Business.Mappers
@@ -9,12 +10,14 @@ namespace Business.Mappers
         public AccountsMapper()
         {
             //DTO
-            CreateMap<AccountDto, Account>();
+            CreateMap<GetAccountDto, Account>();
 
-            CreateMap<Account, AccountDto>()
+            CreateMap<Account, GetAccountDto>()
             .ForMember(u => u.Username, t => t.MapFrom(a => a.User.Username))
             .ForMember(a => a.Abbreviation, c => c.MapFrom(a => a.Currency.Abbreviation));
 
+            CreateMap<Account, CreateAccountDto>()
+            .ForMember(u => u.Abbreviation, c => c.MapFrom(a => a.Currency.Abbreviation));
         }
     }
 }

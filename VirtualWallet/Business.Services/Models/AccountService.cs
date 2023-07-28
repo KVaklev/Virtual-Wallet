@@ -1,4 +1,6 @@
-﻿using Business.Exceptions;
+﻿using AutoMapper;
+using Business.DTOs;
+using Business.Exceptions;
 using Business.QueryParameters;
 using Business.Services.Contracts;
 using Business.Services.Helpers;
@@ -16,27 +18,32 @@ namespace Business.Services.Models
     {
         private readonly IAccountRepository accountRepository;
         private readonly ICardRepository cardRepository;
+        private readonly IMapper mapper;
+        private readonly ICurrencyRepository currencyRepository;
 
-        public AccountService(IAccountRepository accountRepository, ICardRepository cardRepository)
+        public AccountService(IAccountRepository accountRepository, ICardRepository cardRepository, IMapper mapper, ICurrencyRepository currencyRepository)
         {
             this.accountRepository = accountRepository;
-            this.cardRepository = cardRepository;   
+            this.cardRepository = cardRepository;
+            this.mapper = mapper;
+            this.currencyRepository = currencyRepository;
         }
-        public IQueryable<Account> GetAll()
+        public async Task<IQueryable<Account>> GetAll()
         {
-            return accountRepository.GetAll();
+            return await accountRepository.GetAll();
         }
 
         public PaginatedList<Account> FilterBy(AccountQueryParameters filterParameters)
         {
             return this.accountRepository.FilterBy(filterParameters);
         }
-                
-        public Account Create(Account account, User user)
-        {
-            Account accountToCreate = this.accountRepository.Create(account, user);
 
-            accountToCreate.User = user;
+        public async Task<Account> Create(CreateAccountDto accountDto, User user)
+        {
+            Account account = mapper.Map<Account>(accountDto);
+            account.CurrencyId = currencyRepository.GetByАbbreviation(accountDto.Abbreviation).Id;
+
+            Account accountToCreate = await this.accountRepository.Create(account, user);
 
             return accountToCreate;
         }

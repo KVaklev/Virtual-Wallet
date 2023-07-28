@@ -135,7 +135,7 @@ namespace Business.Services.Models
             history.TransferId = transfer.Id;
             history.NameOperation = NameOperation.Transfer;
 
-            this.historyRepository.Ctraete(history);
+            this.historyRepository.Create(history);
             int historyCountNewHistoryAdded = this.context.History.Count();
 
             if (historyCount + 1 == historyCountNewHistoryAdded)
