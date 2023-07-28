@@ -49,11 +49,11 @@ namespace DataAccess.Repositories.Models
 
         public Transaction GetById(int id) 
         {
-            Transaction transaction = context.Transactions
+            Transaction transaction = context.Transactions.Where(t => t.Id == id)
                 .Include(s =>s.AccountSender)
                 .Include(r =>r.AccountRecepient)
                 .Include(c =>c.Currency)
-                .FirstOrDefault(t => t.Id == id);
+                .FirstOrDefault();
 
             return transaction ?? throw new EntityNotFoundException("Transaction doesn't exist.");
         }
@@ -62,9 +62,11 @@ namespace DataAccess.Repositories.Models
         {
             var transactionToUpdate = this.GetById(id);
 
-            if (transactionToUpdate.IsExecuted)
+            if (transactionToUpdate.IsExecuted 
+                || transactionToUpdate.Direction==DirectionType.In 
+                || transactionToUpdate.IsDeleted)
             {
-                throw new UnauthorizedOperationException("You are not authorized to modify the transaction.");
+                throw new UnauthorizedOperationException("You can't update a completed transaction.");
             }
 
             transactionToUpdate.AccountRecepientId = transaction.AccountRecepientId;
@@ -78,11 +80,15 @@ namespace DataAccess.Repositories.Models
 
         public bool Delete(int id)
         {
-            var trasactions = this.GetById(id);
-            trasactions.IsDeleted = true;
+            var trasaction = this.GetById(id);
+            if (trasaction.IsExecuted || trasaction.Direction == DirectionType.In)
+            {
+                throw new EntityNotFoundException("You can't delete a completed transaction!");
+            }
+            trasaction.IsDeleted = true;
 
             context.SaveChanges();
-            return trasactions.IsDeleted;
+            return trasaction.IsDeleted;
         }
 
         public IQueryable<Transaction> GetAll(string username)

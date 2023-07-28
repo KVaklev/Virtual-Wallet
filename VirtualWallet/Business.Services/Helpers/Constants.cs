@@ -7,7 +7,7 @@
         public const string ModifyUserErrorMessage = "Only an admin is authorized to perform the specified action.";
         public const string ModifyUsernameErrorMessage = "Username change is not allowed.";
 
-        public const string ModifyTransactionErrorMessage = "You are not authorized.";
+        public const string ModifyUnauthorizeErrorMessage = "You are not authorized.";
         public const string ModifyTransactionAmountErrorMessage = "Not enough balance.";
         public const string ModifyTransactionNoDataErrorMessage = "No data with these parameters.";
 
@@ -18,7 +18,12 @@
 
         public const string ModifyCardErrorMessage = "Only the admin or owner of the card can update information.";
 
-        public const string ModifyTransferErrorMessage = "You are not authorized to proceed with the transfer.";
+        public const string ModifyTransferErrorMessage = "You are not authorized to create, delete or modify the transfer.";
+
+        public const string ModifyTransferAmountErrorMessage = "Insufficient balance.";
+
+        public const string ModifyTransferNoDataErrorMessage = "There are now results related to these parameters";
+
 
 
 

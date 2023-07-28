@@ -16,7 +16,7 @@ namespace DataAccess.Repositories.Contracts
 
         Transfer Update(int id, Transfer transfer);
 
-        Transfer Delete(int id);
+        bool Delete(int id);
 
         PaginatedList<Transfer> FilterBy(TransferQueryParameters filterParameters, string username);
 

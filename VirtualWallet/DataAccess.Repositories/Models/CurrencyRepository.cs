@@ -42,6 +42,17 @@ namespace DataAccess.Repositories.Models
         public async Task<Currency> UpdateAsync(int id, Currency currency)
         {
             var currencyToUpdate = await this.GetByIdAsync(id);
+            var currency = this.context.Currencies.Where(c => c.Id == id).FirstOrDefault();
+            if (currency==null || currency.IsDeleted)
+            {
+                throw new EntityNotFoundException("Тhere is no such currency");
+            }
+            return currency; 
+        }
+
+        public Currency Update(int id, Currency currency)
+        {
+            var currencyToUpdate = this.GetById(id);
             currencyToUpdate.Name = currency.Name;
             currencyToUpdate.Abbreviation = currency.Abbreviation;
             await context.SaveChangesAsync();

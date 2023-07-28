@@ -18,12 +18,12 @@ namespace DataAccess.Models.Models
 
         public NameOperation NameOperation { get; set; }
 
-        [Required(ErrorMessage = "The {0} field is required")]
+        
         [Range(1, int.MaxValue, ErrorMessage = "The {0} field must be in the range from {1} to {2}.")]
         public int? TransactionId { get; set; }
         public Transaction? Transaction { get; set; }
 
-        [Required(ErrorMessage = "The {0} field is required")]
+        
         [Range(1, int.MaxValue, ErrorMessage = "The {0} field must be in the range from {1} to {2}.")]
         public int? TransferId { get; set; }
         public Transfer? Transfer { get; set; }

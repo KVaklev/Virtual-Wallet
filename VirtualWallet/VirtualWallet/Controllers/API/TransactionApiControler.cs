@@ -138,6 +138,26 @@ namespace VirtualWallet.Controllers.API
             }
         }
 
+        [HttpPut("{id}/execute"), Authorize]
+        public IActionResult Execute(int id)
+        {
+            try
+            {
+                var loggedUser = FindLoggedUser();
+                var isExecute = this.transactionService.Execute(id, loggedUser);
+                return StatusCode(StatusCodes.Status200OK, isExecute);
+            }
+            catch (EntityNotFoundException e)
+            {
+                return StatusCode(StatusCodes.Status404NotFound, e.Message);
+            }
+            catch (UnauthorizedOperationException e)
+            {
+                return StatusCode(StatusCodes.Status401Unauthorized, e.Message);
+            }
+
+        }
+
         private GetTransactionDto MapTransactionToDto(Transaction transaction, User loggedUser)
         {
             var accountRecipient = this.accountService.GetById(transaction.AccountRecepientId, loggedUser);
@@ -148,7 +168,7 @@ namespace VirtualWallet.Controllers.API
             getTransactionDto.Amount = transaction.Amount;
             getTransactionDto.Date = transaction.Date;
             getTransactionDto.Direction = transaction.Direction.ToString();
-            getTransactionDto.Аbbreviation = transaction.Currency.Abbreviation;
+            getTransactionDto.Abbreviation = transaction.Currency.Abbreviation;
             return getTransactionDto;
 
         }

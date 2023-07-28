@@ -42,14 +42,14 @@ namespace DataAccess.Repositories.Models
             return transfer;
         }
 
-        public Transfer Delete(int id)
+        public bool Delete(int id)
         {
             Transfer transferToDelete = this.GetById(id);
             transferToDelete.IsCancelled = true;
             context.Transfers.Remove(transferToDelete);
             context.SaveChanges();
 
-            return transferToDelete;
+            return transferToDelete.IsCancelled;
         }
 
         public Transfer GetById(int id)
@@ -77,6 +77,12 @@ namespace DataAccess.Repositories.Models
         public Transfer Update(int id, Transfer transfer)
         {
             var transferToUpdate = GetById(id);
+
+            if (transferToUpdate.IsConfirmed)
+            {
+                throw new UnauthorizedOperationException("Transfer is confirmed! You are not authorized to modify it");
+            }
+
             transferToUpdate.Amount = transfer.Amount;
             transferToUpdate.CardId = transfer.CardId;
             transferToUpdate.CurrencyId = transfer.CurrencyId;
