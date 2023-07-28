@@ -3,6 +3,7 @@ using Business.QueryParameters;
 using DataAccess.Models.Models;
 using DataAccess.Repositories.Contracts;
 using DataAccess.Repositories.Data;
+using DataAccess.Repositories.Helpers;
 using Microsoft.EntityFrameworkCore;
 
 namespace DataAccess.Repositories.Models
@@ -36,13 +37,14 @@ namespace DataAccess.Repositories.Models
             result = await SortOrderAsync(result, filterParameters.SortOrder);
 
             int totalItems = await result.CountAsync();
+
             if (totalItems == 0)
             {
                 throw new EntityNotFoundException("No users match the specified filter criteria.");
             }
 
             int totalPages = (result.Count() + filterParameters.PageSize - 1) / filterParameters.PageSize;
-            result = await PaginateAsync(result, filterParameters.PageNumber, filterParameters.PageSize);
+            result = await Common<User>.PaginateAsync(result, filterParameters.PageNumber, filterParameters.PageSize);
 
             return new PaginatedList<User>(result.ToList(), totalPages, filterParameters.PageNumber);
         }
@@ -148,13 +150,6 @@ namespace DataAccess.Repositories.Models
             }
             await context.SaveChangesAsync();
             return userToUnblock;
-        }
-
-        public async static Task<IQueryable<User>> PaginateAsync(IQueryable<User> result, int pageNumber, int pageSize)
-        {
-            return await Task.FromResult(result
-                .Skip((pageNumber - 1) * pageSize)
-                .Take(pageSize));
         }
 
         public async Task<bool> PhoneNumberExistsAsync(string phoneNumber)

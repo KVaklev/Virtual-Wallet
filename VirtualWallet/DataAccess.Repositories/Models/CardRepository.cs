@@ -4,6 +4,7 @@ using DataAccess.Models.Enums;
 using DataAccess.Models.Models;
 using DataAccess.Repositories.Contracts;
 using DataAccess.Repositories.Data;
+using DataAccess.Repositories.Helpers;
 using Microsoft.EntityFrameworkCore;
 
 namespace DataAccess.Repositories.Models
@@ -72,7 +73,7 @@ namespace DataAccess.Repositories.Models
             }
 
             int totalPages = (result.Count() + filterParameters.PageSize - 1) / filterParameters.PageSize;
-            result = await PaginateAsync(result, filterParameters.PageNumber, filterParameters.PageSize);
+            result = await Common<Card>.PaginateAsync(result, filterParameters.PageNumber, filterParameters.PageSize);
 
             return new PaginatedList<Card>(result.ToList(), totalPages, filterParameters.PageNumber);
         }
@@ -144,13 +145,6 @@ namespace DataAccess.Repositories.Models
             await context.SaveChangesAsync();
 
             return card;
-        }
-
-        public async static Task<IQueryable<Card>> PaginateAsync(IQueryable<Card> result, int pageNumber, int pageSize)
-        {
-            return await Task.FromResult(result
-                .Skip((pageNumber - 1) * pageSize)
-                .Take(pageSize));
         }
 
         private async Task UpdateExpirationDateAsync(Card card, Card cardToUpdate)
