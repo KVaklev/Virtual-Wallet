@@ -2,6 +2,7 @@
 using Business.QueryParameters;
 using Business.Services.Contracts;
 using Business.Services.Helpers;
+using DataAccess.Models.Enums;
 using DataAccess.Models.Models;
 using DataAccess.Repositories.Contracts;
 using DataAccess.Repositories.Data;
@@ -20,9 +21,10 @@ namespace Business.Services.Models
         private readonly IHistoryRepository historyRepository;
         private readonly IAccountRepository accountRepository;
         private readonly IUserRepository userRepository;
+        private readonly ICardRepository cardRepository;
         private readonly ApplicationContext context;
 
-        public TransferService(ITransferRepository transferRepository, IHistoryRepository historyRepository, IAccountRepository accountRepository, IUserRepository userRepository, ApplicationContext context)
+        public TransferService(ITransferRepository transferRepository, IHistoryRepository historyRepository, IAccountRepository accountRepository, IUserRepository userRepository, ICardRepository cardRepository, ApplicationContext context)
         {
             this.transferRepository = transferRepository;
             this.historyRepository = historyRepository;
@@ -53,59 +55,115 @@ namespace Business.Services.Models
                 throw new UnauthorizedOperationException(Constants.ModifyTransferErrorMessage);
             }
 
+            if (this.accountRepository.CheckBalance(transfer.AccountId, transfer.Amount))
+            {
+                throw new UnauthorizedOperationException(Constants.ModifyTransferAmountErrorMessage);
+            }
+
             var createdTransfer = this.transferRepository.Create(transfer);
 
             return createdTransfer;
         }
 
-        public void Delete(int id, User user)
+        public bool Delete(int id, User user)
         {
-            throw new NotImplementedException();
-        }
+            if (!IsUserAuthorized(id, user.Id))
+            {
+                throw new UnauthorizedOperationException(Constants.ModifyTransferErrorMessage);
+            }
 
-        public bool Execute(int transferId)
-        {
-            throw new NotImplementedException();
+            return this.transferRepository.Delete(id);
         }
-
-        public PaginatedList<Transfer> FilterBy(TransferQueryParameters transferQueryParameters)
-        {
-            throw new NotImplementedException();
-        }
-
 
         public Transfer Update(int id, Transfer transfer, User user)
         {
-            throw new NotImplementedException();
-        }
-
-        private bool IsUserAuthorized(int id, int userId)
-        {
-            bool isAuthorized = true;
-
-            Transfer transferToUpdate = this.transferRepository.GetById(id);
-
-            if (transferToUpdate.Account.User.Id != userId)
+            if (!IsUserAuthorized(id, user.Id))
             {
-                isAuthorized = false;
+                throw new UnauthenticatedOperationException(Constants.ModifyTransferErrorMessage);
             }
-            return isAuthorized;
+
+            return this.transferRepository.Update(id, transfer);
         }
 
-        public bool IsUserAuthorized(int id, User user)
+        public PaginatedList<Transfer> FilterBy(TransferQueryParameters transferQueryParameters, User user)
         {
-            bool IsUserAuthorized = false;
+            var result = this.transferRepository.FilterBy(transferQueryParameters, user.Username);
+
+            if (result.Count == 0)
+            {
+                throw new EntityNotFoundException(Constants.ModifyTransferNoDataErrorMessage);
+            }
+
+            return result;
+        }
+
+        public bool Execute(int transferId, User user)
+        {
+            if (!IsUserAuthorized(transferId, user.Id))
+            {
+                throw new UnauthorizedOperationException(Constants.ModifyTransferErrorMessage);
+            }
+
+            var transferToExecute = this.transferRepository.GetById(transferId);
+            transferToExecute.IsConfirmed = true;
+            transferToExecute.DateCreated = DateTime.Now;
+
+            if (transferToExecute.TransferType == TransferDirection.Deposit)
+            {
+                this.accountRepository.IncreaseBalance(transferToExecute.AccountId, transferToExecute.Amount);
+
+                this.cardRepository.DecreaseBalance(transferToExecute.CardId, transferToExecute.Amount);
+            }
+
+            if (transferToExecute.TransferType == TransferDirection.Withdrawal)
+            {
+                this.accountRepository.DecreaseBalance(transferToExecute.AccountId, transferToExecute.Amount);
+
+                this.cardRepository.IncreaseBalance(transferToExecute.CardId, transferToExecute.Amount);
+            }
+
+            AddTransferToHistory(transferToExecute);
+
+            return transferToExecute.IsConfirmed;
+
+        }
+        public bool AddTransferToHistory(Transfer transfer)
+        {
+            var history = new History();
+            var historyCount = this.context.History.Count();
+            history.EventTime = DateTime.Now;
+            history.TransferId = transfer.Id;
+            history.NameOperation = NameOperation.Transfer;
+
+            this.historyRepository.Ctraete(history);
+            int historyCountNewHistoryAdded = this.context.History.Count();
+
+            if (historyCount + 1 == historyCountNewHistoryAdded)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+
+
+        }
+        public bool IsUserAuthorized(int id, int userId)
+        {
+            bool IsUserAuthorized = true;
 
             Transfer transferToGet = this.transferRepository.GetById(id);
 
-            if (transferToGet.Account.UserId == user.Id || user.IsAdmin)
+            if (transferToGet.Account.UserId != userId)
             {
-                IsUserAuthorized = true;
+                IsUserAuthorized = false;
             }
 
             return IsUserAuthorized;
 
         }
+
     }
 
 

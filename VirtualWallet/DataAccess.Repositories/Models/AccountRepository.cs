@@ -21,7 +21,7 @@ namespace DataAccess.Repositories.Models
         public IQueryable<Account> GetAll()
         {
             IQueryable<Account> result = context.Accounts
-                .Where(a=>a.IsDeleted==false)
+                .Where(a => a.IsDeleted == false)
                 .Include(a => a.User)
                 .Include(a=>a.Cards)
                 .Include(a => a.Currency);
@@ -86,7 +86,7 @@ namespace DataAccess.Repositories.Models
                 throw new EntityNotFoundException($"Account with ID = {id} does not exist.");
             }
 
-           if (CardExists(card.CardNumber))
+            if (CardExists(card.CardNumber))
             {
                 accountToRemoveCard.Cards.Remove(card);
 
@@ -118,6 +118,7 @@ namespace DataAccess.Repositories.Models
         {
             Account account = context.Accounts
                 .Include(a=>a.User)
+                .Include(a=>a.Cards)
                 .Include(a=>a.Currency)
                 .Where(a => a.IsDeleted == false)
                 .Where(a => a.User.Username == username)
@@ -126,7 +127,6 @@ namespace DataAccess.Repositories.Models
             return account ?? throw new EntityNotFoundException($"Account with username = {username} does not exist.");
         }
 
-       
         public Account IncreaseBalance(int id, decimal amount)
         {
             Account accountToDepositTo = this.GetById(id);
@@ -171,7 +171,7 @@ namespace DataAccess.Repositories.Models
             result = FilterByToDate(result, filterParameters.ToDate);
             result = FilterByCurrencyAbbrev(result, filterParameters.Currencyabbrev);
 
-            int totalPages = (result.Count() + filterParameters.PageSize -1) / filterParameters.PageSize;
+            int totalPages = (result.Count() + filterParameters.PageSize - 1) / filterParameters.PageSize;
 
             result = Paginate(result, filterParameters.PageNumber, filterParameters.PageSize);
 
@@ -187,8 +187,6 @@ namespace DataAccess.Repositories.Models
                 .Take(pageSize);
         }
 
-
-
         public IQueryable<Account> FilterByUsername(IQueryable<Account> accounts, string? username)
         {
             if (!string.IsNullOrEmpty(username))
@@ -200,7 +198,7 @@ namespace DataAccess.Repositories.Models
         }
         private IQueryable<Account> FilterByFromDate(IQueryable<Account> accounts, string? fromDate)
         {
-            if(!string.IsNullOrEmpty(fromDate))
+            if (!string.IsNullOrEmpty(fromDate))
             {
                 DateTime date = DateTime.Parse(fromDate);
 
@@ -210,9 +208,9 @@ namespace DataAccess.Repositories.Models
             return accounts;
         }
 
-        private IQueryable<Account>FilterByToDate(IQueryable<Account> accounts, string? toDate)
+        private IQueryable<Account> FilterByToDate(IQueryable<Account> accounts, string? toDate)
         {
-            if(!string.IsNullOrEmpty (toDate))
+            if (!string.IsNullOrEmpty(toDate))
             {
                 DateTime date = DateTime.Parse(toDate);
 
@@ -222,7 +220,7 @@ namespace DataAccess.Repositories.Models
             return accounts;
         }
 
-        private IQueryable<Account>FilterByCurrencyAbbrev(IQueryable<Account> accounts, string? currencyabbrev)
+        private IQueryable<Account> FilterByCurrencyAbbrev(IQueryable<Account> accounts, string? currencyabbrev)
         {
             if (!string.IsNullOrEmpty(currencyabbrev))
             {
@@ -239,7 +237,7 @@ namespace DataAccess.Repositories.Models
                 case "balance":
                     return accounts.OrderBy(a => a.Balance);
                 case "date":
-                    return accounts.OrderBy(a=>a.DateCreated);
+                    return accounts.OrderBy(a => a.DateCreated);
                 case "cards":
                     return accounts.OrderBy(a => a.Cards.Count());
                 default:
@@ -260,5 +258,16 @@ namespace DataAccess.Repositories.Models
                 .Where(a => a.IsDeleted == false)
                 .Any(account => account.Id == id);
         }
+
+        
+
+
+
+        //public bool AccountExists(int id)
+        //{
+        //    return context.Accounts.Any(a => a.UserId == id);
+        //}
+
+
     }
 }

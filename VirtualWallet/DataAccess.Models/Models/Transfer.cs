@@ -8,7 +8,7 @@ namespace DataAccess.Models.Models
 
         public int Id { get; set; }
         public DateTime DateCreated { get; set; }
-        public int? AccountId { get; set; }
+        public int AccountId { get; set; }
         public Account Account { get; set; }
         public int CurrencyId { get; set; }
         public Currency Currency { get; set; }

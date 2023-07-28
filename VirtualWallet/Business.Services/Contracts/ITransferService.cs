@@ -11,13 +11,13 @@ namespace Business.Services.Contracts
     public interface ITransferService
     {
         IQueryable<Transfer> GetAll(string username);
-        PaginatedList<Transfer> FilterBy(TransferQueryParameters transferQueryParameters);
+        PaginatedList<Transfer> FilterBy(TransferQueryParameters transferQueryParameters, User user);
         Transfer GetById(int id, User user);
         Transfer Create(Transfer transfer, User user);
         Transfer Update(int id, Transfer transfer, User user);
-        void Delete(int id, User user);
+        bool Delete(int id, User user);
+        bool Execute(int transferId, User user);
 
-        bool Execute(int transferId);
 
     }
 }

@@ -20,7 +20,12 @@
 
         public const string ModifyCardErrorMessage = "Only the admin or owner of the card can update information.";
 
-        public const string ModifyTransferErrorMessage = "You are not authorized to proceed with the transfer.";
+        public const string ModifyTransferErrorMessage = "You are not authorized to create, delete or modify the transfer.";
+
+        public const string ModifyTransferAmountErrorMessage = "Insufficient balance.";
+
+        public const string ModifyTransferNoDataErrorMessage = "There are now results related to these parameters";
+
 
 
 

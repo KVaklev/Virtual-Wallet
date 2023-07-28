@@ -104,11 +104,6 @@ namespace Business.Services.Models
 
 
 
-        //public bool AccountExists(int id)
-        //{
-        //    return this.accountRepository.AccountExists(id);
-        //}
-
 
     }
 }
