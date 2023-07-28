@@ -9,6 +9,8 @@ namespace Business.QueryParameters
         public string? PhoneNumber { get; set; }
         public string? SortBy { get; set; }
         public string? SortOrder { get; set; }
+        public int PageSize { get; set; } = 5;
+        public int PageNumber { get; set; } = 1;
 
     }
 }

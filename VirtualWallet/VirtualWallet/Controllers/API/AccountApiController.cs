@@ -31,7 +31,7 @@ namespace VirtualWallet.Controllers.API
         [HttpGet, Authorize]
         public IActionResult GatAllAcounts()
         {
-            var loggedUser = FindLoggedUser();
+            //var loggedUser = FindLoggedUser();
 
             var result = accountService.GetAll().ToList();
 
@@ -47,12 +47,12 @@ namespace VirtualWallet.Controllers.API
 
         //}
 
-        private User FindLoggedUser()
-        {
-            var loggedUsersUsername = User.Claims.FirstOrDefault(claim => claim.Type == "Username").Value;
-            var loggedUser = authManager.TryGetUserByUsername(loggedUsersUsername);
-            return loggedUser;
-        }
+        //private User FindLoggedUser()
+        //{
+        //    var loggedUsersUsername = User.Claims.FirstOrDefault(claim => claim.Type == "Username").Value;
+        //    var loggedUser = authManager.TryGetUserByUsername(loggedUsersUsername);
+        //    return loggedUser;
+        //}
 
 
 

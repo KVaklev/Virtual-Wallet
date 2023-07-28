@@ -5,24 +5,21 @@ namespace Business.Services.Contracts
 {
     public interface IUserService
     {
-        //List<User> GetAll();
         Task<List<User>> GetAllAsync();
-        Task<List<User>> FilterByAsync(UserQueryParameters queryParameters);
-        //List<User> FilterBy(UserQueryParameters filterParameters);
-        //PaginatedList<IUser> FilterBy(UserQueryParameters filterParameters);
-        User GetById(int id);
-        User GetByUsername(string username);
-        User GetByEmail(string email);
-        User GetByPhoneNumber(string phoneNumber);
-        User Create(User user);
-        User Update(int id, User user, User loggedUser);
-        bool Delete(int id, User loggedUser);
-        User Promote(int id, User loggedUser);
-        User BlockUser(int id, User loggedUser);
-        User UnblockUser(int id, User loggedUser); 
-        bool UsernameExists(string username);
-        bool EmailExists(string email);
-        bool PhoneNumberExists(string phoneNumber);
-        bool IsAuthorized(User user, User loggedUser);
+        Task<PaginatedList<User>> FilterByAsync(UserQueryParameters queryParameters);
+        Task<User> GetByIdAsync(int id);
+        Task<User> GetByUsernameAsync(string username);
+        Task<User> GetByEmailAsync(string email);
+        Task<User> GetByPhoneNumberAsync(string phoneNumber);
+        Task<User> CreateAsync(User user);
+        Task<User> UpdateAsync(int id, User user, User loggedUser);
+        Task<bool> DeleteAsync(int id, User loggedUser);
+        Task<User> PromoteAsync(int id, User loggedUser);
+        Task<User> BlockUserAsync(int id, User loggedUser);
+        Task<User> UnblockUserAsync(int id, User loggedUser);
+        Task<bool> UsernameExistsAsync(string username);
+        Task<bool> EmailExistsAsync(string email);
+        Task<bool> PhoneNumberExistsAsync(string phoneNumber);
+        Task<bool> IsAuthorizedAsync(User user, User loggedUser);
     }
 }

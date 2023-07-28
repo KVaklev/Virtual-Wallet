@@ -4,8 +4,8 @@ namespace Presentation.Helpers
 {
     public interface IAuthManager
     {
-        User TryGetUser(string credentials);
-        User TryGetUserByUsername(string username);
-        User TryGetUser(string username, string password);
+        Task<User> TryGetUserAsync(string credentials);
+        Task<User> TryGetUserByUsernameAsync(string username);
+        Task<User> TryGetUserAsync(string username, string password);
     }
 }

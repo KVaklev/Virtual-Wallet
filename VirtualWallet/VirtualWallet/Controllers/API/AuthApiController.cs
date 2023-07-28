@@ -30,11 +30,11 @@ namespace VirtualWallet.Controllers.API
 
         [AllowAnonymous]
         [HttpPost("login")]
-        public IActionResult Login(string username, string password)
+        public async Task<IActionResult> LoginAsync(string username, string password)
         {
             try
             {
-                var loggedUser = authManager.TryGetUserByUsername(username);
+                var loggedUser = await authManager.TryGetUserByUsernameAsync(username);
 
                 if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
                 {
@@ -58,12 +58,12 @@ namespace VirtualWallet.Controllers.API
 
         [AllowAnonymous]
         [HttpPost("register")]
-        public IActionResult Register([FromBody] CreateUserDto createUserDto)
+        public async Task<IActionResult> RegisterAsync([FromBody] CreateUserDto createUserDto)
         {
             try
             {
                 var user = this.mapper.Map<User>(createUserDto);
-                var createdUser = this.userService.Create(user);
+                var createdUser = await this.userService.CreateAsync(user);
                 return StatusCode(StatusCodes.Status201Created, createdUser);
             }
             catch (DuplicateEntityException ex)
