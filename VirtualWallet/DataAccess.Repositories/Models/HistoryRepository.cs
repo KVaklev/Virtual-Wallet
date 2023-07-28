@@ -1,16 +1,10 @@
 ﻿using DataAccess.Models.Models;
 using DataAccess.Repositories.Data;
-using Microsoft.EntityFrameworkCore.Migrations;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using DataAccess.Repositories.Contracts;
 using Microsoft.EntityFrameworkCore;
 using Business.Exceptions;
 using Business.QueryParameters;
 using IHistoryRepository = DataAccess.Repositories.Contracts.IHistoryRepository;
+using DataAccess.Models.Enums;
 
 namespace DataAccess.Repositories.Models
 {
@@ -23,11 +17,38 @@ namespace DataAccess.Repositories.Models
              this.context=context;
         }
 
-        public History Create(History history)
+        public History CreateWithTransaction(Transaction transaction)
         {
+            var history = new History();
+            history.EventTime = DateTime.Now;
+            history.TransactionId = transaction.Id;
+            history.NameOperation = NameOperation.Transaction;
+
+            if (transaction.Direction == DirectionType.Out)
+            {
+                history.AccountId = transaction.AccountSenderId;
+            }
+            else
+            {
+                history.AccountId = transaction.AccountRecepientId;
+            }
             this.context.Add(history);
             this.context.SaveChanges();
 
+            return history;
+        }
+        
+        public History CreateWithTransfer(Transfer transfer)
+        {
+            var history = new History();
+            
+            history.EventTime = DateTime.Now;
+            history.TransferId = transfer.Id;
+            history.NameOperation = NameOperation.Transfer;
+            history.AccountId = transfer.AccountId;
+
+            this.context.Add(history);
+            this.context.SaveChanges();
             return history;
         }
 
@@ -118,5 +139,6 @@ namespace DataAccess.Repositories.Models
             }
         }
 
+        
     }
 }

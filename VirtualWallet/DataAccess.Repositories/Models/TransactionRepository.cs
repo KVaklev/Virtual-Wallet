@@ -40,6 +40,7 @@ namespace DataAccess.Repositories.Models
             transactionIn.Amount = transactionOut.Amount;
             transactionIn.Date = DateTime.Now;
             transactionIn.IsDeleted = false;
+            transactionIn.IsExecuted = true;
 
             context.Add(transactionIn);
             context.SaveChanges();
@@ -58,17 +59,8 @@ namespace DataAccess.Repositories.Models
             return transaction ?? throw new EntityNotFoundException("Transaction doesn't exist.");
         }
 
-        public Transaction Update(int id, Transaction transaction)
+        public Transaction Update(Transaction transactionToUpdate, Transaction transaction)
         {
-            var transactionToUpdate = this.GetById(id);
-
-            if (transactionToUpdate.IsExecuted 
-                || transactionToUpdate.Direction==DirectionType.In 
-                || transactionToUpdate.IsDeleted)
-            {
-                throw new UnauthorizedOperationException("You can't update a completed transaction.");
-            }
-
             transactionToUpdate.AccountRecepientId = transaction.AccountRecepientId;
             transactionToUpdate.Amount = transaction.Amount;
             transactionToUpdate.CurrencyId = transaction.CurrencyId;
@@ -78,17 +70,11 @@ namespace DataAccess.Repositories.Models
             return transactionToUpdate;
         }
 
-        public bool Delete(int id)
+        public bool Delete(Transaction transaction)
         {
-            var trasaction = this.GetById(id);
-            if (trasaction.IsExecuted || trasaction.Direction == DirectionType.In)
-            {
-                throw new EntityNotFoundException("You can't delete a completed transaction!");
-            }
-            trasaction.IsDeleted = true;
-
+            transaction.IsDeleted = true;
             context.SaveChanges();
-            return trasaction.IsDeleted;
+            return transaction.IsDeleted;
         }
 
         public IQueryable<Transaction> GetAll(string username)
@@ -98,8 +84,6 @@ namespace DataAccess.Repositories.Models
                     .Include(r => r.AccountRecepient)
                     .ThenInclude(u =>u.User)
                     .Include(c => c.Currency);
-
-            result = result.Where(t => t.AccountSender.User.Username == username);
 
             return result ?? throw new EntityNotFoundException("Тhere are no transactions!");
         }
@@ -113,6 +97,8 @@ namespace DataAccess.Repositories.Models
             result = FilterByFromData(result, filterParameters.FromDate);
             result = FilterByToData(result, filterParameters.ToDate);
             result = SortBy(result, filterParameters.SortBy);
+            
+            //TODO check for user and in,out
 
             int totalPages = (result.Count() + filterParameters.PageSize - 1) / filterParameters.PageSize;
 
@@ -174,7 +160,7 @@ namespace DataAccess.Repositories.Models
             {
                 return result;
             }
-           //TODO
+           
            throw new EntityNotFoundException($"Invalid value for {parameterName}.");
         }
 

@@ -5,7 +5,9 @@ namespace DataAccess.Repositories.Contracts
 {
     public interface IHistoryRepository
     {
-        History Create(History history);
+        public History CreateWithTransaction(Transaction transaction);
+
+        public History CreateWithTransfer(Transfer transfer);
 
         History GetById(int id);
 

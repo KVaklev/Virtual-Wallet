@@ -21,6 +21,7 @@ namespace VirtualWallet.Controllers.API
         private readonly IAccountService accountService;
         private readonly IUserService userService;
         private readonly ICurrencyService currencyService;
+        
 
 
         public TransactionApiControler(
@@ -45,6 +46,11 @@ namespace VirtualWallet.Controllers.API
         [HttpPost, Authorize]
         public IActionResult Create([FromBody] CreateTransactionDto transactionDto)
         {
+            try
+            {
+                var loggedUser = FindLoggedUser();
+                var createdTransaction = this.transactionService.Create(transactionDto, loggedUser);
+                var createdTransactionDto = this.mapper.Map<GetTransactionDto>(createdTransaction);
            // Todo map method
 
             var loggedUser = FindLoggedUser();
@@ -52,7 +58,17 @@ namespace VirtualWallet.Controllers.API
             var createdTransaction = this.transactionService.Create(transaction, loggedUser);
             var createdTransactionDto = MapTransactionToDto(createdTransaction, loggedUser);
 
-            return StatusCode(StatusCodes.Status201Created, createdTransactionDto);
+                return StatusCode(StatusCodes.Status201Created, createdTransactionDto);
+            }
+            catch (EntityNotFoundException e)
+            {
+                return StatusCode(StatusCodes.Status404NotFound, e.Message);
+            }
+            catch (UnauthorizedOperationException e)
+            {
+                return StatusCode(StatusCodes.Status401Unauthorized, e.Message);
+            }
+            
         }
 
         [HttpDelete("{id}"), Authorize]
@@ -80,9 +96,8 @@ namespace VirtualWallet.Controllers.API
             try
             {
                 var loggedUser = FindLoggedUser();
-                var transaction = MapDtoТоTransaction(transactionDto);
-                var updateTransaction = this.transactionService.Update(id, loggedUser, transaction);
-                var updateTransactionDto = MapTransactionToDto(updateTransaction, loggedUser);
+                var updateTransaction = this.transactionService.Update(id, loggedUser, transactionDto);
+                var updateTransactionDto = this.mapper.Map<GetTransactionDto>(updateTransaction);
                 return StatusCode(StatusCodes.Status200OK, updateTransactionDto);
             }
             catch (EntityNotFoundException e)
@@ -101,8 +116,8 @@ namespace VirtualWallet.Controllers.API
             try
             {
                 var loggedUser = FindLoggedUser();
-                var transaction = this.transactionService.GetById(id, loggedUser);
-                var transactionDto = MapTransactionToDto(transaction, loggedUser);
+                var transactionDto = this.transactionService.GetById(id, loggedUser);
+                
                 return StatusCode(StatusCodes.Status200OK, transactionDto);
             }
             catch (EntityNotFoundException e)
@@ -124,8 +139,9 @@ namespace VirtualWallet.Controllers.API
                 var loggedUser = FindLoggedUser();
                 var transacrions = this.transactionService.FilterBy(filterParameters, loggedUser);
                 List<GetTransactionDto> transactionDtos = transacrions
-                    .Select(transaction => MapTransactionToDto(transaction, loggedUser))
+                    .Select(transaction => mapper.Map<GetTransactionDto>(transaction))
                     .ToList();
+
                 return StatusCode(StatusCodes.Status200OK, transactionDtos);
             }
             catch (EntityNotFoundException e)
@@ -194,5 +210,6 @@ namespace VirtualWallet.Controllers.API
             var loggedUser = await authManager.TryGetUserByUsernameAsync(loggedUsersUsername);
             return loggedUser;
         }
+       
     }
 }
