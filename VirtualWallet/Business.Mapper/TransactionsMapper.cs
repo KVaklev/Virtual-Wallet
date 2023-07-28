@@ -10,12 +10,17 @@ namespace Business.Mappers
         public TransactionsMapper()
         {
             //DTO
-            CreateMap<Transaction, CreateTransactionDto>()
-                .ForMember(r => r.RecepientUsername, u => u.MapFrom(c => c.AccountRecepient.User.Username))
-                .ForMember(c => c.Abbreviation, u => u.MapFrom(a => a.Currency.Abbreviation));
+            CreateMap<CreateTransactionDto, Transaction>()
+                .ForPath(t => t.AccountRecepient.User.Username, t => t.MapFrom(t => t.RecepientUsername))
+                .ForPath(t => t.Currency.Abbreviation, t => t.MapFrom(t => t.Abbreviation))
+                .ReverseMap();
 
-            CreateMap<GetTransactionDto, Transaction>();
-                
+            CreateMap<GetTransactionDto, Transaction>()
+                .ForPath(t => t.AccountRecepient.User.Username, t => t.MapFrom(t => t.RecipientUsername))
+                .ForPath(t => t.Currency.Abbreviation, t => t.MapFrom(t => t.Abbreviation))
+                .ForPath(t => t.Direction, t => t.MapFrom(t => t.Direction))
+                .ReverseMap();
+
 
         }
     }

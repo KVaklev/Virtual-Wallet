@@ -12,9 +12,9 @@ namespace DataAccess.Repositories.Contracts
         
         Transaction GetById(int id);
 
-        Transaction Update(int id, Transaction transaction);
+        Transaction Update(Transaction transactionToUpdate, Transaction transaction);
 
-        bool Delete(int id);
+        bool Delete(Transaction transaction);
 
         IQueryable<Transaction> GetAll(string username);
 

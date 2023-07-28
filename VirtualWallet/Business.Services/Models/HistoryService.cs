@@ -2,6 +2,7 @@
 using Business.QueryParameters;
 using Business.Services.Contracts;
 using Business.Services.Helpers;
+using DataAccess.Models.Enums;
 using DataAccess.Models.Models;
 using DataAccess.Repositories.Contracts;
 
@@ -16,6 +17,7 @@ namespace Business.Services.Models
             this.historyRepository = historyRepository;
         }
 
+       
         public History GetById(int id, User user)
         {
             if (!user.IsAdmin || IsUserUnauthorized(id, user)!=true)

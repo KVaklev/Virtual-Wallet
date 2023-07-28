@@ -6,6 +6,9 @@ using DataAccess.Models.Enums;
 using DataAccess.Models.Models;
 using DataAccess.Repositories.Data;
 using DataAccess.Repositories.Contracts;
+using Business.Dto;
+using AutoMapper;
+using Business.DTOs;
 
 namespace Business.Services.Models
 {
@@ -15,23 +18,31 @@ namespace Business.Services.Models
         private readonly IHistoryRepository historyRepository;
         private readonly ApplicationContext context;
         private readonly IAccountRepository accountRepository;
+        private readonly ICurrencyRepository currencyRepository;
+        private readonly IMapper mapper;
 
         public TransactionService(
             ITransactionRepository transactionRepository,
             IHistoryRepository historyRepository,
             ApplicationContext context,
-            IAccountRepository accountRepository
+            IAccountRepository accountRepository,
+            ICurrencyRepository currencyRepository,
+            IMapper mapper
             )
         {
             this.transactionRepository = transactionRepository;
             this.historyRepository = historyRepository;
             this.context = context;
             this.accountRepository = accountRepository;
+            this.currencyRepository = currencyRepository;
+            this.mapper = mapper;
         }
 
-        public Transaction Create(Transaction transaction, User user)
+        public Transaction Create(CreateTransactionDto transactionDto, User loggedUser)
         {
-            if (user.IsBlocked)
+            var transaction = MapDtoТоTransaction(transactionDto, loggedUser);
+
+            if (loggedUser.IsBlocked)
             {
                 throw new UnauthorizedOperationException(Constants.ModifyUnauthorizeErrorMessage);
             }
@@ -39,30 +50,42 @@ namespace Business.Services.Models
             {
                 throw new EntityNotFoundException(Constants.ModifyTransactionAmountErrorMessage);
             }
-            transaction.Direction = DirectionType.Out;
+            
             var newTransaction = this.transactionRepository.CreateOutTransaction(transaction);
 
             return newTransaction;
         }
 
-        public Transaction GetById(int id, User user)
+        public GetTransactionDto GetById(int id, User user)
         {
             if (!IsUserUnauthorized(id, user.Id) || user.IsAdmin != true)
             {
                 throw new UnauthorizedOperationException(Constants.ModifyUnauthorizeErrorMessage);
             }
+            var transaction = this.transactionRepository.GetById(id);
+            var transactionDto = this.mapper.Map<GetTransactionDto>(transaction);
 
-            return this.transactionRepository.GetById(id);
+            return transactionDto;
         }
 
-        public Transaction Update(int id, User user, Transaction transaction)
+        public Transaction Update(int id, User user, CreateTransactionDto transactionDto)
         {
             if (!IsUserUnauthorized(id, user.Id))
             {
                 throw new UnauthorizedOperationException(Constants.ModifyUnauthorizeErrorMessage);
             }
+
+            var transactionToUpdate = this.transactionRepository.GetById(id);
             
-            return this.transactionRepository.Update(id, transaction);
+            if (transactionToUpdate.IsExecuted
+                || transactionToUpdate.Direction == DirectionType.In
+                || transactionToUpdate.IsDeleted)
+            {
+                throw new UnauthorizedOperationException(Constants.ModifyTransactionUpdateErrorMessage);
+            }
+
+            var newTransaction = MapDtoТоTransaction(transactionDto, user);
+            return this.transactionRepository.Update(transactionToUpdate, newTransaction);
         }
 
         public bool Delete(int id, User user)
@@ -71,13 +94,14 @@ namespace Business.Services.Models
             {
                 throw new UnauthorizedOperationException(Constants.ModifyUnauthorizeErrorMessage);
             }
-            
-            return this.transactionRepository.Delete(id);
-        }
 
-        public IQueryable<Transaction> GetAll(string username)
-        {
-            return this.transactionRepository.GetAll(username);
+            var trasaction = this.transactionRepository.GetById(id);
+            if (trasaction.IsExecuted || trasaction.Direction == DirectionType.In)
+            {
+                throw new UnauthorizedOperationException(Constants.ModifyTransactionUpdateErrorMessage);
+            }
+
+            return this.transactionRepository.Delete(trasaction);
         }
 
         public PaginatedList<Transaction> FilterBy(TransactionQueryParameters filterParameters, User user)
@@ -98,10 +122,13 @@ namespace Business.Services.Models
             }
             
             var transactionOut = this.transactionRepository.GetById(transactionId);
-            if (transactionOut.IsExecuted || transactionOut.Direction==DirectionType.In || transactionOut.IsDeleted)
+            if (transactionOut.IsExecuted 
+                || transactionOut.Direction==DirectionType.In 
+                || transactionOut.IsDeleted)
             {
                 throw new UnauthorizedOperationException(Constants.ModifyUnauthorizeErrorMessage);
             }
+
             transactionOut.IsExecuted = true;
             transactionOut.Date = DateTime.Now;
 
@@ -118,23 +145,11 @@ namespace Business.Services.Models
         
         private bool AddTransactionToHistory(Transaction transaction)
         {
-            var history = new History();
-            history.EventTime = DateTime.Now;
-            history.TransactionId = transaction.Id;
-            history.NameOperation = NameOperation.Transaction;
-           
-            if (transaction.Direction==DirectionType.Out)
-            {
-                history.AccountId = transaction.AccountSenderId;
-            }
-            else
-            {
-                history.AccountId = transaction.AccountRecepientId;
-            }
+            
             int historyCount = this.context.History.Count();
-            this.historyRepository.Create(history);
+            this.historyRepository.CreateWithTransaction(transaction);
             int newHistoryCount = this.context.History.Count();
-           
+
             if (newHistoryCount == historyCount + 1)
             {
                 return true;
@@ -143,6 +158,21 @@ namespace Business.Services.Models
             {
                 return false;
             }
+        }
+
+        private Transaction MapDtoТоTransaction(CreateTransactionDto transactionDto, User user)
+        {
+            var transaction = this.mapper.Map<Transaction>(transactionDto);
+            transaction.AccountSenderId = (int)user.AccountId;
+            transaction.AccountSender = user.Account;
+            transaction.AccountRecepientId = this.accountRepository
+                                                 .GetByUsername(transactionDto.RecepientUsername)
+                                                 .Id;
+            transaction.CurrencyId = this.currencyRepository
+                                         .GetByАbbreviation(transactionDto.Abbreviation)
+                                         .Id;
+            transaction.Direction = DirectionType.Out;
+            return transaction;
         }
 
         private bool IsUserUnauthorized(int id, int userId)
@@ -157,5 +187,6 @@ namespace Business.Services.Models
             }
             return isUserUnauthorized;
         }
+
     }
 }
