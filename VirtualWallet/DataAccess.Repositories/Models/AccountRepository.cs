@@ -118,6 +118,7 @@ namespace DataAccess.Repositories.Models
         {
             Account account = context.Accounts
                 .Include(a=>a.User)
+                .Include(a=>a.Cards)
                 .Include(a=>a.Currency)
                 .Where(a => a.IsDeleted == false)
                 .Where(a => a.User.Username == username)
