@@ -2,11 +2,7 @@
 using DataAccess.Models.Models;
 using DataAccess.Repositories.Contracts;
 using DataAccess.Repositories.Data;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace DataAccess.Repositories.Models
 {
@@ -18,56 +14,57 @@ namespace DataAccess.Repositories.Models
         {
             this.context = context;
         }
+        public async Task<List<Currency>> GetAllAsync()
+        {
+            var currencies = await this.context.Currencies
+                .Where(c => c.IsDeleted == false)
+                .OrderBy(n => n.Name)
+                .ToListAsync();
+            return currencies ?? throw new EntityNotFoundException("Тhere is no such currency");
+        }
 
-        public Currency Create(Currency currency)
+        public async Task<Currency> GetByIdAsync(int id)
+        {
+            var currency = await this.context.Currencies
+                .Where(c => c.Id == id)
+                .FirstOrDefaultAsync();
+            return currency ?? throw new EntityNotFoundException("Currency with ID = {id} doesn't exist.");
+        }
+
+        public async Task<Currency> CreateAsync(Currency currency)
         {
             currency.IsDeleted = false;
             context.Add(currency);
-            context.SaveChanges();
+            await context.SaveChangesAsync();
             return currency;
         }
 
-        public Currency GetById(int id)
+        public async Task<Currency> UpdateAsync(int id, Currency currency)
         {
-            var currency = this.context.Currencies.Where(c => c.Id == id).FirstOrDefault();
-            return currency ?? throw new EntityNotFoundException("Тhere is no such currency");
-        }
-
-        public Currency Update(int id, Currency currency)
-        {
-            var currencyToUpdate = this.GetById(id);
+            var currencyToUpdate = await this.GetByIdAsync(id);
             currencyToUpdate.Name = currency.Name;
             currencyToUpdate.Abbreviation = currency.Abbreviation;
-            context.SaveChanges();
+            await context.SaveChangesAsync();
 
             return currencyToUpdate;
         }
 
-        public bool Delete(int id) 
+        public async Task<bool> DeleteAsync(int id) 
         {
-            var currencyToDelete = this.GetById(id);
+            var currencyToDelete = await this.GetByIdAsync(id);
             currencyToDelete.IsDeleted = true;
-            context.SaveChanges();
+            await context.SaveChangesAsync();
 
             return currencyToDelete.IsDeleted;
         }
 
-        public List<Currency> GetAll()
+        public async Task<Currency> GetByАbbreviationAsync(string abbreviation)
         {
-            var currencies = context.Currencies
-                .Where(c => c.IsDeleted == false)
-                .OrderBy(n=>n.Name)
-                .ToList();
-            return currencies ?? throw new EntityNotFoundException("Тhere is no such currency");
-        }
-
-        public Currency GetByАbbreviation(string abbreviation)
-        {
-            var currency = context.Currencies
+            var currency = await context.Currencies
                     .Where(c => c.Abbreviation == abbreviation)
-                    .FirstOrDefault();
+                    .FirstOrDefaultAsync();
  
-            return currency ?? throw new EntityNotFoundException("Тhere is no such currency");
+            return currency ?? throw new EntityNotFoundException("Тhere is no such currency.");
         }
 
     }

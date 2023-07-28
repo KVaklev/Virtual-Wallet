@@ -21,11 +21,12 @@ namespace DataAccess.Repositories.Models
 
         public async Task<List<Card>> GetAllAsync()
         {
-            return await this.context.Cards
+            var cards = await this.context.Cards
                .Where(c=>c.IsDeleted==false)
                .Include(c=>c.Account)
                .ThenInclude(c=>c.User)
                .ToListAsync();
+            return cards ?? throw new EntityNotFoundException("There are no cards.");
         }
 
         public async Task<Card> GetByIdAsync(int id)

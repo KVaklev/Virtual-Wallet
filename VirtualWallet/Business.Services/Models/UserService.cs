@@ -10,12 +10,10 @@ namespace Business.Services.Models
     public class UserService : IUserService
     {
         private readonly IUserRepository userRepository;
-        private readonly IAccountRepository accountRepository;
 
-        public UserService(IUserRepository userRepository, IAccountRepository accountRepository)
+        public UserService(IUserRepository userRepository)
         {
             this.userRepository = userRepository;
-            this.accountRepository = accountRepository;
         }
 
         public async Task<List<User>> GetAllAsync()
@@ -71,7 +69,7 @@ namespace Business.Services.Models
         {
             User userToUpdate = await this.userRepository.GetByIdAsync(id);
 
-            if (!await IsAuthorizedAsync(userToUpdate, loggedUser))
+            if (!await Common.IsAuthorizedAsync(userToUpdate, loggedUser))
             {
                 throw new UnauthorizedOperationException(Constants.ModifyUserErrorMessage);
             }
@@ -100,7 +98,7 @@ namespace Business.Services.Models
         {
             User userToDelete = await this.userRepository.GetByIdAsync(id);
 
-            if (!await IsAuthorizedAsync(userToDelete, loggedUser))
+            if (!await Common.IsAuthorizedAsync(userToDelete, loggedUser))
             {
                 throw new UnauthorizedOperationException(Constants.ModifyUserErrorMessage);
             } 
@@ -112,7 +110,7 @@ namespace Business.Services.Models
         }
         public async Task<User> PromoteAsync(int id, User loggedUser)
         {
-            if (!await IsAdminAsync(loggedUser))
+            if (!await Common.IsAdminAsync(loggedUser))
             {
                 throw new UnauthorizedOperationException(Constants.ModifyUserErrorMessage);
             }
@@ -120,7 +118,7 @@ namespace Business.Services.Models
         }
         public async Task<User> BlockUserAsync(int id, User loggedUser)
         {
-            if (!await IsAdminAsync(loggedUser))
+            if (!await Common.IsAdminAsync(loggedUser))
             {
                 throw new UnauthorizedOperationException(Constants.ModifyUserErrorMessage);
             }
@@ -128,7 +126,7 @@ namespace Business.Services.Models
         }
         public async Task<User> UnblockUserAsync(int id, User loggedUser)
         {
-            if (!await IsAdminAsync(loggedUser))
+            if (!await Common.IsAdminAsync(loggedUser))
             {
                 throw new UnauthorizedOperationException(Constants.ModifyUserErrorMessage);
             }
@@ -146,23 +144,6 @@ namespace Business.Services.Models
         {
             return await this.userRepository.PhoneNumberExistsAsync(phoneNumber);
         }
-        public async Task<bool> IsAuthorizedAsync(User user, User loggedUser)
-        {
-            bool isAuthorized = false;
-
-            if (user.Id == loggedUser.Id || loggedUser.IsAdmin)
-            {
-                isAuthorized = true;
-            }
-            return await Task.FromResult(isAuthorized);
-        }
-        public async Task<bool> IsAdminAsync(User loggedUser)
-        {
-            if (!loggedUser.IsAdmin)
-            {
-                return await Task.FromResult(false);
-            }
-            return await Task.FromResult(true);
-        }
+       
     }
 }

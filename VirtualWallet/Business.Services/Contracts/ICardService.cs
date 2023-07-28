@@ -13,7 +13,6 @@ namespace Business.Services.Contracts
         Task<Card> UpdateAsync(int id, User loggedUser, Card card);
         Task<bool> DeleteAsync(int id, User loggedUser);
         Task<bool> CardNumberExistsAsync(string cardNumber);
-        Task<bool> IsAuthorizedAsync(Card card, User loggedUser);
        
     }
 }

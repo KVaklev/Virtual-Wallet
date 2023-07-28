@@ -4,7 +4,6 @@ using Business.Dto;
 using DataAccess.Models.Models;
 using Microsoft.AspNetCore.Mvc;
 using Presentation.Helpers;
-using VirtualWallet.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Business.Exceptions;
 using Business.DTOs;
@@ -143,7 +142,7 @@ namespace VirtualWallet.Controllers.API
         {
             var accountRecipient = this.accountService.GetById(transaction.AccountRecepientId, loggedUser);
             var recipient = this.userService.GetByIdAsync((int)accountRecipient.UserId);
-            var currency = this.currencyService.GetById(transaction.CurrencyId);
+            var currency = this.currencyService.GetByIdAsync(transaction.CurrencyId);
             var getTransactionDto = new GetTransactionDto();
             getTransactionDto.RecipientUsername = recipient.Username;
             getTransactionDto.Amount = transaction.Amount;
@@ -158,7 +157,7 @@ namespace VirtualWallet.Controllers.API
         {
             var loggedUser = FindLoggedUser();
             var userRecipient = this.userService.GetByUsernameAsync(transactionDto.RecepientUsername);
-            var currency = this.currencyService.GetByАbbreviation(transactionDto.Currency);
+            var currency = this.currencyService.GetByАbbreviationAsync(transactionDto.Currency);
 
             var transaction = new Transaction();
             transaction.AccountSenderId = loggedUser.Id;
@@ -169,10 +168,10 @@ namespace VirtualWallet.Controllers.API
             return transaction;
         }
 
-        private User FindLoggedUser()
+        private async Task<User> FindLoggedUserAsync()
         {
             var loggedUsersUsername = User.Claims.FirstOrDefault(claim => claim.Type == "Username").Value;
-            var loggedUser = authManager.TryGetUserByUsername(loggedUsersUsername);
+            var loggedUser = await authManager.TryGetUserByUsernameAsync(loggedUsersUsername);
             return loggedUser;
         }
     }

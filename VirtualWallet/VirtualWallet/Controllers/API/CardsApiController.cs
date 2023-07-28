@@ -19,7 +19,10 @@ namespace VirtualWallet.Controllers.API
         private readonly IAuthManager authManager;
         private readonly ICardService cardService;
 
-        public CardsApiController(IMapper mapper, IAuthManager authManager, ICardService cardService)
+        public CardsApiController(
+            IMapper mapper,
+            IAuthManager authManager,
+            ICardService cardService)
         {
             this.mapper = mapper;
             this.authManager = authManager;
@@ -67,7 +70,7 @@ namespace VirtualWallet.Controllers.API
         {
             try
             {
-                var loggedUsersAccountId = FindLoggedUsersAccount();
+                var loggedUsersAccountId = await FindLoggedUsersAccountAsync();
                 Card createCard = mapper.Map<Card>(createCardDto);
                 Card createdCard = await cardService.CreateAsync(loggedUsersAccountId, createCard);
 

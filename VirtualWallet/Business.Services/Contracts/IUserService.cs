@@ -20,6 +20,5 @@ namespace Business.Services.Contracts
         Task<bool> UsernameExistsAsync(string username);
         Task<bool> EmailExistsAsync(string email);
         Task<bool> PhoneNumberExistsAsync(string phoneNumber);
-        Task<bool> IsAuthorizedAsync(User user, User loggedUser);
     }
 }

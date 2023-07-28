@@ -18,9 +18,10 @@ namespace DataAccess.Repositories.Models
         }
         public async Task<List<User>> GetAllAsync()
         {
-            return await context.Users
+            var users = await context.Users
                 .Where(u=>u.IsDeleted==false)
                 .ToListAsync();
+            return users ?? throw new EntityNotFoundException("There are no users.");
         }
 
         public async Task<PaginatedList<User>> FilterByAsync(UserQueryParameters filterParameters)

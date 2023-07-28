@@ -8,6 +8,8 @@ namespace DataAccess.Models.Models
 {
     public class User
     {
+        public static readonly object Claims;
+
         public int Id { get; set; }
 
         [MinLength(Constants.NameMinLength, ErrorMessage = Constants.NameMinLengthErrorMessage)]

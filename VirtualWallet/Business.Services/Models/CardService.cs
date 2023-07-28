@@ -50,7 +50,7 @@ namespace Business.Services.Models
             {
                 throw new DuplicateEntityException($"Card with card number '{card.CardNumber}' already exists.");
             }
-            if (!await IsAuthorizedAsync(cardToUpdate, loggedUser))
+            if (!await Common.IsAuthorizedAsync(cardToUpdate, loggedUser))
             {
                 throw new UnauthorizedOperationException(Constants.ModifyCardErrorMessage);
             }
@@ -61,7 +61,7 @@ namespace Business.Services.Models
         }
         public async Task<bool> DeleteAsync(int id, User loggedUser)
         {
-            if (!await IsAdminAsync(loggedUser))
+            if (!await Common.IsAdminAsync(loggedUser))
             {
                 throw new UnauthorizedOperationException(Constants.ModifyUserErrorMessage);
             }
@@ -70,26 +70,6 @@ namespace Business.Services.Models
         public async Task<bool> CardNumberExistsAsync(string cardNumber)
         {
             return await this.cardRepository.CardNumberExistsAsync(cardNumber);
-        }
-
-        public async Task<bool> IsAuthorizedAsync(Card card, User loggedUser)
-        {
-            bool isAuthorized = false;
-
-            if (card.Account.User.Id == loggedUser.Id || loggedUser.IsAdmin)
-            {
-                isAuthorized = true;
-            }
-            return await Task.FromResult(isAuthorized);
-        }
-
-        public async Task<bool> IsAdminAsync(User loggedUser)
-        {
-            if (!loggedUser.IsAdmin)
-            {
-                return await Task.FromResult(false);
-            }
-            return await Task.FromResult(true);
         }
 
     }
