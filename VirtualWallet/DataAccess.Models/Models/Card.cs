@@ -45,5 +45,7 @@ namespace DataAccess.Models.Models
 
         [Required(ErrorMessage = Constants.EmptyFieldErrorMessage)]
         public int? CurrencyId { get; set; }
+
+        public bool IsDeleted { get; set; }
     }
 }

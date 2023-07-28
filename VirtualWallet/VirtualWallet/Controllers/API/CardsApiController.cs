@@ -103,6 +103,26 @@ namespace VirtualWallet.Controllers.API
                 return StatusCode(StatusCodes.Status409Conflict, e.Message);
             }
         }
+
+        [HttpDelete("{id}"), Authorize]
+        public IActionResult DeleteCard(int id)
+        {
+            try
+            {
+                User loggedUser = FindLoggedUser();
+                var isDeleted = this.cardService.Delete(id, loggedUser);
+
+                return StatusCode(StatusCodes.Status200OK);
+            }
+            catch (UnauthorizedOperationException e)
+            {
+                return StatusCode(StatusCodes.Status401Unauthorized, e.Message);
+            }
+            catch (EntityNotFoundException e)
+            {
+                return StatusCode(StatusCodes.Status404NotFound, e.Message);
+            }
+        }
         private int FindLoggedUsersAccount()
         {
             var loggedUsersAccountIdAsString = User.Claims.FirstOrDefault(claim => claim.Type == "UsersAccountId").Value;

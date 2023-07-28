@@ -4,29 +4,27 @@ using DataAccess.Models.Models;
 using DataAccess.Repositories.Contracts;
 using DataAccess.Repositories.Data;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DataAccess.Repositories.Models
 {
     public class AccountRepository : IAccountRepository
     {
         private readonly ApplicationContext context;
+        private readonly ICardRepository cardRepository;
 
-        public AccountRepository(ApplicationContext context)
+        public AccountRepository(ApplicationContext context, ICardRepository cardRepository)
         {
             this.context = context;
+            this.cardRepository = cardRepository;
         }
 
         public IQueryable<Account> GetAll()
         {
             IQueryable<Account> result = context.Accounts
-                 .Include(a => a.User)
-                 //.Include(a => a.Balance)
-                 .Include(a => a.Currency);
+                .Where(a=>a.IsDeleted==false)
+                .Include(a => a.User)
+                .Include(a=>a.Cards)
+                .Include(a => a.Currency);
 
             return result ?? throw new EntityNotFoundException($"There are no accounts");
         }
@@ -43,16 +41,15 @@ namespace DataAccess.Repositories.Models
 
         public bool Delete(int id)
         {
-            Account accountToDelete = this.GetById(id);
+            var accountToDelete = this.GetById(id);
+            accountToDelete.IsDeleted = true;
 
-            if (accountToDelete != null)
+            foreach (var card in accountToDelete.Cards)
             {
-                context.Accounts.Remove(accountToDelete);
-                context.SaveChanges();
-
-                return true;
+                this.cardRepository.Delete(card.Id);
             }
-            return false;
+            context.SaveChanges();
+            return accountToDelete.IsDeleted;
         }
 
         public bool AddCard(int id, Card card)
@@ -107,6 +104,10 @@ namespace DataAccess.Repositories.Models
         public Account GetById(int id)
         {
             Account account = context.Accounts
+                .Include(a=>a.User)
+                .Include(a=>a.Cards)
+                .Include(a=>a.Currency)
+                .Where(a => a.IsDeleted == false)
                 .Where(a => a.Id == id)
                 .FirstOrDefault();
 
@@ -116,6 +117,9 @@ namespace DataAccess.Repositories.Models
         public Account GetByUsername(string username)
         {
             Account account = context.Accounts
+                .Include(a=>a.User)
+                .Include(a=>a.Currency)
+                .Where(a => a.IsDeleted == false)
                 .Where(a => a.User.Username == username)
                 .FirstOrDefault();
 
@@ -158,8 +162,10 @@ namespace DataAccess.Repositories.Models
 
         public PaginatedList<Account> FilterBy(AccountQueryParameters filterParameters)
         {
-            IQueryable<Account> result = context.Accounts;
-               
+            IQueryable<Account> result = context.Accounts
+                .Where(a => a.IsDeleted == false);
+
+
             result = FilterByUsername(result, filterParameters.Username);
             result = FilterByFromDate(result, filterParameters.FromDate);
             result = FilterByToDate(result, filterParameters.ToDate);
@@ -242,23 +248,17 @@ namespace DataAccess.Repositories.Models
         }
         public bool CardExists(string cardNumber)
         {
-            return context.Cards.Any(card => card.CardNumber == cardNumber);
+            return context.Cards
+                .Where(a => a.IsDeleted == false)
+                .Any(card => card.CardNumber == cardNumber);
+
         }
 
         public bool AccountExists(int id)
         {
-            return context.Accounts.Any(account => account.Id == id);
+            return context.Accounts
+                .Where(a => a.IsDeleted == false)
+                .Any(account => account.Id == id);
         }
-
-        
-
-
-
-        //public bool AccountExists(int id)
-        //{
-        //    return context.Accounts.Any(a => a.UserId == id);
-        //}
-
-
     }
 }

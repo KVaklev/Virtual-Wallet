@@ -10,12 +10,10 @@ namespace Business.Services.Models
     public class CardService : ICardService
     {
         private readonly ICardRepository repository;
-        private readonly IAccountRepository accountRepository;
 
-        public CardService(ICardRepository repository, IAccountRepository accountRepository)
+        public CardService(ICardRepository repository)
         {
             this.repository = repository;
-            this.accountRepository = accountRepository;
         }
         public List<Card> GetAll()
         {
@@ -61,6 +59,14 @@ namespace Business.Services.Models
             return updatedCard;
 
         }
+        public bool Delete(int id, User loggedUser)
+        {
+            if (!IsAdmin(loggedUser))
+            {
+                throw new UnauthorizedOperationException(Constants.ModifyUserErrorMessage);
+            }
+            return this.repository.Delete(id);
+        }
         public bool CardNumberExists(string cardNumber)
         {
             return this.repository.CardNumberExists(cardNumber);
@@ -76,5 +82,15 @@ namespace Business.Services.Models
             }
             return isAuthorized;
         }
+
+        public bool IsAdmin(User loggedUser)
+        {
+            if (!loggedUser.IsAdmin)
+            {
+                return false;
+            }
+            return true;
+        }
+
     }
 }

@@ -21,5 +21,6 @@ namespace DataAccess.Models.Models
         public List<Transaction> TransactionsRecipient { get; set; } = new List<Transaction>();
 
         //public string InvitationCode { get; set; }
+        public bool IsDeleted { get; set; }
     }
 }
