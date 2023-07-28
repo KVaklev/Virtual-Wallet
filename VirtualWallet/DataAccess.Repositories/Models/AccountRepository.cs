@@ -24,8 +24,7 @@ namespace DataAccess.Repositories.Models
                 .Where(a=>a.IsDeleted==false)
                 .Include(a => a.User)
                 .Include(a=>a.Cards)
-                 //.Include(a => a.Balance)
-                 .Include(a => a.Currency);
+                .Include(a => a.Currency);
 
             return result ?? throw new EntityNotFoundException($"There are no accounts");
         }
@@ -45,7 +44,7 @@ namespace DataAccess.Repositories.Models
             var accountToDelete = this.GetById(id);
             accountToDelete.IsDeleted = true;
 
-            foreach (var card in accountToDelete.Cards) //ToDo - ne sa se prikachili
+            foreach (var card in accountToDelete.Cards)
             {
                 this.cardRepository.Delete(card.Id);
             }
@@ -105,6 +104,9 @@ namespace DataAccess.Repositories.Models
         public Account GetById(int id)
         {
             Account account = context.Accounts
+                .Include(a=>a.User)
+                .Include(a=>a.Cards)
+                .Include(a=>a.Currency)
                 .Where(a => a.IsDeleted == false)
                 .Where(a => a.Id == id)
                 .FirstOrDefault();
@@ -115,6 +117,8 @@ namespace DataAccess.Repositories.Models
         public Account GetByUsername(string username)
         {
             Account account = context.Accounts
+                .Include(a=>a.User)
+                .Include(a=>a.Currency)
                 .Where(a => a.IsDeleted == false)
                 .Where(a => a.User.Username == username)
                 .FirstOrDefault();
@@ -256,16 +260,5 @@ namespace DataAccess.Repositories.Models
                 .Where(a => a.IsDeleted == false)
                 .Any(account => account.Id == id);
         }
-
-        
-
-
-
-        //public bool AccountExists(int id)
-        //{
-        //    return context.Accounts.Any(a => a.UserId == id);
-        //}
-
-
     }
 }

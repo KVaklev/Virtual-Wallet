@@ -88,6 +88,7 @@ namespace DataAccess.Repositories.Data
                      IsAdmin = true,
                      IsBlocked = false
                 },
+
                 new User
                 {
                      Id = 5,
@@ -100,6 +101,7 @@ namespace DataAccess.Repositories.Data
                      IsAdmin = false,
                      IsBlocked = false
                 },
+
                 new User
                 {
                      Id = 6,
@@ -112,6 +114,7 @@ namespace DataAccess.Repositories.Data
                      IsAdmin = false,
                      IsBlocked = false
                 },
+
                 new User
                 {
                      Id = 7,
@@ -124,7 +127,8 @@ namespace DataAccess.Repositories.Data
                      IsAdmin = true,
                      IsBlocked = false
                 },
-                 new User
+
+                new User
                 {
                      Id = 8,
                      FirstName = "Ivan",
@@ -140,15 +144,47 @@ namespace DataAccess.Repositories.Data
             };
 
             modelBuilder.Entity<User>().HasData(users);
-
-
             modelBuilder.Entity<User>()
                 .HasOne(u => u.Account)
                 .WithOne(a => a.User)
                 .HasForeignKey<Account>(a => a.UserId)
                 .OnDelete(DeleteBehavior.NoAction);
 
+            //Seed accounts
 
+            List<Account> accounts = new List<Account>()
+            {
+                new Account()
+                {
+                   Id = 1,
+                   UserId = 1,
+                   Balance = 850,
+                   DateCreated = DateTime.Now,
+                   CurrencyId = 1
+                },
+
+                new Account()
+                {
+                    Id = 2,
+                    UserId = 2,
+                    Balance = 1000,
+                    DateCreated = DateTime.Now.AddMonths(1),
+                    CurrencyId=2
+                }
+            };
+
+            modelBuilder.Entity<Account>().HasData(accounts);
+            modelBuilder.Entity<Account>()
+                .HasMany(u => u.TransactionsSender)
+                .WithOne(t => t.AccountSender)
+                .HasForeignKey(t => t.AccountSenderId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<Account>()
+                .HasMany(u => u.TransactionsRecipient)
+                .WithOne(t => t.AccountRecepient)
+                .HasForeignKey(t => t.AccountRecepientId)
+                .OnDelete(DeleteBehavior.NoAction);
 
             //Seed currencies
 
@@ -169,8 +205,6 @@ namespace DataAccess.Repositories.Data
                 Abbreviation = "USD",
                 IsDeleted=false
                 }
-
-
             };
 
             modelBuilder.Entity<Currency>().HasData(currencies);
@@ -184,10 +218,10 @@ namespace DataAccess.Repositories.Data
             modelBuilder.Entity<Transaction>().HasData(transactions);
 
             modelBuilder.Entity<Transaction>()
-            .HasOne(c => c.AccountSender)
-            .WithMany(u => u.TransactionsSender)
-            .HasForeignKey(c => c.AccountSenderId)
-            .OnDelete(DeleteBehavior.NoAction);
+                .HasOne(c => c.AccountSender)
+                .WithMany(u => u.TransactionsSender)
+                .HasForeignKey(c => c.AccountSenderId)
+                .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<Transaction>()
                 .HasOne(c => c.AccountRecepient)
@@ -232,7 +266,7 @@ namespace DataAccess.Repositories.Data
                      Balance = 750
                  },
 
-                new Card
+                 new Card
                 {
                      Id = 2,
                      CardNumber = "2232567891011121",
@@ -245,7 +279,7 @@ namespace DataAccess.Repositories.Data
                      Balance = 1000
                 },
 
-                new Card
+                 new Card
                 {
                      Id = 3,
                      CardNumber = "2232565891011121",
@@ -273,46 +307,6 @@ namespace DataAccess.Repositories.Data
                .HasForeignKey(c => c.AccountId)
                .OnDelete(DeleteBehavior.NoAction);
 
-            //Seed accounts
-            List<Account> accounts = new List<Account>()
-            {
-                new Account()
-                {
-                    Id = 1,
-                    UserId = 1,
-                    Balance = 850,
-                    DateCreated = DateTime.Now,
-                    CurrencyId = 1,
-                    
-
-                },
-
-                new Account()
-                {
-                    Id = 2,
-                    UserId = 2,
-                    Balance = 1000,
-                    DateCreated = DateTime.Now.AddMonths(1),
-                    CurrencyId=2
-
-                   
-                }
-
-            };
-
-            modelBuilder.Entity<Account>().HasData(accounts);
-            modelBuilder.Entity<Account>()
-                .HasMany(u => u.TransactionsSender)
-                .WithOne(t => t.AccountSender)
-                .HasForeignKey(t => t.AccountSenderId)
-                .OnDelete(DeleteBehavior.NoAction);
-
-            modelBuilder.Entity<Account>()
-                .HasMany(u => u.TransactionsRecipient)
-                .WithOne(t => t.AccountRecepient)
-                .HasForeignKey(t => t.AccountRecepientId)
-                .OnDelete(DeleteBehavior.NoAction);
-
             //Seed history
 
             List<History> history = new List<History>()
@@ -337,7 +331,6 @@ namespace DataAccess.Repositories.Data
                 .WithMany()
                 .HasForeignKey(a => a.TransactionId)
             .OnDelete(DeleteBehavior.NoAction);
-
 
         }
     }
