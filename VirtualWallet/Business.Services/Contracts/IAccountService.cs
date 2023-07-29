@@ -14,14 +14,14 @@ namespace Business.Services.Contracts
     {
         IQueryable<Account> GetAll();
         PaginatedList<Account> FilterBy(AccountQueryParameters accountQueryParameters);
-        Account GetById(int id, User user);
+        Task <Account> GetByIdAsync(int id, User user);
         Task <Account> GetByUsernameAsync(int id, User user);
-        Task <Account> Create(CreateAccountDto accountDto, User user);
-        bool AddCard(int id, Card card, User user);
-        bool RemoveCard(int id,  Card card, User user);
-        bool Delete(int id, User loggedUser);
+        Task <Account> CreateAsync(CreateAccountDto accountDto, User user);
+        Task <bool> AddCardAsync(int id, Card card, User user);
+        Task <bool> RemoveCardAsync(int id,  Card card, User user);
+        Task <bool> DeleteAsync(int id, User loggedUser);
 
-       // bool AccountExists(int id);
+       
 
 
 

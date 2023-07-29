@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
 using Business.Dto;
+using Business.DTOs;
+using Business.Exceptions;
 using Business.QueryParameters;
 using Business.Services.Contracts;
 using Business.Services.Models;
@@ -21,7 +23,7 @@ namespace VirtualWallet.Controllers.API
         private readonly ITransferService transferService;
         private readonly IAccountService accountService;
         private readonly ICardService cardService;
-                private readonly IUserService userService;
+        private readonly IUserService userService;
         private readonly ICurrencyService currencyService;
 
         public TransferApiContorller(
@@ -45,18 +47,30 @@ namespace VirtualWallet.Controllers.API
 
         //[HttpGet, Authorize]
 
-        //public IActionResult GetTransfers([FromQuery] TransferQueryParameters transferQueryParameters)
+        //public async Task<ActionResult<IEnumerable<TransferDto>>> GetTransfers([FromQuery] TransferQueryParameters transferQueryParameters)
         //{
         //    try
         //    {
-        //        List<Transfer> result = transferService.FilterBy(transferQueryParameters, user)
+        //        var loggedUser = FindLoggedUser();
 
-        //        List<TransferDto> transferDtos = new List<TransferDto>();
+        //        var transfers = this.transferService.FilterBy(transferQueryParameters, loggedUser);
+
+        //        var result = await transfers.Select(transfer => mapper.Map<TransferDto>(transfer)).ToList();
+                                
+
+        //        return StatusCode(StatusCodes.Status200OK, result);
+                
         //    }
-        //    catch (Exception)
-        //    {
 
-        //        throw;
+        //    catch (EntityNotFoundException e)
+        //    {
+        //        return StatusCode(StatusCodes.Status404NotFound, e.Message);
+               
+        //    }
+
+        //    catch (UnauthorizedOperationException e)
+        //    {
+        //        return StatusCode(StatusCodes.Status401Unauthorized, e.Message);
         //    }
         //}
 
