@@ -52,11 +52,11 @@ namespace VirtualWallet.Controllers.API
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllAsync()
+        public IActionResult GetAll()
         {
             try
             {
-                List<Currency> currencies = await this.currencyService.GetAllAsync();
+                IQueryable<Currency> currencies = this.currencyService.GetAll();
                 List<CurrencyDto> currenciesDto = currencies
                     .Select(currency => mapper.Map<CurrencyDto>(currency))
                     .ToList();

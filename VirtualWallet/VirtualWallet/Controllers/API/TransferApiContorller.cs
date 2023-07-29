@@ -81,12 +81,12 @@ namespace VirtualWallet.Controllers.API
 
         //}
 
-        private User FindLoggedUser()
-        {
-            var loggedUsersUsername = User.Claims.FirstOrDefault(claim => claim.Type == "Username").Value;
-            var loggedUser = authManager.TryGetUserByUsername(loggedUsersUsername);
-            return loggedUser;
-        }
+        //private User FindLoggedUser()
+        //{
+        //    var loggedUsersUsername = User.Claims.FirstOrDefault(claim => claim.Type == "Username").Value;
+        //    var loggedUser = authManager.TryGetUserByUsername(loggedUsersUsername);
+        //    return loggedUser;
+        //}
 
 
 

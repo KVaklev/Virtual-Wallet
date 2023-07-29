@@ -7,6 +7,7 @@ using DataAccess.Models.Models;
 using DataAccess.Repositories.Contracts;
 using DataAccess.Repositories.Data;
 using DataAccess.Repositories.Models;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -55,8 +56,8 @@ namespace Business.Services.Models
                 throw new UnauthorizedOperationException(Constants.ModifyTransferErrorMessage);
             }
 
-            if (await this.accountRepository.CheckBalanceAsync(transfer.AccountId, transfer.Amount))
-            if (this.accountRepository.HasEnoughBalance(transfer.AccountId, transfer.Amount))
+
+            if (!await this.accountRepository.HasEnoughBalanceAsync(transfer.AccountId, transfer.Amount))
             {
                 throw new UnauthorizedOperationException(Constants.ModifyTransferAmountErrorMessage);
             }
@@ -123,17 +124,17 @@ namespace Business.Services.Models
                 this.cardRepository.IncreaseBalanceAsync(transferToExecute.CardId, transferToExecute.Amount);
             }
 
-            AddTransferToHistory(transferToExecute);
+            AddTransferToHistoryAsync(transferToExecute);
 
             return transferToExecute.IsConfirmed;
 
         }
-        public bool AddTransferToHistory(Transfer transfer)
+        private async Task<bool> AddTransferToHistoryAsync(Transfer transfer)
         {
-            var historyCount = this.context.History.Count();
+            var historyCount = await this.context.History.CountAsync();
 
-            var history=this.historyRepository.CreateWithTransfer(transfer);
-            int historyCountNewHistoryAdded = this.context.History.Count();
+            var history= await this.historyRepository.CreateWithTransferAsync(transfer);
+            int historyCountNewHistoryAdded = await this.context.History.CountAsync();
 
             if (historyCount + 1 == historyCountNewHistoryAdded)
             {
@@ -143,8 +144,6 @@ namespace Business.Services.Models
             {
                 return false;
             }
-
-
         }
         public async Task <bool> IsUserAuthorizedAsync(int id, int userId)
         {

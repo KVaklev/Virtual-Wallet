@@ -44,19 +44,13 @@ namespace VirtualWallet.Controllers.API
         }
 
         [HttpPost, Authorize]
-        public IActionResult Create([FromBody] CreateTransactionDto transactionDto)
+        public async Task<IActionResult> CreateAsync([FromBody] CreateTransactionDto transactionDto)
         {
             try
             {
-                var loggedUser = FindLoggedUser();
-                var createdTransaction = this.transactionService.Create(transactionDto, loggedUser);
+                var loggedUser = await FindLoggedUserAsync();
+                var createdTransaction = await this.transactionService.CreateAsync(transactionDto, loggedUser);
                 var createdTransactionDto = this.mapper.Map<GetTransactionDto>(createdTransaction);
-           // Todo map method
-
-            var loggedUser = FindLoggedUser();
-            var transaction = MapDtoТоTransaction(transactionDto);
-            var createdTransaction = this.transactionService.Create(transaction, loggedUser);
-            var createdTransactionDto = MapTransactionToDto(createdTransaction, loggedUser);
 
                 return StatusCode(StatusCodes.Status201Created, createdTransactionDto);
             }
@@ -72,12 +66,12 @@ namespace VirtualWallet.Controllers.API
         }
 
         [HttpDelete("{id}"), Authorize]
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> DeleteAsync(int id)
         {
             try
             {
-                var loggedUser = FindLoggedUser();
-                var isDeleted = this.transactionService.Delete(id, loggedUser);
+                var loggedUser = await FindLoggedUserAsync();
+                var isDeleted = await this.transactionService.DeleteAsync(id, loggedUser);
                 return StatusCode(StatusCodes.Status200OK);
             }
             catch (EntityNotFoundException e)
@@ -91,12 +85,12 @@ namespace VirtualWallet.Controllers.API
         }
 
         [HttpPut("{id}"), Authorize]
-        public IActionResult Update(int id, [FromBody] CreateTransactionDto transactionDto)
+        public async Task<IActionResult> UpdateAsync(int id, [FromBody] CreateTransactionDto transactionDto)
         {
             try
             {
-                var loggedUser = FindLoggedUser();
-                var updateTransaction = this.transactionService.Update(id, loggedUser, transactionDto);
+                var loggedUser = await FindLoggedUserAsync();
+                var updateTransaction = await this.transactionService.UpdateAsync(id, loggedUser, transactionDto);
                 var updateTransactionDto = this.mapper.Map<GetTransactionDto>(updateTransaction);
                 return StatusCode(StatusCodes.Status200OK, updateTransactionDto);
             }
@@ -111,12 +105,12 @@ namespace VirtualWallet.Controllers.API
         }
 
         [HttpGet("{id}"), Authorize]
-        public IActionResult GetById(int id)
+        public async Task<IActionResult> GetByIdAsync(int id)
         {
             try
             {
-                var loggedUser = FindLoggedUser();
-                var transactionDto = this.transactionService.GetById(id, loggedUser);
+                var loggedUser = await FindLoggedUserAsync();
+                var transactionDto = await this.transactionService.GetByIdAsync(id, loggedUser);
                 
                 return StatusCode(StatusCodes.Status200OK, transactionDto);
             }
@@ -132,12 +126,12 @@ namespace VirtualWallet.Controllers.API
         }
 
         [HttpGet, Authorize]
-        public IActionResult GetTransactions([FromQuery] TransactionQueryParameters filterParameters)
+        public async Task<IActionResult> GetTransactionsAsync([FromQuery] TransactionQueryParameters filterParameters)
         {
             try
             {
-                var loggedUser = FindLoggedUser();
-                var transacrions = this.transactionService.FilterBy(filterParameters, loggedUser);
+                var loggedUser = await FindLoggedUserAsync();
+                var transacrions = await this.transactionService.FilterByAsync(filterParameters, loggedUser);
                 List<GetTransactionDto> transactionDtos = transacrions
                     .Select(transaction => mapper.Map<GetTransactionDto>(transaction))
                     .ToList();
@@ -155,13 +149,13 @@ namespace VirtualWallet.Controllers.API
         }
 
         [HttpPut("{id}/execute"), Authorize]
-        public IActionResult Execute(int id)
+        public async Task<IActionResult> ExecuteAsync(int id)
         {
             try
             {
-                var loggedUser = FindLoggedUser();
-                var isExecute = this.transactionService.Execute(id, loggedUser);
-                return StatusCode(StatusCodes.Status200OK, isExecute);
+                var loggedUser = await FindLoggedUserAsync();
+                var isExecuted = await this.transactionService.ExecuteAsync(id, loggedUser);
+                return StatusCode(StatusCodes.Status200OK, isExecuted);
             }
             catch (EntityNotFoundException e)
             {
@@ -174,11 +168,11 @@ namespace VirtualWallet.Controllers.API
 
         }
 
-        private GetTransactionDto MapTransactionToDto(Transaction transaction, User loggedUser)
+        private async Task<GetTransactionDto> MapTransactionToDtoAsync(Transaction transaction, User loggedUser)
         {
-            var accountRecipient = this.accountService.GetById(transaction.AccountRecepientId, loggedUser);
-            var recipient = this.userService.GetByIdAsync((int)accountRecipient.UserId);
-            var currency = this.currencyService.GetByIdAsync(transaction.CurrencyId);
+            var accountRecipient = await this.accountService.GetByIdAsync(transaction.AccountRecepientId, loggedUser);
+            var recipient = await this.userService.GetByIdAsync((int)accountRecipient.UserId);
+            var currency = await this.currencyService.GetByIdAsync(transaction.CurrencyId);
             var getTransactionDto = new GetTransactionDto();
             getTransactionDto.RecipientUsername = recipient.Username;
             getTransactionDto.Amount = transaction.Amount;
@@ -189,11 +183,11 @@ namespace VirtualWallet.Controllers.API
 
         }
 
-        private Transaction MapDtoТоTransaction(CreateTransactionDto transactionDto)
+        private async Task<Transaction> MapDtoТоTransactionAsync(CreateTransactionDto transactionDto)
         {
-            var loggedUser = FindLoggedUser();
-            var userRecipient = this.userService.GetByUsernameAsync(transactionDto.RecepientUsername);
-            var currency = this.currencyService.GetByАbbreviationAsync(transactionDto.Currency);
+            var loggedUser = await FindLoggedUserAsync();
+            var userRecipient = await this.userService.GetByUsernameAsync(transactionDto.RecepientUsername);
+            var currency = await this.currencyService.GetByАbbreviationAsync(transactionDto.Abbreviation);
 
             var transaction = new Transaction();
             transaction.AccountSenderId = loggedUser.Id;
@@ -203,7 +197,6 @@ namespace VirtualWallet.Controllers.API
 
             return transaction;
         }
-
         private async Task<User> FindLoggedUserAsync()
         {
             var loggedUsersUsername = User.Claims.FirstOrDefault(claim => claim.Type == "Username").Value;

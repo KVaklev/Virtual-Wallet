@@ -29,12 +29,12 @@ namespace VirtualWallet.Controllers.API
         }
 
         [HttpGet("{id}"), Authorize]
-        public IActionResult GetbyId(int id)
+        public async Task<IActionResult> GetbyIdAsync(int id)
         {
             try
             {
-                var loggedUser = FindLoggedUser();
-                var history = this.historyService.GetById(id, loggedUser);
+                var loggedUser = await FindLoggedUserAsync();
+                var history = await this.historyService.GetByIdAsync(id, loggedUser);
                 
                 return StatusCode(StatusCodes.Status200OK, history);
             }
@@ -50,12 +50,12 @@ namespace VirtualWallet.Controllers.API
         }
 
         [HttpGet, Authorize]
-        public IActionResult GetHistory([FromQuery] HistoryQueryParameters historyQueryParameters) 
+        public async Task<IActionResult> GetHistoryAsync([FromQuery] HistoryQueryParameters historyQueryParameters) 
         {
             try
             {
-                var loggedUser = FindLoggedUser();
-                var history = this.historyService.FilterBy(historyQueryParameters, loggedUser);
+                var loggedUser = await FindLoggedUserAsync();
+                var history = await this.historyService.FilterByAsync(historyQueryParameters, loggedUser);
                 
                 return StatusCode(StatusCodes.Status200OK, history);
             }
@@ -70,10 +70,10 @@ namespace VirtualWallet.Controllers.API
 
         }
 
-        private User FindLoggedUser()
+        private async Task<User> FindLoggedUserAsync()
         {
             var loggedUsersUsername = User.Claims.FirstOrDefault(claim => claim.Type == "Username").Value;
-            var loggedUser = authManager.TryGetUserByUsername(loggedUsersUsername);
+            var loggedUser = await authManager.TryGetUserByUsernameAsync(loggedUsersUsername);
             return loggedUser;
         }
     }

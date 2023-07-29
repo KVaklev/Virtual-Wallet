@@ -66,7 +66,7 @@ namespace VirtualWallet.Controllers.API
         public async Task<ActionResult> Create([FromBody] CreateAccountDto createAccountDto)
 
         {
-            var loggedUser = FindLoggedUser();
+            var loggedUser = await FindLoggedUserAsync();
 
             Account newAccount = await accountService.CreateAsync(createAccountDto, loggedUser);
 
@@ -74,10 +74,10 @@ namespace VirtualWallet.Controllers.API
 
         }
 
-        private User FindLoggedUser()
+        private async Task<User> FindLoggedUserAsync()
         {
             var loggedUsersUsername = User.Claims.FirstOrDefault(claim => claim.Type == "Username").Value;
-            var loggedUser = authManager.TryGetUserByUsername(loggedUsersUsername);
+            var loggedUser = await authManager.TryGetUserByUsernameAsync(loggedUsersUsername);
             return loggedUser;
         }
 
