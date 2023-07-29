@@ -42,7 +42,7 @@ namespace Business.Services.Models
         {
             if (!IsUserAuthorized(id, user.Id) || user.IsAdmin != true)
             {
-                throw new UnauthorizedOperationException(Constants.ModifyUnauthorizeErrorMessage);
+                throw new UnauthorizedOperationException(Constants.ModifyTransferGetByIdErrorMessage);
             }
 
             return this.transferRepository.GetById(id);
@@ -112,14 +112,14 @@ namespace Business.Services.Models
             {
                 this.accountRepository.IncreaseBalance(transferToExecute.AccountId, transferToExecute.Amount);
 
-                this.cardRepository.DecreaseBalance(transferToExecute.CardId, transferToExecute.Amount);
+                this.cardRepository.DecreaseBalanceAsync(transferToExecute.CardId, transferToExecute.Amount);
             }
 
             if (transferToExecute.TransferType == TransferDirection.Withdrawal)
             {
                 this.accountRepository.DecreaseBalance(transferToExecute.AccountId, transferToExecute.Amount);
 
-                this.cardRepository.IncreaseBalance(transferToExecute.CardId, transferToExecute.Amount);
+                this.cardRepository.IncreaseBalanceAsync(transferToExecute.CardId, transferToExecute.Amount);
             }
 
             AddTransferToHistory(transferToExecute);

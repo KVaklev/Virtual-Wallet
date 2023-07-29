@@ -20,13 +20,13 @@ namespace DataAccess.Repositories.Models
             this.currencyRepository = currencyRepository;
         }
 
-        public async Task<List<Card>> GetAllAsync()
+        public IQueryable<Card> GetAll()
         {
-            var cards = await this.context.Cards
+            var cards = this.context.Cards
                .Where(c=>c.IsDeleted==false)
                .Include(c=>c.Account)
                .ThenInclude(c=>c.User)
-               .ToListAsync();
+               .AsQueryable();
             return cards ?? throw new EntityNotFoundException("There are no cards.");
         }
 
@@ -42,22 +42,19 @@ namespace DataAccess.Repositories.Models
             return card;
         }
 
-        public async Task<List<Card>> GetByAccountIdAsync(int accountId)
+        public IQueryable<Card> GetByAccountId(int accountId)
         {
-            List<Card> cards = await context.Cards
+            var cards = context.Cards
                 .Where(c=>c.IsDeleted==false)
                 .Where(card => card.AccountId == accountId)
-                .ToListAsync();
+                .AsQueryable();
 
             return cards ?? throw new EntityNotFoundException($"Account with ID = {accountId} doesn't have any cards.");
         }
 
         public async Task<PaginatedList<Card>> FilterByAsync(CardQueryParameters filterParameters)
         {
-            IQueryable<Card> result = context.Cards
-                .Where(c=>c.IsDeleted==false)
-                .Include(c => c.Account)
-                .ThenInclude(a => a.User);
+            IQueryable<Card> result = this.GetAll();
 
             result = await FilterByUsernameAsync(result, filterParameters.Username);
             result = await FilterByExpirationDateAsync(result, filterParameters.ExpirationDate);

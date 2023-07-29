@@ -30,6 +30,8 @@
         public const string ModifyTransferAmountErrorMessage = "Insufficient balance.";
         public const string ModifyTransferErrorMessage = "You are not authorized to create, delete or modify the transfer.";
         public const string ModifyTransferNoDataErrorMessage = "There are now results related to these parameters";
+        public const string ModifyTransferGetByIdErrorMessage = "You are not authorized for the specified action.";
+
 
         //Constant messages for currency
 

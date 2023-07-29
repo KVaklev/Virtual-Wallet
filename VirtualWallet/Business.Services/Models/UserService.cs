@@ -16,9 +16,9 @@ namespace Business.Services.Models
             this.userRepository = userRepository;
         }
 
-        public async Task<List<User>> GetAllAsync()
+        public IQueryable<User> GetAll()
         {
-            return await this.userRepository.GetAllAsync();
+            return this.userRepository.GetAll();
         }
 
         public async Task<PaginatedList<User>> FilterByAsync(UserQueryParameters filterParameters)

@@ -15,9 +15,9 @@ namespace Business.Services.Models
         {
             this.cardRepository = repository;
         }
-        public async Task<List<Card>> GetAllAsync()
+        public IQueryable<Card> GetAll()
         {
-            return await this.cardRepository.GetAllAsync();
+            return this.cardRepository.GetAll();
         }
         public async Task<PaginatedList<Card>> FilterByAsync(CardQueryParameters filterParameters)
         {
@@ -27,9 +27,9 @@ namespace Business.Services.Models
         {
             return await this.cardRepository.GetByIdAsync(id);
         }
-        public async Task<List<Card>> GetByAccountIdAsync(int accountId)
+        public IQueryable<Card> GetByAccountId(int accountId)
         {
-            return await this.cardRepository.GetByAccountIdAsync(accountId);
+            return this.cardRepository.GetByAccountId(accountId);
         }
         public async Task<Card> CreateAsync(int accountId, Card card)
         {

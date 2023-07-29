@@ -5,7 +5,7 @@ namespace Business.Services.Contracts
 {
     public interface IUserService
     {
-        Task<List<User>> GetAllAsync();
+        IQueryable<User> GetAll();
         Task<PaginatedList<User>> FilterByAsync(UserQueryParameters queryParameters);
         Task<User> GetByIdAsync(int id);
         Task<User> GetByUsernameAsync(string username);

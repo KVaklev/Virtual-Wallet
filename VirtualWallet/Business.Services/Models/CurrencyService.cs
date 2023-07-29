@@ -33,9 +33,9 @@ namespace Business.Services.Models
             return await this.currencyRepository.DeleteAsync(id);
         }
 
-        public async Task<List<Currency>> GetAllAsync()
+        public IQueryable<Currency> GetAll()
         {
-            return await this.currencyRepository.GetAllAsync();
+            return this.currencyRepository.GetAll();
         }
 
         public async Task<Currency> GetByIdAsync(int id)

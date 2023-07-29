@@ -4,7 +4,7 @@ namespace Business.Services.Contracts
 {
     public interface ICurrencyService
     {
-        Task<List<Currency>> GetAllAsync();
+        IQueryable<Currency> GetAll();
         Task<Currency> GetByIdAsync(int id);
         Task<Currency> GetByАbbreviationAsync(string abbreviation);
         Task<Currency> CreateAsync(Currency currency, User loggedUser);

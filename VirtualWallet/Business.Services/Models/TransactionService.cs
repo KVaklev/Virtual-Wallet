@@ -66,7 +66,7 @@ namespace Business.Services.Models
             {
                 throw new EntityNotFoundException(Constants.ModifyTransactionAmountErrorMessage);
             }
-            
+
             var newTransaction = await this.transactionRepository.CreateOutTransactionAsync(transaction);
 
             return newTransaction;
@@ -80,7 +80,7 @@ namespace Business.Services.Models
             }
 
             var transactionToUpdate = await this.transactionRepository.GetByIdAsync(id);
-            
+
             if (transactionToUpdate.IsExecuted
                 || transactionToUpdate.Direction == DirectionType.In
                 || transactionToUpdate.IsDeleted)
@@ -111,14 +111,14 @@ namespace Business.Services.Models
 
         public async Task<bool> ExecuteAsync(int transactionId, User user)
         {
-            if (!await IsTransactionSenderAsync(transactionId,user.Id))
+            if (!await IsTransactionSenderAsync(transactionId, user.Id))
             {
                 throw new UnauthorizedOperationException(Constants.ModifyTransactionErrorMessage);
             }
-            
+
             var transactionOut = await this.transactionRepository.GetByIdAsync(transactionId);
-            if (transactionOut.IsExecuted 
-                || transactionOut.Direction==DirectionType.In 
+            if (transactionOut.IsExecuted
+                || transactionOut.Direction == DirectionType.In
                 || transactionOut.IsDeleted)
             {
                 throw new UnauthorizedOperationException(Constants.ModifyTransactionDeleteErrorMessage); //Is modify message for all three cases?
@@ -137,35 +137,31 @@ namespace Business.Services.Models
 
             return transactionOut.IsExecuted;
         }
-        
+
         private async Task<bool> AddTransactionToHistoryAsync(Transaction transaction)
         {
 
             int historyCount = await this.context.History.CountAsync();
-            await this.historyRepository.CreateWithTransactionAsync(transaction);
+                               await this.historyRepository.CreateWithTransactionAsync(transaction);
             int newHistoryCount = await this.context.History.CountAsync();
 
             if (newHistoryCount == historyCount + 1)
             {
                 return true;
             }
-            else 
+            else
             {
                 return false;
             }
         }
 
-        private Transaction MapDtoТоTransaction(CreateTransactionDto transactionDto, User user)
+        private async Task<Transaction> MapDtoТоTransaction(CreateTransactionDto transactionDto, User user)
         {
             var transaction = this.mapper.Map<Transaction>(transactionDto);
             transaction.AccountSenderId = (int)user.AccountId;
             transaction.AccountSender = user.Account;
-            transaction.AccountRecepientId = this.accountRepository
-                                                 .GetByUsername(transactionDto.RecepientUsername)
-                                                 .Id;
-            transaction.CurrencyId = this.currencyRepository
-                                         .GetByАbbreviation(transactionDto.Abbreviation)
-                                         .Id;
+            transaction.AccountRecepientId = await this.accountRepository.GetByUsernameAsync(transactionDto.RecepientUsername).Id;
+            transaction.CurrencyId = await this.currencyRepository.(GetByАbbreviationAsync(transactionDto.Abbreviation)).Id;
             transaction.Direction = DirectionType.Out;
             return transaction;
         }

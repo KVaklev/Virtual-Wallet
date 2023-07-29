@@ -17,18 +17,18 @@ namespace DataAccess.Repositories.Models
         {
             this.context = context;
         }
-        public async Task<List<User>> GetAllAsync()
+        public IQueryable<User> GetAll()
         {
-            var users = await context.Users
-                .Where(u=>u.IsDeleted==false)
-                .ToListAsync();
+            var users = context.Users
+                .Where(u => u.IsDeleted == false)
+                .AsQueryable();
+
             return users ?? throw new EntityNotFoundException("There are no users.");
         }
 
         public async Task<PaginatedList<User>> FilterByAsync(UserQueryParameters filterParameters)
         {
-            IQueryable<User> result = context.Users
-                .Where(u => u.IsDeleted == false);
+            IQueryable<User> result = this.GetAll();
 
             result = await FilterByUsernameAsync(result, filterParameters.Username);
             result = await FilterByEmailAsync(result, filterParameters.Email);

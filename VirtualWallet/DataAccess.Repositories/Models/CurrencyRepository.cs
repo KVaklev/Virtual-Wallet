@@ -14,13 +14,14 @@ namespace DataAccess.Repositories.Models
         {
             this.context = context;
         }
-        public async Task<List<Currency>> GetAllAsync()
+        public IQueryable<Currency> GetAll()
         {
-            var currencies = await this.context.Currencies
+            var currencies = this.context.Currencies
                 .Where(c => c.IsDeleted == false)
                 .OrderBy(n => n.Name)
-                .ToListAsync();
-            return currencies ?? throw new EntityNotFoundException("Тhere is no such currency");
+                .AsQueryable();
+
+            return currencies ?? throw new EntityNotFoundException("Тhere are no added currencies.");
         }
 
         public async Task<Currency> GetByIdAsync(int id)
@@ -42,17 +43,6 @@ namespace DataAccess.Repositories.Models
         public async Task<Currency> UpdateAsync(int id, Currency currency)
         {
             var currencyToUpdate = await this.GetByIdAsync(id);
-            var currency = this.context.Currencies.Where(c => c.Id == id).FirstOrDefault();
-            if (currency==null || currency.IsDeleted)
-            {
-                throw new EntityNotFoundException("Тhere is no such currency");
-            }
-            return currency; 
-        }
-
-        public Currency Update(int id, Currency currency)
-        {
-            var currencyToUpdate = this.GetById(id);
             currencyToUpdate.Name = currency.Name;
             currencyToUpdate.Abbreviation = currency.Abbreviation;
             await context.SaveChangesAsync();
