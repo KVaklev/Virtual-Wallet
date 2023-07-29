@@ -160,6 +160,16 @@ namespace Business.Services.Models
             var transaction = this.mapper.Map<Transaction>(transactionDto);
             transaction.AccountSenderId = (int)user.AccountId;
             transaction.AccountSender = user.Account;
+            transaction.AccountRecepientId = this.accountRepository
+                                                 .GetByUsername(transactionDto.RecepientUsername)
+                                                 .Id;
+            transaction.AccountRecepient = this.accountRepository
+                                                 .GetByUsername(transactionDto.RecepientUsername);
+            transaction.CurrencyId = this.currencyRepository
+                                         .GetByАbbreviation(transactionDto.Abbreviation)
+                                         .Id;
+            transaction.Currency = this.currencyRepository
+                                         .GetByАbbreviation(transactionDto.Abbreviation);
             transaction.AccountRecepientId = await this.accountRepository.GetByUsernameAsync(transactionDto.RecepientUsername).Id;
             transaction.CurrencyId = await this.currencyRepository.(GetByАbbreviationAsync(transactionDto.Abbreviation)).Id;
             transaction.Direction = DirectionType.Out;

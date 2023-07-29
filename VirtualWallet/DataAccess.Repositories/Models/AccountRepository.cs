@@ -18,25 +18,27 @@ namespace DataAccess.Repositories.Models
             this.cardRepository = cardRepository;
         }
 
-        public IQueryable<Account> GetAll()
+        public Task<IQueryable<Account>> GetAll()
         {
             IQueryable<Account> result = context.Accounts
                 .Where(a => a.IsDeleted == false)
                 .Include(a => a.User)
-                .Include(a=>a.Cards)
+                .Include(a => a.Cards)
                 .Include(a => a.Currency);
 
-            return result ?? throw new EntityNotFoundException($"There are no accounts");
+            return Task.FromResult(result ?? throw new EntityNotFoundException($"There are no accounts"));
         }
 
-        public Account Create(Account account, User user)
+        public Task<Account> Create(Account account, User user)
         {
             account.DateCreated = DateTime.Now;
             account.User = user;
+            account.UserId = user.Id;
+            account.Balance = 0;
             context.Add(account);
             context.SaveChanges();
 
-            return account;
+            return Task.FromResult(account);
         }
 
         public bool Delete(int id)
@@ -104,9 +106,9 @@ namespace DataAccess.Repositories.Models
         public Account GetById(int id)
         {
             Account account = context.Accounts
-                .Include(a=>a.User)
-                .Include(a=>a.Cards)
-                .Include(a=>a.Currency)
+                .Include(a => a.User)
+                .Include(a => a.Cards)
+                .Include(a => a.Currency)
                 .Where(a => a.IsDeleted == false)
                 .Where(a => a.Id == id)
                 .FirstOrDefault();
@@ -117,9 +119,9 @@ namespace DataAccess.Repositories.Models
         public Account GetByUsername(string username)
         {
             Account account = context.Accounts
-                .Include(a=>a.User)
-                .Include(a=>a.Cards)
-                .Include(a=>a.Currency)
+                .Include(a => a.User)
+                .Include(a => a.Cards)
+                .Include(a => a.Currency)
                 .Where(a => a.IsDeleted == false)
                 .Where(a => a.User.Username == username)
                 .FirstOrDefault();
@@ -259,14 +261,7 @@ namespace DataAccess.Repositories.Models
                 .Any(account => account.Id == id);
         }
 
-        
 
-
-
-        //public bool AccountExists(int id)
-        //{
-        //    return context.Accounts.Any(a => a.UserId == id);
-        //}
 
 
     }

@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Business.Dto;
+using Business.DTOs;
 using Business.QueryParameters;
 using Business.Services.Contracts;
 using Business.Services.Models;
@@ -28,31 +29,57 @@ namespace VirtualWallet.Controllers.API
             this.accountService = accountService;
         }
 
-        [HttpGet, Authorize]
-        public IActionResult GatAllAcounts()
+        [HttpGet(""), Authorize]
+
+        public async Task<ActionResult<IEnumerable<GetAccountDto>>> GetAllAcounts()
         {
             //var loggedUser = FindLoggedUser();
 
-            var result = accountService.GetAll().ToList();
+            var result = (await accountService.GetAll()).ToList();
 
-            List<AccountDto> accountDtos = result.Select(account => mapper.Map<AccountDto>(account)).ToList();
+            List<GetAccountDto> accountDtos = result.Select(account => mapper.Map<GetAccountDto>(account)).ToList();
 
             return Ok(accountDtos);
 
         }
 
-        //[HttpPost, Authorize]
-        //public IActionResult Create([FromBody] AccountDto accountDto)
+        //[HttpGet("{id}"), Authorize]
+
+        //public async Task<ActionResult<IEnumerable<AccountDto>>> GetAllAcounts()
         //{
+        //    var loggedUser = FindLoggedUser();
+
+        //    var result = (await accountService.GetAll()).ToList();
+
+        //    List<AccountDto> accountDtos = result.Select(account => mapper.Map<AccountDto>(account)).ToList();
+
+        //    return Ok(accountDtos);
 
         //}
 
-        //private User FindLoggedUser()
-        //{
-        //    var loggedUsersUsername = User.Claims.FirstOrDefault(claim => claim.Type == "Username").Value;
-        //    var loggedUser = authManager.TryGetUserByUsername(loggedUsersUsername);
-        //    return loggedUser;
-        //}
+        //[HttpPost("")]
+        //public  async Task<ActionResult> 
+
+        //[HttpGet("getbyid")]
+
+        [HttpPost(""), Authorize]
+        public async Task<ActionResult> Create([FromBody] CreateAccountDto createAccountDto)
+
+        {
+            var loggedUser = FindLoggedUser();
+
+            Account newAccount = await accountService.Create(createAccountDto, loggedUser);
+
+            return Ok(newAccount);
+
+        }
+
+        private User FindLoggedUser()
+        {
+            var loggedUsersUsername = User.Claims.FirstOrDefault(claim => claim.Type == "Username").Value;
+            var loggedUser = authManager.TryGetUserByUsername(loggedUsersUsername);
+            return loggedUser;
+        }
 
 
 

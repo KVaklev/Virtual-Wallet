@@ -21,6 +21,15 @@
         public const string ModifyTransactionAmountErrorMessage = "Not enough balance.";
         public const string ModifyTransactionNoDataErrorMessage = "No data with these parameters.";
         public const string ModifyTransactionDeleteErrorMessage = "You can't delete a completed transaction!";
+        public const string ModifyTransactionUpdateErrorMessage = "You can't update a completed transaction.";
+
+        public const string ModifyCurrencyErrorMessage = "You are not admin.";
+        public const string ModifyCurrencyNotFoundErrorMessage = "This currency doesn't exist.";
+         
+        public const string ModifyAccountErrorMessage = "Only the admin or owner of the account can access, delete or modify it.";
+        public const string ModifyAccountCardErrorMessage = "Only the admin or owner of the account can add or remove a card.";
+
+        public const string ModifyCardErrorMessage = "Only the admin or owner of the card can update information.";
         public const string ModifyTransactionUpdateErrorMessage = "You can't update a completed transaction!";
         public const string ModifyTransactionBlockedErrorMessage = "You are not allowed to make transactions while being blocked!";
         public const string ModifyTransactionErrorMessage = "Only an admin or sender of the transaction is authorized to perform the specified action.";

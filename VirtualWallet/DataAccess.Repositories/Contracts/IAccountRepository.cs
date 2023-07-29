@@ -10,7 +10,7 @@ namespace DataAccess.Repositories.Contracts
 {
     public interface IAccountRepository
     {
-        IQueryable<Account> GetAll();
+        Task<IQueryable<Account>> GetAll();
 
         PaginatedList<Account> FilterBy(AccountQueryParameters filterParameters);
 
@@ -18,7 +18,7 @@ namespace DataAccess.Repositories.Contracts
 
         Account GetByUsername(string username);
 
-        Account Create(Account account, User user);
+        Task<Account> Create(Account account, User user);
 
         bool AddCard(int id, Card card);
 
