@@ -62,8 +62,7 @@ namespace VirtualWallet.Controllers.API
         {
             try
             {
-                var user = this.mapper.Map<User>(createUserDto);
-                var createdUser = this.userService.Create(user);
+                var createdUser = await this.userService.CreateAsync(createUserDto);
                 return StatusCode(StatusCodes.Status201Created, createdUser);
             }
             catch (DuplicateEntityException ex)

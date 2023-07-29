@@ -16,8 +16,39 @@ namespace DataAccess.Repositories.Models
         {
              this.context=context;
         }
+        public IQueryable<History> GetAll(User loggedUser)
+        {
+            IQueryable<History> result = context.History
+                .Include(tr => tr.Transaction)
+                .ThenInclude(c => c.Currency)
+                .Include(tf => tf.Transfer)
+                .ThenInclude(c => c.Currency)
+                .Include(ac => ac.Account)
+                .ThenInclude(u => u.User);
 
-        public History CreateWithTransaction(Transaction transaction)
+            if (!loggedUser.IsAdmin)
+            { 
+                result = result.Where(t => t.AccountId==loggedUser.AccountId);
+            }
+
+            return result ?? throw new EntityNotFoundException("Тhere are no records!");
+        }
+
+        public async Task<History> GetByIdAsync(int id)
+        {
+            var history = await context.History
+                .Include(tr=>tr.Transaction)
+                .ThenInclude(c=>c.Currency)
+                .Include(tf=>tf.Transfer)
+                .ThenInclude(c => c.Currency)
+                .Include(ac=>ac.Account)
+                .ThenInclude(u=>u.User)
+                .FirstOrDefaultAsync(h => h.Id == id);
+
+            return history ?? throw new EntityNotFoundException($"There are no records for the specified id.");
+        }
+
+        public async Task<History> CreateWithTransactionAsync(Transaction transaction)
         {
             var history = new History();
             history.EventTime = DateTime.Now;

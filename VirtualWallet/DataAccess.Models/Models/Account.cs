@@ -1,5 +1,4 @@
-﻿using System.Security.Principal;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 
 namespace DataAccess.Models.Models
 {
@@ -14,6 +13,7 @@ namespace DataAccess.Models.Models
         public User? User { get; set; }
         public decimal Balance { get; set; }
         public int? CurrencyId { get; set; }
+        [JsonIgnore]
         public Currency? Currency { get; set; }
         public List<Card>? Cards { get; set; } = new List<Card>();
         public List<Transfer> Transfers { get; set; } = new List<Transfer>();

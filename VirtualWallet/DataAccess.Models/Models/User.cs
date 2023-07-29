@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace DataAccess.Models.Models
 {
@@ -45,6 +46,7 @@ namespace DataAccess.Models.Models
         [NotMapped]
         [DisplayName(Constants.ImageFileFieldErrorMessage)]
         public IFormFile ImageFile { get; set; }
+        [JsonIgnore]
         public Account? Account { get; set; }
         public int? AccountId { get; set; }
         public bool IsDeleted { get; set; }

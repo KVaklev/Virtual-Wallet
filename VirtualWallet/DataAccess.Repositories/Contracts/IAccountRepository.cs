@@ -12,9 +12,7 @@ namespace DataAccess.Repositories.Contracts
     {
         Task<IQueryable<Account>> GetAll();
 
-        PaginatedList<Account> FilterBy(AccountQueryParameters filterParameters);
-
-        Account GetById(int id);
+        Task <Account> GetByIdAsync(int id);
 
         Account GetByUsername(string username);
 

@@ -22,9 +22,13 @@ namespace DataAccess.Repositories.Models
         //}
         public async Task<List<User>> GetAllAsync()
         {
-            return await context.Users
-                .Where(u=>u.IsDeleted==false)
-                .ToListAsync();
+            var users = context.Users
+                .Where(u => u.IsDeleted == false)
+                .Include(u=>u.Account)
+                .ThenInclude(c=>c.Currency)
+                .AsQueryable();
+
+            return users ?? throw new EntityNotFoundException("There are no users.");
         }
         //public List<User> FilterBy(UserQueryParameters filterParameters)
         //{
@@ -77,7 +81,9 @@ namespace DataAccess.Repositories.Models
             User? user = context.Users
                 .Where(u => u.IsDeleted == false)
                 .Where(users => users.Id == id)
-                .FirstOrDefault();
+                .Include(u => u.Account)
+                .ThenInclude(c => c.Currency)
+                .FirstOrDefaultAsync();
             return user ?? throw new EntityNotFoundException($"User with ID = {id} doesn't exist.");
         }
         public User GetByUsername(string username)
