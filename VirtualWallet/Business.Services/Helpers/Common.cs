@@ -37,6 +37,5 @@ namespace Business.Services.Helpers
             return await Task.FromResult(isAuthorized);
         }
 
-
     }
 }

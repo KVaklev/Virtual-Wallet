@@ -6,11 +6,6 @@ using Business.Services.Contracts;
 using Business.Services.Helpers;
 using DataAccess.Models.Models;
 using DataAccess.Repositories.Contracts;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Business.Services.Models
 {
@@ -26,13 +21,13 @@ namespace Business.Services.Models
             this.cardRepository = cardRepository;
             this.currencyRepository = currencyRepository;
         }
-        public async Task<IQueryable<Account>> GetAll()
+        public IQueryable<Account> GetAll()
         {
-            return await accountRepository.GetAll();
+            return accountRepository.GetAll();
         }
 
 
-        public async Task<Account> Create(CreateAccountDto accountDto, User user)
+        public async Task<Account> CreateAsync(CreateAccountDto accountDto, User user)
         {
             Account account = new Account();
             account.Currency = await currencyRepository.GetByАbbreviationAsync(accountDto.Abbreviation);
@@ -48,47 +43,47 @@ namespace Business.Services.Models
             return await this.accountRepository.DeleteAsync(id);
         }
 
-        public Account GetById(int id, User user)
+        public async Task <Account> GetByIdAsync(int id, User user)
         {
-            if (!IsUserAuthorized(id, user))
+            if (!(await IsUserAuthorized(id, user)))
             {
                 throw new UnauthorizedOperationException(Constants.ModifyAccountErrorMessage);
             }
-            return this.accountRepository.GetById(id);
+            return await this.accountRepository.GetByIdAsync(id);
         }
 
-        public Account GetByUsername(int id, User user)
+        public async Task <Account> GetByUsernameAsync(int id, User user)
         {
-            if (!IsUserAuthorized(id, user))
+            if (!(await IsUserAuthorized(id, user)))
             {
                 throw new UnauthorizedOperationException(Constants.ModifyAccountErrorMessage);
             }
-            return accountRepository.GetByUsername(user.Username);
+            return await accountRepository.GetByUsernameAsync(user.Username);
         }
 
-        public bool AddCard(int id, Card card, User user)
+        public async Task <bool> AddCardAsync(int id, Card card, User user)
         {
-            if (!IsUserAuthorized(id, user))
+            if (!(await IsUserAuthorized(id, user)))
             {
                 throw new UnauthorizedOperationException(Constants.ModifyAccountCardErrorMessage);
             }
-            return this.accountRepository.AddCard(id, card);
+            return await this.accountRepository.AddCardAsync(id, card);
         }
 
-        public bool RemoveCard(int id, Card card, User user)
+        public async Task <bool> RemoveCardAsync(int id, Card card, User user)
         {
-            if (!IsUserAuthorized(id, user))
+            if (!(await IsUserAuthorized(id, user)))
             {
                 throw new UnauthorizedOperationException(Constants.ModifyAccountCardErrorMessage);
             }
-            return this.accountRepository.RemoveCard(id, card);
+            return await this.accountRepository.RemoveCardAsync(id, card);
         }
 
-        public bool IsUserAuthorized(int id, User user)
+        public async Task <bool> IsUserAuthorized(int id, User user)
         {
             bool IsUserAccountOwnerOrAdminId = false;
 
-            Account accountToGet = this.accountRepository.GetById(id);
+            Account accountToGet = await this.accountRepository.GetByIdAsync(id);
 
             if (accountToGet.UserId == user.Id || user.IsAdmin)
             {

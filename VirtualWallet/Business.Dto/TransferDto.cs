@@ -9,11 +9,10 @@ namespace Business.Dto
 {
     public class TransferDto
     {
+        public string Username { get; set; }
         public DateTime Date { get; set; }
 
-        public string Username { get; set; }
-
-        public string CurrencyAbbreviation { get; set; }
+        public string Abbreviation { get; set; }
 
         public string CardNumber { get; set; }
 

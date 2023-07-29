@@ -12,7 +12,7 @@ namespace Presentation.Helpers
         {
             this.userService = userService;
         }
-        public User TryGetUser(string credentials)
+        public async Task<User> TryGetUserAsync(string credentials)
         {
             string[] credentialsArray = credentials.Split(':');
             string username = credentialsArray[0];
@@ -22,7 +22,7 @@ namespace Presentation.Helpers
 
             try
             {
-                var user = this.userService.GetByUsername(username);
+                var user = await this.userService.GetByUsernameAsync(username);
                 if (user.Password == encodedPassword)
                 {
                     return user;
@@ -35,22 +35,23 @@ namespace Presentation.Helpers
             }
         }
 
-        public User TryGetUser(string username, string password)
+        public async Task<User> TryGetUserAsync(string username, string password)
         {
-            var user = TryGetUser(username + ":" + password);
+            var user = await TryGetUserAsync(username + ":" + password);
             return user;
         }
 
-        public User TryGetUserByUsername(string username)
+        public async Task<User> TryGetUserByUsernameAsync(string username)
         {
             try
             {
-                return this.userService.GetByUsername(username);
+                return await this.userService.GetByUsernameAsync(username);
             }
             catch (EntityNotFoundException)
             {
                 throw new UnauthorizedOperationException("Invalid username!");
             }
         }
+
     }
 }

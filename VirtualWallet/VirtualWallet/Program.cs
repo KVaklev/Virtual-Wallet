@@ -1,5 +1,5 @@
-using Business.Mappers;
 using Business.Services.Contracts;
+using Business.Services.Helpers;
 using Business.Services.Models;
 using DataAccess.Repositories.Contracts;
 using DataAccess.Repositories.Data;
@@ -7,10 +7,8 @@ using DataAccess.Repositories.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
 using Presentation.Helpers;
 using System.Text;
-using VirtualWallet.Helpers;
 using VirtualWallet.Models;
 
 namespace VirtualWallet
@@ -55,7 +53,6 @@ namespace VirtualWallet
             //Helpers
             builder.Services.AddScoped<IAuthManager, AuthManager>();
             builder.Services.AddScoped<AuthManager>();
-            builder.Services.AddScoped<HelpersApi>();
             builder.Services.AddSwaggerGen();
             
 

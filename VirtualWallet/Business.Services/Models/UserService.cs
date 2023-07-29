@@ -35,40 +35,31 @@ namespace Business.Services.Models
             this.context = context;
         }
 
-        //public List<User> GetAll()
-        //{
-        //    return this.repository.GetAll();
-        //}
-
-        public async Task<List<User>> GetAllAsync()
+        public IQueryable<User> GetAll()
         {
-            return await this.repository.GetAllAsync();
-        }
-        //public List<User> FilterBy(UserQueryParameters filterParameters)
-        //{
-        //    return this.repository.FilterBy(filterParameters);
-        //}
-
-        public async Task<List<User>> FilterByAsync(UserQueryParameters filterParameters)
-        {
-            return await this.repository.FilterByAsync(filterParameters);
+            return this.userRepository.GetAll();
         }
 
-        public User GetById(int id)
+        public async Task<PaginatedList<User>> FilterByAsync(UserQueryParameters filterParameters)
         {
-            return this.repository.GetById(id);
+            return await this.userRepository.FilterByAsync(filterParameters);
         }
-        public User GetByUsername(string username)
+
+        public async Task<User> GetByIdAsync(int id)
         {
-            return this.repository.GetByUsername(username);
+            return await this.userRepository.GetByIdAsync(id);
         }
-        public User GetByEmail(string email)
+        public async Task<User> GetByUsernameAsync(string username)
         {
-            return this.repository.GetByEmail(email);
+            return await this.userRepository.GetByUsernameAsync(username);
+        } 
+        public async Task<User> GetByEmailAsync(string email)
+        {
+            return await this.userRepository.GetByEmailAsync(email);
         }
-        public User GetByPhoneNumber(string pnoneNumber)
+        public async Task<User> GetByPhoneNumberAsync(string pnoneNumber)
         {
-            return this.repository.GetByPhoneNumber(pnoneNumber);
+            return await this.userRepository.GetByPhoneNumberAsync(pnoneNumber);
         }
 
         public async Task<GetUserDto> CreateAsync(CreateUserDto createUserDto)
@@ -79,12 +70,12 @@ namespace Business.Services.Models
                 throw new DuplicateEntityException($"User with username '{user.Username}' already exists.");
             }
 
-            if (EmailExists(user.Email))
+            if (await EmailExistsAsync(user.Email))
             {
                 throw new DuplicateEntityException($"User with email '{user.Email}' already exists.");
             }
 
-            if (PhoneNumberExists(user.PhoneNumber))
+            if (await PhoneNumberExistsAsync(user.PhoneNumber))
             {
                 throw new DuplicateEntityException($"User with phone number '{user.PhoneNumber}' already exists.");
             }
@@ -102,18 +93,18 @@ namespace Business.Services.Models
             return getUserDto;
 
         }
-        public User Update(int id, User user, User loggedUser)
+        public async Task<User> UpdateAsync(int id, User user, User loggedUser)
         {
-            User userToUpdate = this.repository.GetById(id);
+            User userToUpdate = await this.userRepository.GetByIdAsync(id);
 
-            if (!IsAuthorized(userToUpdate, loggedUser))
+            if (!await Common.IsAuthorizedAsync(userToUpdate, loggedUser))
             {
                 throw new UnauthorizedOperationException(Constants.ModifyUserErrorMessage);
             }
 
             if (user.Email != userToUpdate.Email)
             {
-                if (EmailExists(user.Email))
+                if (await EmailExistsAsync(user.Email))
                 {
                     throw new DuplicateEntityException($"User with email '{user.Email}' already exists.");
                 }
@@ -121,21 +112,21 @@ namespace Business.Services.Models
 
             if (user.PhoneNumber != userToUpdate.PhoneNumber)
             {
-                if (PhoneNumberExists(user.PhoneNumber))
+                if (await PhoneNumberExistsAsync(user.PhoneNumber))
                 {
                     throw new DuplicateEntityException($"User with phone number '{user.PhoneNumber}' already exists.");
                 }
             }
 
-            userToUpdate = this.repository.Update(id, loggedUser);
+            userToUpdate = await this.userRepository.UpdateAsync(id, loggedUser);
             return userToUpdate;
         }
 
-        public bool Delete(int id, User loggedUser)
+        public async Task<bool> DeleteAsync(int id, User loggedUser)
         {
-            User userToDelete = this.repository.GetById(id);
+            User userToDelete = await this.userRepository.GetByIdAsync(id);
 
-            if (!IsAuthorized(userToDelete, loggedUser))
+            if (!await Common.IsAuthorizedAsync(userToDelete, loggedUser))
             {
                 throw new UnauthorizedOperationException(Constants.ModifyUserErrorMessage);
             } 
@@ -143,61 +134,44 @@ namespace Business.Services.Models
              var accountToDelete = await this.accountRepository.GetByIdAsync((int)userToDelete.AccountId);
              await this.accountService.DeleteAsync(accountToDelete.Id, loggedUser);
 
-            return this.repository.Delete(id);
+            return await this.userRepository.DeleteAsync(id);
         }
-        public User Promote(int id, User loggedUser)
+        public async Task<User> PromoteAsync(int id, User loggedUser)
         {
-            if (!IsAdmin(loggedUser))
+            if (!await Common.IsAdminAsync(loggedUser))
             {
                 throw new UnauthorizedOperationException(Constants.ModifyUserErrorMessage);
             }
-            return this.repository.Promote(id);
+            return await this.userRepository.PromoteAsync(id);
         }
-        public User BlockUser(int id, User loggedUser)
+        public async Task<User> BlockUserAsync(int id, User loggedUser)
         {
-            if (!IsAdmin(loggedUser))
+            if (!await Common.IsAdminAsync(loggedUser))
             {
                 throw new UnauthorizedOperationException(Constants.ModifyUserErrorMessage);
             }
-            return this.repository.BlockUser(id);
+            return await this.userRepository.BlockUserAsync(id);
         }
-        public User UnblockUser(int id, User loggedUser)
+        public async Task<User> UnblockUserAsync(int id, User loggedUser)
         {
-            if (!IsAdmin(loggedUser))
+            if (!await Common.IsAdminAsync(loggedUser))
             {
                 throw new UnauthorizedOperationException(Constants.ModifyUserErrorMessage);
             }
-            return this.repository.UnblockUser(id);
+            return await this.userRepository.UnblockUserAsync(id);
         }
-        public bool EmailExists(string email)
+        public async Task<bool> EmailExistsAsync(string email)
         {
-            return this.repository.EmailExists(email);
+            return await this.userRepository.EmailExistsAsync(email);
         }
-        public bool UsernameExists(string username)
+        public async Task<bool> UsernameExistsAsync(string username)
         {
-            return this.repository.UsernameExists(username);
+            return await this.userRepository.UsernameExistsAsync(username);
         }
-        public bool PhoneNumberExists(string phoneNumber)
+        public async Task<bool> PhoneNumberExistsAsync(string phoneNumber)
         {
-            return this.repository.PhoneNumberExists(phoneNumber);
+            return await this.userRepository.PhoneNumberExistsAsync(phoneNumber);
         }
-        public bool IsAuthorized(User user, User loggedUser)
-        {
-            bool isAuthorized = false;
-
-            if (user.Id == loggedUser.Id || loggedUser.IsAdmin)
-            {
-                isAuthorized = true;
-            }
-            return isAuthorized;
-        }
-        public bool IsAdmin(User loggedUser)
-        {
-            if (!loggedUser.IsAdmin)
-            {
-                return false;
-            }
-            return true;
-        }
+       
     }
 }

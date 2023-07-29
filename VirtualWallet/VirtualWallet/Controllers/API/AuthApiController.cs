@@ -21,7 +21,10 @@ namespace VirtualWallet.Controllers.API
         private readonly IMapper mapper;
         private readonly IUserService userService;
 
-        public AuthApiController(IAuthManager authManager, IMapper mapper, IUserService userService)
+        public AuthApiController(
+            IAuthManager authManager,
+            IMapper mapper, 
+            IUserService userService)
         {
             this.authManager = authManager;
             this.mapper = mapper;
@@ -30,18 +33,18 @@ namespace VirtualWallet.Controllers.API
 
         [AllowAnonymous]
         [HttpPost("login")]
-        public IActionResult Login(string username, string password)
+        public async Task<IActionResult> LoginAsync(string username, string password)
         {
             try
             {
-                var loggedUser = authManager.TryGetUserByUsername(username);
+                var loggedUser = await authManager.TryGetUserByUsernameAsync(username);
 
                 if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
                 {
                     return BadRequest("Username and/or Password not specified");
                 }
 
-                string token = CreateApiToken(loggedUser);
+                string token = await CreateApiTokenAsync(loggedUser);
 
                 return Ok("Logged in successfully. Token: " + token);
 
@@ -58,7 +61,7 @@ namespace VirtualWallet.Controllers.API
 
         [AllowAnonymous]
         [HttpPost("register")]
-        public IActionResult Register([FromBody] CreateUserDto createUserDto)
+        public async Task<IActionResult> RegisterAsync([FromBody] CreateUserDto createUserDto)
         {
             try
             {
@@ -71,7 +74,7 @@ namespace VirtualWallet.Controllers.API
             }
         }
 
-        private string CreateApiToken(User loggedUser)
+        private async Task<string> CreateApiTokenAsync(User loggedUser)
         {
             var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("This is my secret testing key"));
             var signinCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256);
@@ -82,7 +85,7 @@ namespace VirtualWallet.Controllers.API
                 new Claim("LoggedUserId", loggedUser.Id.ToString()),
                 new Claim("Username", loggedUser.Username),
                 new Claim("IsAdmin", loggedUser.IsAdmin.ToString()),
-                new Claim("UsersAccountId", loggedUser.Account.Id.ToString()),
+                new Claim("UsersAccountId", loggedUser.Account.Id.ToString()),//null check
                 new Claim(JwtRegisteredClaimNames.Email, loggedUser.Email),
                 new Claim(JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString())
         },
@@ -93,7 +96,7 @@ namespace VirtualWallet.Controllers.API
 
             .WriteToken(jwtSecurityToken);
             Response.Cookies.Append("Cookie_JWT", token);
-            return token;
+            return await Task.FromResult(token);
         }
     }
 }

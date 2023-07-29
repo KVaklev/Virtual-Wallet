@@ -9,87 +9,67 @@ namespace Business.Services.Models
 {
     public class CardService : ICardService
     {
-        private readonly ICardRepository repository;
+        private readonly ICardRepository cardRepository;
 
         public CardService(ICardRepository repository)
         {
-            this.repository = repository;
+            this.cardRepository = repository;
         }
-        public List<Card> GetAll()
+        public IQueryable<Card> GetAll()
         {
-            return this.repository.GetAll();
+            return this.cardRepository.GetAll();
         }
-        public Card GetById(int id)
+        public async Task<PaginatedList<Card>> FilterByAsync(CardQueryParameters filterParameters)
         {
-            return this.repository.GetById(id);
+            return await this.cardRepository.FilterByAsync(filterParameters);
         }
-        public List<Card> GetByAccountId(int accountId)
+        public async Task<Card> GetByIdAsync(int id)
         {
-            return this.repository.GetByAccountId(accountId);
+            return await this.cardRepository.GetByIdAsync(id);
         }
-        public List<Card> FilterBy(CardQueryParameters filterParameters)
+        public IQueryable<Card> GetByAccountId(int accountId)
         {
-            return this.repository.FilterBy(filterParameters);
+            return this.cardRepository.GetByAccountId(accountId);
         }
-        public Card Create(int accountId, Card card)
+        public async Task<Card> CreateAsync(int accountId, Card card)
         {
-            if (CardNumberExists(card.CardNumber))
+            if (await CardNumberExistsAsync(card.CardNumber))
             {
                 throw new DuplicateEntityException($"Card with card number '{card.CardNumber}' already exists.");
             }
 
-           var createdCard = this.repository.Create(accountId, card);
+           var createdCard = await this.cardRepository.CreateAsync(accountId, card);
            return createdCard;
         }
 
-        public Card Update(int id, User loggedUser, Card card)
+        public async Task<Card> UpdateAsync(int id, User loggedUser, Card card)
         {
-            Card cardToUpdate = this.repository.GetById(id);
+            Card cardToUpdate = await this.cardRepository.GetByIdAsync(id);
 
-            if (CardNumberExists(card.CardNumber))
+            if (await CardNumberExistsAsync(card.CardNumber))
             {
                 throw new DuplicateEntityException($"Card with card number '{card.CardNumber}' already exists.");
             }
-            if (!IsAuthorized(cardToUpdate, loggedUser))
+            if (!await Common.IsAuthorizedAsync(cardToUpdate, loggedUser))
             {
                 throw new UnauthorizedOperationException(Constants.ModifyCardErrorMessage);
             }
 
-            var updatedCard = this.repository.Update(id, card);
+            var updatedCard = await this.cardRepository.UpdateAsync(id, card);
             return updatedCard;
 
         }
-        public bool Delete(int id, User loggedUser)
+        public async Task<bool> DeleteAsync(int id, User loggedUser)
         {
-            if (!IsAdmin(loggedUser))
+            if (!await Common.IsAdminAsync(loggedUser))
             {
                 throw new UnauthorizedOperationException(Constants.ModifyUserErrorMessage);
             }
-            return this.repository.Delete(id);
+            return await this.cardRepository.DeleteAsync(id);
         }
-        public bool CardNumberExists(string cardNumber)
+        public async Task<bool> CardNumberExistsAsync(string cardNumber)
         {
-            return this.repository.CardNumberExists(cardNumber);
-        }
-
-        public bool IsAuthorized(Card card, User loggedUser)
-        {
-            bool isAuthorized = false;
-
-            if (card.Account.User.Id == loggedUser.Id || loggedUser.IsAdmin)
-            {
-                isAuthorized = true;
-            }
-            return isAuthorized;
-        }
-
-        public bool IsAdmin(User loggedUser)
-        {
-            if (!loggedUser.IsAdmin)
-            {
-                return false;
-            }
-            return true;
+            return await this.cardRepository.CardNumberExistsAsync(cardNumber);
         }
 
     }

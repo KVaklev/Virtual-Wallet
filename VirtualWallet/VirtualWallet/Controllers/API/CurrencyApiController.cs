@@ -6,7 +6,6 @@ using DataAccess.Models.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Presentation.Helpers;
-using VirtualWallet.Helpers;
 
 namespace VirtualWallet.Controllers.API
 {
@@ -23,9 +22,7 @@ namespace VirtualWallet.Controllers.API
             ICurrencyService currencyService,
             IMapper mapper,
             IUserService userService,
-            IAuthManager authManager
-
-            )
+            IAuthManager authManager)
         {
             this.currencyService = currencyService;
             this.mapper = mapper;
@@ -34,22 +31,23 @@ namespace VirtualWallet.Controllers.API
         }
 
         [HttpPost, Authorize]
-        public IActionResult Create([FromBody] CurrencyDto currencyDto)
+        public async Task<IActionResult> CreateAsync([FromBody] CurrencyDto currencyDto)
         {
             try
             {
-                var loggedUser = FindLoggedUser();
+                var loggedUser = await FindLoggedUserAsync();
                 var currency = this.mapper.Map<Currency>(currencyDto);
-                this.currencyService.Create(currency, loggedUser);
+                await this.currencyService.CreateAsync(currency, loggedUser);
+
                 return StatusCode(StatusCodes.Status200OK, currencyDto);
             }
-            catch (EntityNotFoundException ex)
+            catch (EntityNotFoundException e)
             {
-                return StatusCode(StatusCodes.Status404NotFound, ex.Message);
+                return StatusCode(StatusCodes.Status404NotFound, e.Message);
             }
-            catch (UnauthorizedOperationException ex)
+            catch (UnauthorizedOperationException e)
             {
-                return StatusCode(StatusCodes.Status401Unauthorized, ex.Message);
+                return StatusCode(StatusCodes.Status401Unauthorized, e.Message);
             }
         }
 
@@ -58,76 +56,81 @@ namespace VirtualWallet.Controllers.API
         {
             try
             {
-                List<Currency> currencies = this.currencyService.GetAll();
+                IQueryable<Currency> currencies = this.currencyService.GetAll();
                 List<CurrencyDto> currenciesDto = currencies
-                    .Select(currency => mapper.Map<CurrencyDto>(currency)).ToList();
+                    .Select(currency => mapper.Map<CurrencyDto>(currency))
+                    .ToList();
+
                 return StatusCode(StatusCodes.Status200OK, currenciesDto);
             }
-            catch (EntityNotFoundException ex)
+            catch (EntityNotFoundException e)
             {
-                return StatusCode(StatusCodes.Status404NotFound, ex.Message);
+                return StatusCode(StatusCodes.Status404NotFound, e.Message);
             }
         }
 
         [HttpGet("{id}")]
-        public IActionResult GetById([FromRoute] int id)
+        public async Task<IActionResult> GetByIdAsync([FromRoute] int id)
         {
             try
             {
-                var currency = this.currencyService.GetById(id);
+                var currency = await this.currencyService.GetByIdAsync(id);
                 var currencyDto = this.mapper.Map<CurrencyDto>(currency);
+
                 return StatusCode(StatusCodes.Status200OK, currencyDto);
             }
-            catch (EntityNotFoundException ex)
+            catch (EntityNotFoundException e)
             {
-                return StatusCode(StatusCodes.Status404NotFound, ex.Message);
+                return StatusCode(StatusCodes.Status404NotFound, e.Message);
             }
         }
 
         [HttpPut("{id}"), Authorize]
-        public IActionResult Update([FromRoute] int id, [FromBody] CurrencyDto currencyDto)
+        public async Task<IActionResult> UpdateAsync([FromRoute] int id, [FromBody] CurrencyDto currencyDto)
         {
             try
             {
-                var loggedUser = FindLoggedUser();
+                var loggedUser = await FindLoggedUserAsync();
                 var currency = this.mapper.Map<Currency>(currencyDto);
-                var updateCurency = this.currencyService.Update(id, currency, loggedUser);
+                var updateCurency = await this.currencyService.UpdateAsync(id, currency, loggedUser);
                 var currencyUpdateDto = this.mapper.Map<CurrencyDto>(updateCurency);
+
                 return StatusCode(StatusCodes.Status200OK, currencyUpdateDto);
             }
-            catch (EntityNotFoundException ex)
+            catch (EntityNotFoundException e)
             {
-                return StatusCode(StatusCodes.Status404NotFound, ex.Message);
+                return StatusCode(StatusCodes.Status404NotFound, e.Message);
             }
-            catch (UnauthorizedOperationException ex)
+            catch (UnauthorizedOperationException e)
             {
-                return StatusCode(StatusCodes.Status401Unauthorized, ex.Message);
+                return StatusCode(StatusCodes.Status401Unauthorized, e.Message);
             }
         }
 
         [HttpDelete("{id}"), Authorize]
-        public IActionResult Delete([FromRoute] int id)
+        public async Task<IActionResult> DeleteAsync([FromRoute] int id)
         {
             try
             {
-                var loggedUser = FindLoggedUser();
-                var isDeleted = this.currencyService.Delete(id, loggedUser);
+                var loggedUser = await FindLoggedUserAsync();
+                var isDeleted = await this.currencyService.DeleteAsync(id, loggedUser);
+
                 return StatusCode(StatusCodes.Status200OK, isDeleted);
             }
-            catch (EntityNotFoundException ex)
+            catch (EntityNotFoundException e)
             {
-                return StatusCode(StatusCodes.Status404NotFound, ex.Message);
+                return StatusCode(StatusCodes.Status404NotFound, e.Message);
             }
-            catch (UnauthorizedOperationException ex)
+            catch (UnauthorizedOperationException e)
             {
-                return StatusCode(StatusCodes.Status401Unauthorized, ex.Message);
+                return StatusCode(StatusCodes.Status401Unauthorized, e.Message);
             }
 
         }
-        private User FindLoggedUser()
+        private async Task<User> FindLoggedUserAsync()
         {
             var loggedUsersUsername = User.Claims.FirstOrDefault(claim => claim.Type == "Username").Value;
-            var loggedUser = authManager.TryGetUserByUsername(loggedUsersUsername);
+            var loggedUser = await authManager.TryGetUserByUsernameAsync(loggedUsersUsername);
             return loggedUser;
         }
     }

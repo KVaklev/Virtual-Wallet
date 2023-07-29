@@ -18,7 +18,7 @@ namespace DataAccess.Repositories.Models
             this.cardRepository = cardRepository;
         }
 
-        public Task<IQueryable<Account>> GetAll()
+        public IQueryable <Account> GetAll()
         {
             IQueryable<Account> result = context.Accounts
                 .Where(a => a.IsDeleted == false)
@@ -26,37 +26,40 @@ namespace DataAccess.Repositories.Models
                 .Include(a => a.Cards)
                 .Include(a => a.Currency);
 
-            return Task.FromResult(result ?? throw new EntityNotFoundException($"There are no accounts"));
+            return result ?? throw new EntityNotFoundException($"There are no accounts");
         }
 
-        public Task<Account> Create(Account account, User user)
+        public async Task<Account> CreateAsync(Account account, User user)
         {
             account.DateCreated = DateTime.Now;
             account.User = user;
             account.UserId = user.Id;
             account.Balance = 0;
             context.Add(account);
-            context.SaveChanges();
+            await context.SaveChangesAsync();
 
-            return Task.FromResult(account);
+            return account;
         }
 
-        public bool Delete(int id)
+        public async Task <bool> DeleteAsync(int id)
         {
-            var accountToDelete = this.GetById(id);
+            var accountToDelete = await this.GetByIdAsync(id);
+
             accountToDelete.IsDeleted = true;
 
             foreach (var card in accountToDelete.Cards)
             {
-                this.cardRepository.Delete(card.Id);
+                this.cardRepository.DeleteAsync(card.Id);
             }
-            context.SaveChanges();
+            await context.SaveChangesAsync();
+
             return accountToDelete.IsDeleted;
         }
+               
 
-        public bool AddCard(int id, Card card)
+        public async Task <bool> AddCardAsync(int id, Card card)
         {
-            var accountToAddCard = this.context.Accounts.FirstOrDefault(a => a.Id == id);
+            var accountToAddCard = await this.context.Accounts.FirstOrDefaultAsync(a => a.Id == id);
 
             if (accountToAddCard == null)
             {
@@ -67,7 +70,7 @@ namespace DataAccess.Repositories.Models
             {
                 accountToAddCard.Cards.Add(card);
 
-                context.SaveChanges();
+                await context.SaveChangesAsync();
 
                 return true;
             }
@@ -78,9 +81,9 @@ namespace DataAccess.Repositories.Models
             }
         }
 
-        public bool RemoveCard(int id, Card card)
+        public async Task <bool> RemoveCardAsync(int id, Card card)
         {
-            var accountToRemoveCard = this.context.Accounts.FirstOrDefault(a => a.Id == id);
+            var accountToRemoveCard = await this.context.Accounts.FirstOrDefaultAsync(a => a.Id == id);
 
 
             if (accountToRemoveCard == null)
@@ -92,7 +95,7 @@ namespace DataAccess.Repositories.Models
             {
                 accountToRemoveCard.Cards.Remove(card);
 
-                context.SaveChanges();
+                await context.SaveChangesAsync();
 
                 return true;
             }
@@ -103,7 +106,7 @@ namespace DataAccess.Repositories.Models
             }
         }
 
-        public Account GetById(int id)
+        public async Task <Account> GetByIdAsync(int id)
         {
             Account account = await context.Accounts
                 .Where(a => a.IsDeleted == false)
@@ -116,44 +119,44 @@ namespace DataAccess.Repositories.Models
             return account ?? throw new EntityNotFoundException($"Account with ID ={id} does not exist.");
         }
 
-        public Account GetByUsername(string username)
+        public async Task<Account> GetByUsernameAsync(string username)
         {
-            Account account = context.Accounts
+            Account account = await context.Accounts
                 .Include(a => a.User)
                 .Include(a => a.Cards)
                 .Include(a => a.Currency)
                 .Where(a => a.IsDeleted == false)
                 .Where(a => a.User.Username == username)
-                .FirstOrDefault();
+                .FirstOrDefaultAsync();
 
             return account ?? throw new EntityNotFoundException($"Account with username = {username} does not exist.");
         }
 
-        public Account IncreaseBalance(int id, decimal amount)
+        public async Task <Account> IncreaseBalanceAsync(int id, decimal amount)
         {
-            Account accountToDepositTo = this.GetById(id);
+            Account accountToDepositTo = await this.GetByIdAsync(id);
 
             accountToDepositTo.Balance += amount;
 
-            context.SaveChanges();
+            await context.SaveChangesAsync();
 
             return accountToDepositTo;
         }
 
-        public Account DecreaseBalance(int id, decimal amount)
+        public async Task <Account> DecreaseBalanceAsync(int id, decimal amount)
         {
-            Account accountToWithdrawFrom = this.GetById(id);
+            Account accountToWithdrawFrom = await this.GetByIdAsync(id);
 
             accountToWithdrawFrom.Balance -= amount;
 
-            context.SaveChanges();
+            await context.SaveChangesAsync();
 
             return accountToWithdrawFrom;
         }
 
-        public bool CheckBalance(int id, decimal amount)
+        public async Task<bool> HasEnoughBalanceAsync(int id, decimal amount)
         {
-            Account accountToCheck = this.GetById(id);
+            Account accountToCheck = await this.GetByIdAsync(id);
 
             if (accountToCheck.Balance < amount)
             {
@@ -170,6 +173,7 @@ namespace DataAccess.Repositories.Models
                 .Any(card => card.CardNumber == cardNumber);
 
         }
+
 
         public bool AccountExists(int id)
         {

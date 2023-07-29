@@ -5,16 +5,14 @@ namespace Business.Services.Contracts
 {
     public interface ICardService
     {
-        List<Card> GetAll();
-        Card GetById(int id);
-        List<Card> GetByAccountId(int accountId);
-        List<Card> FilterBy(CardQueryParameters filterParameters);
-        Card Create(int accountId, Card card);
-        Card Update(int id, User loggedUser, Card card);
-        bool Delete(int id, User loggedUser);
-        bool CardNumberExists(string cardNumber);
-        bool IsAuthorized(Card card, User loggedUser);
-
-        //PaginatedList<Card> FilterBy(CardQueryParameters filterParameters);
+        IQueryable<Card> GetAll();
+        Task<PaginatedList<Card>> FilterByAsync(CardQueryParameters queryParameters);
+        Task<Card> GetByIdAsync(int id);
+        IQueryable<Card> GetByAccountId(int accountId);
+        Task<Card> CreateAsync(int accountId, Card card);
+        Task<Card> UpdateAsync(int id, User loggedUser, Card card);
+        Task<bool> DeleteAsync(int id, User loggedUser);
+        Task<bool> CardNumberExistsAsync(string cardNumber);
+       
     }
 }

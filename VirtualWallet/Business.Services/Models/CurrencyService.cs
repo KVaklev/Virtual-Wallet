@@ -3,12 +3,6 @@ using Business.Services.Contracts;
 using Business.Services.Helpers;
 using DataAccess.Models.Models;
 using DataAccess.Repositories.Contracts;
-using DataAccess.Repositories.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Business.Services.Models
 {
@@ -16,57 +10,57 @@ namespace Business.Services.Models
     {
         private readonly ICurrencyRepository currencyRepository;
 
-            public CurrencyService(ICurrencyRepository currencyRepository)
+        public CurrencyService(ICurrencyRepository currencyRepository)
         {
             this.currencyRepository = currencyRepository;
         }
        
-        public Currency Create(Currency currency, User user)
+        public async Task<Currency> CreateAsync(Currency currency, User loggedUser)
         {
-            if (!user.IsAdmin)
+            if (!await Common.IsAdminAsync(loggedUser))
             {
-                throw new UnauthorizedOperationException(Constants.ModifyCurrencyErrorMessage);
+                throw new UnauthorizedOperationException(Constants.ModifyUserErrorMessage);
             }
-            return this.currencyRepository.Create(currency);
+            return await this.currencyRepository.CreateAsync(currency);
         }
 
-        public bool Delete(int id, User user)
+        public async Task<bool> DeleteAsync(int id, User loggedUser)
         {
-            if (!user.IsAdmin)
+            if (!await Common.IsAdminAsync(loggedUser))
             {
-                throw new UnauthorizedOperationException(Constants.ModifyCurrencyErrorMessage);
+                throw new UnauthorizedOperationException(Constants.ModifyUserErrorMessage);
             }
-
-            return this.currencyRepository.Delete(id);
+            return await this.currencyRepository.DeleteAsync(id);
         }
 
-        public List<Currency> GetAll()
+        public IQueryable<Currency> GetAll()
         {
             return this.currencyRepository.GetAll();
         }
 
-        public Currency GetById(int id)
+        public async Task<Currency> GetByIdAsync(int id)
         {
-            return this.currencyRepository.GetById(id);
+            return await this.currencyRepository.GetByIdAsync(id);
         }
 
-        public Currency Update(int id, Currency currency, User user)
+        public async Task<Currency> UpdateAsync(int id, Currency currency, User loggedUser)
         {
-            if (!user.IsAdmin)
+            if (!await Common.IsAdminAsync(loggedUser))
             {
-                throw new UnauthorizedOperationException(Constants.ModifyCurrencyErrorMessage);
+                throw new UnauthorizedOperationException(Constants.ModifyUserErrorMessage);
             }
-            var currencyToUpdate = this.GetById(id);
+            var currencyToUpdate = await this.GetByIdAsync(id);
             if (currencyToUpdate.IsDeleted)
             {
                 throw new EntityNotFoundException(Constants.ModifyCurrencyNotFoundErrorMessage);
             }
-            return this.currencyRepository.Update(id, currency);
+            return await this.currencyRepository.UpdateAsync(id, currency);
         }
 
-        public Currency GetByАbbreviation(string abbreviation)
+        public async Task<Currency> GetByАbbreviationAsync(string abbreviation)
         {
-            return this.currencyRepository.GetByАbbreviation(abbreviation);
+            return await this.currencyRepository.GetByАbbreviationAsync(abbreviation);
         }
+
     }
 }

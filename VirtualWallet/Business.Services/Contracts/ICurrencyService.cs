@@ -1,24 +1,15 @@
 ﻿using DataAccess.Models.Models;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace Business.Services.Contracts
 {
     public interface ICurrencyService
     {
-        Currency Create(Currency currency, User user);
+        IQueryable<Currency> GetAll();
+        Task<Currency> GetByIdAsync(int id);
+        Task<Currency> GetByАbbreviationAsync(string abbreviation);
+        Task<Currency> CreateAsync(Currency currency, User loggedUser);
+        Task<Currency> UpdateAsync(int id, Currency currency, User loggedUser);
+        Task<bool> DeleteAsync(int id, User loggedUser);
 
-        Currency GetById(int id);
-
-        Currency Update(int id, Currency currency, User user);
-
-        bool Delete(int id, User user);
-
-        List<Currency> GetAll();
-
-        Currency GetByАbbreviation(string abbreviation);
     }
 }

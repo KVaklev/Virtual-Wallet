@@ -10,25 +10,25 @@ namespace DataAccess.Repositories.Contracts
 {
     public interface IAccountRepository
     {
-        Task<IQueryable<Account>> GetAll();
+        IQueryable<Account> GetAll();
 
         Task <Account> GetByIdAsync(int id);
 
-        Account GetByUsername(string username);
+        Task <Account> GetByUsernameAsync(string username);
 
-        Task<Account> Create(Account account, User user);
+        Task<Account> CreateAsync(Account account, User user);
 
-        bool AddCard(int id, Card card);
+        Task <bool> AddCardAsync(int id, Card card);
 
-        bool RemoveCard(int id, Card card);
+        Task <bool> RemoveCardAsync(int id, Card card);
 
-        bool Delete(int id);
+        Task <bool> DeleteAsync(int id);
 
-        Account IncreaseBalance(int id, decimal amount);
+        Task <Account> IncreaseBalanceAsync(int id, decimal amount);
 
-        Account DecreaseBalance(int id, decimal amount);
+        Task <Account> DecreaseBalanceAsync(int id, decimal amount);
 
-        bool CheckBalance(int id, decimal amount);
+        Task<bool> HasEnoughBalanceAsync(int id, decimal amount);
 
         public bool CardExists(string cardNumber);
 

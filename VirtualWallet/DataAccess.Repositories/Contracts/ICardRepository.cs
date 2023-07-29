@@ -5,20 +5,16 @@ namespace DataAccess.Repositories.Contracts
 {
     public interface ICardRepository
     {
-        List<Card> GetAll();
-        Card GetById(int id);
-        List<Card> GetByAccountId(int accountId);
-        List<Card> FilterBy(CardQueryParameters filterParameters);
-        Card Create(int accountId, Card card);
-        Card Update(int id, Card card);
-        bool CardNumberExists(string cardNumber);
-        Card IncreaseBalance(int id, decimal amount);
-        Card DecreaseBalance(int id, decimal amount);
-        bool Delete (int id);
-
-        //Card Update(int id, Card card);
-        //void Delete(int id);
-        //PaginatedList<Card> FilterBy(UserQueryParameters filterParameters);
+        IQueryable<Card> GetAll();
+        Task<PaginatedList<Card>> FilterByAsync(CardQueryParameters queryParameters);
+        Task<Card> GetByIdAsync(int id);
+        IQueryable<Card> GetByAccountId(int accountId);
+        Task<Card> CreateAsync(int accountId, Card card);
+        Task<Card> UpdateAsync(int id, Card card);
+        Task<bool> CardNumberExistsAsync(string cardNumber);
+        Task<Card> IncreaseBalanceAsync(int id, decimal amount);
+        Task<Card> DecreaseBalanceAsync(int id, decimal amount);
+        Task<bool> DeleteAsync(int id);
 
     }
 }

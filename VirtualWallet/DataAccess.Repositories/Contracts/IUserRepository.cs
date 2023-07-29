@@ -5,25 +5,20 @@ namespace DataAccess.Repositories.Contracts
 {
     public interface IUserRepository
     {
-        //List<User> GetAll();
-        Task<List<User>> GetAllAsync();
-        //List<User> FilterBy(UserQueryParameters filterParameters);
-        Task<List<User>>FilterByAsync(UserQueryParameters queryParameters);
-        // PaginatedList<IUser> FilterBy(UserQueryParameters filterParameters);
-        User GetById(int id);
-        User GetByUsername(string username);
-        User GetByEmail(string email);
-        User GetByPhoneNumber(string phoneNumber);
-        User Create(User user);
-        User Update(int id, User user);
-        bool Delete(int id);
-        User Promote(int id);
-        User BlockUser(int id);
-        User UnblockUser(int id);
-        void UpdateAdminStatus(User user, User userToUpdate);
-        void UpdatePhoneNumber(User user, User userToUpdate);
-        bool UsernameExists(string username);
-        bool EmailExists(string email);
-        bool PhoneNumberExists(string phoneNumber);
+        IQueryable<User> GetAll();
+        Task<PaginatedList<User>> FilterByAsync(UserQueryParameters queryParameters);
+        Task<User> GetByIdAsync(int id);
+        Task<User> GetByUsernameAsync(string username);
+        Task<User> GetByEmailAsync(string email);
+        Task<User> GetByPhoneNumberAsync(string phoneNumber);
+        Task<User> CreateAsync(User user);
+        Task<User> UpdateAsync(int id, User user);
+        Task<bool> DeleteAsync(int id);
+        Task<User> PromoteAsync(int id);
+        Task<User> BlockUserAsync(int id);
+        Task<User> UnblockUserAsync(int id);
+        Task<bool> UsernameExistsAsync(string username);
+        Task<bool> EmailExistsAsync(string email);
+        Task<bool> PhoneNumberExistsAsync(string phoneNumber);
     }
 }

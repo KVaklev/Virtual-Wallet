@@ -3,6 +3,7 @@ using Business.QueryParameters;
 using DataAccess.Models.Models;
 using DataAccess.Repositories.Contracts;
 using DataAccess.Repositories.Data;
+using DataAccess.Repositories.Helpers;
 using Microsoft.EntityFrameworkCore;
 
 namespace DataAccess.Repositories.Models
@@ -16,11 +17,7 @@ namespace DataAccess.Repositories.Models
         {
             this.context = context;
         }
-        //public List<User> GetAll()
-        //{
-        //    return context.Users.ToList();
-        //}
-        public async Task<List<User>> GetAllAsync()
+        public IQueryable<User> GetAll()
         {
             var users = context.Users
                 .Where(u => u.IsDeleted == false)
@@ -30,55 +27,33 @@ namespace DataAccess.Repositories.Models
 
             return users ?? throw new EntityNotFoundException("There are no users.");
         }
-        //public List<User> FilterBy(UserQueryParameters filterParameters)
-        //{
-        //    IQueryable<User> result = context.Users
-        //                  .Where(u=>u.IsDeleted==false);
 
-        //    result = FilterByUsername(result, filterParameters.Username);
-        //    result = FilterByEmail(result, filterParameters.Email);
-        //    result = FilterByPhoneNumber(result, filterParameters.PhoneNumber);
-        //    result = SortBy(result, filterParameters.SortBy);
-        //    result = SortOrder(result, filterParameters.SortOrder);
-
-        //    List<User> filteredAndSortedUsers = result.ToList();
-
-        //    if (filteredAndSortedUsers.Count == 0)
-        //    {
-        //        throw new EntityNotFoundException("No users match the specified filter criteria.");
-        //    }
-
-        //    return filteredAndSortedUsers;
-        //}
-        public async Task<List<User>> FilterByAsync(UserQueryParameters filterParameters)
+        public async Task<PaginatedList<User>> FilterByAsync(UserQueryParameters filterParameters)
         {
-            IQueryable<User> result = context.Users
-                .Where(u => u.IsDeleted == false);
+            IQueryable<User> result = this.GetAll();
 
-            result = FilterByUsername(result, filterParameters.Username);
-            result = FilterByEmail(result, filterParameters.Email);
-            result = FilterByPhoneNumber(result, filterParameters.PhoneNumber);
-            result = SortBy(result, filterParameters.SortBy);
-            result = SortOrder(result, filterParameters.SortOrder);
+            result = await FilterByUsernameAsync(result, filterParameters.Username);
+            result = await FilterByEmailAsync(result, filterParameters.Email);
+            result = await FilterByPhoneNumberAsync(result, filterParameters.PhoneNumber);
+            result = await SortByAsync(result, filterParameters.SortBy);
+            result = await SortOrderAsync(result, filterParameters.SortOrder);
 
-            List<User> filteredAndSortedUsers = await result.ToListAsync();
+            int totalItems = await result.CountAsync();
 
-            if (filteredAndSortedUsers.Count == 0)
+            if (totalItems == 0)
             {
                 throw new EntityNotFoundException("No users match the specified filter criteria.");
             }
 
-            return filteredAndSortedUsers;
+            int totalPages = (result.Count() + filterParameters.PageSize - 1) / filterParameters.PageSize;
+            result = await Common<User>.PaginateAsync(result, filterParameters.PageNumber, filterParameters.PageSize);
+
+            return new PaginatedList<User>(result.ToList(), totalPages, filterParameters.PageNumber);
         }
 
-
-        //public PaginatedList<User> FilterBy(UserQueryParameters filterParameters)
-        //{
-        //    return this.repository.FilterBy(filterParameters);
-        //}
-        public User GetById(int id)
+        public async Task<User> GetByIdAsync(int id)
         {
-            User? user = context.Users
+            User? user = await context.Users
                 .Where(u => u.IsDeleted == false)
                 .Where(users => users.Id == id)
                 .Include(u => u.Account)
@@ -86,40 +61,45 @@ namespace DataAccess.Repositories.Models
                 .FirstOrDefaultAsync();
             return user ?? throw new EntityNotFoundException($"User with ID = {id} doesn't exist.");
         }
-        public User GetByUsername(string username)
+
+        public async Task<User> GetByUsernameAsync(string username)
         {
-            User? user = context.Users
+            User? user = await context.Users
                 .Where(u => u.IsDeleted == false)
                 .Include(u => u.Account)
                 .Where(users => users.Username == username)
-                .FirstOrDefault();
+                .FirstOrDefaultAsync();
             return user ?? throw new EntityNotFoundException($"User with username '{username}' doesn't exist.");
         }
-        public User GetByEmail(string email)
+
+        public async Task<User> GetByEmailAsync(string email)
         {
-            User? user = context.Users
+            User? user = await context.Users
                 .Where(u => u.IsDeleted == false)
                 .Where(users => users.Email == email)
-                .FirstOrDefault();
+                .FirstOrDefaultAsync();
             return user ?? throw new EntityNotFoundException($"User with email '{email}' doesn't exist.");
         }
-        public User GetByPhoneNumber(string phoneNumber)
+
+        public async Task<User> GetByPhoneNumberAsync(string phoneNumber)
         {
-            User? user = context.Users
+            User? user = await context.Users
                 .Where(u => u.IsDeleted == false)
                 .Where(users => users.PhoneNumber == phoneNumber)
-                .FirstOrDefault();
+                .FirstOrDefaultAsync();
             return user ?? throw new EntityNotFoundException($"User with pnone number '{phoneNumber}' doesn't exist.");
         }
-        public User Create(User user)
+
+        public async Task<User> CreateAsync(User user)
         {
             context.Users.Add(user);
-            context.SaveChanges();
+            await context.SaveChangesAsync();
             return user;
         }
-        public User Update(int id, User user)
+
+        public async Task<User> UpdateAsync(int id, User user)
         {
-            User userToUpdate = this.GetById(id);
+            User userToUpdate = await this.GetByIdAsync(id);
 
             userToUpdate.FirstName = user.FirstName ?? userToUpdate.FirstName;
             userToUpdate.LastName = user.LastName ?? userToUpdate.LastName;
@@ -127,58 +107,78 @@ namespace DataAccess.Repositories.Models
             userToUpdate.Email = user.Email ?? userToUpdate.Email;
             userToUpdate.Username = user.Username ?? userToUpdate.Username;
             userToUpdate.IsBlocked = user.IsBlocked;
-            UpdatePhoneNumber(user, userToUpdate);
-            UpdateAdminStatus(user, userToUpdate);
+            await UpdatePhoneNumberAsync(user, userToUpdate);
+            await UpdateAdminStatusAsync(user, userToUpdate);
 
-            context.SaveChanges();
+            await context.SaveChangesAsync();
             return userToUpdate;
         }
-        public bool Delete(int id)
+
+        public async Task<bool> DeleteAsync(int id)
         {
-            User userToDelete = this.GetById(id);
+            User userToDelete = await this.GetByIdAsync(id);
             userToDelete.IsDeleted = true;
 
-            context.SaveChanges();
+            await context.SaveChangesAsync();
             return userToDelete.IsDeleted;
         }
-        public User Promote(int id)
+
+        public async Task<User> PromoteAsync(int id)
         {
-            User userToPromote = this.GetById(id);
+            User userToPromote = await this.GetByIdAsync(id);
             if (!userToPromote.IsAdmin)
             {
                 userToPromote.IsAdmin = true;
             }
-            context.SaveChanges();
+            await context.SaveChangesAsync();
             return userToPromote;
         }
-        public User BlockUser(int id)
+
+        public async Task<User> BlockUserAsync(int id)
         {
-            User userToBlock = this.GetById(id);
+            User userToBlock = await this.GetByIdAsync(id);
             if (!userToBlock.IsBlocked)
             {
                 userToBlock.IsBlocked = true;
             }
-            context.SaveChanges();
+            await context.SaveChangesAsync();
             return userToBlock;
         }
-        public User UnblockUser(int id)
+
+        public async Task<User> UnblockUserAsync(int id)
         {
-            User userToUnblock = this.GetById(id);
+            User userToUnblock = await this.GetByIdAsync(id);
             if (userToUnblock.IsBlocked)
             {
                 userToUnblock.IsBlocked = false;
             }
-            context.SaveChanges();
+            await context.SaveChangesAsync();
             return userToUnblock;
         }
-        public void UpdatePhoneNumber(User user, User userToUpdate)
+
+        public async Task<bool> PhoneNumberExistsAsync(string phoneNumber)
+        {
+            return await context.Users.AnyAsync(u => u.PhoneNumber == phoneNumber);
+        }
+
+        public async Task<bool> EmailExistsAsync(string email)
+        {
+            return await context.Users.AnyAsync(u => u.Email == email);
+        }
+
+        public async Task<bool> UsernameExistsAsync(string username)
+        {
+            return await context.Users.AnyAsync(u => u.Username == username);
+        }
+
+        private async Task UpdatePhoneNumberAsync(User user, User userToUpdate)
         {
             if (user?.PhoneNumber != null)
             {
                 userToUpdate.PhoneNumber = user.PhoneNumber;
             }
         }
-        public void UpdateAdminStatus(User user, User userToUpdate)
+        private async Task UpdateAdminStatusAsync(User user, User userToUpdate)
         {
             if (!userToUpdate.IsAdmin)
             {
@@ -189,85 +189,56 @@ namespace DataAccess.Repositories.Models
                 userToUpdate.IsAdmin = true;
             }
         }
-        public bool EmailExists(string email)
-        {
-            return context.Users.Any(u => u.Email == email);
-        }
-        public bool UsernameExists(string username)
-        {
-            return context.Users.Any(u => u.Username == username);
-        }
-        public bool PhoneNumberExists(string phoneNumber)
-        {
-            return context.Users.Any(u => u.PhoneNumber == phoneNumber);
-        }
-        //private IQueryable<User> FilterByUsername(IQueryable<User> result, string? username)
-        //{
-        //    if (!string.IsNullOrEmpty(username))
-        //    {
-        //        result = result.Where(user => user.Username != null 
-        //                           && user.Username== username);
-        //    }
-
-        //    return result;
-        //}
-        public IQueryable<User> FilterByUsername(IQueryable<User> result, string? username)
+        private async Task<IQueryable<User>> FilterByUsernameAsync(IQueryable<User> result, string? username)
         {
             if (!string.IsNullOrEmpty(username))
             {
                 result = result.Where(user => user.Username != null && user.Username == username);
             }
-
-            return result;
+            return await Task.FromResult(result);
         }
-        private IQueryable<User> FilterByEmail(IQueryable<User> result, string? email)
+        private async Task<IQueryable<User>> FilterByEmailAsync(IQueryable<User> result, string? email)
         {
             if (!string.IsNullOrEmpty(email))
             {
-                result = result.Where(user => user.Email != null
-                                   && user.Email == email);
+                result = result.Where(user => user.Email != null && user.Email == email);
             }
-
-            return result;
+            return await Task.FromResult(result);
         }
-        private IQueryable<User> FilterByPhoneNumber(IQueryable<User> result, string? phoneNumber)
+        private async Task<IQueryable<User>> FilterByPhoneNumberAsync(IQueryable<User> result, string? phoneNumber)
         {
             if (!string.IsNullOrEmpty(phoneNumber))
             {
-                result = result.Where(user => user.PhoneNumber != null
-                                   && user.PhoneNumber == phoneNumber);
+                result = result.Where(user => user.PhoneNumber != null && user.PhoneNumber == phoneNumber);
             }
-
-            return result;
+            return await Task.FromResult(result);
         }
-        private IQueryable<User> SortBy(IQueryable<User> result, string? sortCriteria)
+        private async Task<IQueryable<User>> SortByAsync(IQueryable<User> result, string? sortCriteria)
         {
             switch (sortCriteria)
             {
                 case "username":
-                    return result.OrderBy(user => user.Username);
+                    return await Task.FromResult(result.OrderBy(user => user.Username));
                 case "email":
-                    return result.OrderBy(user => user.Email);
+                    return await Task.FromResult(result.OrderBy(user => user.Email));
                 case "phoneNumber":
-                    return result.OrderBy(user => user.PhoneNumber);
+                    return await Task.FromResult(result.OrderBy(user => user.PhoneNumber));
                 default:
-                    return result;
+                    return await Task.FromResult(result);
             }
         }
-        private IQueryable<User> SortOrder(IQueryable<User> result, string? sortOrder)
+        private async Task<IQueryable<User>> SortOrderAsync(IQueryable<User> result, string? sortOrder)
         {
             switch (sortOrder)
             {
                 case "desc":
-                    return result.Reverse();
+                    return await Task.FromResult(result.Reverse());
                 default:
-                    return result;
+                    return await Task.FromResult(result);
             }
         }
 
-        public Task<List<User>> FilterByAsyns(UserQueryParameters queryParameters)
-        {
-            throw new NotImplementedException();
-        }
     }
+
+
 }

@@ -19,31 +19,18 @@ namespace VirtualWallet.Controllers.API
         private readonly IMapper mapper;
         private readonly IAuthManager authManager;
 
-        public UsersApiController(IUserService userService, IMapper mapper, IAuthManager authManager)
+        public UsersApiController(
+            IUserService userService,
+            IMapper mapper,
+            IAuthManager authManager)
         {
             this.userService = userService;
             this.mapper = mapper;
             this.authManager = authManager;
         }
-        //[HttpGet(""),Authorize]
-        //public IActionResult GetUsers([FromQuery] UserQueryParameters userQueryParameters)
-        //{
-        //    try
-        //    {
-        //        List<User> result = userService.FilterBy(userQueryParameters);
-        //        List<GetUserDto> userDtos = result
-        //            .Select(user => mapper.Map<GetUserDto>(user))
-        //            .ToList();
-
-        //        return StatusCode(StatusCodes.Status200OK, userDtos);
-        //    }
-        //    catch (EntityNotFoundException e)
-        //    {
-        //        return StatusCode(StatusCodes.Status404NotFound, e.Message);
-        //    }
-        //}
-        [HttpGet(""), Authorize]
-        public async Task<IActionResult> GetUsers([FromQuery] UserQueryParameters userQueryParameters)
+       
+        [HttpGet, Authorize]
+        public async Task<IActionResult> GetUsersAsync([FromQuery] UserQueryParameters userQueryParameters)
         {
             try
             {
@@ -61,23 +48,23 @@ namespace VirtualWallet.Controllers.API
         }
 
         [HttpGet("id"),Authorize]
-        public IActionResult GetById(int id)
+        public async Task<IActionResult> GetByIdAsync(int id)
         {
             try
             {
-                User user = userService.GetById(id);
+                User user = await userService.GetByIdAsync(id);
                 GetUserDto userDto = mapper.Map<GetUserDto>(user);
 
                 return StatusCode(StatusCodes.Status200OK, userDto);
             }
-            catch (EntityNotFoundException ex)
+            catch (EntityNotFoundException e)
             {
-                return StatusCode(StatusCodes.Status404NotFound, ex.Message);
+                return StatusCode(StatusCodes.Status404NotFound, e.Message);
             }
         }
 
-        [HttpPost("")]
-        public IActionResult CreateUser([FromBody] CreateUserDto createUserDto)
+        [HttpPost]
+        public async Task<IActionResult> CreateUserAsync([FromBody] CreateUserDto createUserDto)
         {
             try
             {
@@ -92,13 +79,13 @@ namespace VirtualWallet.Controllers.API
         }
 
         [HttpPut("{id}"), Authorize]
-        public IActionResult UpdateUser(int id, [FromBody] UpdateUserDto updateUserDto)
+        public async Task<IActionResult> UpdateUser(int id, [FromBody] UpdateUserDto updateUserDto)
         {
             try
             {
-                User loggedUser = FindLoggedUser();
+                User loggedUser = await FindLoggedUserAsync();
                 User user = mapper.Map<User>(updateUserDto);
-                User updatedUser = userService.Update(id, user, loggedUser);
+                User updatedUser = await userService.UpdateAsync(id, user, loggedUser);
 
                 return StatusCode(StatusCodes.Status200OK, updatedUser);
             }
@@ -114,12 +101,12 @@ namespace VirtualWallet.Controllers.API
 
 
         [HttpDelete("{id}"), Authorize]
-        public IActionResult DeleteUser(int id)
+        public async Task<IActionResult> DeleteUser(int id)
         {
             try
             {
-                User loggedUser = FindLoggedUser();
-                userService.Delete(id, loggedUser);
+                User loggedUser = await FindLoggedUserAsync();
+                await userService.DeleteAsync(id, loggedUser);
 
                 return StatusCode(StatusCodes.Status200OK, "User was successfully deleted.");
             }
@@ -134,12 +121,12 @@ namespace VirtualWallet.Controllers.API
         }
 
         [HttpPut("{id}/promote"), Authorize]
-        public IActionResult Promote(int id)
+        public async Task<IActionResult> Promote(int id)
         {
             try
             {
-                User loggedUser = FindLoggedUser();
-                var promotedUser = userService.Promote(id, loggedUser);
+                User loggedUser = await FindLoggedUserAsync();
+                var promotedUser = await userService.PromoteAsync(id, loggedUser);
 
                 return StatusCode(StatusCodes.Status200OK, "User was successfully promoted with admin rights.");
             }
@@ -154,12 +141,12 @@ namespace VirtualWallet.Controllers.API
         }
 
         [HttpPut("{id}/block"), Authorize]
-        public IActionResult BlockUser(int id)
+        public async Task<IActionResult> BlockUser(int id)
         {
             try
             {
-                User loggedUser = FindLoggedUser();
-                var blockedUser = userService.BlockUser(id, loggedUser);
+                User loggedUser = await FindLoggedUserAsync();
+                var blockedUser = await userService.BlockUserAsync(id, loggedUser);
 
                 return StatusCode(StatusCodes.Status200OK, "User was successfully blocked.");
             }
@@ -174,12 +161,12 @@ namespace VirtualWallet.Controllers.API
         }
 
         [HttpPut("{id}/unblock"), Authorize]
-        public IActionResult UnblockUser(int id)
+        public async Task<IActionResult> UnblockUser(int id)
         {
             try
             {
-                User loggedUser = FindLoggedUser();
-                var unblockedUser = userService.UnblockUser(id, loggedUser);
+                User loggedUser = await FindLoggedUserAsync();
+                var unblockedUser = await userService.UnblockUserAsync(id, loggedUser);
 
                 return StatusCode(StatusCodes.Status200OK, "User was successfully unblocked.");
             }
@@ -192,10 +179,10 @@ namespace VirtualWallet.Controllers.API
                 return StatusCode(StatusCodes.Status401Unauthorized, e.Message);
             }
         }
-        private User FindLoggedUser()
+        private async Task<User> FindLoggedUserAsync()
         {
             var loggedUsersUsername = User.Claims.FirstOrDefault(claim => claim.Type == "Username").Value;
-            var loggedUser = authManager.TryGetUserByUsername(loggedUsersUsername);
+            var loggedUser = await authManager.TryGetUserByUsernameAsync(loggedUsersUsername);
             return loggedUser;
         }
     }

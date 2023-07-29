@@ -2,11 +2,8 @@
 using Business.Dto;
 using Business.DTOs;
 using Business.Exceptions;
-using Business.Mappers;
 using Business.QueryParameters;
 using Business.Services.Contracts;
-using Business.Services.Models;
-using DataAccess.Models.Enums;
 using DataAccess.Models.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -22,7 +19,10 @@ namespace VirtualWallet.Controllers.API
         private readonly IAuthManager authManager;
         private readonly ICardService cardService;
 
-        public CardsApiController(IMapper mapper, IAuthManager authManager, ICardService cardService)
+        public CardsApiController(
+            IMapper mapper,
+            IAuthManager authManager,
+            ICardService cardService)
         {
             this.mapper = mapper;
             this.authManager = authManager;
@@ -31,11 +31,11 @@ namespace VirtualWallet.Controllers.API
         }
 
         [HttpGet, Authorize]
-        public IActionResult GetCards([FromQuery] CardQueryParameters cardQueryParameters)
+        public async Task<IActionResult> GetCardsAsync([FromQuery] CardQueryParameters cardQueryParameters)
         {
             try
             {
-                List<Card> result = cardService.FilterBy(cardQueryParameters);
+                List<Card> result = await cardService.FilterByAsync(cardQueryParameters);
 
                 List<GetCardDto> cardDtos = result
                     .Select(card => mapper.Map<GetCardDto>(card))
@@ -50,11 +50,11 @@ namespace VirtualWallet.Controllers.API
         }
 
         [HttpGet("id"), Authorize]
-        public IActionResult GetById(int id)
+        public async Task<IActionResult> GetByIdAsync(int id)
         {
             try
             {
-                Card card = cardService.GetById(id);
+                Card card = await cardService.GetByIdAsync(id);
                 GetCardDto cardDto = mapper.Map<GetCardDto>(card);
 
                 return StatusCode(StatusCodes.Status200OK, cardDto);
@@ -66,13 +66,13 @@ namespace VirtualWallet.Controllers.API
         }
 
         [HttpPost, Authorize]
-        public IActionResult CreateCard([FromBody] CreateCardDto createCardDto)
+        public async Task<IActionResult> CreateCardAsync([FromBody] CreateCardDto createCardDto)
         {
             try
             {
-                var loggedUsersAccountId = FindLoggedUsersAccount();
+                var loggedUsersAccountId = await FindLoggedUsersAccountAsync();
                 Card createCard = mapper.Map<Card>(createCardDto);
-                Card createdCard = cardService.Create(loggedUsersAccountId, createCard);
+                Card createdCard = await cardService.CreateAsync(loggedUsersAccountId, createCard);
 
                 return StatusCode(StatusCodes.Status201Created, createdCard);
             }
@@ -83,14 +83,14 @@ namespace VirtualWallet.Controllers.API
         }
 
         [HttpPut, Authorize]
-        public IActionResult UpdateCard(int id, [FromBody] UpdateCardDto updateCardDto)
+        public async Task<IActionResult> UpdateCardAsync(int id, [FromBody] UpdateCardDto updateCardDto)
         {
             try
             {
-                User loggedUser = FindLoggedUser();
-                var loggedUsersAccountId = FindLoggedUsersAccount();
+                User loggedUser = await FindLoggedUserAsync();
+                var loggedUsersAccountId = await FindLoggedUsersAccountAsync();
                 Card updateCard = mapper.Map<Card>(updateCardDto);
-                Card updatedCard = cardService.Update(id, loggedUser, updateCard);
+                Card updatedCard = await cardService.UpdateAsync(id, loggedUser, updateCard);
 
                 return StatusCode(StatusCodes.Status200OK, updatedCard);
             }
@@ -105,12 +105,12 @@ namespace VirtualWallet.Controllers.API
         }
 
         [HttpDelete("{id}"), Authorize]
-        public IActionResult DeleteCard(int id)
+        public async Task<IActionResult> DeleteCardAsync(int id)
         {
             try
             {
-                User loggedUser = FindLoggedUser();
-                var isDeleted = this.cardService.Delete(id, loggedUser);
+                User loggedUser = await FindLoggedUserAsync();
+                var isDeleted = await this.cardService.DeleteAsync(id, loggedUser);
 
                 return StatusCode(StatusCodes.Status200OK);
             }
@@ -123,17 +123,17 @@ namespace VirtualWallet.Controllers.API
                 return StatusCode(StatusCodes.Status404NotFound, e.Message);
             }
         }
-        private int FindLoggedUsersAccount()
+        private async Task<User> FindLoggedUserAsync()
+        {
+            var loggedUsersUsername = User.Claims.FirstOrDefault(claim => claim.Type == "Username").Value;
+            var loggedUser = await authManager.TryGetUserByUsernameAsync(loggedUsersUsername);
+            return loggedUser;
+        }
+        private async Task<int> FindLoggedUsersAccountAsync()
         {
             var loggedUsersAccountIdAsString = User.Claims.FirstOrDefault(claim => claim.Type == "UsersAccountId").Value;
             var accountId = int.Parse(loggedUsersAccountIdAsString);
             return accountId;
-        }
-        private User FindLoggedUser()
-        {
-            var loggedUsersUsername = User.Claims.FirstOrDefault(claim => claim.Type == "Username").Value;
-            var loggedUser = authManager.TryGetUserByUsername(loggedUsersUsername);
-            return loggedUser;
         }
 
     }
