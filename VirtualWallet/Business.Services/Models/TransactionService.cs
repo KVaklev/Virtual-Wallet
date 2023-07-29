@@ -168,9 +168,13 @@ namespace Business.Services.Models
             transaction.AccountRecepientId = this.accountRepository
                                                  .GetByUsername(transactionDto.RecepientUsername)
                                                  .Id;
+            transaction.AccountRecepient = this.accountRepository
+                                                 .GetByUsername(transactionDto.RecepientUsername);
             transaction.CurrencyId = this.currencyRepository
                                          .GetByАbbreviation(transactionDto.Abbreviation)
                                          .Id;
+            transaction.Currency = this.currencyRepository
+                                         .GetByАbbreviation(transactionDto.Abbreviation);
             transaction.Direction = DirectionType.Out;
             return transaction;
         }

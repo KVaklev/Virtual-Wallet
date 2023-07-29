@@ -1,14 +1,13 @@
-﻿using Business.QueryParameters;
+﻿using Business.DTOs;
+using Business.QueryParameters;
 using DataAccess.Models.Models;
 
 namespace Business.Services.Contracts
 {
     public interface IHistoryService
     {
-        History GetById(int id, User user);
+        GetHistoryDto GetById(int id, User user);
 
-        IQueryable<History> GetAll(User user);
-
-        PaginatedList<History> FilterBy(HistoryQueryParameters filterParameters, User user);
+         List<GetHistoryDto> FilterBy(HistoryQueryParameters filterParameters, User user);
     }
 }

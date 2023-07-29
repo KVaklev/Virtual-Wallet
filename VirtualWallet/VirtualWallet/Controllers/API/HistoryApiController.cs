@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Business.DTOs;
+using Business.Exceptions;
 using Business.QueryParameters;
 using Business.Services.Contracts;
 using DataAccess.Models.Models;
@@ -30,19 +31,43 @@ namespace VirtualWallet.Controllers.API
         [HttpGet("{id}"), Authorize]
         public IActionResult GetbyId(int id)
         {
-            var loggedUser = FindLoggedUser();
-            var history = this.historyService.GetById(id, loggedUser);
-            var historyDto = this.mapper.Map<GetHistoryDto>(history);
-            return StatusCode(StatusCodes.Status200OK, history);
+            try
+            {
+                var loggedUser = FindLoggedUser();
+                var history = this.historyService.GetById(id, loggedUser);
+                
+                return StatusCode(StatusCodes.Status200OK, history);
+            }
+            catch (EntityNotFoundException e)
+            {
+                return StatusCode(StatusCodes.Status404NotFound, e.Message);
+            }
+            catch (UnauthorizedOperationException e)
+            {
+                return StatusCode(StatusCodes.Status401Unauthorized, e.Message);
+            }
+
         }
 
         [HttpGet, Authorize]
         public IActionResult GetHistory([FromQuery] HistoryQueryParameters historyQueryParameters) 
         {
-            var loggedUser = FindLoggedUser();
-            var history = this.historyService.FilterBy(historyQueryParameters, loggedUser);
-            var historyDto = this.mapper.Map<GetHistoryDto>(history);
-            return StatusCode(StatusCodes.Status200OK, history);
+            try
+            {
+                var loggedUser = FindLoggedUser();
+                var history = this.historyService.FilterBy(historyQueryParameters, loggedUser);
+                
+                return StatusCode(StatusCodes.Status200OK, history);
+            }
+            catch (EntityNotFoundException e)
+            {
+                return StatusCode(StatusCodes.Status404NotFound, e.Message);
+            }
+            catch (UnauthorizedOperationException e)
+            {
+                return StatusCode(StatusCodes.Status401Unauthorized, e.Message);
+            }
+
         }
 
         private User FindLoggedUser()
