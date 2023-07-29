@@ -5,17 +5,11 @@ namespace DataAccess.Repositories.Contracts
 {
     public interface IHistoryRepository
     {
-        public History CreateWithTransaction(Transaction transaction);
-
-        public History CreateWithTransfer(Transfer transfer);
-
-        History GetById(int id);
-
-        IQueryable<History> GetAll(User user);
-
-        PaginatedList<History> FilterBy(HistoryQueryParameters filterParameters, User user);
-
-        IQueryable<History> Paginate(IQueryable<History> result, int pageNumber, int pageSize);
+        IQueryable<History> GetAll(User loggedUser);
+        Task<History> GetByIdAsync(int id);
+        Task<PaginatedList<History>> FilterByAsync(HistoryQueryParameters filterParameters, User loggedUser);
+        Task<History> CreateWithTransactionAsync(Transaction transaction);
+        Task<History> CreateWithTransferAsync(Transfer transfer);
 
     }
 }

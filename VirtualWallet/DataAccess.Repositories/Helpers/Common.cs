@@ -1,4 +1,6 @@
-﻿namespace DataAccess.Repositories.Helpers
+﻿using DataAccess.Models.Models;
+
+namespace DataAccess.Repositories.Helpers
 {
     public static class Common<T>
     {
@@ -7,6 +9,14 @@
             return await Task.FromResult(result
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize));
+        }
+        public static async Task<bool> IsAdminAsync(User loggedUser)
+        {
+            if (!loggedUser.IsAdmin)
+            {
+                return await Task.FromResult(false);
+            }
+            return await Task.FromResult(true);
         }
     }
 }

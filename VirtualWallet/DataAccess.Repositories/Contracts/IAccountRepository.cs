@@ -16,7 +16,7 @@ namespace DataAccess.Repositories.Contracts
 
         Account GetById(int id);
 
-        Account GetByUsername(string username);
+        Task<Account> GetByUsernameAsync(string username);
 
         Task<Account> Create(Account account, User user);
 
@@ -30,7 +30,7 @@ namespace DataAccess.Repositories.Contracts
 
         Account DecreaseBalance(int id, decimal amount);
 
-        bool HasEnoughBalance(int id, decimal amount);
+        Task<bool> HasEnoughBalanceAsync(int id, decimal amount);
 
         public bool CardExists(string cardNumber);
 

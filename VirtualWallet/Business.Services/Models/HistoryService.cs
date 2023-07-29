@@ -26,38 +26,41 @@ namespace Business.Services.Models
             this.transactionRepository = transactionRepository;
             this.mapper = mapper;
         }
-
-       
-        public GetHistoryDto GetById(int id, User user)
+        public IQueryable<History> GetAll(User loggedUser)
         {
-            if (!user.IsAdmin || IsUserUnauthorized(id, user)!=true)
+            return this.historyRepository.GetAll(loggedUser);
+        }
+
+        public async Task<GetHistoryDto> GetByIdAsync(int id, User loggedUser)
+        {
+            if (!await Common.IsAdminAsync(loggedUser) || !await IsHistoryOwnerAsync(id, loggedUser))
             {
-                throw new UnauthorizedOperationException(Constants.ModifyUnauthorizeErrorMessage);
+                throw new UnauthorizedOperationException(Constants.ModifyHistoryErrorMessage);
             }
             
-            var history = historyRepository.GetById(id);
-            var hidtoriDto = MapHistoryToDto(history);
-            return hidtoriDto;
+            var history = await historyRepository.GetByIdAsync(id);
+            var historyDto = MapHistoryToDtoAsync(history);
+            return historyDto;
         }
 
-        
-        //todo - paginated
-        public List<GetHistoryDto> FilterBy(HistoryQueryParameters filterParameters, User user)
+        public async Task<List<GetHistoryDto>> FilterByAsync(HistoryQueryParameters filterParameters, User loggedUser)
         {
-            if (filterParameters.Username!=null & !user.IsAdmin)
+            if (filterParameters.Username != null && !await Common.IsAdminAsync(loggedUser))
             {
-                throw new UnauthorizedOperationException(Constants.ModifyUnauthorizeErrorMessage);
+                throw new UnauthorizedOperationException(Constants.ModifyHistoryErrorMessage);
             }
-            var result = this.historyRepository.FilterBy(filterParameters, user);
-            if (result.Count == 0)
-            {
-                throw new EntityNotFoundException(Constants.ModifyTransactionNoDataErrorMessage);
-            }
-            var resultDto = result.Select(r=>MapHistoryToDto(r)).ToList();
-            return resultDto;
+            
+            var result = await this.historyRepository.FilterByAsync(filterParameters, loggedUser);
+
+            var resultDto = result
+                             .Select(result => MapHistoryToDtoAsync(result)) 
+                             .ToList();
+
+            return resultDto; //PaginatedList<GetHistoryDto>
+           
         }
 
-        private GetHistoryDto MapHistoryToDto(History history)
+        private GetHistoryDto MapHistoryToDtoAsync(History history)
         {
             var historyDto = new GetHistoryDto();
             historyDto.EventTime = history.EventTime.ToString();
@@ -87,22 +90,22 @@ namespace Business.Services.Models
                     historyDto.From = history.Transfer.Account.User.Username;
                     historyDto.To = history.Transfer.Card.CardNumber;
                 }
-
             }
             return historyDto;
         }
 
-        private bool IsUserUnauthorized(int id, User user)
+        private async Task<bool> IsHistoryOwnerAsync(int id, User user)
         {
-            bool isUserUnauthorized = true;
+            bool isHistoryOwner = true;
 
-            History history = this.historyRepository.GetById(id);
+            History history = await this.historyRepository.GetByIdAsync(id);
 
             if (history.AccountId!=user.AccountId)
             {
-                isUserUnauthorized = false;
+                isHistoryOwner = false;
             }
-            return isUserUnauthorized;
+            return isHistoryOwner;
         }
+
     }
 }

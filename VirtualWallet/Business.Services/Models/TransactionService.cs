@@ -9,6 +9,7 @@ using DataAccess.Repositories.Contracts;
 using Business.Dto;
 using AutoMapper;
 using Business.DTOs;
+using Microsoft.EntityFrameworkCore;
 
 namespace Business.Services.Models
 {
@@ -43,7 +44,7 @@ namespace Business.Services.Models
             {
                 throw new UnauthorizedOperationException(Constants.ModifyTransactionErrorMessage);
             }
-            var transaction = await this.transactionRepository.GetByIdAsyns(id);
+            var transaction = await this.transactionRepository.GetByIdAsync(id);
             var transactionDto = this.mapper.Map<GetTransactionDto>(transaction);
 
             return transactionDto;
@@ -56,12 +57,13 @@ namespace Business.Services.Models
 
         public async Task<Transaction> CreateAsync(CreateTransactionDto transactionDto, User loggedUser)
         {
-            var transaction = MapDtoТоTransaction(transactionDto, loggedUser);
+            var transaction = await MapDtoТоTransactionAsync(transactionDto, loggedUser);
 
             if (loggedUser.IsBlocked)
             {
                 throw new UnauthorizedOperationException(Constants.ModifyTransactionBlockedErrorMessage);
             }
+            
             if (!await this.accountRepository.HasEnoughBalanceAsync(transaction.AccountSenderId, transaction.Amount))
             {
                 throw new EntityNotFoundException(Constants.ModifyTransactionAmountErrorMessage);
@@ -88,7 +90,7 @@ namespace Business.Services.Models
                 throw new UnauthorizedOperationException(Constants.ModifyTransactionUpdateErrorMessage);
             }
 
-            var newTransaction = MapDtoТоTransaction(transactionDto, loggedUser);
+            var newTransaction = await MapDtoТоTransactionAsync(transactionDto, loggedUser);
             return await this.transactionRepository.UpdateAsync(transactionToUpdate, newTransaction);
         }
 
@@ -132,8 +134,8 @@ namespace Business.Services.Models
             await this.accountRepository.DecreaseBalanceAsync(transactionOut.AccountSenderId, transactionOut.Amount);
             await this.accountRepository.IncreaseBalanceAsync(transactionIn.AccountRecepientId, transactionIn.Amount);
 
-            await AddTransactionToHistory(transactionOut);
-            await AddTransactionToHistory(transactionIn);
+            await AddTransactionToHistoryAsync(transactionOut);
+            await AddTransactionToHistoryAsync(transactionIn);
 
             return transactionOut.IsExecuted;
         }
@@ -155,37 +157,29 @@ namespace Business.Services.Models
             }
         }
 
-        private async Task<Transaction> MapDtoТоTransaction(CreateTransactionDto transactionDto, User user)
+        private async Task<Transaction> MapDtoТоTransactionAsync(CreateTransactionDto transactionDto, User user)
         {
             var transaction = this.mapper.Map<Transaction>(transactionDto);
             transaction.AccountSenderId = (int)user.AccountId;
             transaction.AccountSender = user.Account;
-            transaction.AccountRecepientId = this.accountRepository
-                                                 .GetByUsername(transactionDto.RecepientUsername)
-                                                 .Id;
-            transaction.AccountRecepient = this.accountRepository
-                                                 .GetByUsername(transactionDto.RecepientUsername);
-            transaction.CurrencyId = this.currencyRepository
-                                         .GetByАbbreviation(transactionDto.Abbreviation)
-                                         .Id;
-            transaction.Currency = this.currencyRepository
-                                         .GetByАbbreviation(transactionDto.Abbreviation);
-            transaction.AccountRecepientId = await this.accountRepository.GetByUsernameAsync(transactionDto.RecepientUsername).Id;
-            transaction.CurrencyId = await this.currencyRepository.(GetByАbbreviationAsync(transactionDto.Abbreviation)).Id;
+            transaction.AccountRecepient = await this.accountRepository.GetByUsernameAsync(transactionDto.RecepientUsername);
+            transaction.Currency = await this.currencyRepository.GetByАbbreviationAsync(transactionDto.Abbreviation);
+            transaction.AccountRecepientId = (await this.accountRepository.GetByUsernameAsync(transactionDto.RecepientUsername)).Id;
+            transaction.CurrencyId = (await this.currencyRepository.GetByАbbreviationAsync(transactionDto.Abbreviation)).Id;
             transaction.Direction = DirectionType.Out;
             return transaction;
         }
 
         private async Task<bool> IsTransactionSenderAsync(int id, int userId)
         {
-            bool isUserUnauthorized = true;
+            bool isTransactionSender = true;
             Transaction transactionToUpdate = await this.transactionRepository.GetByIdAsync(id);
 
             if (transactionToUpdate.AccountSender.User.Id != userId)
             {
-                isUserUnauthorized = false;
+                isTransactionSender = false;
             }
-            return isUserUnauthorized;
+            return isTransactionSender;
         }
 
     }

@@ -48,7 +48,7 @@ namespace DataAccess.Repositories.Models
 
             foreach (var card in accountToDelete.Cards)
             {
-                this.cardRepository.Delete(card.Id);
+                this.cardRepository.DeleteAsync(card.Id);
             }
             context.SaveChanges();
             return accountToDelete.IsDeleted;
@@ -116,15 +116,15 @@ namespace DataAccess.Repositories.Models
             return account ?? throw new EntityNotFoundException($"Account with ID ={id} does not exist.");
         }
 
-        public Account GetByUsername(string username)
+        public async Task<Account> GetByUsernameAsync(string username)
         {
-            Account account = context.Accounts
+            Account account = await context.Accounts
                 .Include(a => a.User)
                 .Include(a => a.Cards)
                 .Include(a => a.Currency)
                 .Where(a => a.IsDeleted == false)
                 .Where(a => a.User.Username == username)
-                .FirstOrDefault();
+                .FirstOrDefaultAsync();
 
             return account ?? throw new EntityNotFoundException($"Account with username = {username} does not exist.");
         }
@@ -151,7 +151,7 @@ namespace DataAccess.Repositories.Models
             return accountToWithdrawFrom;
         }
 
-        public bool HasEnoughBalance(int id, decimal amount)
+        public async Task<bool> HasEnoughBalanceAsync(int id, decimal amount)
         {
             Account accountToCheck = this.GetById(id);
 

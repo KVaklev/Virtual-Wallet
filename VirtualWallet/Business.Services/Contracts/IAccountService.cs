@@ -12,10 +12,10 @@ namespace Business.Services.Contracts
 {
     public interface IAccountService
     {
-        Task<IQueryable<Account>> GetAll();
+        IQueryable<Account> GetAll();
         PaginatedList<Account> FilterBy(AccountQueryParameters accountQueryParameters);
         Account GetById(int id, User user);
-        Account GetByUsername(int id, User user);
+        Task <Account> GetByUsernameAsync(int id, User user);
         Task <Account> Create(CreateAccountDto accountDto, User user);
         bool AddCard(int id, Card card, User user);
         bool RemoveCard(int id,  Card card, User user);

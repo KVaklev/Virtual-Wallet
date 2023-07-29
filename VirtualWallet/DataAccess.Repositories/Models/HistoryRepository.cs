@@ -3,8 +3,9 @@ using DataAccess.Repositories.Data;
 using Microsoft.EntityFrameworkCore;
 using Business.Exceptions;
 using Business.QueryParameters;
-using IHistoryRepository = DataAccess.Repositories.Contracts.IHistoryRepository;
 using DataAccess.Models.Enums;
+using DataAccess.Repositories.Helpers;
+using DataAccess.Repositories.Contracts;
 
 namespace DataAccess.Repositories.Models
 {
@@ -16,10 +17,38 @@ namespace DataAccess.Repositories.Models
         {
              this.context=context;
         }
+        public IQueryable<History> GetAll(User loggedUser)
+        {
+            IQueryable<History> result = context.History
+                    .Include(tr => tr.Transaction)
+                    .Include(tf => tf.Transfer)
+                    .Include(ac => ac.Account)
+                    .ThenInclude(u => u.User);
 
-        public History CreateWithTransaction(Transaction transaction)
+            if (!loggedUser.IsAdmin)
+            { 
+                result = result.Where(t => t.AccountId==loggedUser.AccountId);
+            }
+
+            return result ?? throw new EntityNotFoundException("Тhere are no records!");
+        }
+
+        public async Task<History> GetByIdAsync(int id)
+        {
+            var history = await context.History
+                .Include(tr=>tr.Transaction)
+                .Include(tf=>tf.Transfer)
+                .Include(ac=>ac.Account)
+                .ThenInclude(u=>u.User)
+                .FirstOrDefaultAsync(h => h.Id == id);
+
+            return history ?? throw new EntityNotFoundException($"There are no records for the specified id.");
+        }
+
+        public async Task<History> CreateWithTransactionAsync(Transaction transaction)
         {
             var history = new History();
+
             history.EventTime = DateTime.Now;
             history.TransactionId = transaction.Id;
             history.NameOperation = NameOperation.Transaction;
@@ -32,13 +61,13 @@ namespace DataAccess.Repositories.Models
             {
                 history.AccountId = transaction.AccountRecepientId;
             }
-            this.context.Add(history);
-            this.context.SaveChanges();
+            await this.context.AddAsync(history);
+            await this.context.SaveChangesAsync();
 
             return history;
         }
         
-        public History CreateWithTransfer(Transfer transfer)
+        public async Task<History> CreateWithTransferAsync(Transfer transfer)
         {
             var history = new History();
             
@@ -47,100 +76,59 @@ namespace DataAccess.Repositories.Models
             history.NameOperation = NameOperation.Transfer;
             history.AccountId = transfer.AccountId;
 
-            this.context.Add(history);
-            this.context.SaveChanges();
+            await this.context.AddAsync(history);
+            await this.context.SaveChangesAsync();
             return history;
         }
 
-        public History GetById(int id)
+        public async Task<PaginatedList<History>> FilterByAsync(HistoryQueryParameters filterParameters, User loggedUser)
         {
-            var history = context.History
-                .Include(tr=>tr.Transaction)
-                .Include(tf=>tf.Transfer)
-                .Include(ac=>ac.Account)
-                .ThenInclude(u=>u.User)
-                .FirstOrDefault(h => h.Id == id);
+            IQueryable<History> result = this.GetAll(loggedUser);
 
-            return history ?? throw new EntityNotFoundException($"No records with this id={id}");
-        }
+            result = await FilterByUsernameAsync(result, filterParameters.Username);
+            result = await FilterByFromDataAsync(result, filterParameters.FromDate);
+            result = await FilterByToDataAsync(result, filterParameters.ToDate);
 
-        public IQueryable<History> GetAll(User user)
-        {
-            IQueryable<History> result = context.History
-                    .Include(tr => tr.Transaction)
-                    .Include(tf => tf.Transfer)
-                    .Include(ac => ac.Account)
-                    .ThenInclude(u => u.User);
+            int totalItems = await result.CountAsync();
 
-            if (!user.IsAdmin)
-            { 
-                result = result.Where(t => t.AccountId==user.AccountId);
+            if (totalItems == 0)
+            {
+                throw new EntityNotFoundException("No history matches the specified filter criteria.");
             }
 
-            return result ?? throw new EntityNotFoundException("Тhere are no records!");
-        }
-
-        public PaginatedList<History> FilterBy(HistoryQueryParameters filterParameters, User user)
-        {
-            IQueryable<History> result = this.GetAll(user);
-
-            result = FilterByUsername(result, filterParameters.Username);
-            result = FilterByFromData(result, filterParameters.FromDate);
-            result = FilterByToData(result, filterParameters.ToDate);
-            
-
             int totalPages = (result.Count() + filterParameters.PageSize - 1) / filterParameters.PageSize;
-            result = Paginate(result, filterParameters.PageNumber, filterParameters.PageSize);
+            result = await Common<History>.PaginateAsync(result, filterParameters.PageNumber, filterParameters.PageSize);
+           
             return new PaginatedList<History>(result.ToList(), totalPages, filterParameters.PageNumber);
         }
 
-        public IQueryable<History> Paginate(IQueryable<History> result, int pageNumber, int pageSize)
-        {
-            return result
-                .Skip((pageNumber - 1) * pageSize)
-                .Take(pageSize);
-        }
-
-        private IQueryable<History> FilterByUsername(IQueryable<History> histories, string? username)
+        private async Task<IQueryable<History>> FilterByUsernameAsync(IQueryable<History> result, string? username)
         {
             if (!string.IsNullOrEmpty(username))
             {
-                return histories.Where(h=>h.Account.User.Username == username);
+                return result.Where(history => history.Account.User.Username == username);
             }
-            else
-            {
-                return histories;
-            }
+            return await Task.FromResult(result);
         }
-
-        private IQueryable<History> FilterByFromData(IQueryable<History> history, string? fromData)
+        private async Task<IQueryable<History>> FilterByFromDataAsync(IQueryable<History> result, string? fromData)
         {
             if (!string.IsNullOrEmpty(fromData))
             {
                 DateTime date = DateTime.Parse(fromData);
 
-                return history.Where(h => h.EventTime >= date);
+                return result.Where(history => history.EventTime >= date);
             }
-            else
-            {
-                return history;
-            }
+            return await Task.FromResult(result);
         }
-
-        private IQueryable<History> FilterByToData(IQueryable<History> history, string? toData)
+        private async Task<IQueryable<History>> FilterByToDataAsync(IQueryable<History> result, string? toData)
         {
             if (!string.IsNullOrEmpty(toData))
             {
                 DateTime date = DateTime.Parse(toData);
 
-                return history.Where(t => t.EventTime <= date);
+                return result.Where(history => history.EventTime <= date);
             }
-            else
-            {
-                return history;
-            }
-        }
-
-        
+            return await Task.FromResult(result);
+        }        
     }
 }

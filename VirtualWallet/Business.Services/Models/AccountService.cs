@@ -6,11 +6,6 @@ using Business.Services.Contracts;
 using Business.Services.Helpers;
 using DataAccess.Models.Models;
 using DataAccess.Repositories.Contracts;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Business.Services.Models
 {
@@ -41,7 +36,7 @@ namespace Business.Services.Models
         public async Task<Account> Create(CreateAccountDto accountDto, User user)
         {
             Account account = mapper.Map<Account>(accountDto);
-            account.CurrencyId = currencyRepository.GetByАbbreviation(accountDto.Abbreviation).Id;
+            account.CurrencyId = currencyRepository.GetByАbbreviationAsync(accountDto.Abbreviation).Id;
 
             Account accountToCreate = await this.accountRepository.Create(account, user);
 
@@ -67,13 +62,13 @@ namespace Business.Services.Models
             return this.accountRepository.GetById(id);
         }
 
-        public Account GetByUsername(int id, User user)
+        public async Task <Account> GetByUsernameAsync(int id, User user)
         {
             if (!IsUserAuthorized(id, user))
             {
                 throw new UnauthorizedOperationException(Constants.ModifyAccountErrorMessage);
             }
-            return accountRepository.GetByUsername(user.Username);
+            return await accountRepository.GetByUsernameAsync(user.Username);
         }
 
         public bool AddCard(int id, Card card, User user)

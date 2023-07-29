@@ -49,12 +49,12 @@ namespace Business.Services.Models
             {
                 throw new UnauthorizedOperationException(Constants.ModifyUserErrorMessage);
             }
-            var currencyToUpdate = this.GetById(id);
+            var currencyToUpdate = await this.GetByIdAsync(id);
             if (currencyToUpdate.IsDeleted)
             {
                 throw new EntityNotFoundException(Constants.ModifyCurrencyNotFoundErrorMessage);
             }
-            return this.currencyRepository.Update(id, currency);
+            return await this.currencyRepository.UpdateAsync(id, currency);
         }
 
         public async Task<Currency> GetByАbbreviationAsync(string abbreviation)
