@@ -1,4 +1,7 @@
-﻿using Business.Exceptions;
+﻿using AutoMapper;
+using Business.Dto;
+using Business.DTOs;
+using Business.Exceptions;
 using Business.QueryParameters;
 using Business.Services.Contracts;
 using Business.Services.Helpers;
@@ -24,14 +27,18 @@ namespace Business.Services.Models
         private readonly IUserRepository userRepository;
         private readonly ICardRepository cardRepository;
         private readonly ApplicationContext context;
+        private readonly IMapper mapper;
+        private readonly ICurrencyRepository currencyRepository;
 
-        public TransferService(ITransferRepository transferRepository, IHistoryRepository historyRepository, IAccountRepository accountRepository, IUserRepository userRepository, ICardRepository cardRepository, ApplicationContext context)
+        public TransferService(ITransferRepository transferRepository, IHistoryRepository historyRepository, IAccountRepository accountRepository, IUserRepository userRepository, ICardRepository cardRepository, ApplicationContext context, IMapper mapper, ICurrencyRepository currencyRepository)
         {
             this.transferRepository = transferRepository;
             this.historyRepository = historyRepository;
             this.accountRepository = accountRepository;
             this.userRepository = userRepository;
             this.context = context;
+            this.mapper = mapper;
+            this.currencyRepository = currencyRepository;
         }
 
         public IQueryable<Transfer> GetAll(string username)
@@ -39,18 +46,24 @@ namespace Business.Services.Models
             return transferRepository.GetAll(username);
         }
 
-        public async Task <Transfer> GetByIdAsync(int id, User user)
+        public async Task<GetTransferDto> GetByIdAsync(int id, User user)
         {
             if (!(await IsUserAuthorizedAsync(id, user.Id) || user.IsAdmin != true))
             {
                 throw new UnauthorizedOperationException(Constants.ModifyTransferGetByIdErrorMessage);
             }
 
-            return await this.transferRepository.GetByIdAsync(id);
+            var transfer = await transferRepository.GetByIdAsync(id);
+
+            var transferDto = this.mapper.Map<GetTransferDto>(transfer);
+
+            return transferDto;
         }
 
-        public async Task <Transfer> CreateAsync(Transfer transfer, User user)
+        public async Task<Transfer> CreateAsync(CreateTransferDto transferDto, User user)
         {
+            var transfer = await MapDtoToTransferAsync(transferDto, user);
+
             if (user.IsBlocked)
             {
                 throw new UnauthorizedOperationException(Constants.ModifyTransferErrorMessage);
@@ -66,27 +79,39 @@ namespace Business.Services.Models
 
             return createdTransfer;
         }
-
-        public async Task <bool> DeleteAsync(int id, User user)
+        public async Task<bool> DeleteAsync(int id, User user)
         {
             if (!await IsUserAuthorizedAsync(id, user.Id))
             {
                 throw new UnauthorizedOperationException(Constants.ModifyTransferErrorMessage);
             }
 
+            var transfer = await this.transferRepository.GetByIdAsync(id);
+            if (transfer.IsCancelled || transfer.IsConfirmed)
+            {
+                throw new InvalidOperationException(Constants.ModifyTransferUpdateDeleteErrorErrorMessage);
+            }
             return await this.transferRepository.DeleteAsync(id);
         }
 
-        public async Task <Transfer> UpdateAsync(int id, Transfer transfer, User user)
+        public async Task<Transfer> UpdateAsync(int id, CreateTransferDto transferDto, User user)
         {
-            if (!(await IsUserAuthorizedAsync(id, user.Id)))
+            if (!await IsUserAuthorizedAsync(id, user.Id))
             {
-                throw new UnauthenticatedOperationException(Constants.ModifyTransferErrorMessage);
+                throw new UnauthorizedOperationException(Constants.ModifyTransferErrorMessage);
             }
 
-            return await this.transferRepository.UpdateAsync(id, transfer);
-        }
+            var transferToUpdate = await this.transferRepository.GetByIdAsync(id);
 
+            if (transferToUpdate.IsConfirmed || transferToUpdate.IsCancelled)
+            {
+                throw new UnauthorizedOperationException(Constants.ModifyTransferUpdateDeleteErrorErrorMessage);
+            }
+
+            var updatedTransfer = await MapDtoToTransferAsync(transferDto, user);
+
+            return await this.transferRepository.UpdateAsync(transferToUpdate.Id, updatedTransfer);
+        }
         public PaginatedList<Transfer> FilterBy(TransferQueryParameters transferQueryParameters, User user)
         {
             var result = this.transferRepository.FilterBy(transferQueryParameters, user.Username);
@@ -106,7 +131,7 @@ namespace Business.Services.Models
                 throw new UnauthorizedOperationException(Constants.ModifyTransferErrorMessage);
             }
 
-            var transferToExecute =  await this.transferRepository.GetByIdAsync(transferId);
+            var transferToExecute = await this.transferRepository.GetByIdAsync(transferId);
             transferToExecute.IsConfirmed = true;
             transferToExecute.DateCreated = DateTime.Now;
 
@@ -133,7 +158,7 @@ namespace Business.Services.Models
         {
             var historyCount = await this.context.History.CountAsync();
 
-            var history= await this.historyRepository.CreateWithTransferAsync(transfer);
+            var history = await this.historyRepository.CreateWithTransferAsync(transfer);
             int historyCountNewHistoryAdded = await this.context.History.CountAsync();
 
             if (historyCount + 1 == historyCountNewHistoryAdded)
@@ -145,7 +170,7 @@ namespace Business.Services.Models
                 return false;
             }
         }
-        public async Task <bool> IsUserAuthorizedAsync(int id, int userId)
+        public async Task<bool> IsUserAuthorizedAsync(int id, int userId)
         {
             bool IsUserAuthorized = true;
 
@@ -157,6 +182,18 @@ namespace Business.Services.Models
             }
 
             return IsUserAuthorized;
+
+        }
+        public async Task<Transfer> MapDtoToTransferAsync(CreateTransferDto transferDto, User user)
+        {
+            var transfer = this.mapper.Map<Transfer>(transferDto);
+            transfer.AccountId = (int)user.AccountId;
+            transfer.Account = await this.accountRepository.GetByIdAsync((int)user.AccountId);
+            transfer.Currency = await this.currencyRepository.GetByАbbreviationAsync(transferDto.Abbreviation);
+            transfer.CurrencyId = transfer.Currency.Id;
+
+            return transfer;
+
 
         }
 

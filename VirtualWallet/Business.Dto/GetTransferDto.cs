@@ -7,9 +7,10 @@ using System.Threading.Tasks;
 
 namespace Business.Dto
 {
-    public class TransferDto
+    public class GetTransferDto
     {
         public string Username { get; set; }
+
         public DateTime Date { get; set; }
 
         public string Abbreviation { get; set; }
