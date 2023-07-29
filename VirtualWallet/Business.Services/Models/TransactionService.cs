@@ -175,7 +175,24 @@ namespace Business.Services.Models
             }
         }
 
-        
+        private Transaction MapDtoТоTransaction(CreateTransactionDto transactionDto, User user)
+        {
+            var transaction = this.mapper.Map<Transaction>(transactionDto);
+            transaction.AccountSenderId = (int)user.AccountId;
+            transaction.AccountSender = user.Account;
+            transaction.AccountRecepientId = this.accountRepository
+                                                 .GetByUsername(transactionDto.RecepientUsername)
+                                                 .Id;
+            transaction.AccountRecepient = this.accountRepository
+                                                 .GetByUsername(transactionDto.RecepientUsername);
+            transaction.CurrencyId = this.currencyRepository
+                                         .GetByАbbreviation(transactionDto.Abbreviation)
+                                         .Id;
+            transaction.Currency = this.currencyRepository
+                                         .GetByАbbreviation(transactionDto.Abbreviation);
+            transaction.Direction = DirectionType.Out;
+            return transaction;
+        }
 
         private bool IsUserUnauthorized(int id, int userId)
         {

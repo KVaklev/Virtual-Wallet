@@ -56,6 +56,11 @@ namespace Business.Services.Models
             {
                 throw new UnauthorizedOperationException(Constants.ModifyCurrencyErrorMessage);
             }
+            var currencyToUpdate = this.GetById(id);
+            if (currencyToUpdate.IsDeleted)
+            {
+                throw new EntityNotFoundException(Constants.ModifyCurrencyNotFoundErrorMessage);
+            }
             return this.currencyRepository.Update(id, currency);
         }
 
