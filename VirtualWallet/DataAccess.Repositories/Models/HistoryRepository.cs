@@ -58,6 +58,7 @@ namespace DataAccess.Repositories.Models
                 .Include(tr=>tr.Transaction)
                 .Include(tf=>tf.Transfer)
                 .Include(ac=>ac.Account)
+                .ThenInclude(u=>u.User)
                 .FirstOrDefault(h => h.Id == id);
 
             return history ?? throw new EntityNotFoundException($"No records with this id={id}");
@@ -68,7 +69,8 @@ namespace DataAccess.Repositories.Models
             IQueryable<History> result = context.History
                     .Include(tr => tr.Transaction)
                     .Include(tf => tf.Transfer)
-                    .Include(ac => ac.Account);
+                    .Include(ac => ac.Account)
+                    .ThenInclude(u => u.User);
 
             if (!user.IsAdmin)
             { 

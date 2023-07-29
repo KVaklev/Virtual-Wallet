@@ -66,7 +66,7 @@ namespace Business.Services.Models
             if (history.TransactionId != null)
             {
                 historyDto.From = history.Transaction.AccountSender.User.Username;
-                historyDto.To = this.transactionRepository.GetById((int)history.TransactionId).AccountRecepient.User.Username;
+                historyDto.To = history.Transaction.AccountRecepient.User.Username;
                 historyDto.Amount = history.Transaction.Amount;
                 historyDto.Аbbreviation = history.Transaction.Currency.Abbreviation;
                 historyDto.Direction = history.Transaction.Direction.ToString();

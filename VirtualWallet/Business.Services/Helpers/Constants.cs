@@ -14,6 +14,7 @@
         public const string ModifyTransactionUpdateErrorMessage = "You can't update a completed transaction.";
 
         public const string ModifyCurrencyErrorMessage = "You are not admin.";
+        public const string ModifyCurrencyNotFoundErrorMessage = "This currency doesn't exist.";
          
         public const string ModifyAccountErrorMessage = "Only the admin or owner of the account can access, delete or modify it.";
         public const string ModifyAccountCardErrorMessage = "Only the admin or owner of the account can add or remove a card.";
