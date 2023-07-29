@@ -31,11 +31,11 @@ namespace VirtualWallet.Controllers.API
 
         [HttpGet(""), Authorize]
 
-        public async Task<ActionResult<IEnumerable<GetAccountDto>>> GetAllAcounts()
+        public ActionResult GetAllAcounts()
         {
             var loggedUser = FindLoggedUser();
 
-            var result = (await accountService.GetAll()).ToList();
+            var result = accountService.GetAll();
 
             List<GetAccountDto> accountDtos = result.Select(account => mapper.Map<GetAccountDto>(account)).ToList();
 
@@ -68,7 +68,7 @@ namespace VirtualWallet.Controllers.API
         {
             var loggedUser = FindLoggedUser();
 
-            Account newAccount = await accountService.Create(createAccountDto, loggedUser);
+            Account newAccount = await accountService.CreateAsync(createAccountDto, loggedUser);
 
             return Ok(newAccount);
 

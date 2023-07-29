@@ -35,54 +35,54 @@ namespace Business.Services.Models
 
         public IQueryable<Transfer> GetAll(string username)
         {
-            return this.transferRepository.GetAll(username);
+            return transferRepository.GetAll(username);
         }
 
-        public Transfer GetById(int id, User user)
+        public async Task <Transfer> GetByIdAsync(int id, User user)
         {
-            if (!IsUserAuthorized(id, user.Id) || user.IsAdmin != true)
+            if (!(await IsUserAuthorizedAsync(id, user.Id) || user.IsAdmin != true)
             {
                 throw new UnauthorizedOperationException(Constants.ModifyUnauthorizeErrorMessage);
             }
 
-            return this.transferRepository.GetById(id);
+            return await this.transferRepository.GetByIdAsync(id);
         }
 
-        public Transfer Create(Transfer transfer, User user)
+        public async Task <Transfer> CreateAsync(Transfer transfer, User user)
         {
             if (user.IsBlocked)
             {
                 throw new UnauthorizedOperationException(Constants.ModifyTransferErrorMessage);
             }
 
-            if (this.accountRepository.CheckBalance(transfer.AccountId, transfer.Amount))
+            if (await this.accountRepository.CheckBalanceAsync(transfer.AccountId, transfer.Amount))
             {
                 throw new UnauthorizedOperationException(Constants.ModifyTransferAmountErrorMessage);
             }
 
-            var createdTransfer = this.transferRepository.Create(transfer);
+            var createdTransfer = await this.transferRepository.CreateAsync(transfer);
 
             return createdTransfer;
         }
 
-        public bool Delete(int id, User user)
+        public async Task <bool> DeleteAsync(int id, User user)
         {
             if (!IsUserAuthorized(id, user.Id))
             {
                 throw new UnauthorizedOperationException(Constants.ModifyTransferErrorMessage);
             }
 
-            return this.transferRepository.Delete(id);
+            return await this.transferRepository.DeleteAsync(id);
         }
 
-        public Transfer Update(int id, Transfer transfer, User user)
+        public async Task <Transfer> UpdateAsync(int id, Transfer transfer, User user)
         {
-            if (!IsUserAuthorized(id, user.Id))
+            if (!(await IsUserAuthorizedAsync(id, user.Id)))
             {
                 throw new UnauthenticatedOperationException(Constants.ModifyTransferErrorMessage);
             }
 
-            return this.transferRepository.Update(id, transfer);
+            return await this.transferRepository.UpdateAsync(id, transfer);
         }
 
         public PaginatedList<Transfer> FilterBy(TransferQueryParameters transferQueryParameters, User user)
@@ -97,27 +97,27 @@ namespace Business.Services.Models
             return result;
         }
 
-        public bool Execute(int transferId, User user)
+        public async Task<bool> ExecuteAsync(int transferId, User user)
         {
-            if (!IsUserAuthorized(transferId, user.Id))
+            if (!(await IsUserAuthorizedAsync(transferId, user.Id)))
             {
                 throw new UnauthorizedOperationException(Constants.ModifyTransferErrorMessage);
             }
 
-            var transferToExecute = this.transferRepository.GetById(transferId);
+            var transferToExecute =  await this.transferRepository.GetByIdAsync(transferId);
             transferToExecute.IsConfirmed = true;
             transferToExecute.DateCreated = DateTime.Now;
 
             if (transferToExecute.TransferType == TransferDirection.Deposit)
             {
-                this.accountRepository.IncreaseBalance(transferToExecute.AccountId, transferToExecute.Amount);
+                this.accountRepository.IncreaseBalanceAsync(transferToExecute.AccountId, transferToExecute.Amount);
 
                 this.cardRepository.DecreaseBalance(transferToExecute.CardId, transferToExecute.Amount);
             }
 
             if (transferToExecute.TransferType == TransferDirection.Withdrawal)
             {
-                this.accountRepository.DecreaseBalance(transferToExecute.AccountId, transferToExecute.Amount);
+                this.accountRepository.DecreaseBalanceAsync(transferToExecute.AccountId, transferToExecute.Amount);
 
                 this.cardRepository.IncreaseBalance(transferToExecute.CardId, transferToExecute.Amount);
             }
@@ -145,11 +145,11 @@ namespace Business.Services.Models
 
 
         }
-        public bool IsUserAuthorized(int id, int userId)
+        public async Task <bool> IsUserAuthorizedAsync(int id, int userId)
         {
             bool IsUserAuthorized = true;
 
-            Transfer transferToGet = this.transferRepository.GetById(id);
+            Transfer transferToGet = await this.transferRepository.GetByIdAsync(id);
 
             if (transferToGet.Account.UserId != userId)
             {

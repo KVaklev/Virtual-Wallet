@@ -56,6 +56,21 @@ namespace Business.Services.Models
             return newTransaction;
         }
 
+        private Transaction MapDtoТоTransaction(CreateTransactionDto transactionDto, User user)
+        {
+            var transaction = this.mapper.Map<Transaction>(transactionDto);
+            transaction.AccountSenderId = (int)user.AccountId;
+            transaction.AccountSender = user.Account;
+            transaction.AccountRecepientId = this.accountRepository
+                                                 .GetByUsername(transactionDto.RecepientUsername)
+                                                 .Id;
+            transaction.CurrencyId = this.currencyRepository
+                                         .GetByАbbreviation(transactionDto.Abbreviation)
+                                         .Id;
+            transaction.Direction = DirectionType.Out;
+            return transaction;
+        }
+
         public GetTransactionDto GetById(int id, User user)
         {
             if (!IsUserUnauthorized(id, user.Id) || user.IsAdmin != true)
@@ -160,20 +175,7 @@ namespace Business.Services.Models
             }
         }
 
-        private Transaction MapDtoТоTransaction(CreateTransactionDto transactionDto, User user)
-        {
-            var transaction = this.mapper.Map<Transaction>(transactionDto);
-            transaction.AccountSenderId = (int)user.AccountId;
-            transaction.AccountSender = user.Account;
-            transaction.AccountRecepientId = this.accountRepository
-                                                 .GetByUsername(transactionDto.RecepientUsername)
-                                                 .Id;
-            transaction.CurrencyId = this.currencyRepository
-                                         .GetByАbbreviation(transactionDto.Abbreviation)
-                                         .Id;
-            transaction.Direction = DirectionType.Out;
-            return transaction;
-        }
+        
 
         private bool IsUserUnauthorized(int id, int userId)
         {

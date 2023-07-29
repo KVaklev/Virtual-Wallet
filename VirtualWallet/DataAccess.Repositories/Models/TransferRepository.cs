@@ -25,58 +25,57 @@ namespace DataAccess.Repositories.Models
                 .Include(t => t.Amount)
                 .Include(c => c.Currency);
 
-
             result = result.Where(a => a.Account.User.Username == username);
 
             return result ?? throw new EntityNotFoundException("There are no transfers!");
         }
 
-        public Transfer Create(Transfer transfer)
+        public async Task<Transfer> CreateAsync(Transfer transfer)
         {
             transfer.DateCreated = DateTime.Now;
             transfer.IsConfirmed = false;
             transfer.IsCancelled = false;
             context.Add(transfer);
-            context.SaveChanges();
+            await context.SaveChangesAsync();
 
             return transfer;
         }
 
-        public bool Delete(int id)
+        public async Task<bool> DeleteAsync(int id)
         {
-            Transfer transferToDelete = this.GetById(id);
+            Transfer transferToDelete = await GetByIdAsync(id);
             transferToDelete.IsCancelled = true;
             context.Transfers.Remove(transferToDelete);
-            context.SaveChanges();
+            await context.SaveChangesAsync();
 
             return transferToDelete.IsCancelled;
         }
 
-        public Transfer GetById(int id)
+        public async Task<Transfer> GetByIdAsync(int id)
         {
-            Transfer transfer = context.Transfers
+            Transfer transfer = await context.Transfers
                 .Include(t => t.Account)
                 .ThenInclude(u => u.User)
                 .Include(t => t.Currency)
-                .FirstOrDefault(t => t.Id == id);
+                .FirstOrDefaultAsync(t => t.Id == id);
 
             return transfer ?? throw new EntityNotFoundException($"Transfer with ID = {id} does not exist");
 
         }
 
-        public Transfer GetByUserId(int userId)
+        public async Task<Transfer> GetByUserIdAsync(int userId)
         {
-            Transfer transfer = context.Transfers
+            Transfer transfer = await context.Transfers
                 .Include(a => a.Account)
                 .ThenInclude(u => u.User)
-                .FirstOrDefault(t => t.Account.User.Id == userId);
+                .FirstOrDefaultAsync(t => t.Account.User.Id == userId);
 
             return transfer ?? throw new EntityNotFoundException($"Transfer with UserId = {userId} does not exist");
         }
 
-        public Transfer Update(int id, Transfer transfer)
+        public async Task<Transfer> UpdateAsync(int id, Transfer transfer)
         {
-            var transferToUpdate = GetById(id);
+            var transferToUpdate = await GetByIdAsync(id);
 
             if (transferToUpdate.IsConfirmed)
             {
@@ -88,14 +87,16 @@ namespace DataAccess.Repositories.Models
             transferToUpdate.CurrencyId = transfer.CurrencyId;
 
 
-            context.SaveChanges();
+            await context.SaveChangesAsync();
             return transferToUpdate;
 
         }
 
+
         public PaginatedList<Transfer> FilterBy(TransferQueryParameters filterParameters, string username)
         {
-            IQueryable<Transfer> result = this.GetAll(username);
+            
+            IQueryable<Transfer> result = GetAll(username);
 
             result = FilterByUsername(result, filterParameters.Username);
             result = FilterByFromDate(result, filterParameters.FromDate);
@@ -103,12 +104,21 @@ namespace DataAccess.Repositories.Models
             result = FilterByTransferType(result, filterParameters.TransferType);
             result = SortBy(result, filterParameters.SortBy);
 
+            int finalResult = result.Count();
+
+            if (finalResult == 0)
+            {
+                throw new EntityNotFoundException("No results found by the specified filter criteria.");
+            }
+
             int totalPages = (result.Count() + filterParameters.PageSize - 1) /
                 filterParameters.PageSize;
 
             result = Paginate(result, filterParameters.PageNumber, filterParameters.PageSize);
 
             return new PaginatedList<Transfer>(result.ToList(), totalPages, filterParameters.PageNumber);
+
+
         }
 
         public static IQueryable<Transfer> Paginate(IQueryable<Transfer> result, int pageNumber, int pageSize)
