@@ -45,34 +45,34 @@ namespace VirtualWallet.Controllers.API
 
         }
 
-        [HttpGet, Authorize]
+        //[HttpGet, Authorize]
 
-        public async Task<ActionResult<IEnumerable<TransferDto>>> GetTransfers([FromQuery] TransferQueryParameters transferQueryParameters)
-        {
-            try
-            {
-                var loggedUser = FindLoggedUser();
+        //public async Task<ActionResult<IEnumerable<TransferDto>>> GetTransfers([FromQuery] TransferQueryParameters transferQueryParameters)
+        //{
+        //    try
+        //    {
+        //        var loggedUser = FindLoggedUser();
 
-                var transfers = this.transferService.FilterBy(transferQueryParameters, loggedUser);
+        //        var transfers = this.transferService.FilterBy(transferQueryParameters, loggedUser);
 
-                var result = await transfers.Select(transfer => mapper.Map<TransferDto>(transfer)).ToList();
+        //        var result = await transfers.Select(transfer => mapper.Map<TransferDto>(transfer)).ToList();
                                 
 
-                return StatusCode(StatusCodes.Status200OK, result);
+        //        return StatusCode(StatusCodes.Status200OK, result);
                 
-            }
+        //    }
 
-            catch (EntityNotFoundException e)
-            {
-                return StatusCode(StatusCodes.Status404NotFound, e.Message);
+        //    catch (EntityNotFoundException e)
+        //    {
+        //        return StatusCode(StatusCodes.Status404NotFound, e.Message);
                
-            }
+        //    }
 
-            catch (UnauthorizedOperationException e)
-            {
-                return StatusCode(StatusCodes.Status401Unauthorized, e.Message);
-            }
-        }
+        //    catch (UnauthorizedOperationException e)
+        //    {
+        //        return StatusCode(StatusCodes.Status401Unauthorized, e.Message);
+        //    }
+        //}
 
         //[HttpPost, Authorize]
 

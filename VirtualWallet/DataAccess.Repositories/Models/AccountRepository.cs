@@ -26,7 +26,7 @@ namespace DataAccess.Repositories.Models
                 .Include(a => a.Cards)
                 .Include(a => a.Currency);
 
-            return result ?? throw new EntityNotFoundException($"There are no accounts"));
+            return result ?? throw new EntityNotFoundException($"There are no accounts");
         }
 
         public async Task<Account> CreateAsync(Account account, User user)

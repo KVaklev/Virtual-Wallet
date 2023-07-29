@@ -40,7 +40,7 @@ namespace Business.Services.Models
 
         public async Task <Transfer> GetByIdAsync(int id, User user)
         {
-            if (!(await IsUserAuthorizedAsync(id, user.Id) || user.IsAdmin != true)
+            if (!(await IsUserAuthorizedAsync(id, user.Id) || user.IsAdmin != true))
             {
                 throw new UnauthorizedOperationException(Constants.ModifyUnauthorizeErrorMessage);
             }
@@ -67,7 +67,7 @@ namespace Business.Services.Models
 
         public async Task <bool> DeleteAsync(int id, User user)
         {
-            if (!IsUserAuthorized(id, user.Id))
+            if (!await IsUserAuthorizedAsync(id, user.Id))
             {
                 throw new UnauthorizedOperationException(Constants.ModifyTransferErrorMessage);
             }
