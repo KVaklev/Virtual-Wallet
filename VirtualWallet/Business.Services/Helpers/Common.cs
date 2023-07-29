@@ -1,4 +1,6 @@
 ﻿using DataAccess.Models.Models;
+using DataAccess.Repositories.Contracts;
+using System.Runtime.CompilerServices;
 
 namespace Business.Services.Helpers
 {

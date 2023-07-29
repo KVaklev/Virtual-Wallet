@@ -149,7 +149,7 @@ namespace DataAccess.Repositories.Models
             return accountToWithdrawFrom;
         }
 
-        public bool CheckBalance(int id, decimal amount)
+        public bool HasEnoughBalance(int id, decimal amount)
         {
             Account accountToCheck = this.GetById(id);
 

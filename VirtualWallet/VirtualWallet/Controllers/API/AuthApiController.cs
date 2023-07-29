@@ -86,7 +86,7 @@ namespace VirtualWallet.Controllers.API
                 new Claim("LoggedUserId", loggedUser.Id.ToString()),
                 new Claim("Username", loggedUser.Username),
                 new Claim("IsAdmin", loggedUser.IsAdmin.ToString()),
-                new Claim("UsersAccountId", loggedUser.Account.Id.ToString()),
+                new Claim("UsersAccountId", loggedUser.Account.Id.ToString()),//null check
                 new Claim(JwtRegisteredClaimNames.Email, loggedUser.Email),
                 new Claim(JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString())
         },

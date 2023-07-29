@@ -3,10 +3,8 @@ using DataAccess.Models.Models;
 using DataAccess.Repositories.Data;
 using Microsoft.EntityFrameworkCore;
 using DataAccess.Repositories.Contracts;
-using System.Text;
 using DataAccess.Models.Enums;
 using Business.QueryParameters;
-using DataAccess.Models.ValidationAttributes;
 
 namespace DataAccess.Repositories.Models
 {
@@ -97,9 +95,12 @@ namespace DataAccess.Repositories.Models
             result = FilterByFromData(result, filterParameters.FromDate);
             result = FilterByToData(result, filterParameters.ToDate);
             result = SortBy(result, filterParameters.SortBy);
-            
-            //TODO check for user and in,out
 
+            //TODO check for user and in,out
+            //if (result.Count == 0)
+            //{
+            //    throw new EntityNotFoundException(Constants.ModifyTransactionNoDataErrorMessage);
+            //}
             int totalPages = (result.Count() + filterParameters.PageSize - 1) / filterParameters.PageSize;
 
             result = Paginate(result, filterParameters.PageNumber, filterParameters.PageSize);

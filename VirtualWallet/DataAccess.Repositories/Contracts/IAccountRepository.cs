@@ -30,7 +30,7 @@ namespace DataAccess.Repositories.Contracts
 
         Account DecreaseBalance(int id, decimal amount);
 
-        bool CheckBalance(int id, decimal amount);
+        bool HasEnoughBalance(int id, decimal amount);
 
         public bool CardExists(string cardNumber);
 

@@ -55,7 +55,7 @@ namespace Business.Services.Models
                 throw new UnauthorizedOperationException(Constants.ModifyTransferErrorMessage);
             }
 
-            if (this.accountRepository.CheckBalance(transfer.AccountId, transfer.Amount))
+            if (this.accountRepository.HasEnoughBalance(transfer.AccountId, transfer.Amount))
             {
                 throw new UnauthorizedOperationException(Constants.ModifyTransferAmountErrorMessage);
             }

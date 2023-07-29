@@ -2,34 +2,38 @@
 {
     public class Constants
     {
-        //Constants for user
+        //Constant messages for user
 
         public const string ModifyUserErrorMessage = "Only an admin is authorized to perform the specified action.";
         public const string ModifyUsernameErrorMessage = "Username change is not allowed.";
 
-        public const string ModifyUnauthorizeErrorMessage = "You are not authorized.";
+        //Constant messages for account
+
+        public const string ModifyAccountErrorMessage = "Only an admin or owner of the account can access, delete or modify the acount.";
+        public const string ModifyAccountCardErrorMessage = "Only an admin or owner of the account can add or remove a card.";
+
+        //Constant messages for cards
+
+        public const string ModifyCardErrorMessage = "Only an admin or owner of the card can update information.";
+
+        //Constant messages for transactions 
+
         public const string ModifyTransactionAmountErrorMessage = "Not enough balance.";
         public const string ModifyTransactionNoDataErrorMessage = "No data with these parameters.";
         public const string ModifyTransactionDeleteErrorMessage = "You can't delete a completed transaction!";
-        public const string ModifyTransactionUpdateErrorMessage = "You can't update a completed transaction.";
+        public const string ModifyTransactionUpdateErrorMessage = "You can't update a completed transaction!";
+        public const string ModifyTransactionBlockedErrorMessage = "You are not allowed to make transactions while being blocked!";
+        public const string ModifyTransactionErrorMessage = "Only an admin or sender of the transaction is authorized to perform the specified action.";
 
-        public const string ModifyCurrencyErrorMessage = "You are not admin.";
-         
-        public const string ModifyAccountErrorMessage = "Only the admin or owner of the account can access, delete or modify it.";
-        public const string ModifyAccountCardErrorMessage = "Only the admin or owner of the account can add or remove a card.";
-
-        public const string ModifyCardErrorMessage = "Only the admin or owner of the card can update information.";
-
-        public const string ModifyTransferErrorMessage = "You are not authorized to create, delete or modify the transfer.";
+        //Constant messages for transfers
 
         public const string ModifyTransferAmountErrorMessage = "Insufficient balance.";
-
+        public const string ModifyTransferErrorMessage = "You are not authorized to create, delete or modify the transfer.";
         public const string ModifyTransferNoDataErrorMessage = "There are now results related to these parameters";
 
+        //Constant messages for currency
 
-
-
-
+        public const string ModifyCurrencyErrorMessage = "You are not admin.";
 
     }
 }

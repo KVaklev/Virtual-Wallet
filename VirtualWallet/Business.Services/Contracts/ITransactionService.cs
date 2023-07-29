@@ -7,11 +7,11 @@ namespace Business.Services.Contracts
 {
     public interface ITransactionService
     {
-        Transaction Create(CreateTransactionDto transactionDto, User user);
-        GetTransactionDto GetById(int id, User user);
-        Transaction Update(int id, User user, CreateTransactionDto transactionDto);
-        bool Delete(int id, User user);
-        PaginatedList<Transaction> FilterBy(TransactionQueryParameters filterParameters, User user);
-        public bool Execute(int transactionId, User user);
+        Task<GetTransactionDto> GetByIdAsync(int id, User loggedUser);
+        Task<PaginatedList<Transaction>> FilterByAsync(TransactionQueryParameters filterParameters, User loggedUser);
+        Task<Transaction> CreateAsync(CreateTransactionDto transactionDto, User loggedUser);
+        Task<Transaction> UpdateAsync(int id, User user, CreateTransactionDto transactionDto);
+        Task<bool> DeleteAsync(int id, User logedUser);
+        Task<bool> ExecuteAsync(int transactionId, User user);
     }
 }
