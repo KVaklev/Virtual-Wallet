@@ -44,26 +44,26 @@ namespace VirtualWallet.Controllers.API
             this.currencyService = currencyService;
 
         }
-        //[HttpGet, Authorize] // to make it async
-        //public IActionResult GetTransfer([FromQuery] TransferQueryParameters filterParameters)
-        //{
-        //    try
-        //    {
-        //        var loggedUser = FindLoggedUser();
-        //        var transfers = this.transferService.FilterBy(filterParameters, loggedUser);
-        //        List<GetTransferDto> transferDtos = transfers.Select(transfer => mapper.Map<GetTransferDto>(transfer)).ToList();
+        [HttpGet, Authorize] // to make it async
+        public IActionResult GetTransfer([FromQuery] TransferQueryParameters filterParameters)
+        {
+            try
+            {
+                var loggedUser = FindLoggedUser();
+                var transfers = this.transferService.FilterBy(filterParameters, loggedUser);
+                List<GetTransferDto> transferDtos = transfers.Select(transfer => mapper.Map<GetTransferDto>(transfer)).ToList();
 
-        //        return StatusCode(StatusCodes.Status200OK, transferDtos);
-        //    }
-        //    catch (EntityNotFoundException e)
-        //    {
-        //        return StatusCode(StatusCodes.Status404NotFound, e.Message);
-        //    }
-        //    catch (UnauthorizedOperationException e)
-        //    {
-        //        return StatusCode(StatusCodes.Status401Unauthorized, e.Message);
-        //    }
-        //}
+                return StatusCode(StatusCodes.Status200OK, transferDtos);
+            }
+            catch (EntityNotFoundException e)
+            {
+                return StatusCode(StatusCodes.Status404NotFound, e.Message);
+            }
+            catch (UnauthorizedOperationException e)
+            {
+                return StatusCode(StatusCodes.Status401Unauthorized, e.Message);
+            }
+        }
 
         [HttpGet("{id}"), Authorize]
 
@@ -175,10 +175,10 @@ namespace VirtualWallet.Controllers.API
             }
 
         }
-        private Task <User> FindLoggedUserAsync()
+        private async Task <User> FindLoggedUserAsync()
         {
             var loggedUsersUsername = User.Claims.FirstOrDefault(claim => claim.Type == "Username").Value;
-            var loggedUser = authManager.TryGetUserByUsernameAsync(loggedUsersUsername);
+            var loggedUser = await authManager.TryGetUserByUsernameAsync(loggedUsersUsername);
             return loggedUser;
         }
 
