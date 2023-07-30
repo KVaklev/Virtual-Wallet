@@ -45,12 +45,12 @@ namespace VirtualWallet.Controllers.API
 
         }
         [HttpGet, Authorize] // to make it async
-        public IActionResult GetTransfer([FromQuery] TransferQueryParameters filterParameters)
+        public async Task<IActionResult> GetTransfer([FromQuery] TransferQueryParameters filterParameters)
         {
             try
             {
-                var loggedUser = FindLoggedUser();
-                var transfers = this.transferService.FilterBy(filterParameters, loggedUser);
+                var loggedUser = await FindLoggedUserAsync();
+                var transfers = this.transferService.FilterByAsync(filterParameters, loggedUser);
                 List<GetTransferDto> transferDtos = transfers.Select(transfer => mapper.Map<GetTransferDto>(transfer)).ToList();
 
                 return StatusCode(StatusCodes.Status200OK, transferDtos);
