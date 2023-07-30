@@ -13,14 +13,12 @@ namespace Business.Services.Models
     {
         private readonly IAccountRepository accountRepository;
         private readonly ICardRepository cardRepository;
-        private readonly IMapper mapper;
         private readonly ICurrencyRepository currencyRepository;
 
         public AccountService(IAccountRepository accountRepository, ICardRepository cardRepository, IMapper mapper, ICurrencyRepository currencyRepository)
         {
             this.accountRepository = accountRepository;
             this.cardRepository = cardRepository;
-            this.mapper = mapper;
             this.currencyRepository = currencyRepository;
         }
         public IQueryable<Account> GetAll()
@@ -28,28 +26,20 @@ namespace Business.Services.Models
             return accountRepository.GetAll();
         }
 
-        public async Task<PaginatedList<Account>> FilterByAsync(AccountQueryParameters filterParameters)
-        {
-            return await this.accountRepository.FilterByAsync(filterParameters);
-        }
 
         public async Task<Account> CreateAsync(CreateAccountDto accountDto, User user)
         {
-            Account account = mapper.Map<Account>(accountDto);
-            account.CurrencyId = currencyRepository.GetByАbbreviationAsync(accountDto.Abbreviation).Id;
-
+            Account account = new Account();
+            account.Currency = await currencyRepository.GetByАbbreviationAsync(accountDto.Abbreviation);
+            account.CurrencyId = account.Currency.Id;
+            
             Account accountToCreate = await this.accountRepository.CreateAsync(account, user);
 
             return accountToCreate;
         }
 
         public async Task <bool> DeleteAsync(int id, User loggedUser)
-        {
-            if (!(await IsUserAuthorized(id, loggedUser)))
-            {
-                throw new UnauthorizedOperationException(Constants.ModifyAccountErrorMessage);
-            }
-
+        { 
             return await this.accountRepository.DeleteAsync(id);
         }
 
@@ -103,6 +93,5 @@ namespace Business.Services.Models
             return IsUserAccountOwnerOrAdminId;
 
         }
-
     }
 }

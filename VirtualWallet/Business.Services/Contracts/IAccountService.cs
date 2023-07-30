@@ -13,17 +13,11 @@ namespace Business.Services.Contracts
     public interface IAccountService
     {
         IQueryable<Account> GetAll();
-        Task<PaginatedList<Account>> FilterByAsync(AccountQueryParameters accountQueryParameters);
         Task <Account> GetByIdAsync(int id, User user);
         Task <Account> GetByUsernameAsync(int id, User user);
         Task <Account> CreateAsync(CreateAccountDto accountDto, User user);
         Task <bool> AddCardAsync(int id, Card card, User user);
         Task <bool> RemoveCardAsync(int id,  Card card, User user);
         Task <bool> DeleteAsync(int id, User loggedUser);
-
-       
-
-
-
     }
 }

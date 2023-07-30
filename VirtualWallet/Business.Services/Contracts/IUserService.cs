@@ -1,4 +1,5 @@
-﻿using Business.QueryParameters;
+﻿using Business.Dto;
+using Business.QueryParameters;
 using DataAccess.Models.Models;
 
 namespace Business.Services.Contracts
@@ -11,7 +12,7 @@ namespace Business.Services.Contracts
         Task<User> GetByUsernameAsync(string username);
         Task<User> GetByEmailAsync(string email);
         Task<User> GetByPhoneNumberAsync(string phoneNumber);
-        Task<User> CreateAsync(User user);
+        Task<GetUserDto> CreateAsync(CreateUserDto createUserDto);
         Task<User> UpdateAsync(int id, User user, User loggedUser);
         Task<bool> DeleteAsync(int id, User loggedUser);
         Task<User> PromoteAsync(int id, User loggedUser);

@@ -9,9 +9,12 @@ namespace Business.Mappers
         public UsersMapper()
         {
             //DTO
-            CreateMap<GetUserDto, User>();
+            CreateMap<GetUserDto, User>()
+                .ForPath(u => u.Account.Currency.Abbreviation, u => u.MapFrom(u => u.Abbreviation))
+                .ForPath(u => u.Account.Balance, u => u.MapFrom(u => u.Balance))
+                .ReverseMap(); 
             CreateMap<CreateUserDto, User>();
-            CreateMap<User, GetUserDto>();
+            // CreateMap<User, GetUserDto>(); - TODO - check is this necessary
             CreateMap<User, CreateUserDto>();
             CreateMap<User, UpdateUserDto>();
             CreateMap<UpdateUserDto, User>();
