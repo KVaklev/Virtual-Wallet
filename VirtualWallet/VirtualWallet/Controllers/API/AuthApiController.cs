@@ -18,16 +18,13 @@ namespace VirtualWallet.Controllers.API
     public class AuthApiController : ControllerBase
     {
         private readonly IAuthManager authManager;
-        private readonly IMapper mapper;
         private readonly IUserService userService;
 
         public AuthApiController(
-            IAuthManager authManager,
-            IMapper mapper, 
+            IAuthManager authManager, 
             IUserService userService)
         {
             this.authManager = authManager;
-            this.mapper = mapper;
             this.userService = userService;
         }
 
@@ -37,21 +34,21 @@ namespace VirtualWallet.Controllers.API
         {
             try
             {
-                var loggedUser = await authManager.TryGetUserByUsernameAsync(username);
-
-                if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
-                {
-                    return BadRequest("Username and/or Password not specified");
-                }
+                this.authManager.CheckForNullEntry(username, password);
+                var loggedUser = await this.authManager.TryGetUserByUsernameAsync(username);
+                var authenticatedUser = await this.authManager.AuthenticateAsync(loggedUser, username, password);
 
                 string token = await CreateApiTokenAsync(loggedUser);
 
                 return Ok("Logged in successfully. Token: " + token);
-
             }
-            catch (UnauthorizedOperationException ex)
+            catch (ArgumentException e)
             {
-                return StatusCode(StatusCodes.Status401Unauthorized, ex.Message);
+                return StatusCode(StatusCodes.Status400BadRequest, e.Message);
+            }
+            catch (UnauthorizedOperationException e)
+            {
+                return StatusCode(StatusCodes.Status401Unauthorized, e.Message);
             }
             catch
             {
@@ -66,11 +63,12 @@ namespace VirtualWallet.Controllers.API
             try
             {
                 var createdUser = await this.userService.CreateAsync(createUserDto);
+                
                 return StatusCode(StatusCodes.Status201Created, createdUser);
             }
-            catch (DuplicateEntityException ex)
+            catch (DuplicateEntityException e)
             {
-                return StatusCode(StatusCodes.Status409Conflict, ex.Message);
+                return StatusCode(StatusCodes.Status409Conflict, e.Message);
             }
         }
 

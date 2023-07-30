@@ -175,18 +175,18 @@ namespace DataAccess.Repositories.Models
         {
             if (user?.PhoneNumber != null)
             {
-                userToUpdate.PhoneNumber = user.PhoneNumber;
+                await Task.FromResult(userToUpdate.PhoneNumber = user.PhoneNumber);
             }
         }
         private async Task UpdateAdminStatusAsync(User user, User userToUpdate)
         {
             if (!userToUpdate.IsAdmin)
             {
-                userToUpdate.IsAdmin = user.IsAdmin;
+                await Task.FromResult(userToUpdate.IsAdmin = user.IsAdmin);
             }
             else
             {
-                userToUpdate.IsAdmin = true;
+                await Task.FromResult(userToUpdate.IsAdmin = true);
             }
         }
         private async Task<IQueryable<User>> FilterByUsernameAsync(IQueryable<User> result, string? username)

@@ -32,7 +32,8 @@ namespace DataAccess.Models.Models
 
         [Required(ErrorMessage = Constants.EmptyFieldErrorMessage)]
         [Password]
-        public string Password { get; set; }
+        public byte[] Password { get; set; }
+        public byte[]? PasswordKey { get; set; }
 
         [Required(ErrorMessage = Constants.EmptyFieldErrorMessage)]
         [PhoneNumber(ErrorMessage = Constants.PhoneNumberFieldErroMessage)]

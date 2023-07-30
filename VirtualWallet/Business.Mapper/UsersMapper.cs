@@ -20,5 +20,14 @@ namespace Business.Mappers
             CreateMap<UpdateUserDto, User>();
 
         }
+
+        public static async Task<User> MapCreateDtoToUserAsync(CreateUserDto createUserDto)
+        {
+            User newUser = new User();
+            newUser.Username = createUserDto.Username;
+            newUser.Email = createUserDto.Email;
+            newUser.PhoneNumber = createUserDto.PhoneNumber;
+            return newUser;
+        }
     }
 }
