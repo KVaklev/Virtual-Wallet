@@ -21,6 +21,8 @@ namespace DataAccess.Repositories.Models
         {
             var users = context.Users
                 .Where(u => u.IsDeleted == false)
+                .Include(u=>u.Account)
+                .ThenInclude(c=>c.Currency)
                 .AsQueryable();
 
             return users ?? throw new EntityNotFoundException("There are no users.");
@@ -54,6 +56,8 @@ namespace DataAccess.Repositories.Models
             User? user = await context.Users
                 .Where(u => u.IsDeleted == false)
                 .Where(users => users.Id == id)
+                .Include(u => u.Account)
+                .ThenInclude(c => c.Currency)
                 .FirstOrDefaultAsync();
             return user ?? throw new EntityNotFoundException($"User with ID = {id} doesn't exist.");
         }

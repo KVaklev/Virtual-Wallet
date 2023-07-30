@@ -68,8 +68,7 @@ namespace VirtualWallet.Controllers.API
         {
             try
             {
-                User user = mapper.Map<User>(createUserDto);
-                User createdUser = await userService.CreateAsync(user);
+                GetUserDto createdUser = await userService.CreateAsync(createUserDto);
 
                 return StatusCode(StatusCodes.Status201Created, createdUser);
             }

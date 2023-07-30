@@ -12,8 +12,6 @@ namespace DataAccess.Repositories.Contracts
     {
         IQueryable<Account> GetAll();
 
-        PaginatedList<Account> FilterBy(AccountQueryParameters filterParameters);
-
         Task <Account> GetByIdAsync(int id);
 
         Task <Account> GetByUsernameAsync(string username);
@@ -36,7 +34,7 @@ namespace DataAccess.Repositories.Contracts
 
         public bool AccountExists(int id);
 
-        
+        // bool AccountExists(int id);
 
 
     }

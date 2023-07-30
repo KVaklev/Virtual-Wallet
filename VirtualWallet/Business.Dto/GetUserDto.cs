@@ -12,5 +12,11 @@ namespace Business.Dto
 
         [Required]
         public string PhoneNumber { get; set;}
+
+        [Required]
+        public decimal Balance { get; set;}
+
+        [Required]
+        public string Abbreviation { get; set;}
     }
 }

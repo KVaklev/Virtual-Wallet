@@ -20,10 +20,12 @@ namespace DataAccess.Repositories.Models
         public IQueryable<History> GetAll(User loggedUser)
         {
             IQueryable<History> result = context.History
-                    .Include(tr => tr.Transaction)
-                    .Include(tf => tf.Transfer)
-                    .Include(ac => ac.Account)
-                    .ThenInclude(u => u.User);
+                .Include(tr => tr.Transaction)
+                .ThenInclude(c => c.Currency)
+                .Include(tf => tf.Transfer)
+                .ThenInclude(c => c.Currency)
+                .Include(ac => ac.Account)
+                .ThenInclude(u => u.User);
 
             if (!loggedUser.IsAdmin)
             { 
@@ -37,7 +39,9 @@ namespace DataAccess.Repositories.Models
         {
             var history = await context.History
                 .Include(tr=>tr.Transaction)
+                .ThenInclude(c=>c.Currency)
                 .Include(tf=>tf.Transfer)
+                .ThenInclude(c => c.Currency)
                 .Include(ac=>ac.Account)
                 .ThenInclude(u=>u.User)
                 .FirstOrDefaultAsync(h => h.Id == id);

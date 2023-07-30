@@ -109,11 +109,11 @@ namespace DataAccess.Repositories.Models
         public async Task <Account> GetByIdAsync(int id)
         {
             Account account = await context.Accounts
+                .Where(a => a.IsDeleted == false)
+                .Where(a => a.Id == id)
                 .Include(a => a.User)
                 .Include(a => a.Cards)
                 .Include(a => a.Currency)
-                .Where(a => a.IsDeleted == false)
-                .Where(a => a.Id == id)
                 .FirstOrDefaultAsync();
 
             return account ?? throw new EntityNotFoundException($"Account with ID ={id} does not exist.");
@@ -165,90 +165,7 @@ namespace DataAccess.Repositories.Models
             return true;
         }
 
-        public PaginatedList<Account> FilterBy(AccountQueryParameters filterParameters)
-        {
-            IQueryable<Account> result = context.Accounts
-                .Where(a => a.IsDeleted == false);
-
-
-            result = FilterByUsername(result, filterParameters.Username);
-            result = FilterByFromDate(result, filterParameters.FromDate);
-            result = FilterByToDate(result, filterParameters.ToDate);
-            result = FilterByCurrencyAbbrev(result, filterParameters.Currencyabbrev);
-
-            int totalPages = (result.Count() + filterParameters.PageSize - 1) / filterParameters.PageSize;
-
-            result = Paginate(result, filterParameters.PageNumber, filterParameters.PageSize);
-
-            return new PaginatedList<Account>(result.ToList(), totalPages, filterParameters.PageNumber);
-
-
-        }
-
-        public static IQueryable<Account> Paginate(IQueryable<Account> result, int pageNumber, int pageSize)
-        {
-            return result
-                .Skip((pageNumber - 1) * pageSize)
-                .Take(pageSize);
-        }
-
-        public IQueryable<Account> FilterByUsername(IQueryable<Account> accounts, string? username)
-        {
-            if (!string.IsNullOrEmpty(username))
-            {
-                accounts = accounts.Where(a => a.User.Username == username);
-            }
-
-            return accounts;
-        }
-        private IQueryable<Account> FilterByFromDate(IQueryable<Account> accounts, string? fromDate)
-        {
-            if (!string.IsNullOrEmpty(fromDate))
-            {
-                DateTime date = DateTime.Parse(fromDate);
-
-                accounts = accounts.Where(a => a.DateCreated >= date);
-            }
-
-            return accounts;
-        }
-
-        private IQueryable<Account> FilterByToDate(IQueryable<Account> accounts, string? toDate)
-        {
-            if (!string.IsNullOrEmpty(toDate))
-            {
-                DateTime date = DateTime.Parse(toDate);
-
-                accounts = accounts.Where(a => a.DateCreated <= date);
-            }
-
-            return accounts;
-        }
-
-        private IQueryable<Account> FilterByCurrencyAbbrev(IQueryable<Account> accounts, string? currencyabbrev)
-        {
-            if (!string.IsNullOrEmpty(currencyabbrev))
-            {
-                accounts = accounts.Where(a => a.Currency.Abbreviation == currencyabbrev);
-            }
-
-            return accounts;
-        }
-
-        private IQueryable<Account> SortBy(IQueryable<Account> accounts, string sortCriteria)
-        {
-            switch (sortCriteria)
-            {
-                case "balance":
-                    return accounts.OrderBy(a => a.Balance);
-                case "date":
-                    return accounts.OrderBy(a => a.DateCreated);
-                case "cards":
-                    return accounts.OrderBy(a => a.Cards.Count());
-                default:
-                    return accounts;
-            }
-        }
+        
         public bool CardExists(string cardNumber)
         {
             return context.Cards
@@ -264,9 +181,5 @@ namespace DataAccess.Repositories.Models
                 .Where(a => a.IsDeleted == false)
                 .Any(account => account.Id == id);
         }
-
-
-
-
     }
 }
