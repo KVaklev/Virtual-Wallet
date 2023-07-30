@@ -28,9 +28,9 @@ namespace Business.Services.Models
             return accountRepository.GetAll();
         }
 
-        public PaginatedList<Account> FilterBy(AccountQueryParameters filterParameters)
+        public async Task<PaginatedList<Account>> FilterByAsync(AccountQueryParameters filterParameters)
         {
-            return this.accountRepository.FilterBy(filterParameters);
+            return await this.accountRepository.FilterByAsync(filterParameters);
         }
 
         public async Task<Account> CreateAsync(CreateAccountDto accountDto, User user)
@@ -103,9 +103,6 @@ namespace Business.Services.Models
             return IsUserAccountOwnerOrAdminId;
 
         }
-
-
-
 
     }
 }

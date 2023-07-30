@@ -13,7 +13,7 @@ namespace Business.Services.Contracts
     public interface IAccountService
     {
         IQueryable<Account> GetAll();
-        PaginatedList<Account> FilterBy(AccountQueryParameters accountQueryParameters);
+        Task<PaginatedList<Account>> FilterByAsync(AccountQueryParameters accountQueryParameters);
         Task <Account> GetByIdAsync(int id, User user);
         Task <Account> GetByUsernameAsync(int id, User user);
         Task <Account> CreateAsync(CreateAccountDto accountDto, User user);
