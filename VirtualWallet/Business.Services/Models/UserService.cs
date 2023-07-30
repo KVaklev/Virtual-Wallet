@@ -18,21 +18,18 @@ namespace Business.Services.Models
         private readonly IAccountRepository accountRepository;
         private readonly IAccountService accountService;
         private readonly IMapper mapper;
-        private readonly ApplicationContext context;
 
         public UserService(
             IUserRepository userRepository,
             IAccountRepository accountRepository,
             IAccountService accountService,
-            IMapper mapper,
-            ApplicationContext context
+            IMapper mapper
             )
         {
             this.userRepository = userRepository;
             this.accountRepository = accountRepository;
             this.accountService = accountService;
             this.mapper = mapper;
-            this.context = context;
         }
 
         public IQueryable<User> GetAll()
@@ -65,6 +62,7 @@ namespace Business.Services.Models
         public async Task<GetUserDto> CreateAsync(CreateUserDto createUserDto)
         {
             User user = mapper.Map<User>(createUserDto);
+            
             if (await UsernameExistsAsync(user.Username))
             {
                 throw new DuplicateEntityException($"User with username '{user.Username}' already exists.");
@@ -81,13 +79,8 @@ namespace Business.Services.Models
             }
            
             User createdUser = await this.userRepository.CreateAsync(user);
-            var createAccountDto = new CreateAccountDto()
-            {
-                Abbreviation = createUserDto.Abbreviation
-            };
-            Account createdAcount = await this.accountService.CreateAsync(createAccountDto, createdUser);
-            createdUser.AccountId = createdAcount.Id;
-            await context.SaveChangesAsync();
+            await this.accountService.CreateAsync(createUserDto.Abbreviation, createdUser);
+ 
             GetUserDto getUserDto = mapper.Map<GetUserDto>(createdUser);
 
             return getUserDto;
@@ -131,8 +124,8 @@ namespace Business.Services.Models
                 throw new UnauthorizedOperationException(Constants.ModifyUserErrorMessage);
             } 
             
-             var accountToDelete = await this.accountRepository.GetByIdAsync((int)userToDelete.AccountId);
-             await this.accountService.DeleteAsync(accountToDelete.Id, loggedUser);
+            var accountToDelete = await this.accountRepository.GetByIdAsync((int)userToDelete.AccountId);
+            await this.accountService.DeleteAsync(accountToDelete.Id, loggedUser);
 
             return await this.userRepository.DeleteAsync(id);
         }
@@ -172,6 +165,5 @@ namespace Business.Services.Models
         {
             return await this.userRepository.PhoneNumberExistsAsync(phoneNumber);
         }
-       
     }
 }
