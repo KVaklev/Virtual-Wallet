@@ -117,9 +117,9 @@ namespace Business.Services.Models
 
             return await this.transferRepository.UpdateAsync(transferToUpdate.Id, updatedTransfer);
         }
-        public async Task<PaginatedList<Transfer>> FilterByAsync(TransferQueryParameters transferQueryParameters, User user)
+        public async Task<PaginatedList<Transfer>> FilterByAsync(TransferQueryParameters transferQueryParameters, User loggedUser)
         {
-            var result = await this.transferRepository.FilterByAsync(transferQueryParameters, user.Username);
+            var result = await this.transferRepository.FilterByAsync(transferQueryParameters, loggedUser.Username);
 
             if (result.Count == 0)
             {
@@ -193,10 +193,10 @@ namespace Business.Services.Models
         public async Task<Transfer> MapDtoToTransferAsync(CreateTransferDto transferDto, User user, Card card)
         {
             var transfer = this.mapper.Map<Transfer>(transferDto);
-            transfer.Card = card;
             transfer.AccountId = (int)user.AccountId;
             transfer.Account = await this.accountRepository.GetByIdAsync((int)user.AccountId);
             transfer.Currency = await this.currencyRepository.GetByАbbreviationAsync(transferDto.Abbreviation);
+            transfer.Card = await this.cardRepository.GetByIdAsync(card.Id); 
             transfer.CurrencyId = transfer.Currency.Id;
 
             return transfer;

@@ -23,9 +23,11 @@ namespace DataAccess.Repositories.Models
             IQueryable<Transfer> result = context.Transfers
             .Include(a => a.Account)
             .ThenInclude(u => u.User)
-            .Include(c => c.Currency);
+            .Include(c => c.Currency)
+            .Include(t => t.Card);
 
-            result = result.Where(a => a.Account.User.Username == username);
+             result = result.Where(a => a.Account.User.Username == username);
+
 
             return result ?? throw new EntityNotFoundException("There are no transfers!");
         }
@@ -57,7 +59,7 @@ namespace DataAccess.Repositories.Models
                 .Include(t => t.Account)
                 .ThenInclude(u => u.User)
                 .Include(t => t.Currency)
-                .FirstOrDefaultAsync(t => t.Id == id);
+                                .FirstOrDefaultAsync(t => t.Id == id);
 
             return transfer ?? throw new EntityNotFoundException($"Transfer with ID = {id} does not exist");
 
