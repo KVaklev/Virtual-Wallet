@@ -133,6 +133,7 @@ namespace Business.Services.Models
             transactionOut.Date = DateTime.Now;
             var transactionInAmount = await GetTransactionInAmountAsync(transactionOut);
             var transactionIn = await this.transactionRepository.CreateInTransactionAsync(transactionOut, transactionInAmount);
+            
             await this.accountRepository.DecreaseBalanceAsync(transactionOut.AccountSenderId, transactionOut.Amount);
             await this.accountRepository.IncreaseBalanceAsync(transactionIn.AccountRecepientId, transactionIn.Amount);
 
@@ -145,7 +146,7 @@ namespace Business.Services.Models
         {
             var transactionInAmount = transactionOut.Amount;
             var senderAccountCurrencyCode = transactionOut.AccountSender.Currency.CurrencyCode;
-            var recepientAccountCurrencyCode = "USD";//transactionOut.AccountRecepient.Currency.CurrencyCode;
+            var recepientAccountCurrencyCode = transactionOut.AccountRecepient.Currency.CurrencyCode;
             var recepientAccountCurrencyCodeResult = await IsDifferentAccountRecipientCurrencyAsync(senderAccountCurrencyCode, recepientAccountCurrencyCode);
             
             if (recepientAccountCurrencyCodeResult.IsSuccessful)

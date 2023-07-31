@@ -88,7 +88,7 @@ namespace DataAccess.Repositories.Models
             transactionIn.AccountRecepientId = transactionOut.AccountRecepientId;
             transactionIn.AccountSenderId = transactionOut.AccountSenderId;
             transactionIn.Amount = amount;
-            transactionIn.CurrencyId = transactionOut.CurrencyId;
+            transactionIn.CurrencyId = (int)transactionOut.AccountRecepient.CurrencyId;
             transactionIn.Direction = DirectionType.In;
             transactionIn.Date = DateTime.Now;
             transactionIn.IsDeleted = false;
