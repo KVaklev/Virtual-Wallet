@@ -44,7 +44,7 @@ namespace DataAccess.Repositories.Models
         {
             var currencyToUpdate = await this.GetByIdAsync(id);
             currencyToUpdate.Name = currency.Name;
-            currencyToUpdate.Abbreviation = currency.Abbreviation;
+            currencyToUpdate.CurrencyCode = currency.CurrencyCode;
             await context.SaveChangesAsync();
 
             return currencyToUpdate;
@@ -62,7 +62,7 @@ namespace DataAccess.Repositories.Models
         public async Task<Currency> GetByАbbreviationAsync(string abbreviation)
         {
             var currency = await context.Currencies
-                    .Where(c => c.Abbreviation == abbreviation)
+                    .Where(c => c.CurrencyCode == abbreviation)
                     .FirstOrDefaultAsync();
  
             return currency ?? throw new EntityNotFoundException("Тhere is no such currency.");

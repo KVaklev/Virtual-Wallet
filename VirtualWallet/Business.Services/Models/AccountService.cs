@@ -30,7 +30,7 @@ namespace Business.Services.Models
         public async Task<Account> CreateAsync(CreateAccountDto accountDto, User user)
         {
             Account account = new Account();
-            account.Currency = await currencyRepository.GetByАbbreviationAsync(accountDto.Abbreviation);
+            account.Currency = await currencyRepository.GetByАbbreviationAsync(accountDto.currencyCode);
             account.CurrencyId = account.Currency.Id;
             
             Account accountToCreate = await this.accountRepository.CreateAsync(account, user);

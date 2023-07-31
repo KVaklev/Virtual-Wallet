@@ -14,10 +14,10 @@ namespace Business.Mappers
 
             CreateMap<Account, GetAccountDto>()
             .ForMember(u => u.Username, t => t.MapFrom(a => a.User.Username))
-            .ForMember(a => a.Abbreviation, c => c.MapFrom(a => a.Currency.Abbreviation));
+            .ForMember(a => a.CurrencyCode, c => c.MapFrom(a => a.Currency.CurrencyCode));
 
             CreateMap<Account, CreateAccountDto>()
-            .ForMember(u => u.Abbreviation, c => c.MapFrom(a => a.Currency.Abbreviation));
+            .ForMember(u => u.currencyCode, c => c.MapFrom(a => a.Currency.CurrencyCode));
         }
     }
 }

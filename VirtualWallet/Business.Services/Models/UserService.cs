@@ -83,7 +83,7 @@ namespace Business.Services.Models
             User createdUser = await this.userRepository.CreateAsync(user);
             var createAccountDto = new CreateAccountDto()
             {
-                Abbreviation = createUserDto.Abbreviation
+                currencyCode = createUserDto.CurrencyCode
             };
             Account createdAcount = await this.accountService.CreateAsync(createAccountDto, createdUser);
             createdUser.AccountId = createdAcount.Id;

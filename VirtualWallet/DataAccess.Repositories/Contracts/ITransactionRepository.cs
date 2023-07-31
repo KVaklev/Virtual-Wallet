@@ -11,7 +11,7 @@ namespace DataAccess.Repositories.Contracts
         Task<PaginatedList<Transaction>> FilterByAsync(TransactionQueryParameters filterParameters, string username);
         Task<Transaction> UpdateAsync(Transaction transactionToUpdate, Transaction transaction);
         Task<bool> DeleteAsync(Transaction transaction);
-        Task<Transaction> CreateInTransactionAsync(Transaction transactionOut);
+        Task<Transaction> CreateInTransactionAsync(Transaction transactionOut, decimal amount);
         Task<Transaction> CreateOutTransactionAsync(Transaction trasaction);
 
     }

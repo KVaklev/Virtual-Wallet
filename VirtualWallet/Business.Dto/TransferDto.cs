@@ -12,7 +12,7 @@ namespace Business.Dto
         public string Username { get; set; }
         public DateTime Date { get; set; }
 
-        public string Abbreviation { get; set; }
+        public string CurrencyCode { get; set; }
 
         public string CardNumber { get; set; }
 

@@ -71,13 +71,13 @@ namespace Business.Services.Models
                 historyDto.From = history.Transaction.AccountSender.User.Username;
                 historyDto.To = history.Transaction.AccountRecepient.User.Username;
                 historyDto.Amount = history.Transaction.Amount;
-                historyDto.Аbbreviation = history.Transaction.Currency.Abbreviation;
+                historyDto.CurrencyCode = history.Transaction.Currency.CurrencyCode;
                 historyDto.Direction = history.Transaction.Direction.ToString();
             }
             else
             {
                 historyDto.Amount = history.Transfer.Amount;
-                historyDto.Аbbreviation = history.Transfer.Currency.Abbreviation;
+                historyDto.CurrencyCode = history.Transfer.Currency.CurrencyCode;
                 historyDto.Direction = history.Transfer.TransferType.ToString();
 
                 if (history.Transfer.TransferType == TransferDirection.Deposit)

@@ -12,7 +12,7 @@ namespace Business.DTOs
 
         public DateTime Date { get; set;}
 
-        public string Abbreviation { get; set;}
+        public string CurrencyCode { get; set;}
 
         public decimal Amount { get; set;}
 
