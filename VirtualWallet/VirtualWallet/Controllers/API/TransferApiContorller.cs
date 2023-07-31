@@ -44,26 +44,26 @@ namespace VirtualWallet.Controllers.API
             this.currencyService = currencyService;
 
         }
-        //[HttpGet, Authorize] // to make it async
-        //public async Task<IActionResult> GetTransfer([FromQuery] TransferQueryParameters filterParameters)
-        //{
-        //    try
-        //    {
-        //        var loggedUser = await FindLoggedUserAsync();
-        //        var transfers = this.transferService.FilterByAsync(filterParameters, loggedUser);
-        //        List<GetTransferDto> transferDtos = transfers.Select(transfer => mapper.Map<GetTransferDto>(transfer)).ToList();
+        [HttpGet, Authorize] // to make it async
+        public async Task<IActionResult> GetTransferAsync([FromQuery] TransferQueryParameters filterParameters)
+        {
+            try
+            {
+                var loggedUser = await FindLoggedUserAsync();
+                var transfers = await this.transferService.FilterByAsync(filterParameters, loggedUser);
+                List<GetTransferDto> transferDtos = transfers.Select(transfer => mapper.Map<GetTransferDto>(transfer)).ToList();
 
-        //        return StatusCode(StatusCodes.Status200OK, transferDtos);
-        //    }
-        //    catch (EntityNotFoundException e)
-        //    {
-        //        return StatusCode(StatusCodes.Status404NotFound, e.Message);
-        //    }
-        //    catch (UnauthorizedOperationException e)
-        //    {
-        //        return StatusCode(StatusCodes.Status401Unauthorized, e.Message);
-        //    }
-        //}
+                return StatusCode(StatusCodes.Status200OK, transferDtos);
+            }
+            catch (EntityNotFoundException e)
+            {
+                return StatusCode(StatusCodes.Status404NotFound, e.Message);
+            }
+            catch (UnauthorizedOperationException e)
+            {
+                return StatusCode(StatusCodes.Status401Unauthorized, e.Message);
+            }
+        }
 
         [HttpGet("{id}"), Authorize]
 

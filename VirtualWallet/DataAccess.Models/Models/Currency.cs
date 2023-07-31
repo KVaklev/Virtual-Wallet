@@ -19,7 +19,7 @@ namespace DataAccess.Models.Models
 
         public List<Transaction> Transactions { get; set; } = new List<Transaction>();
 
-        public List<Transfer> Transfer { get; set; } = new List<Transfer>();
+        //public List<Transfer> Transfer { get; set; } = new List<Transfer>();
 
         public bool IsDeleted { get; set; }
     }

@@ -39,6 +39,7 @@ namespace Business.Services.Models
             this.context = context;
             this.mapper = mapper;
             this.currencyRepository = currencyRepository;
+            this.cardRepository = cardRepository;
         }
 
         public IQueryable<Transfer> GetAll(string username)
@@ -62,7 +63,9 @@ namespace Business.Services.Models
 
         public async Task<Transfer> CreateAsync(CreateTransferDto transferDto, User user)
         {
-            var transfer = await MapDtoToTransferAsync(transferDto, user);
+            var card = this.cardRepository.GetByAccountId((int)user.AccountId).FirstOrDefault(x => x.CardNumber == transferDto.CardNumber);
+
+            var transfer = await MapDtoToTransferAsync(transferDto, user, card);
 
             if (user.IsBlocked)
             {
@@ -96,6 +99,8 @@ namespace Business.Services.Models
 
         public async Task<Transfer> UpdateAsync(int id, CreateTransferDto transferDto, User user)
         {
+            var card = this.cardRepository.GetByAccountId((int)user.AccountId).FirstOrDefault(x => x.CardNumber == transferDto.CardNumber);
+
             if (!await IsUserAuthorizedAsync(id, user.Id))
             {
                 throw new UnauthorizedOperationException(Constants.ModifyTransferErrorMessage);
@@ -108,20 +113,21 @@ namespace Business.Services.Models
                 throw new UnauthorizedOperationException(Constants.ModifyTransferUpdateDeleteErrorErrorMessage);
             }
 
-            var updatedTransfer = await MapDtoToTransferAsync(transferDto, user);
+            var updatedTransfer = await MapDtoToTransferAsync(transferDto, user, card);
 
             return await this.transferRepository.UpdateAsync(transferToUpdate.Id, updatedTransfer);
         }
-        public PaginatedList<Transfer> FilterBy(TransferQueryParameters transferQueryParameters, User user)
+        public async Task<PaginatedList<Transfer>> FilterByAsync(TransferQueryParameters transferQueryParameters, User user)
         {
-            var result = this.transferRepository.FilterBy(transferQueryParameters, user.Username);
+            var result = await this.transferRepository.FilterByAsync(transferQueryParameters, user.Username);
 
             if (result.Count == 0)
             {
                 throw new EntityNotFoundException(Constants.ModifyTransferNoDataErrorMessage);
             }
 
-            return result;
+            return await Task.FromResult(result);
+
         }
 
         public async Task<bool> ExecuteAsync(int transferId, User user)
@@ -184,9 +190,10 @@ namespace Business.Services.Models
             return IsUserAuthorized;
 
         }
-        public async Task<Transfer> MapDtoToTransferAsync(CreateTransferDto transferDto, User user)
+        public async Task<Transfer> MapDtoToTransferAsync(CreateTransferDto transferDto, User user, Card card)
         {
             var transfer = this.mapper.Map<Transfer>(transferDto);
+            transfer.Card = card;
             transfer.AccountId = (int)user.AccountId;
             transfer.Account = await this.accountRepository.GetByIdAsync((int)user.AccountId);
             transfer.Currency = await this.currencyRepository.GetByАbbreviationAsync(transferDto.Abbreviation);

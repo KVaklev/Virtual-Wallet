@@ -5,18 +5,18 @@ namespace DataAccess.Repositories.Contracts
 {
     public interface ITransferRepository
     {
-        IQueryable <Transfer> GetAll(string username);
-        PaginatedList<Transfer> FilterBy(TransferQueryParameters filterParameters, string username);
-       
-        Task <Transfer> GetByIdAsync(int id);
+        IQueryable<Transfer> GetAll(string username);
+        Task<PaginatedList<Transfer>> FilterByAsync(TransferQueryParameters filterParameters, string username);
 
-        Task <Transfer> GetByUserIdAsync(int userId);
+        Task<Transfer> GetByIdAsync(int id);
 
-        Task <Transfer> CreateAsync(Transfer transfer);
+        Task<Transfer> GetByUserIdAsync(int userId);
 
-        Task <Transfer> UpdateAsync(int id, Transfer transfer);
+        Task<Transfer> CreateAsync(Transfer transfer);
 
-        Task <bool> DeleteAsync(int id);
+        Task<Transfer> UpdateAsync(int id, Transfer transfer);
+
+        Task<bool> DeleteAsync(int id);
 
 
 
