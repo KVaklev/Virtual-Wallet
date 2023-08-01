@@ -5,8 +5,8 @@ namespace DataAccess.Repositories.Contracts
 {
     public interface ITransferRepository
     {
-        IQueryable<Transfer> GetAll(string username);
-        Task<PaginatedList<Transfer>> FilterByAsync(TransferQueryParameters filterParameters, string username);
+        IQueryable<Transfer> GetAll(User user);
+        Task<PaginatedList<Transfer>> FilterByAsync(TransferQueryParameters filterParameters, User user);
 
         Task<Transfer> GetByIdAsync(int id);
 

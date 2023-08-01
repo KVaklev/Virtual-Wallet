@@ -12,8 +12,8 @@ namespace Business.Services.Contracts
 {
     public interface ITransferService
     {
-        IQueryable <Transfer> GetAll(string username);
-        Task<PaginatedList<Transfer>> FilterByAsync(TransferQueryParameters transferQueryParameters, User username);
+        IQueryable <Transfer> GetAll(User user);
+        Task<PaginatedList<Transfer>> FilterByAsync(TransferQueryParameters transferQueryParameters, User user);
         Task <GetTransferDto> GetByIdAsync(int id, User user);
         Task <Transfer> CreateAsync(CreateTransferDto transferDto, User user);
         Task <Transfer> UpdateAsync(int id, CreateTransferDto transferDto, User user);

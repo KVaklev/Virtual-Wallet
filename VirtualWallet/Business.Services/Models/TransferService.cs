@@ -42,14 +42,14 @@ namespace Business.Services.Models
             this.cardRepository = cardRepository;
         }
 
-        public IQueryable<Transfer> GetAll(string username)
+        public IQueryable<Transfer> GetAll(User user)
         {
-            return transferRepository.GetAll(username);
+            return transferRepository.GetAll(user);
         }
 
         public async Task<GetTransferDto> GetByIdAsync(int id, User user)
         {
-            if (!(await IsUserAuthorizedAsync(id, user.Id) || user.IsAdmin != true))
+            if (!(await IsUserAuthorizedAsync(id, user.Id) || user.IsAdmin ))
             {
                 throw new UnauthorizedOperationException(Constants.ModifyTransferGetByIdErrorMessage);
             }
@@ -82,6 +82,7 @@ namespace Business.Services.Models
 
             return createdTransfer;
         }
+       
         public async Task<bool> DeleteAsync(int id, User user)
         {
             if (!await IsUserAuthorizedAsync(id, user.Id))
@@ -117,9 +118,10 @@ namespace Business.Services.Models
 
             return await this.transferRepository.UpdateAsync(transferToUpdate.Id, updatedTransfer);
         }
+      
         public async Task<PaginatedList<Transfer>> FilterByAsync(TransferQueryParameters transferQueryParameters, User loggedUser)
         {
-            var result = await this.transferRepository.FilterByAsync(transferQueryParameters, loggedUser.Username);
+            var result = await this.transferRepository.FilterByAsync(transferQueryParameters, loggedUser);
 
             if (result.Count == 0)
             {
@@ -160,6 +162,7 @@ namespace Business.Services.Models
             return transferToExecute.IsConfirmed;
 
         }
+       
         private async Task<bool> AddTransferToHistoryAsync(Transfer transfer)
         {
             var historyCount = await this.context.History.CountAsync();
@@ -176,6 +179,7 @@ namespace Business.Services.Models
                 return false;
             }
         }
+       
         public async Task<bool> IsUserAuthorizedAsync(int id, int userId)
         {
             bool IsUserAuthorized = true;
@@ -190,6 +194,7 @@ namespace Business.Services.Models
             return IsUserAuthorized;
 
         }
+        
         public async Task<Transfer> MapDtoToTransferAsync(CreateTransferDto transferDto, User user, Card card)
         {
             var transfer = this.mapper.Map<Transfer>(transferDto);
@@ -197,6 +202,7 @@ namespace Business.Services.Models
             transfer.Account = await this.accountRepository.GetByIdAsync((int)user.AccountId);
             transfer.Currency = await this.currencyRepository.GetByАbbreviationAsync(transferDto.Abbreviation);
             transfer.Card = await this.cardRepository.GetByIdAsync(card.Id); 
+            transfer.CardId = (int)card.Id;
             transfer.CurrencyId = transfer.Currency.Id;
 
             return transfer;

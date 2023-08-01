@@ -44,7 +44,7 @@ namespace VirtualWallet.Controllers.API
             this.currencyService = currencyService;
 
         }
-        [HttpGet, Authorize] // to make it async
+        [HttpGet, Authorize] 
         public async Task<IActionResult> GetTransferAsync([FromQuery] TransferQueryParameters filterParameters)
         {
             try

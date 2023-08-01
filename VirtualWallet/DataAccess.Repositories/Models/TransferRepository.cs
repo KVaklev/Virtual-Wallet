@@ -18,15 +18,20 @@ namespace DataAccess.Repositories.Models
             this.context = context;
         }
 
-        public IQueryable<Transfer> GetAll(string username)
+        public IQueryable<Transfer> GetAll(User user)
         {
             IQueryable<Transfer> result = context.Transfers
             .Include(a => a.Account)
             .ThenInclude(u => u.User)
             .Include(c => c.Currency)
             .Include(t => t.Card);
+            
 
-             result = result.Where(a => a.Account.User.Username == username);
+            if (!user.IsAdmin)
+            {
+
+                result = result.Where(a => a.Account.User.Username == user.Username);
+            }
 
 
             return result ?? throw new EntityNotFoundException("There are no transfers!");
@@ -58,8 +63,10 @@ namespace DataAccess.Repositories.Models
             Transfer transfer = await context.Transfers
                 .Include(t => t.Account)
                 .ThenInclude(u => u.User)
+                .Include(t=>t.Card)
                 .Include(t => t.Currency)
-                                .FirstOrDefaultAsync(t => t.Id == id);
+                                .FirstOrDefaultAsync(t => t.Id == id)
+                                ;
 
             return transfer ?? throw new EntityNotFoundException($"Transfer with ID = {id} does not exist");
 
@@ -95,10 +102,10 @@ namespace DataAccess.Repositories.Models
         }
 
 
-        public async Task<PaginatedList<Transfer>> FilterByAsync(TransferQueryParameters filterParameters, string username)
+        public async Task<PaginatedList<Transfer>> FilterByAsync(TransferQueryParameters filterParameters, User user)
         {
 
-            IQueryable<Transfer> result = GetAll(username);
+            IQueryable<Transfer> result = GetAll(user);
 
             result = await FilterByUsernameAsync(result, filterParameters.Username);
             result = await FilterByFromDateAsync(result, filterParameters.FromDate);
