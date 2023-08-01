@@ -30,11 +30,11 @@ namespace DataAccess.Models.Models
             {
                 string endOfUrl = senderAccountCurrencyCode.ToLower() + "/" + recipientAccountCurrencyCode.ToLower() + ".json";
                 HttpResponseMessage response = await httpClient.GetAsync(endOfUrl);//eur/usd.json
-                //response.EnsureSuccessStatusCode();
                 string jsonResponse = await response.Content.ReadAsStringAsync();
                 ExchangeRateData exchangeRateData = JsonConvert.DeserializeObject<ExchangeRateData>(jsonResponse);
-                string subStr = jsonResponse.Substring(39, 8).ToString();
-                exchangeRateData.CurrencyValue = decimal.Parse(subStr, CultureInfo.InvariantCulture); ;
+                
+                string currencyValue = jsonResponse.Substring(39, 8).ToString();
+                exchangeRateData.CurrencyValue = decimal.Parse(currencyValue, CultureInfo.InvariantCulture); ;
 
               
                 result.IsSuccessful = true;

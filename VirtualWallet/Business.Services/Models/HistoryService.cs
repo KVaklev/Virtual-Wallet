@@ -35,7 +35,7 @@ namespace Business.Services.Models
         {
             if (!await Common.IsAdminAsync(loggedUser) || !await IsHistoryOwnerAsync(id, loggedUser))
             {
-                throw new UnauthorizedOperationException(Constants.ModifyHistoryErrorMessage);
+                throw new UnauthorizedOperationException(Constants.ModifyAuthorizedErrorMessage);
             }
             
             var history = await historyRepository.GetByIdAsync(id);
@@ -47,7 +47,7 @@ namespace Business.Services.Models
         {
             if (filterParameters.Username != null && !await Common.IsAdminAsync(loggedUser))
             {
-                throw new UnauthorizedOperationException(Constants.ModifyHistoryErrorMessage);
+                throw new UnauthorizedOperationException(Constants.ModifyAuthorizedErrorMessage);
             }
             
             var result = await this.historyRepository.FilterByAsync(filterParameters, loggedUser);

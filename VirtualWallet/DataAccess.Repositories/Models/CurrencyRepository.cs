@@ -59,10 +59,10 @@ namespace DataAccess.Repositories.Models
             return currencyToDelete.IsDeleted;
         }
 
-        public async Task<Currency> GetByАbbreviationAsync(string abbreviation)
+        public async Task<Currency> GetByCurrencyCodeAsync(string currencyCode)
         {
             var currency = await context.Currencies
-                    .Where(c => c.CurrencyCode == abbreviation)
+                    .Where(c => c.CurrencyCode == currencyCode)
                     .FirstOrDefaultAsync();
  
             return currency ?? throw new EntityNotFoundException("Тhere is no such currency.");

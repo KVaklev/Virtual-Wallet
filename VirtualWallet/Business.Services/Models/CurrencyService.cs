@@ -59,7 +59,7 @@ namespace Business.Services.Models
 
         public async Task<Currency> GetByАbbreviationAsync(string abbreviation)
         {
-            return await this.currencyRepository.GetByАbbreviationAsync(abbreviation);
+            return await this.currencyRepository.GetByCurrencyCodeAsync(abbreviation);
         }
 
     }
