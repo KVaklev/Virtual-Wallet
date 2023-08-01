@@ -34,8 +34,7 @@ namespace Business.Services.Models
         public async Task<Account> CreateAsync(string currencyCode, User user)
         {
             Account account = new Account();
-
-            account.Currency = await currencyRepository.GetByАbbreviationAsync(currencyCode);
+            account.Currency = await currencyRepository.GetByCurrencyCodeAsync(accountDto.currencyCode);
             account.CurrencyId = account.Currency.Id;
 
             user.AccountId = user.Id;

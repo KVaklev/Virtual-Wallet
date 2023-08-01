@@ -85,7 +85,10 @@ namespace DataAccess.Repositories.Models
             return history;
         }
 
-        public async Task<PaginatedList<History>> FilterByAsync(HistoryQueryParameters filterParameters, User loggedUser)
+        public async Task<PaginatedList<History>> FilterByAsync(
+            HistoryQueryParameters filterParameters, 
+            User loggedUser
+            )
         {
             IQueryable<History> result = this.GetAll(loggedUser);
 

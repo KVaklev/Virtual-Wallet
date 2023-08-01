@@ -194,7 +194,7 @@ namespace DataAccess.Repositories.Data
                 {
                 Id=1,
                 Name = "Български лев",
-                Abbreviation="BGN",
+                CurrencyCode="BGN",
                 IsDeleted=false
                 },
 
@@ -202,7 +202,7 @@ namespace DataAccess.Repositories.Data
                 {
                 Id = 2,
                 Name = "Американски долар",
-                Abbreviation = "USD",
+                CurrencyCode = "USD",
                 IsDeleted=false
                 }
             };

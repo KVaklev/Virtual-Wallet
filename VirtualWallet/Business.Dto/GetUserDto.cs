@@ -17,6 +17,6 @@ namespace Business.Dto
         public decimal Balance { get; set;}
 
         [Required]
-        public string Abbreviation { get; set;}
+        public string CurrencyCode { get; set;}
     }
 }

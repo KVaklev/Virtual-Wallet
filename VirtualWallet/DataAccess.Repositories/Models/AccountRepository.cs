@@ -50,10 +50,16 @@ namespace DataAccess.Repositories.Models
 
             accountToDelete.IsDeleted = true;
 
+            if(accountToDelete.Cards.Count==0) 
+            {
+                throw new EntityNotFoundException("There are no cards lineked to this account");
+            }
+
             foreach (var card in accountToDelete.Cards)
             {
                 this.cardRepository.DeleteAsync(card.Id);
             }
+
             await context.SaveChangesAsync();
 
             return accountToDelete.IsDeleted;

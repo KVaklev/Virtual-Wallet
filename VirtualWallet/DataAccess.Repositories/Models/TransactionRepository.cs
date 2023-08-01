@@ -25,6 +25,7 @@ namespace DataAccess.Repositories.Models
                 .Include(c =>c.Currency)
                 .FirstOrDefaultAsync();
 
+            //todo - filter by username
             return transaction ?? throw new EntityNotFoundException($"Transaction with ID = {id} doesn't exist.");
         }
 
@@ -37,6 +38,7 @@ namespace DataAccess.Repositories.Models
                     .Include(c => c.Currency)
                     .AsQueryable();
 
+            //todo - filter by username
             return result ?? throw new EntityNotFoundException("Тhere are no transactions!");
         }
         public async Task<PaginatedList<Transaction>> FilterByAsync(TransactionQueryParameters filterParameters, string username)
@@ -80,14 +82,14 @@ namespace DataAccess.Repositories.Models
             return transaction.IsDeleted;
         }
 
-        public async Task<Transaction> CreateInTransactionAsync(Transaction transactionOut)
+        public async Task<Transaction> CreateInTransactionAsync(Transaction transactionOut, decimal amount)
         {
             var transactionIn = new Transaction();
             transactionIn.AccountRecepientId = transactionOut.AccountRecepientId;
             transactionIn.AccountSenderId = transactionOut.AccountSenderId;
-            transactionIn.CurrencyId = transactionOut.CurrencyId;
+            transactionIn.Amount = amount;
+            transactionIn.CurrencyId = (int)transactionOut.AccountRecepient.CurrencyId;
             transactionIn.Direction = DirectionType.In;
-            transactionIn.Amount = transactionOut.Amount;
             transactionIn.Date = DateTime.Now;
             transactionIn.IsDeleted = false;
             transactionIn.IsExecuted = true;

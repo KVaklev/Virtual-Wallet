@@ -20,27 +20,32 @@
 
         public const string ModifyTransactionAmountErrorMessage = "Not enough balance.";
         public const string ModifyTransactionNoDataErrorMessage = "No data with these parameters.";
-        public const string ModifyTransactionDeleteErrorMessage = "You can't delete a completed transaction!";
-        public const string ModifyTransactionUpdateErrorMessage = "You can't update a completed transaction.";
-
+        public const string ModifyTransactionExecuteErrorMessage = "You can't update or delete a completed transaction!";
         public const string ModifyTransactionBlockedErrorMessage = "You are not allowed to make transactions while being blocked!";
-        public const string ModifyTransactionErrorMessage = "Only an admin or sender of the transaction is authorized to perform the specified action.";
+        
 
         //Constant messages for transfers
 
         public const string ModifyTransferAmountErrorMessage = "Insufficient balance.";
         public const string ModifyTransferErrorMessage = "You are not authorized to create, delete or modify the transfer.";
-        public const string ModifyTransferNoDataErrorMessage = "There are now results related to these parameters";
+        public const string ModifyTransferNoDataErrorMessage = "There are no results related to these parameters";
         public const string ModifyTransferGetByIdErrorMessage = "You are not authorized for the specified action.";
+
+        public const string ModifyTransferUpdateDeleteErrorErrorMessage = "The transfer is either processed or cancelled so you cannot update or delete it.";
+
 
         //Constant messages for currency
 
         public const string ModifyCurrencyErrorMessage = "You are not authorized for the specified action.";
         public const string ModifyCurrencyNotFoundErrorMessage = "This currency doesn't exist.";
 
-        //Constant messages for history
+        //Constant messages for Authorized
 
-        public const string ModifyHistoryErrorMessage = "You are not authorized for the specified action.";
+        public const string ModifyAuthorizedErrorMessage = "You are not authorized for the specified action.";
 
+        //Constant messages for ExchangeRate
+
+        public const string ModifyHttpRequestExceptionErrorMessage = "No such host is known.";
+        public const string ModifyJsonExceptionErrorMessage = "JSON Deserialization Error.";
     }
 }
