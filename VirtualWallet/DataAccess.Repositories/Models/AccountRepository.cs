@@ -3,6 +3,7 @@ using Business.QueryParameters;
 using DataAccess.Models.Models;
 using DataAccess.Repositories.Contracts;
 using DataAccess.Repositories.Data;
+using DataAccess.Repositories.Helpers;
 using Microsoft.EntityFrameworkCore;
 
 namespace DataAccess.Repositories.Models
@@ -99,7 +100,6 @@ namespace DataAccess.Repositories.Models
 
                 return true;
             }
-
             else
             {
                 throw new EntityNotFoundException($"Card with ID = {card.Id} does not exist.");
