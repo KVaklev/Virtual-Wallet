@@ -170,7 +170,6 @@ namespace DataAccess.Repositories.Models
         {
             return await context.Users.AnyAsync(u => u.Username == username);
         }
-
         private async Task UpdatePhoneNumberAsync(User user, User userToUpdate)
         {
             if (user?.PhoneNumber != null)

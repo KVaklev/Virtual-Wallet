@@ -53,6 +53,7 @@ namespace DataAccess.Models.Models
         public Account? Account { get; set; }
         public int? AccountId { get; set; }
         public bool IsDeleted { get; set; }
+        public bool IsVerified { get; set; }
 
     }
 }

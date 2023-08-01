@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
-using Business.DTOs;
 using Business.Exceptions;
-using Business.QueryParameters;
+using Business.Services.Additional;
 using Business.Services.Contracts;
 using Business.Services.Helpers;
 using DataAccess.Models.Models;
@@ -14,18 +13,19 @@ namespace Business.Services.Models
         private readonly IAccountRepository accountRepository;
         private readonly ICardRepository cardRepository;
         private readonly ICurrencyRepository currencyRepository;
+        private readonly IUserRepository userRepository;
 
-        public AccountService(IAccountRepository accountRepository, ICardRepository cardRepository, IMapper mapper, ICurrencyRepository currencyRepository)
+        public AccountService(IAccountRepository accountRepository, ICardRepository cardRepository, IMapper mapper, ICurrencyRepository currencyRepository, IUserRepository userRepository)
         {
             this.accountRepository = accountRepository;
             this.cardRepository = cardRepository;
             this.currencyRepository = currencyRepository;
+            this.userRepository = userRepository;
         }
         public IQueryable<Account> GetAll()
         {
             return accountRepository.GetAll();
         }
-
 
         public async Task<Account> CreateAsync(string currencyCode, User user)
         {
@@ -94,7 +94,18 @@ namespace Business.Services.Models
             }
 
             return IsUserAccountOwnerOrAdminId;
+        }
 
+        public async Task<string> GenerateTokenAsync(int id)
+        {
+            var user = await this.userRepository.GetByIdAsync(id);
+            var token = (DateTime.Now.ToString() + user.Username).ComputeSha256Hash();
+            return token;
+        }
+
+        public async Task<bool> ConfirmRegistrationAsync(int id, string token)
+        {
+            return await this.accountRepository.ConfirmRegistrationAsync(id, token);
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Business.Dto;
 using Business.Exceptions;
+using Business.Services.Additional;
 using Business.Services.Contracts;
 using DataAccess.Models.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -14,18 +15,25 @@ using System.Text;
 namespace VirtualWallet.Controllers.API
 {
     [ApiController]
-    [Route("api/auth")]
+    [Route("api")]
     public class AuthApiController : ControllerBase
     {
         private readonly IAuthManager authManager;
         private readonly IUserService userService;
+        private readonly IEmailService emailService;
+        private readonly IAccountService accountService;
 
         public AuthApiController(
             IAuthManager authManager, 
-            IUserService userService)
+            IUserService userService,
+            IEmailService emailService,
+            IAccountService accountService
+            )
         {
             this.authManager = authManager;
             this.userService = userService;
+            this.emailService = emailService;
+            this.accountService = accountService;
         }
 
         [AllowAnonymous]
@@ -63,14 +71,41 @@ namespace VirtualWallet.Controllers.API
             try
             {
                 var createdUser = await this.userService.CreateAsync(createUserDto);
+                await this.SendConfirmationEmailAsync(createdUser.Username);
                 
-                return StatusCode(StatusCodes.Status201Created, createdUser);
+               return StatusCode(StatusCodes.Status201Created, createdUser);
             }
             catch (DuplicateEntityException e)
             {
                 return StatusCode(StatusCodes.Status409Conflict, e.Message);
             }
         }
+
+        [AllowAnonymous]
+        [HttpGet("confirm-email")]
+        public async Task<IActionResult> SendConfirmationEmailAsync(string username)
+        {
+            var user = await this.userService.GetByUsernameAsync(username);
+
+            var token = this.accountService.GenerateTokenAsync(user.Id);
+            var confirmationLink = Url.Action(nameof(ConfirmRegistration), "AuthApi",
+                                   new { userId = user.Id, token = token.Result }, Request.Scheme);
+
+            var message = this.emailService.BuildEmail(user, confirmationLink);
+            emailService.SendEMail(message);
+
+            return Ok("Confirmation email was sent successfully. Please check your inbox folder.");
+        }
+
+
+        [HttpGet("confirm-registration")]
+        public async Task<IActionResult> ConfirmRegistration([FromQuery] int userId, [FromQuery] string token)
+        {
+            await this.accountService.ConfirmRegistrationAsync(userId, token);
+            return Ok("Registration confirmed!");
+        }
+
+
 
         private async Task<string> CreateApiTokenAsync(User loggedUser)
         {
