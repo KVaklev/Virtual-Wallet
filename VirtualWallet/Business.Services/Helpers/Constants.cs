@@ -21,8 +21,6 @@
         public const string ModifyTransactionAmountErrorMessage = "Not enough balance.";
         public const string ModifyTransactionNoDataErrorMessage = "No data with these parameters.";
         public const string ModifyTransactionExecuteErrorMessage = "You can't update or delete a completed transaction!";
-        public const string ModifyTransactionUpdateErrorMessage = "You can't update a completed transaction.";
-
         public const string ModifyTransactionBlockedErrorMessage = "You are not allowed to make transactions while being blocked!";
         
 

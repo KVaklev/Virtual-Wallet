@@ -33,7 +33,7 @@ namespace Business.Services.Models
 
         public async Task<GetHistoryDto> GetByIdAsync(int id, User loggedUser)
         {
-            if (!await Common.IsAdminAsync(loggedUser) || !await IsHistoryOwnerAsync(id, loggedUser))
+            if (!loggedUser.IsAdmin || !await IsHistoryOwnerAsync(id, loggedUser))
             {
                 throw new UnauthorizedOperationException(Constants.ModifyAuthorizedErrorMessage);
             }
@@ -43,9 +43,12 @@ namespace Business.Services.Models
             return historyDto;
         }
 
-        public async Task<List<GetHistoryDto>> FilterByAsync(HistoryQueryParameters filterParameters, User loggedUser)
+        public async Task<List<GetHistoryDto>> FilterByAsync(
+            HistoryQueryParameters filterParameters, 
+            User loggedUser
+            )
         {
-            if (filterParameters.Username != null && !await Common.IsAdminAsync(loggedUser))
+            if (filterParameters.Username != null && !loggedUser.IsAdmin)
             {
                 throw new UnauthorizedOperationException(Constants.ModifyAuthorizedErrorMessage);
             }
