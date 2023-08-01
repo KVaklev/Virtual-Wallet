@@ -1,7 +1,5 @@
-﻿using AutoMapper;
-using Business.Dto;
+﻿using Business.Dto;
 using Business.Exceptions;
-using Business.Services.Additional;
 using Business.Services.Contracts;
 using DataAccess.Models.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -88,23 +86,22 @@ namespace VirtualWallet.Controllers.API
             var user = await this.userService.GetByUsernameAsync(username);
 
             var token = this.accountService.GenerateTokenAsync(user.Id);
-            var confirmationLink = Url.Action(nameof(ConfirmRegistration), "AuthApi",
+            var confirmationLink = Url.Action(nameof(ConfirmRegistrationAsync), "AuthApi",
                                    new { userId = user.Id, token = token.Result }, Request.Scheme);
 
-            var message = this.emailService.BuildEmail(user, confirmationLink);
-            emailService.SendEMail(message);
+            var message = await this.emailService.BuildEmailAsync(user, confirmationLink);
+            await emailService.SendEMailAsync(message);
 
             return Ok("Confirmation email was sent successfully. Please check your inbox folder.");
         }
 
 
         [HttpGet("confirm-registration")]
-        public async Task<IActionResult> ConfirmRegistration([FromQuery] int userId, [FromQuery] string token)
+        public async Task<IActionResult> ConfirmRegistrationAsync([FromQuery] int userId, [FromQuery] string token)
         {
             await this.accountService.ConfirmRegistrationAsync(userId, token);
             return Ok("Registration confirmed!");
         }
-
 
 
         private async Task<string> CreateApiTokenAsync(User loggedUser)

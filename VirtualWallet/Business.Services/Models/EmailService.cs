@@ -13,28 +13,28 @@ namespace Business.Services.Models
         {
             this.emailConfiguration = emailConfiguration;
         }
-        public Message BuildEmail(User user, string confirmationLink)
+        public Task<Message> BuildEmailAsync(User user, string confirmationLink)
         {
             var message = new Message(new string[] { user.Email });
             message.Content += confirmationLink;
 
-            return message;
+            return Task.FromResult(message);
         }
-        public void SendEMail(Message message)
+        public async Task SendEMailAsync(Message message)
         {
             var emailMessage = CreateEmailMessage(message);
-            Send(emailMessage);
+            await SendAsync(emailMessage);
         }
-        private void Send(MimeMessage mailMessage)
+        private async Task SendAsync(MimeMessage mailMessage)
         {
             using var client = new SmtpClient();
             try
             {
-                client.Connect(emailConfiguration.SMTPServer, emailConfiguration.Port, true);
+                await client.ConnectAsync(emailConfiguration.SMTPServer, emailConfiguration.Port, true);
                 client.AuthenticationMechanisms.Remove("XOAUTH2");
-                client.Authenticate(emailConfiguration.Username, emailConfiguration.Password);
+                await client.AuthenticateAsync(emailConfiguration.Username, emailConfiguration.Password);
 
-                client.Send(mailMessage);
+                await client.SendAsync(mailMessage);
             }
             catch (Exception)
             {
@@ -43,8 +43,8 @@ namespace Business.Services.Models
             }
             finally
             {
-                client.Disconnect(true);
-                client.Dispose();
+                await client.DisconnectAsync(true);
+                      client.Dispose();
             }
         }
         private MimeMessage CreateEmailMessage(Message message)

@@ -5,7 +5,7 @@ namespace Business.Services.Contracts
 {
     public interface IEmailService
     {
-        Message BuildEmail(User user, string confirmationLink);
-        void SendEMail(Message message);
+        Task<Message> BuildEmailAsync(User user, string confirmationLink);
+        Task SendEMailAsync(Message message);
     }
 }

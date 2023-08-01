@@ -5,6 +5,10 @@ using Business.Services.Contracts;
 using Business.Services.Helpers;
 using DataAccess.Models.Models;
 using DataAccess.Repositories.Contracts;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 
 namespace Business.Services.Models
 {
@@ -107,5 +111,6 @@ namespace Business.Services.Models
         {
             return await this.accountRepository.ConfirmRegistrationAsync(id, token);
         }
+
     }
 }
