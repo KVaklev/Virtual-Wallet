@@ -1,4 +1,5 @@
-﻿using Business.Dto;
+﻿using Business.DTOs.Requests;
+using Business.DTOs.Responses;
 using Business.QueryParameters;
 using DataAccess.Models.Models;
 

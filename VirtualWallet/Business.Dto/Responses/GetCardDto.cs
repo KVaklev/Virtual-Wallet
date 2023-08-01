@@ -1,7 +1,7 @@
 ﻿using DataAccess.Models.Enums;
 using System.ComponentModel.DataAnnotations;
 
-namespace Business.Dto
+namespace Business.DTOs.Responses
 {
     public class GetCardDto
     {

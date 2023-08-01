@@ -1,20 +1,20 @@
-﻿using DataAccess.Models.Enums;
-using DataAccess.Models.Models;
-using DataAccess.Models.ValidationAttributes;
+﻿using DataAccess.Models.ValidationAttributes;
 using System.ComponentModel.DataAnnotations;
 
-namespace Business.Dto
+namespace Business.DTOs.Requests
 {
     public class CreateCardDto
     {
-
         [Required(ErrorMessage = Constants.EmptyFieldErrorMessage)]
         [CardNumber(ErrorMessage = Constants.CardNumberFieldErroMessage)]
         [StringLength(16, ErrorMessage = Constants.CardNumberLengthErrorMessage)]
         public string CardNumber { get; set; }
 
-        [Required(ErrorMessage = Constants.EmptyFieldErrorMessage)]
+        [Required(ErrorMessage = Constants.EmptyFieldExpirationDateErrorMessage)]
+        [ValidExpirationDate(ErrorMessage = Constants.ExpirationDateErrorMessage)]
+        [DataType(DataType.Date)]
         public DateTime ExpirationDate { get; set; }
+
         [Required(ErrorMessage = Constants.EmptyFieldErrorMessage)]
         [MinLength(Constants.CardHolderMinLength, ErrorMessage = Constants.CardHolderMinLengthErrorMessage)]
         [MaxLength(Constants.CardHolderMaxLength, ErrorMessage = Constants.CardHolderMaxLengthErrorMessage)]
@@ -38,7 +38,6 @@ namespace Business.Dto
         public decimal? CreditLimit { get; set; }
 
         [Required(ErrorMessage = Constants.EmptyFieldErrorMessage)]
-        public string Currency { get; set; }
-
+        public string CurrencyCode { get; set; }
     }
 }

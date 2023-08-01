@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
-using Business.Dto;
+using Business.DTOs.Requests;
+using Business.DTOs.Responses;
 using DataAccess.Models.Models;
 
 namespace Business.Mappers

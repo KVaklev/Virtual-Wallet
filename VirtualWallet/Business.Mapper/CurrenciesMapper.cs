@@ -9,8 +9,8 @@ namespace Business.Mappers
         public CurrenciesMapper()
         {
             //DTO
-            CreateMap<CurrencyDto, Currency>();
-            CreateMap<Currency, CurrencyDto>();
+            CreateMap<CreateCurrencyDto, Currency>();
+            CreateMap<Currency, CreateCurrencyDto>();
 
         }
        

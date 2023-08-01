@@ -1,7 +1,7 @@
 ﻿using DataAccess.Models.ValidationAttributes;
 using System.ComponentModel.DataAnnotations;
 
-namespace Business.Dto
+namespace Business.DTOs.Requests
 {
     public class UpdateUserDto
     {

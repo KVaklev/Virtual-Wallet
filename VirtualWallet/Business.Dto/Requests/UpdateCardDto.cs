@@ -1,10 +1,7 @@
-﻿using DataAccess.Models.Enums;
-using DataAccess.Models.Models;
-using DataAccess.Models.ValidationAttributes;
+﻿using DataAccess.Models.ValidationAttributes;
 using System.ComponentModel.DataAnnotations;
-using System.Text.Json.Serialization;
 
-namespace Business.DTOs
+namespace Business.DTOs.Requests
 {
     public class UpdateCardDto
     {
@@ -13,7 +10,7 @@ namespace Business.DTOs
         public string? CardNumber { get; set; }
 
         public DateTime? ExpirationDate { get; set; }
-        
+
         [MinLength(Constants.CardHolderMinLength, ErrorMessage = Constants.CardHolderMinLengthErrorMessage)]
         [MaxLength(Constants.CardHolderMaxLength, ErrorMessage = Constants.CardHolderMaxLengthErrorMessage)]
         public string? CardHolder { get; set; }
@@ -21,9 +18,12 @@ namespace Business.DTOs
         [CardCheckNumber(ErrorMessage = Constants.CardCheckNumberFieldErrorMessage)]
         [StringLength(Constants.CheckNumberLength, ErrorMessage = Constants.CheckNumberLengthErrorMessage)]
         public string? CheckNumber { get; set; }
+
+        [AllowedCardTypes(ErrorMessage = Constants.EmptyFieldCardTypeErrorMessage)]
         public string? CardType { get; set; }
         public decimal? CreditLimit { get; set; }
-        public string? Currency { get; set; }
 
+        [StringLength(Constants.CurrencyCodeLength, ErrorMessage = Constants.CurrencyCodeLengthErrorMessage)]
+        public string? CurrencyCode { get; set; }
     }
 }

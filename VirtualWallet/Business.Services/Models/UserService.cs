@@ -6,12 +6,13 @@ using Business.Services.Helpers;
 using Business.QueryParameters;
 using DataAccess.Repositories.Models;
 using AutoMapper;
-using Business.Dto;
 using Business.DTOs;
 using DataAccess.Repositories.Data;
 using Business.Mappers;
 using System.Security.Cryptography;
 using System.Text;
+using Business.DTOs.Requests;
+using Business.DTOs.Responses;
 
 namespace Business.Services.Models
 {
