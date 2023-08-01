@@ -87,16 +87,16 @@ namespace Business.Services.Models
 
         public async Task <bool> IsUserAuthorized(int id, User user)
         {
-            bool IsUserAccountOwnerOrAdminId = false;
+            bool isUserAccountOwnerOrAdminId = false;
 
             Account accountToGet = await this.accountRepository.GetByIdAsync(id);
 
             if (accountToGet.UserId == user.Id || user.IsAdmin)
             {
-                IsUserAccountOwnerOrAdminId = true;
+                isUserAccountOwnerOrAdminId = true;
             }
 
-            return IsUserAccountOwnerOrAdminId;
+            return isUserAccountOwnerOrAdminId;
         }
 
         public async Task<string> GenerateTokenAsync(int id)

@@ -15,7 +15,7 @@ using System.Text.Json;
 namespace VirtualWallet.Controllers.API
 {
     [ApiController]
-    [Route("api/transfer")]
+    [Route("api/transfers")]
     public class TransferApiContorller : ControllerBase
     {
         private readonly IMapper mapper;

@@ -13,15 +13,15 @@ using System.Text;
 namespace VirtualWallet.Controllers.API
 {
     [ApiController]
-    [Route("api")]
-    public class AuthApiController : ControllerBase
+    [Route("api/accounts")]
+    public class AccountApiController : ControllerBase
     {
         private readonly IAuthManager authManager;
         private readonly IUserService userService;
         private readonly IEmailService emailService;
         private readonly IAccountService accountService;
 
-        public AuthApiController(
+        public AccountApiController(
             IAuthManager authManager, 
             IUserService userService,
             IEmailService emailService,
