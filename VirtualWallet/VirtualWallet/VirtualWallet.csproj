@@ -27,4 +27,8 @@
     <ProjectReference Include="..\Presentation.Helpers\Presentation.Helpers.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Pages\Currency\" />
+  </ItemGroup>
+
 </Project>

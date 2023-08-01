@@ -19,14 +19,12 @@ namespace VirtualWallet.Controllers.MVC
         {
             try
             {
-                
-
                 var currencies = this.currencyService.GetAll;
-                return View(comments);
+                return View(currencies);
             }
             catch (EntityNotFoundException ex)
             {
-                return EntityErrorView(ex.Message);
+                return View(ex.Message);
             }
         }
     }

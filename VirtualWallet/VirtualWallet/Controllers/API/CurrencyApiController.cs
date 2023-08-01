@@ -14,18 +14,15 @@ namespace VirtualWallet.Controllers.API
     public class CurrencyApiController : ControllerBase
     {
         private readonly ICurrencyService currencyService;
-        private readonly IMapper mapper;
         private readonly IUserService userService;
         private readonly IAuthManager authManager;
 
         public CurrencyApiController(
             ICurrencyService currencyService,
-            IMapper mapper,
             IUserService userService,
             IAuthManager authManager)
         {
             this.currencyService = currencyService;
-            this.mapper = mapper;
             this.userService = userService;
             this.authManager = authManager;
         }
@@ -55,12 +52,8 @@ namespace VirtualWallet.Controllers.API
         {
             try
             {
-                IQueryable<Currency> currencies = this.currencyService.GetAll();
-                List<CurrencyDto> currenciesDto = currencies
-                    .Select(currency => mapper.Map<CurrencyDto>(currency))
-                    .ToList();
-
-                return StatusCode(StatusCodes.Status200OK, currenciesDto);
+                var currencies = this.currencyService.GetAll();
+                return StatusCode(StatusCodes.Status200OK, currencies);
             }
             catch (EntityNotFoundException e)
             {
@@ -74,9 +67,8 @@ namespace VirtualWallet.Controllers.API
             try
             {
                 var currency = await this.currencyService.GetByIdAsync(id);
-                var currencyDto = this.mapper.Map<CurrencyDto>(currency);
-
-                return StatusCode(StatusCodes.Status200OK, currencyDto);
+                
+                return StatusCode(StatusCodes.Status200OK, currency);
             }
             catch (EntityNotFoundException e)
             {
@@ -90,11 +82,9 @@ namespace VirtualWallet.Controllers.API
             try
             {
                 var loggedUser = await FindLoggedUserAsync();
-                var currency = this.mapper.Map<Currency>(currencyDto);
-                var updateCurency = await this.currencyService.UpdateAsync(id, currency, loggedUser);
-                var currencyUpdateDto = this.mapper.Map<CurrencyDto>(updateCurency);
+                var updateCurencyDto = await this.currencyService.UpdateAsync(id, currencyDto, loggedUser);
 
-                return StatusCode(StatusCodes.Status200OK, currencyUpdateDto);
+                return StatusCode(StatusCodes.Status200OK, updateCurencyDto);
             }
             catch (EntityNotFoundException e)
             {

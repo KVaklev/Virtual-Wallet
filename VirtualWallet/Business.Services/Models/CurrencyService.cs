@@ -60,21 +60,23 @@ namespace Business.Services.Models
             return currencyDto;
         }
 
-        public async Task<Currency> UpdateAsync(int id, CurrencyDto currencyDto, User loggedUser)
+        public async Task<CurrencyDto> UpdateAsync(int id, CurrencyDto currencyDto, User loggedUser)
         {
             if (!await Common.IsAdminAsync(loggedUser))
             {
                 throw new UnauthorizedOperationException(Constants.ModifyUserErrorMessage);
             }
+
             var currencyToUpdate = await this.currencyRepository.GetByIdAsync(id);
             if (currencyToUpdate.IsDeleted)
             {
                 throw new EntityNotFoundException(Constants.ModifyCurrencyNotFoundErrorMessage);
             }
+
             var currency = this.mapper.Map<Currency>(currencyDto);
             var updatedCurrency = await this.currencyRepository.UpdateAsync(currencyToUpdate, currency);
             var updatedCurrencyDto = this.mapper.Map<CurrencyDto>(updatedCurrency);
-            return 
+            return updatedCurrencyDto;
         }
 
     }
