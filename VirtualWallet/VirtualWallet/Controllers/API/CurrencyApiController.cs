@@ -36,8 +36,7 @@ namespace VirtualWallet.Controllers.API
             try
             {
                 var loggedUser = await FindLoggedUserAsync();
-                var currency = this.mapper.Map<Currency>(currencyDto);
-                await this.currencyService.CreateAsync(currency, loggedUser);
+                await this.currencyService.CreateAsync(currencyDto, loggedUser);
 
                 return StatusCode(StatusCodes.Status200OK, currencyDto);
             }

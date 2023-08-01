@@ -1,4 +1,5 @@
-﻿using DataAccess.Models.Models;
+﻿using Business.Dto;
+using DataAccess.Models.Models;
 using System;
 namespace Business.Services.Contracts
 {
@@ -7,7 +8,7 @@ namespace Business.Services.Contracts
         IQueryable<Currency> GetAll();
         Task<Currency> GetByIdAsync(int id);
         Task<Currency> GetByАbbreviationAsync(string abbreviation);
-        Task<Currency> CreateAsync(Currency currency, User loggedUser);
+        Task<CurrencyDto> CreateAsync(CurrencyDto currencyDto, User loggedUser);
         Task<Currency> UpdateAsync(int id, Currency currency, User loggedUser);
         Task<bool> DeleteAsync(int id, User loggedUser);
 

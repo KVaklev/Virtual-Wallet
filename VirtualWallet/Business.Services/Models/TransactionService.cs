@@ -76,8 +76,6 @@ namespace Business.Services.Models
                 result.IsSuccessful = false;
                 result.Message = Constants.ModifyTransactionBlockedErrorMessage;
                 return result;
-
-               // throw new UnauthorizedOperationException(Constants.ModifyTransactionBlockedErrorMessage);
             }
             
             if (!await this.accountRepository.HasEnoughBalanceAsync(transaction.AccountSenderId, transaction.Amount))
@@ -85,7 +83,6 @@ namespace Business.Services.Models
                 result.IsSuccessful = false;
                 result.Message = Constants.ModifyTransactionAmountErrorMessage;
                 return result;
-                // throw new EntityNotFoundException(Constants.ModifyTransactionAmountErrorMessage);
             }
 
             var newTransaction = await this.transactionRepository.CreateOutTransactionAsync(transaction);
@@ -149,6 +146,7 @@ namespace Business.Services.Models
 
             transactionOut.IsExecuted = true;
             transactionOut.Date = DateTime.Now;
+
             var transactionInAmount = await GetTransactionInAmountAsync(transactionOut);
             var transactionIn = await this.transactionRepository.CreateInTransactionAsync(transactionOut, transactionInAmount);
             
@@ -168,11 +166,8 @@ namespace Business.Services.Models
             
             if (transactionCurrencyCode!= recepientAccountCurrencyCode)
             {
-                var exchangeRateDataResult = await exchangeRateService.GetExchangeRateDataAsync(transactionCurrencyCode, recepientAccountCurrencyCode);
-                if (exchangeRateDataResult.IsSuccessful)
-                {
-                    transactionInAmount *= exchangeRateDataResult.Data.CurrencyValue;
-                }
+                transactionInAmount = await this.exchangeRateService
+                    .ExchangeAsync(transactionInAmount, transactionCurrencyCode, recepientAccountCurrencyCode);
             }
 
             return transactionInAmount;
