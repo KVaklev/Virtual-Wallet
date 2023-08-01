@@ -86,7 +86,7 @@ namespace Business.Services.Models
             
             User userToCreate = await RegisterUserAsync(createUserDto, user);
             User createdUser = await this.userRepository.CreateAsync(userToCreate);
-            await this.accountService.CreateAsync(createUserDto.Abbreviation, createdUser);
+            await this.accountService.CreateAsync(createUserDto.CurrencyCode, createdUser);
  
             GetUserDto getUserDto = mapper.Map<GetUserDto>(createdUser);
 
