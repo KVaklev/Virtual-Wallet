@@ -79,7 +79,6 @@ namespace VirtualWallet.Controllers.API
             }
         }
 
-        [AllowAnonymous]
         [HttpGet("confirm-email")]
         public async Task<IActionResult> SendConfirmationEmailAsync(string username)
         {
