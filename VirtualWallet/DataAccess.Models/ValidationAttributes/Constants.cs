@@ -33,8 +33,16 @@
         public const int CheckNumberLength = 3;
         public const string CheckNumberLengthErrorMessage = "The {0} must be exactly {1} characters long.";
 
+        public const string EmptyFieldCardTypeErrorMessage = "The field is required. Specify 'Debit' or 'Credit' card ";
+
+        //Constants for currency
+        public const int CurrencyNameMinLength = 2;
+        public const int CurrencyNameMaxLength = 30;
+        
         //Others
         public const string EmptyFieldErrorMessage = "The field is required.";
-        public const string EmptyFieldCardTypeErrorMessage = "The field is required. Specify 'Debit' or 'Credit' card ";
+        public const string RangeFieldErrorMessage = "The {0} field must be in the range from {1} to {2}.";
+        public const string MinLengthErrorMessage = "The {0} must be at least {1} characters long.";
+        public const string MaxLengthErrorMessage = "The {0} must be no more than {1} characters long.";
     }
 }

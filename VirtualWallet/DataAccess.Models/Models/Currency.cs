@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using DataAccess.Models.ValidationAttributes;
+using System.ComponentModel.DataAnnotations;
 
 namespace DataAccess.Models.Models
 {
@@ -6,10 +7,12 @@ namespace DataAccess.Models.Models
     {
         public int Id { get; set; }
 
-        [MinLength(2, ErrorMessage = "The {0} must be at least {1} characters long.")]
-        [MaxLength(30, ErrorMessage = "The {0} must be no more than {1} characters long.")]
+        [Required(ErrorMessage = Constants.EmptyFieldErrorMessage)]
+        [MinLength(Constants.CurrencyNameMinLength, ErrorMessage = Constants.MinLengthErrorMessage)]
+        [MaxLength(Constants.CurrencyNameMaxLength, ErrorMessage = Constants.MaxLengthErrorMessage)]
         public string Name { get; set; }
 
+        [Required(ErrorMessage = Constants.EmptyFieldErrorMessage)]
         [StringLength(3,ErrorMessage = "The {0} must be {1} characters long.")]
         public string CurrencyCode { get; set; }
 

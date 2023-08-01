@@ -44,24 +44,22 @@ namespace VirtualWallet.Controllers.API
         [HttpPost, Authorize]
         public async Task<IActionResult> CreateAsync([FromBody] CreateTransactionDto transactionDto)
         {
-            try
-            {
-                var loggedUser = await FindLoggedUserAsync();
-                var createdTransaction = await this.transactionService.CreateAsync(transactionDto, loggedUser);
-                var createdTransactionDto = this.mapper.Map<GetTransactionDto>(createdTransaction);
 
-                return StatusCode(StatusCodes.Status201Created, createdTransactionDto);
-            }
-            catch (EntityNotFoundException e)
-            {
-                return StatusCode(StatusCodes.Status404NotFound, e.Message);
-            }
-            catch (UnauthorizedOperationException e)
-            {
-                return StatusCode(StatusCodes.Status401Unauthorized, e.Message);
-            }
+            var loggedUserUsername = User.Claims.FirstOrDefault(claim => claim.Type == "Username").Value;
+            // var createdTransaction = await this.transactionService.CreateAsync(transactionDto, loggedUser);
+            //var createdTransactionDto = this.mapper.Map<GetTransactionDto>(createdTransaction);
+            var result = await this.transactionService.CreateAsync(transactionDto, loggedUserUsername);
 
+            if (result.IsSuccessful)
+            {
+                return StatusCode(StatusCodes.Status201Created, result.Data);
+            }
+            else
+            {
+                return StatusCode(StatusCodes.Status401Unauthorized, result.Message);
+            }
         }
+
 
         [HttpDelete("{id}"), Authorize]
         public async Task<IActionResult> DeleteAsync(int id)

@@ -9,7 +9,7 @@ namespace Business.Services.Contracts
     {
         Task<GetTransactionDto> GetByIdAsync(int id, User loggedUser);
         Task<PaginatedList<Transaction>> FilterByAsync(TransactionQueryParameters filterParameters, User loggedUser);
-        Task<Transaction> CreateAsync(CreateTransactionDto transactionDto, User loggedUser);
+        Task<Response<GetTransactionDto>> CreateAsync(CreateTransactionDto transactionDto, string loggedUser);
         Task<Transaction> UpdateAsync(int id, User user, CreateTransactionDto transactionDto);
         Task<bool> DeleteAsync(int id, User logedUser);
         Task<bool> ExecuteAsync(int transactionId, User user);

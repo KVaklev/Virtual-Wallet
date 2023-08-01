@@ -22,6 +22,7 @@ namespace Business.Services.Models
         private readonly ICurrencyRepository currencyRepository;
         private readonly IMapper mapper;
         private readonly IExchangeRateService exchangeRateService;
+        private readonly IUserRepository userRepository;
 
         public TransactionService(
             ITransactionRepository transactionRepository,
@@ -30,7 +31,8 @@ namespace Business.Services.Models
             IAccountRepository accountRepository,
             ICurrencyRepository currencyRepository,
             IMapper mapper,
-            IExchangeRateService exchangeRateService
+            IExchangeRateService exchangeRateService,
+            IUserRepository userRepository
             )
         {
             this.transactionRepository = transactionRepository;
@@ -40,9 +42,11 @@ namespace Business.Services.Models
             this.currencyRepository = currencyRepository;
             this.mapper = mapper;
             this.exchangeRateService = exchangeRateService;
+            this.userRepository = userRepository;
         }
         public async Task<GetTransactionDto> GetByIdAsync(int id, User loggedUser)
         {
+            
             if (!await IsTransactionSenderAsync(id, loggedUser.Id) || !loggedUser.IsAdmin)
             {
                 throw new UnauthorizedOperationException(Constants.ModifyAuthorizedErrorMessage);
@@ -61,23 +65,34 @@ namespace Business.Services.Models
             return await this.transactionRepository.FilterByAsync(filterParameters, loggedUser.Username);
         }
 
-        public async Task<Transaction> CreateAsync(CreateTransactionDto transactionDto, User loggedUser)
+        public async Task<Response<GetTransactionDto>> CreateAsync(CreateTransactionDto transactionDto, string loggedUsername)
         {
+            var result = new Response<GetTransactionDto>();
+            var loggedUser = await this.userRepository.GetByUsernameAsync(loggedUsername);
             var transaction = await MapDtoТоTransactionAsync(transactionDto, loggedUser);
 
             if (loggedUser.IsBlocked)
             {
-                throw new UnauthorizedOperationException(Constants.ModifyTransactionBlockedErrorMessage);
+                result.IsSuccessful = false;
+                result.Message = Constants.ModifyTransactionBlockedErrorMessage;
+                return result;
+
+               // throw new UnauthorizedOperationException(Constants.ModifyTransactionBlockedErrorMessage);
             }
             
             if (!await this.accountRepository.HasEnoughBalanceAsync(transaction.AccountSenderId, transaction.Amount))
             {
-                throw new EntityNotFoundException(Constants.ModifyTransactionAmountErrorMessage);
+                result.IsSuccessful = false;
+                result.Message = Constants.ModifyTransactionAmountErrorMessage;
+                return result;
+                // throw new EntityNotFoundException(Constants.ModifyTransactionAmountErrorMessage);
             }
 
             var newTransaction = await this.transactionRepository.CreateOutTransactionAsync(transaction);
+            var getTranactionDto = this.mapper.Map<GetTransactionDto>(newTransaction);
+            result.Data = getTranactionDto;
 
-            return newTransaction;
+            return result;
         }
 
         public async Task<Transaction> UpdateAsync(int id, User loggedUser, CreateTransactionDto transactionDto)
@@ -148,12 +163,12 @@ namespace Business.Services.Models
         private async Task<decimal> GetTransactionInAmountAsync(Transaction transactionOut)
         {
             var transactionInAmount = transactionOut.Amount;
-            var senderCurrencyCode = transactionOut.AccountSender.Currency.CurrencyCode;
-            var recepientCurrencyCode = transactionOut.AccountRecepient.Currency.CurrencyCode;
+            var transactionCurrencyCode = transactionOut.Currency.CurrencyCode;
+            var recepientAccountCurrencyCode = transactionOut.AccountRecepient.Currency.CurrencyCode;
             
-            if (senderCurrencyCode!= recepientCurrencyCode)
+            if (transactionCurrencyCode!= recepientAccountCurrencyCode)
             {
-                var exchangeRateDataResult = await exchangeRateService.GetExchangeRateDataAsync(senderCurrencyCode, recepientCurrencyCode);
+                var exchangeRateDataResult = await exchangeRateService.GetExchangeRateDataAsync(transactionCurrencyCode, recepientAccountCurrencyCode);
                 if (exchangeRateDataResult.IsSuccessful)
                 {
                     transactionInAmount *= exchangeRateDataResult.Data.CurrencyValue;
@@ -162,8 +177,7 @@ namespace Business.Services.Models
 
             return transactionInAmount;
         }
-        
-
+       
         private async Task<bool> AddTransactionToHistoryAsync(Transaction transaction)
         {
 
