@@ -8,6 +8,6 @@ namespace Business.DTOs
 {
     public class CreateAccountDto
     {
-       public string Abbreviation { get; set; }
+       public string currencyCode { get; set; }
     }
 }

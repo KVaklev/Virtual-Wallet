@@ -4,7 +4,7 @@
     {
         public string  Username { get; set; }
                 
-        public string Abbreviation { get; set; }
+        public string CurrencyCode { get; set; }
 
         public string DateCreated { get; set; }
 

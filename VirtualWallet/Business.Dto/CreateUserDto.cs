@@ -25,6 +25,6 @@ namespace Business.Dto
         public string Password { get; set; }
 
         [StringLength(3, ErrorMessage = "The {0} must be {1} characters long.")]
-        public string Abbreviation { get; set; }
+        public string CurrencyCode { get; set; }
     }
 }

@@ -77,7 +77,7 @@ namespace DataAccess.Repositories.Models
         public async Task<Card> CreateAsync(int accountId, Card card)
         {
             var carToCreate = new Card();
-            var currency = await currencyRepository.GetByАbbreviationAsync(card.Currency.Abbreviation);
+            var currency = await currencyRepository.GetByCurrencyCodeAsync(card.Currency.CurrencyCode);
 
             carToCreate.AccountId = accountId;
             carToCreate.CardNumber = card.CardNumber;
@@ -98,7 +98,7 @@ namespace DataAccess.Repositories.Models
         public async Task<Card> UpdateAsync(int id, Card card)
         {
             var cardToUpdate = await this.GetByIdAsync(id);
-            var currency = await currencyRepository.GetByАbbreviationAsync(card.Currency.Abbreviation);
+            var currency = await currencyRepository.GetByCurrencyCodeAsync(card.Currency.CurrencyCode);
 
             cardToUpdate.CardNumber = card.CardNumber ?? cardToUpdate.CardNumber;
             cardToUpdate.CheckNumber = card.CheckNumber ?? cardToUpdate.CheckNumber;

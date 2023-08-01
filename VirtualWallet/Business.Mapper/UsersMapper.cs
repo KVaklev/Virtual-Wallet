@@ -10,7 +10,7 @@ namespace Business.Mappers
         {
             //DTO
             CreateMap<GetUserDto, User>()
-                .ForPath(u => u.Account.Currency.Abbreviation, u => u.MapFrom(u => u.Abbreviation))
+                .ForPath(u => u.Account.Currency.CurrencyCode, u => u.MapFrom(u => u.CurrencyCode))
                 .ForPath(u => u.Account.Balance, u => u.MapFrom(u => u.Balance))
                 .ReverseMap(); 
             CreateMap<CreateUserDto, User>();

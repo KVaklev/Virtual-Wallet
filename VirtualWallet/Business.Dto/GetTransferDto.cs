@@ -13,7 +13,7 @@ namespace Business.Dto
 
         public DateTime DateCreated { get; set; }
 
-        public string Abbreviation { get; set; }
+        public string CurrencyCode { get; set; }
 
         public string CardNumber { get; set; }
 
