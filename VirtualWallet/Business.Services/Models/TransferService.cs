@@ -200,7 +200,7 @@ namespace Business.Services.Models
             var transfer = this.mapper.Map<Transfer>(transferDto);
             transfer.AccountId = (int)user.AccountId;
             transfer.Account = await this.accountRepository.GetByIdAsync((int)user.AccountId);
-            transfer.Currency = await this.currencyRepository.GetByАbbreviationAsync(transferDto.Abbreviation);
+            transfer.Currency = await this.currencyRepository.GetByCurrencyCodeAsync(transferDto.CurrencyCode);
             transfer.Card = await this.cardRepository.GetByIdAsync(card.Id); 
             transfer.CardId = (int)card.Id;
             transfer.CurrencyId = transfer.Currency.Id;
