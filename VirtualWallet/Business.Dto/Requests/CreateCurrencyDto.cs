@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Business.DTOs.Requests
 {
-    public class CurrencyDto
+    public class CreateCurrencyDto
     {
         [Required(ErrorMessage = Constants.EmptyFieldErrorMessage)]
         [MinLength(Constants.CurrencyNameMinLength, ErrorMessage = Constants.CurrencyMinLengthErrorMessage)]

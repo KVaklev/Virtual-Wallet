@@ -24,4 +24,3 @@ namespace DataAccess.Models.ValidationAttributes
         }
     }
 }
-}

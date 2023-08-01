@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
-using Business.Dto;
 using Business.Exceptions;
+using Business.DTOs.Responses;
+using Business.DTOs.Requests;
 using Business.Services.Contracts;
 using DataAccess.Models.Models;
 using Microsoft.AspNetCore.Authorization;
