@@ -10,6 +10,7 @@ using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Business.DTOs.Requests;
 using Business.DTOs.Responses;
+using Business.DTOs;
 
 namespace Business.Services.Models
 {
