@@ -23,7 +23,7 @@ namespace Business.DTOs.Requests
         public string? CardType { get; set; }
         public decimal? CreditLimit { get; set; }
 
-        [StringLength(Constants.CurrencyCodeLength, ErrorMessage = Constants.CurrencyCodeLengthErrorMessage)]
+        [StringLength(Constants.CurrencyCodeLength, ErrorMessage = Constants.LengthErrorMessage)]
         public string? CurrencyCode { get; set; }
     }
 }

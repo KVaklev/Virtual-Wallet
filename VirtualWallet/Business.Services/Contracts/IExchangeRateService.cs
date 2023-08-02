@@ -5,8 +5,8 @@ namespace Business.Services.Contracts
 {
     public interface IExchangeRateService
     {
-        Task<Response<ExchangeRateData>> GetExchangeRateDataAsync(string senderAccountCurrencyCode, string recepientAccountCurrencyCode);
+        Task<Response<ExchangeRate>> GetExchangeRateDataAsync(string senderAccountCurrencyCode, string recepientAccountCurrencyCode);
 
-        Task<decimal> ExchangeAsync(decimal amount, decimal currencyValue);
+        Task<decimal> ExchangeAsync(decimal amount, string fromCurrencyCode, string toCurrencyCode);
     }
 }

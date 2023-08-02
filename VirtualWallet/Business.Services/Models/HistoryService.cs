@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Business.DTOs;
 using Business.DTOs.Responses;
 using Business.Exceptions;
 using Business.QueryParameters;
@@ -13,53 +14,53 @@ namespace Business.Services.Models
     public class HistoryService : IHistoryService
     {
         private readonly IHistoryRepository historyRepository;
-        ITransactionRepository transactionRepository;
-        private readonly IMapper mapper;
-
-        public HistoryService(
-            IHistoryRepository historyRepository,
-            ITransactionRepository transactionRepository,
-            IMapper mapper
-            )
+        
+        public HistoryService(IHistoryRepository historyRepository)
         {
             this.historyRepository = historyRepository;
-            this.transactionRepository = transactionRepository;
-            this.mapper = mapper;
         }
-        public IQueryable<History> GetAll(User loggedUser)
+        public IQueryable<GetHistoryDto> GetAll(User loggedUser)
         {
-            return this.historyRepository.GetAll(loggedUser);
+           var allhistoryRecords = this.historyRepository.GetAll(loggedUser);
+           var historyDto = allhistoryRecords.Select(history=> MapHistoryToDtoAsync(history)).AsQueryable();
+           return historyDto;
         }
 
-        public async Task<GetHistoryDto> GetByIdAsync(int id, User loggedUser)
+        public async Task<Response<GetHistoryDto>> GetByIdAsync(int id, User loggedUser)
         {
+            var result = new Response<GetHistoryDto>();
             if (!loggedUser.IsAdmin || !await IsHistoryOwnerAsync(id, loggedUser))
             {
-                throw new UnauthorizedOperationException(Constants.ModifyAuthorizedErrorMessage);
+                result.IsSuccessful = false;
+                result.Message = Constants.ModifyAuthorizedErrorMessage;
+                return result;
             }
             
             var history = await historyRepository.GetByIdAsync(id);
             var historyDto = MapHistoryToDtoAsync(history);
-            return historyDto;
+            result.Data = historyDto;
+            return result;
         }
 
-        public async Task<List<GetHistoryDto>> FilterByAsync(
+        public async Task<Response<IQueryable<GetHistoryDto>>> FilterByAsync(
             HistoryQueryParameters filterParameters, 
             User loggedUser
             )
         {
+            var result = new Response<IQueryable<GetHistoryDto>>();
             if (filterParameters.Username != null && !loggedUser.IsAdmin)
             {
-                throw new UnauthorizedOperationException(Constants.ModifyAuthorizedErrorMessage);
+                result.IsSuccessful = false;
+                result.Message = Constants.ModifyAuthorizedErrorMessage;
+                return result;
             }
             
-            var result = await this.historyRepository.FilterByAsync(filterParameters, loggedUser);
-
-            var resultDto = result
-                             .Select(result => MapHistoryToDtoAsync(result)) 
-                             .ToList();
-
-            return resultDto; //PaginatedList<GetHistoryDto>
+            var historyRecords = await this.historyRepository.FilterByAsync(filterParameters, loggedUser);
+            var resultDto = historyRecords
+                             .Select(history => MapHistoryToDtoAsync(history)) 
+                             .AsQueryable();
+            result.Data = resultDto;
+            return result; // todo - PaginatedList<GetHistoryDto>
            
         }
 

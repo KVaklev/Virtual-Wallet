@@ -1,6 +1,4 @@
-﻿using AutoMapper;
-using Business.DTOs;
-using Business.Exceptions;
+﻿using Business.Exceptions;
 using Business.QueryParameters;
 using Business.Services.Contracts;
 using DataAccess.Models.Models;
@@ -16,16 +14,13 @@ namespace VirtualWallet.Controllers.API
     {
         private readonly IHistoryService historyService;
         private readonly IAuthManager authManager;
-        private readonly IMapper mapper;
 
         public HistoryApiController(
             IHistoryService historyService,
-            IAuthManager authManager,
-            IMapper mapper)
+            IAuthManager authManager)
         {
             this.historyService = historyService;
             this.authManager = authManager;
-            this.mapper = mapper;
         }
 
         [HttpGet("{id}"), Authorize]
@@ -35,18 +30,17 @@ namespace VirtualWallet.Controllers.API
             {
                 var loggedUser = await FindLoggedUserAsync();
                 var history = await this.historyService.GetByIdAsync(id, loggedUser);
-                
-                return StatusCode(StatusCodes.Status200OK, history);
+                if (!history.IsSuccessful)
+                {
+                    return StatusCode(StatusCodes.Status401Unauthorized, history.Message);
+                }
+
+                return StatusCode(StatusCodes.Status200OK, history.Data);
             }
             catch (EntityNotFoundException e)
             {
                 return StatusCode(StatusCodes.Status404NotFound, e.Message);
             }
-            catch (UnauthorizedOperationException e)
-            {
-                return StatusCode(StatusCodes.Status401Unauthorized, e.Message);
-            }
-
         }
 
         [HttpGet, Authorize]
@@ -56,18 +50,18 @@ namespace VirtualWallet.Controllers.API
             {
                 var loggedUser = await FindLoggedUserAsync();
                 var history = await this.historyService.FilterByAsync(historyQueryParameters, loggedUser);
-                
-                return StatusCode(StatusCodes.Status200OK, history);
+
+                if (!history.IsSuccessful)
+                {
+                    return StatusCode(StatusCodes.Status401Unauthorized, history.Message);
+                }
+
+                return StatusCode(StatusCodes.Status200OK, history.Data);
             }
             catch (EntityNotFoundException e)
             {
                 return StatusCode(StatusCodes.Status404NotFound, e.Message);
             }
-            catch (UnauthorizedOperationException e)
-            {
-                return StatusCode(StatusCodes.Status401Unauthorized, e.Message);
-            }
-
         }
 
         private async Task<User> FindLoggedUserAsync()

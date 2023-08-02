@@ -78,7 +78,7 @@ namespace Business.Services.Models
 
             if (!await this.accountRepository.HasEnoughBalanceAsync(transfer.AccountId, transfer.Amount))
             {
-                throw new UnauthorizedOperationException(Constants.ModifyTransferAmountErrorMessage);
+                throw new UnauthorizedOperationException(Constants.ModifyAccountBalancetErrorMessage);
             }
 
             var createdTransfer = await this.transferRepository.CreateAsync(transfer);

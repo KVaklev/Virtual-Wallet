@@ -25,7 +25,7 @@ namespace Business.DTOs.Requests
         public string Password { get; set; }
 
         [Required(ErrorMessage = Constants.EmptyFieldErrorMessage)]
-        [StringLength(Constants.CurrencyCodeLength, ErrorMessage = Constants.CurrencyCodeLengthErrorMessage)]
+        [StringLength(Constants.CurrencyCodeLength, ErrorMessage = Constants.LengthErrorMessage)]
         public string CurrencyCode { get; set; }
     }
 }

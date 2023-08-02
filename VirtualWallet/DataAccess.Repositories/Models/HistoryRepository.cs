@@ -6,6 +6,7 @@ using Business.QueryParameters;
 using DataAccess.Models.Enums;
 using DataAccess.Repositories.Helpers;
 using DataAccess.Repositories.Contracts;
+using DataAccess.Models.ValidationAttributes;
 
 namespace DataAccess.Repositories.Models
 {
@@ -32,7 +33,7 @@ namespace DataAccess.Repositories.Models
                 result = result.Where(t => t.AccountId==loggedUser.AccountId);
             }
 
-            return result ?? throw new EntityNotFoundException("Тhere are no records!");
+            return result ?? throw new EntityNotFoundException(Constants.NoFoundErrorMessage);
         }
 
         public async Task<History> GetByIdAsync(int id)
@@ -46,7 +47,7 @@ namespace DataAccess.Repositories.Models
                 .ThenInclude(u=>u.User)
                 .FirstOrDefaultAsync(h => h.Id == id);
 
-            return history ?? throw new EntityNotFoundException($"There are no records for the specified id.");
+            return history ?? throw new EntityNotFoundException(Constants.NoFoundErrorMessage);
         }
 
         public async Task<History> CreateWithTransactionAsync(Transaction transaction)
@@ -100,7 +101,7 @@ namespace DataAccess.Repositories.Models
 
             if (totalItems == 0)
             {
-                throw new EntityNotFoundException("No history matches the specified filter criteria.");
+                throw new EntityNotFoundException(Constants.NoFoundErrorMessage);
             }
 
             int totalPages = (result.Count() + filterParameters.PageSize - 1) / filterParameters.PageSize;

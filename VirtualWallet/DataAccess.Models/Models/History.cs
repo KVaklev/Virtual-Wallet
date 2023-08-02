@@ -1,30 +1,33 @@
 ﻿using DataAccess.Models.Enums;
+using DataAccess.Models.ValidationAttributes;
 using System.ComponentModel.DataAnnotations;
-using System.Reflection.Emit;
 
 namespace DataAccess.Models.Models
 {
     public class History 
     {
-        [Required(ErrorMessage = "The {0} field is required")]
-        [Range(1, int.MaxValue, ErrorMessage = "The {0} field must be in the range from {1} to {2}.")]
+        [Required(ErrorMessage = Constants.EmptyFieldErrorMessage)]
+        [Range(Constants.IdMinLength, Constants.IdMaxLength, ErrorMessage = Constants.RangeFieldErrorMessage)]
         public int Id { get; set; } 
 
         public DateTime EventTime { get; set; }
 
+        [Required(ErrorMessage = Constants.EmptyFieldErrorMessage)]
+        [Range(Constants.IdMinLength, Constants.IdMaxLength, ErrorMessage = Constants.RangeFieldErrorMessage)]
         public int AccountId { get; set; }
 
         public Account Account { get; set; }
 
+        [Required(ErrorMessage = Constants.EmptyFieldErrorMessage)]
         public NameOperation NameOperation { get; set; }
 
-        
-        [Range(1, int.MaxValue, ErrorMessage = "The {0} field must be in the range from {1} to {2}.")]
+
+        [Range(Constants.IdMinLength, Constants.IdMaxLength, ErrorMessage = Constants.RangeFieldErrorMessage)]
         public int? TransactionId { get; set; }
         public Transaction? Transaction { get; set; }
 
-        
-        [Range(1, int.MaxValue, ErrorMessage = "The {0} field must be in the range from {1} to {2}.")]
+
+        [Range(Constants.IdMinLength, Constants.IdMaxLength, ErrorMessage = Constants.RangeFieldErrorMessage)]
         public int? TransferId { get; set; }
         public Transfer? Transfer { get; set; }
 

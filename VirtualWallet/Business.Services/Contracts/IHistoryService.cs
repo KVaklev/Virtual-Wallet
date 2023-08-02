@@ -1,4 +1,5 @@
-﻿using Business.DTOs.Responses;
+﻿using Business.DTOs;
+using Business.DTOs.Responses;
 using Business.QueryParameters;
 using DataAccess.Models.Models;
 
@@ -6,8 +7,10 @@ namespace Business.Services.Contracts
 {
     public interface IHistoryService
     {
-        Task<GetHistoryDto> GetByIdAsync(int id, User loggedUser);
-        IQueryable<History> GetAll(User loggedUser);
-        Task<List<GetHistoryDto>> FilterByAsync(HistoryQueryParameters filterParameters, User loggedUser);
+        Task<Response<GetHistoryDto>> GetByIdAsync(int id, User loggedUser);
+        IQueryable<GetHistoryDto> GetAll(User loggedUser);
+        Task<Response<IQueryable<GetHistoryDto>>> FilterByAsync(
+            HistoryQueryParameters filterParameters,
+            User loggedUser);
     }
 }
