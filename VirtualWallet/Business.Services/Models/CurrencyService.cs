@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using Business.Dto;
 using Business.DTOs;
+using Business.DTOs.Requests;
 using Business.Services.Contracts;
 using Business.Services.Helpers;
 using DataAccess.Models.Models;
@@ -22,9 +22,9 @@ namespace Business.Services.Models
             this.mapper = mapper;
         }
        
-        public async Task<Response<CurrencyDto>> CreateAsync(CurrencyDto currencyDto, User loggedUser)
+        public async Task<Response<CreateCurrencyDto>> CreateAsync(CreateCurrencyDto currencyDto, User loggedUser)
         {
-            var result = new Response<CurrencyDto>();
+            var result = new Response<CreateCurrencyDto>();
             if (!await Common.IsAdminAsync(loggedUser))
             {
                 result.IsSuccessful = false;
@@ -33,7 +33,7 @@ namespace Business.Services.Models
             }
             var currency = this.mapper.Map<Currency>(currencyDto);
             var newCurrency = await this.currencyRepository.CreateAsync(currency);
-            var newCurrencyDto = this.mapper.Map<CurrencyDto>(currency);
+            var newCurrencyDto = this.mapper.Map<CreateCurrencyDto>(currency);
             result.Data = newCurrencyDto;
             return result;
         }
@@ -53,26 +53,26 @@ namespace Business.Services.Models
             return result;
         }
 
-        public List<CurrencyDto> GetAll()
+        public IQueryable<CreateCurrencyDto> GetAll()
         {
            var currencies = this.currencyRepository.GetAll();
            var currenciesDto = currencies
-                     .Select(currency => mapper.Map<CurrencyDto>(currency))
-                     .ToList();
+                     .Select(currency => mapper.Map<CreateCurrencyDto>(currency))
+                     .AsQueryable();
 
             return currenciesDto;
         }
 
-        public async Task<CurrencyDto> GetByIdAsync(int id)
+        public async Task<CreateCurrencyDto> GetByIdAsync(int id)
         {
             var currency= await this.currencyRepository.GetByIdAsync(id);
-            var currencyDto = this.mapper.Map<CurrencyDto>(currency);
+            var currencyDto = this.mapper.Map<CreateCurrencyDto>(currency);
             return currencyDto;
         }
 
-        public async Task<Response<CurrencyDto>> UpdateAsync(int id, CurrencyDto currencyDto, User loggedUser)
+        public async Task<Response<CreateCurrencyDto>> UpdateAsync(int id, CreateCurrencyDto currencyDto, User loggedUser)
         {
-            var result = new Response<CurrencyDto>();
+            var result = new Response<CreateCurrencyDto>();
             if (!await Common.IsAdminAsync(loggedUser))
             {
                 result.IsSuccessful = false;
@@ -90,7 +90,7 @@ namespace Business.Services.Models
 
             var currency = this.mapper.Map<Currency>(currencyDto);
             var updatedCurrency = await this.currencyRepository.UpdateAsync(currencyToUpdate, currency);
-            var updatedCurrencyDto = this.mapper.Map<CurrencyDto>(updatedCurrency);
+            var updatedCurrencyDto = this.mapper.Map<CreateCurrencyDto>(updatedCurrency);
             result.Data= updatedCurrencyDto;
             return result;
         }

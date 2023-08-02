@@ -1,6 +1,5 @@
-﻿using AutoMapper;
+﻿
 using Business.Exceptions;
-using Business.DTOs.Responses;
 using Business.DTOs.Requests;
 using Business.Services.Contracts;
 using DataAccess.Models.Models;
@@ -53,12 +52,9 @@ namespace VirtualWallet.Controllers.API
         {
             try
             {
-                IQueryable<Currency> currencies = this.currencyService.GetAll();
-                List<CurrencyDto> currenciesDto = currencies
-                    .Select(currency => mapper.Map<CurrencyDto>(currency))
-                    .ToList();
-
-                return StatusCode(StatusCodes.Status200OK, currenciesDto);
+                var result = this.currencyService.GetAll();
+                
+                return StatusCode(StatusCodes.Status200OK, result);
             }
             catch (EntityNotFoundException e)
             {
@@ -71,9 +67,8 @@ namespace VirtualWallet.Controllers.API
         {
             try
             {
-                var currency = await this.currencyService.GetByIdAsync(id);
-                var currencyDto = this.mapper.Map<CurrencyDto>(currency);
-
+                var currencyDto = await this.currencyService.GetByIdAsync(id);
+                
                 return StatusCode(StatusCodes.Status200OK, currencyDto);
             }
             catch (EntityNotFoundException e)
@@ -88,9 +83,11 @@ namespace VirtualWallet.Controllers.API
             try
             {
                 var loggedUser = await FindLoggedUserAsync();
-                var currency = this.mapper.Map<Currency>(currencyDto);
-                var updateCurency = await this.currencyService.UpdateAsync(id, currency, loggedUser);
-                var currencyUpdateDto = this.mapper.Map<CurrencyDto>(updateCurency);
+                var result = await this.currencyService.UpdateAsync(id, currencyDto, loggedUser);
+                if (!result.IsSuccessful)
+                {
+                    return StatusCode(StatusCodes.Status401Unauthorized, result.Message);
+                }
 
                 return StatusCode(StatusCodes.Status200OK, result.Data);
             }
