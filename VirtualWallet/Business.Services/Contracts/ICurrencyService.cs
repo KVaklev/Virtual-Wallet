@@ -1,15 +1,17 @@
-﻿using DataAccess.Models.Models;
+﻿
+using Business.DTOs;
+using Business.DTOs.Requests;
+using DataAccess.Models.Models;
 using System;
 namespace Business.Services.Contracts
 {
     public interface ICurrencyService
     {
-        IQueryable<Currency> GetAll();
-        Task<Currency> GetByIdAsync(int id);
-        Task<Currency> GetByАbbreviationAsync(string abbreviation);
-        Task<Currency> CreateAsync(Currency currency, User loggedUser);
-        Task<Currency> UpdateAsync(int id, Currency currency, User loggedUser);
-        Task<bool> DeleteAsync(int id, User loggedUser);
+        IQueryable<CreateCurrencyDto> GetAll();
+        Task<CreateCurrencyDto> GetByIdAsync(int id);
+        Task<Response<CreateCurrencyDto>> CreateAsync(CreateCurrencyDto currencyDto, User loggedUser);
+        Task<Response<CreateCurrencyDto>> UpdateAsync(int id, CreateCurrencyDto currencyDto, User loggedUser);
+        Task<Response<bool>> DeleteAsync(int id, User loggedUser);
 
     }
 }

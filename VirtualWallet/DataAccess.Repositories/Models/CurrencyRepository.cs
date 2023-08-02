@@ -1,5 +1,6 @@
 ﻿using Business.Exceptions;
 using DataAccess.Models.Models;
+using DataAccess.Models.ValidationAttributes;
 using DataAccess.Repositories.Contracts;
 using DataAccess.Repositories.Data;
 using Microsoft.EntityFrameworkCore;
@@ -21,7 +22,7 @@ namespace DataAccess.Repositories.Models
                 .OrderBy(n => n.Name)
                 .AsQueryable();
 
-            return currencies ?? throw new EntityNotFoundException("Тhere are no added currencies.");
+            return currencies ?? throw new EntityNotFoundException(Constants.NoFoundErrorMessage);
         }
 
         public async Task<Currency> GetByIdAsync(int id)
@@ -29,20 +30,18 @@ namespace DataAccess.Repositories.Models
             var currency = await this.context.Currencies
                 .Where(c => c.Id == id)
                 .FirstOrDefaultAsync();
-            return currency ?? throw new EntityNotFoundException("Currency with ID = {id} doesn't exist.");
+            return currency ?? throw new EntityNotFoundException(Constants.NoFoundErrorMessage);
         }
 
         public async Task<Currency> CreateAsync(Currency currency)
         {
-            //currency.IsDeleted = false;
             context.Add(currency);
             await context.SaveChangesAsync();
             return currency;
         }
 
-        public async Task<Currency> UpdateAsync(int id, Currency currency)
+        public async Task<Currency> UpdateAsync(Currency currencyToUpdate, Currency currency)
         {
-            var currencyToUpdate = await this.GetByIdAsync(id);
             currencyToUpdate.Name = currency.Name;
             currencyToUpdate.CurrencyCode = currency.CurrencyCode;
             await context.SaveChangesAsync();
@@ -65,7 +64,7 @@ namespace DataAccess.Repositories.Models
                     .Where(c => c.CurrencyCode == currencyCode)
                     .FirstOrDefaultAsync();
  
-            return currency ?? throw new EntityNotFoundException("Тhere is no such currency.");
+            return currency ?? throw new EntityNotFoundException(Constants.NoFoundErrorMessage);
         }
 
     }

@@ -6,62 +6,42 @@ using Presentation.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Business.Exceptions;
 using Business.QueryParameters;
-using DataAccess.Repositories.Contracts;
 using Business.DTOs.Requests;
-using Business.DTOs.Responses;
+
 
 namespace VirtualWallet.Controllers.API
 {
     [ApiController]
     [Route("api/transactions")]
     public class TransactionApiControler : ControllerBase
-    {
-        private readonly IMapper mapper;
+    { 
         private readonly IAuthManager authManager;
         private readonly ITransactionService transactionService;
-        private readonly IAccountService accountService;
-        private readonly IUserService userService;
-        private readonly ICurrencyService currencyService;
         
         public TransactionApiControler(
-            IMapper mapper,
             IAuthManager authManager,
-            ITransactionService transactionService,
-            IAccountService accountService,
-            IUserService userService,
-            ICurrencyService currencyService
+            ITransactionService transactionService
             )
         {
-            this.mapper = mapper;
             this.authManager = authManager;
-            this.transactionService = transactionService;
-            this.accountService = accountService;
-            this.userService = userService;
-            this.currencyService = currencyService;
-            
+            this.transactionService = transactionService; 
         }
 
         [HttpPost, Authorize]
         public async Task<IActionResult> CreateAsync([FromBody] CreateTransactionDto transactionDto)
         {
-            try
-            {
-                var loggedUser = await FindLoggedUserAsync();
-                var createdTransaction = await this.transactionService.CreateAsync(transactionDto, loggedUser);
-                var createdTransactionDto = this.mapper.Map<GetTransactionDto>(createdTransaction);
 
-                return StatusCode(StatusCodes.Status201Created, createdTransactionDto);
-            }
-            catch (EntityNotFoundException e)
-            {
-                return StatusCode(StatusCodes.Status404NotFound, e.Message);
-            }
-            catch (UnauthorizedOperationException e)
-            {
-                return StatusCode(StatusCodes.Status401Unauthorized, e.Message);
-            }
+            var loggedUser = await FindLoggedUserAsync();
+            var result = await this.transactionService.CreateOutTransactionAsync(transactionDto, loggedUser);
 
+            if (!result.IsSuccessful)
+            {
+                return StatusCode(StatusCodes.Status401Unauthorized, result.Message);
+            }
+           
+                return StatusCode(StatusCodes.Status201Created, result.Data);
         }
+
 
         [HttpDelete("{id}"), Authorize]
         public async Task<IActionResult> DeleteAsync(int id)
@@ -69,16 +49,16 @@ namespace VirtualWallet.Controllers.API
             try
             {
                 var loggedUser = await FindLoggedUserAsync();
-                var isDeleted = await this.transactionService.DeleteAsync(id, loggedUser);
-                return StatusCode(StatusCodes.Status200OK, isDeleted);
+                var result = await this.transactionService.DeleteAsync(id, loggedUser);
+                if (!result.IsSuccessful)
+                {
+                    return BadRequest(result.Message);
+                }
+                return StatusCode(StatusCodes.Status200OK, result.Message);
             }
             catch (EntityNotFoundException e)
             {
                 return StatusCode(StatusCodes.Status404NotFound, e.Message);
-            }
-            catch (UnauthorizedOperationException e)
-            {
-                return StatusCode(StatusCodes.Status401Unauthorized, e.Message);
             }
         }
 
@@ -88,17 +68,16 @@ namespace VirtualWallet.Controllers.API
             try
             {
                 var loggedUser = await FindLoggedUserAsync();
-                var updateTransaction = await this.transactionService.UpdateAsync(id, loggedUser, transactionDto);
-                var updateTransactionDto = this.mapper.Map<GetTransactionDto>(updateTransaction);
-                return StatusCode(StatusCodes.Status200OK, updateTransactionDto);
+                var result = await this.transactionService.UpdateAsync(id, loggedUser, transactionDto);
+                if (!result.IsSuccessful)
+                {
+                    return BadRequest(result.Message);
+                }
+                return StatusCode(StatusCodes.Status200OK, result.Data);
             }
             catch (EntityNotFoundException e)
             {
                 return StatusCode(StatusCodes.Status404NotFound, e.Message);
-            }
-            catch (UnauthorizedOperationException e)
-            {
-                return StatusCode(StatusCodes.Status401Unauthorized, e.Message);
             }
         }
 
@@ -108,19 +87,17 @@ namespace VirtualWallet.Controllers.API
             try
             {
                 var loggedUser = await FindLoggedUserAsync();
-                var transactionDto = await this.transactionService.GetByIdAsync(id, loggedUser);
-
-                return StatusCode(StatusCodes.Status200OK, transactionDto);
+                var result = await this.transactionService.GetByIdAsync(id, loggedUser);
+                if (!result.IsSuccessful)
+                {
+                    return BadRequest(result.Message);
+                }
+                return StatusCode(StatusCodes.Status200OK, result.Data);
             }
             catch (EntityNotFoundException e)
             {
                 return StatusCode(StatusCodes.Status404NotFound, e.Message);
             }
-            catch (UnauthorizedOperationException e)
-            {
-                return StatusCode(StatusCodes.Status401Unauthorized, e.Message);
-            }
-
         }
 
         [HttpGet, Authorize]
@@ -129,20 +106,13 @@ namespace VirtualWallet.Controllers.API
             try
             {
                 var loggedUser = await FindLoggedUserAsync();
-                var transacrions = await this.transactionService.FilterByAsync(filterParameters, loggedUser);
-                List<GetTransactionDto> transactionDtos = transacrions
-                    .Select(transaction => mapper.Map<GetTransactionDto>(transaction))
-                    .ToList();
-
-                return StatusCode(StatusCodes.Status200OK, transactionDtos);
+                var result = await this.transactionService.FilterByAsync(filterParameters, loggedUser);
+                
+                return StatusCode(StatusCodes.Status200OK, result);
             }
             catch (EntityNotFoundException e)
             {
                 return StatusCode(StatusCodes.Status404NotFound, e.Message);
-            }
-            catch (UnauthorizedOperationException e)
-            {
-                return StatusCode(StatusCodes.Status401Unauthorized, e.Message);
             }
         }
 
@@ -152,17 +122,16 @@ namespace VirtualWallet.Controllers.API
             try
             {
                 var loggedUser = await FindLoggedUserAsync();
-                
-                var isExecuted = await this.transactionService.ExecuteAsync(id, loggedUser);
-                return StatusCode(StatusCodes.Status200OK, isExecuted);
+                var result = await this.transactionService.ExecuteAsync(id, loggedUser);
+                if (!result.IsSuccessful)
+                {
+                    return BadRequest(result.Message);
+                }
+                return StatusCode(StatusCodes.Status200OK, result);
             }
             catch (EntityNotFoundException e)
             {
                 return StatusCode(StatusCodes.Status404NotFound, e.Message);
-            }
-            catch (UnauthorizedOperationException e)
-            {
-                return StatusCode(StatusCodes.Status401Unauthorized, e.Message);
             }
         }
             private async Task<User> FindLoggedUserAsync()

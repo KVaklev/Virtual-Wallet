@@ -22,16 +22,16 @@ namespace DataAccess.Models.Models
             this.httpClient.BaseAddress = new Uri("https://cdn.jsdelivr.net/gh/fawazahmed0/currency-api@1/latest/currencies/");
         }
 
-        public async Task<Response<ExchangeRateData>> GetExchangeRateDataAsync(string senderAccountCurrencyCode, string recipientAccountCurrencyCode)
+        public async Task<Response<ExchangeRate>> GetExchangeRateDataAsync(string fromCurrencyCode, string toCurrencyCode)
         {
-            var result = new Response<ExchangeRateData>();
+            var result = new Response<ExchangeRate>();
             
             try
             {
-                string endOfUrl = senderAccountCurrencyCode.ToLower() + "/" + recipientAccountCurrencyCode.ToLower() + ".json";
+                string endOfUrl = fromCurrencyCode.ToLower() + "/" + toCurrencyCode.ToLower() + ".json";
                 HttpResponseMessage response = await httpClient.GetAsync(endOfUrl);//eur/usd.json
                 string jsonResponse = await response.Content.ReadAsStringAsync();
-                ExchangeRateData exchangeRateData = JsonConvert.DeserializeObject<ExchangeRateData>(jsonResponse);
+                ExchangeRate exchangeRateData = JsonConvert.DeserializeObject<ExchangeRate>(jsonResponse);
                 
                 string currencyValue = jsonResponse.Substring(39, 8).ToString();
                 exchangeRateData.CurrencyValue = decimal.Parse(currencyValue, CultureInfo.InvariantCulture); ;
@@ -41,6 +41,7 @@ namespace DataAccess.Models.Models
                 result.Data = exchangeRateData;
                 return result;
             }
+            //todo
             catch (HttpRequestException ex)
             {  
                 result.IsSuccessful = false;
@@ -54,12 +55,15 @@ namespace DataAccess.Models.Models
                 return result;
             }
         }
-
-        public async Task<decimal> ExchangeAsync(decimal amount, decimal currencyValue)
+        public async Task<decimal> ExchangeAsync(decimal amount, string fromCurrencyCode, string toCurrencyCode)
         {
-            return amount * currencyValue;
+            var exchangeRateDataResult = await GetExchangeRateDataAsync(fromCurrencyCode, toCurrencyCode);
+            if (exchangeRateDataResult.IsSuccessful)
+            {
+                amount *= exchangeRateDataResult.Data.CurrencyValue;
+            }
+            return amount;
         }
-
     }
 }
 

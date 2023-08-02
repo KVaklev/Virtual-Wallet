@@ -6,6 +6,7 @@ using Business.QueryParameters;
 using DataAccess.Models.Enums;
 using DataAccess.Repositories.Helpers;
 using DataAccess.Repositories.Contracts;
+using DataAccess.Models.ValidationAttributes;
 
 namespace DataAccess.Repositories.Models
 {
@@ -16,23 +17,6 @@ namespace DataAccess.Repositories.Models
         public HistoryRepository(ApplicationContext context) 
         {
              this.context=context;
-        }
-        public IQueryable<History> GetAll(User loggedUser)
-        {
-            IQueryable<History> result = context.History
-                .Include(tr => tr.Transaction)
-                .ThenInclude(c => c.Currency)
-                .Include(tf => tf.Transfer)
-                .ThenInclude(c => c.Currency)
-                .Include(ac => ac.Account)
-                .ThenInclude(u => u.User);
-
-            if (!loggedUser.IsAdmin)
-            { 
-                result = result.Where(t => t.AccountId==loggedUser.AccountId);
-            }
-
-            return result ?? throw new EntityNotFoundException("Тhere are no records!");
         }
 
         public async Task<History> GetByIdAsync(int id)
@@ -46,7 +30,7 @@ namespace DataAccess.Repositories.Models
                 .ThenInclude(u=>u.User)
                 .FirstOrDefaultAsync(h => h.Id == id);
 
-            return history ?? throw new EntityNotFoundException($"There are no records for the specified id.");
+            return history ?? throw new EntityNotFoundException(Constants.NoFoundErrorMessage);
         }
 
         public async Task<History> CreateWithTransactionAsync(Transaction transaction)
@@ -85,10 +69,7 @@ namespace DataAccess.Repositories.Models
             return history;
         }
 
-        public async Task<PaginatedList<History>> FilterByAsync(
-            HistoryQueryParameters filterParameters, 
-            User loggedUser
-            )
+        public async Task<PaginatedList<History>> FilterByAsync(HistoryQueryParameters filterParameters, User loggedUser)
         {
             IQueryable<History> result = this.GetAll(loggedUser);
 
@@ -100,13 +81,31 @@ namespace DataAccess.Repositories.Models
 
             if (totalItems == 0)
             {
-                throw new EntityNotFoundException("No history matches the specified filter criteria.");
+                throw new EntityNotFoundException(Constants.NoFoundErrorMessage);
             }
 
             int totalPages = (result.Count() + filterParameters.PageSize - 1) / filterParameters.PageSize;
             result = await Common<History>.PaginateAsync(result, filterParameters.PageNumber, filterParameters.PageSize);
            
             return new PaginatedList<History>(result.ToList(), totalPages, filterParameters.PageNumber);
+        }
+
+        private IQueryable<History> GetAll(User loggedUser)
+        {
+            IQueryable<History> result = context.History
+                .Include(tr => tr.Transaction)
+                .ThenInclude(c => c.Currency)
+                .Include(tf => tf.Transfer)
+                .ThenInclude(c => c.Currency)
+                .Include(ac => ac.Account)
+                .ThenInclude(u => u.User);
+
+            if (!loggedUser.IsAdmin)
+            { 
+                result = result.Where(t => t.AccountId==loggedUser.AccountId);
+            }
+
+            return result ?? throw new EntityNotFoundException(Constants.NoFoundErrorMessage);
         }
 
         private async Task<IQueryable<History>> FilterByUsernameAsync(IQueryable<History> result, string? username)
@@ -117,6 +116,7 @@ namespace DataAccess.Repositories.Models
             }
             return await Task.FromResult(result);
         }
+
         private async Task<IQueryable<History>> FilterByFromDataAsync(IQueryable<History> result, string? fromData)
         {
             if (!string.IsNullOrEmpty(fromData))
@@ -127,6 +127,7 @@ namespace DataAccess.Repositories.Models
             }
             return await Task.FromResult(result);
         }
+
         private async Task<IQueryable<History>> FilterByToDataAsync(IQueryable<History> result, string? toData)
         {
             if (!string.IsNullOrEmpty(toData))

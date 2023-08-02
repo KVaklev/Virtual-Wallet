@@ -7,7 +7,6 @@ namespace DataAccess.Repositories.Contracts
     public interface ITransactionRepository
     {
         Task<Transaction> GetByIdAsync(int id);
-        IQueryable<Transaction> GetAll(string username);
         Task<PaginatedList<Transaction>> FilterByAsync(TransactionQueryParameters filterParameters, string username);
         Task<Transaction> UpdateAsync(Transaction transactionToUpdate, Transaction transaction);
         Task<bool> DeleteAsync(Transaction transaction);

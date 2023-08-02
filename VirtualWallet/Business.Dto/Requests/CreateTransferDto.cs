@@ -9,12 +9,12 @@ namespace Business.DTOs.Requests
         public decimal Amount { get; set; }
 
         [Required(ErrorMessage = Constants.EmptyFieldErrorMessage)]
-        [StringLength(Constants.CurrencyCodeLength, ErrorMessage = Constants.CurrencyCodeLengthErrorMessage)]
+        [StringLength(Constants.CurrencyCodeLength, ErrorMessage = Constants.LengthErrorMessage)]
         public string CurrencyCode { get; set; }
 
         [Required(ErrorMessage = Constants.EmptyFieldErrorMessage)]
         [CardNumber(ErrorMessage = Constants.CardNumberFieldErroMessage)]
-        [StringLength(16, ErrorMessage = Constants.CardNumberLengthErrorMessage)]
+        [StringLength(16, ErrorMessage = Constants.LengthErrorMessage)]
         public string CardNumber { get; set; }
 
         [Required(ErrorMessage = Constants.EmptyFieldTransferTypeErrorMessage)]

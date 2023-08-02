@@ -11,33 +11,31 @@
 
         public const string ModifyAccountErrorMessage = "Only an admin or owner of the account can access, delete or modify the acount.";
         public const string ModifyAccountCardErrorMessage = "Only an admin or owner of the account can add or remove a card.";
+        public const string ModifyAccountBalancetErrorMessage = "Insufficient balance.";
 
         //Constant messages for cards
 
         public const string ModifyCardErrorMessage = "Only an admin or owner of the card can update information.";
 
         //Constant messages for transactions 
-
-        public const string ModifyTransactionAmountErrorMessage = "Not enough balance.";
-        public const string ModifyTransactionNoDataErrorMessage = "No data with these parameters.";
-        public const string ModifyTransactionExecuteErrorMessage = "You can't update or delete a completed transaction!";
+       
+        public const string ModifyTransactionExecuteMessage = "The transacion is successful execute.";
+        public const string ModifyTransactionDeleteMessage = "The transacion is successful delete.";
+        public const string ModifyTransactionNotExecuteErrorMessage = "You can't update or delete a completed transaction!";
         public const string ModifyTransactionBlockedErrorMessage = "You are not allowed to make transactions while being blocked!";
         
 
         //Constant messages for transfers
 
-        public const string ModifyTransferAmountErrorMessage = "Insufficient balance.";
         public const string ModifyTransferErrorMessage = "You are not authorized to create, delete or modify the transfer.";
         public const string ModifyTransferNoDataErrorMessage = "There are no results related to these parameters";
         public const string ModifyTransferGetByIdErrorMessage = "You are not authorized for the specified action.";
-
         public const string ModifyTransferUpdateDeleteErrorErrorMessage = "The transfer is either processed or cancelled so you cannot update or delete it.";
 
+        //Constant messages for curencies
 
-        //Constant messages for currency
-
-        public const string ModifyCurrencyErrorMessage = "You are not authorized for the specified action.";
-        public const string ModifyCurrencyNotFoundErrorMessage = "This currency doesn't exist.";
+        public const string ModifyCurrencyDeleteMessage = "The currency is successful delete.";
+        public const string ModifyCurrencyNotFoundErrorMessage = "The currency does not exist";
 
         //Constant messages for Authorized
 
