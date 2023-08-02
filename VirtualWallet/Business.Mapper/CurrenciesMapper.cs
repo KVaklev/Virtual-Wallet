@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
-using Business.Dto;
+using Business.DTOs.Requests;
+using Business.DTOs.Responses;
 using DataAccess.Models.Models;
 
 namespace Business.Mappers
@@ -9,8 +10,8 @@ namespace Business.Mappers
         public CurrenciesMapper()
         {
             //DTO
-            CreateMap<CurrencyDto, Currency>();
-            CreateMap<Currency, CurrencyDto>();
+            CreateMap<CreateCurrencyDto, Currency>();
+            CreateMap<Currency, CreateCurrencyDto>();
 
         }
        

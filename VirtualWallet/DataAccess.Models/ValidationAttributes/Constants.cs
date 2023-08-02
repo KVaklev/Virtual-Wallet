@@ -47,6 +47,13 @@
 
         public const string NoFoundErrorMessage = "No matches found.";
         public const string EmptyFieldErrorMessage = "The field is required.";
+        public const string EmptyFieldCardTypeErrorMessage = "The field is required. Specify 'Debit' or 'Credit' card ";
+        public const string EmptyFieldTransferTypeErrorMessage = "The field is required. Specify 'Deposit' or 'Withdrawal' tranfer ";
+        public const string EmptyFieldTransactionNameErrorMessage = "The field is required. Specify 'Transaction' or 'Transfer'.";
+        public const string EmptyFieldTransactionDirectionErrorMessage = "The field is required. Specify 'In' or 'Out' direction";
+        public const string EmptyFieldExpirationDateErrorMessage = "Expiration date is required.";
+        public const string ExpirationDateErrorMessage = "Expiration date must not be in the past.";
+
         public const string RangeFieldErrorMessage = "The {0} field must be in the range from {1} to {2}.";
         public const string MinLengthErrorMessage = "The {0} must be at least {1} characters long.";
         public const string MaxLengthErrorMessage = "The {0} must be no more than {1} characters long.";

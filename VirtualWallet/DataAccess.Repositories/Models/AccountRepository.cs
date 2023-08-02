@@ -12,11 +12,13 @@ namespace DataAccess.Repositories.Models
     {
         private readonly ApplicationContext context;
         private readonly ICardRepository cardRepository;
+        private readonly IUserRepository userRepository;
 
-        public AccountRepository(ApplicationContext context, ICardRepository cardRepository)
+        public AccountRepository(ApplicationContext context, ICardRepository cardRepository, IUserRepository userRepository)
         {
             this.context = context;
             this.cardRepository = cardRepository;
+            this.userRepository = userRepository;
         }
 
         public IQueryable <Account> GetAll()
@@ -48,10 +50,16 @@ namespace DataAccess.Repositories.Models
 
             accountToDelete.IsDeleted = true;
 
+            if(accountToDelete.Cards.Count==0) 
+            {
+                throw new EntityNotFoundException("There are no cards lineked to this account");
+            }
+
             foreach (var card in accountToDelete.Cards)
             {
                 this.cardRepository.DeleteAsync(card.Id);
             }
+
             await context.SaveChangesAsync();
 
             return accountToDelete.IsDeleted;
@@ -165,7 +173,6 @@ namespace DataAccess.Repositories.Models
             return true;
         }
 
-        
         public bool CardExists(string cardNumber)
         {
             return context.Cards
@@ -174,12 +181,20 @@ namespace DataAccess.Repositories.Models
 
         }
 
-
         public bool AccountExists(int id)
         {
             return context.Accounts
                 .Where(a => a.IsDeleted == false)
                 .Any(account => account.Id == id);
+        }
+
+        public async Task<bool> ConfirmRegistrationAsync(int userId, string token)
+        {
+            var user = await this.userRepository.GetByIdAsync(userId);
+            user.IsVerified = true;
+
+            await this.context.SaveChangesAsync();
+            return true;
         }
     }
 }

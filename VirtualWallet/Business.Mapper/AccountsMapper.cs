@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using Business.Dto;
 using Business.DTOs;
+using Business.DTOs.Responses;
 using DataAccess.Models.Models;
 
 namespace Business.Mappers
@@ -16,8 +16,6 @@ namespace Business.Mappers
             .ForMember(u => u.Username, t => t.MapFrom(a => a.User.Username))
             .ForMember(a => a.CurrencyCode, c => c.MapFrom(a => a.Currency.CurrencyCode));
 
-            CreateMap<Account, CreateAccountDto>()
-            .ForMember(u => u.currencyCode, c => c.MapFrom(a => a.Currency.CurrencyCode));
         }
     }
 }

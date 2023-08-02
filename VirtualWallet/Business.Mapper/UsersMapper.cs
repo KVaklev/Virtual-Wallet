@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
-using Business.Dto;
+using Business.DTOs.Requests;
+using Business.DTOs.Responses;
 using DataAccess.Models.Models;
 
 namespace Business.Mappers
@@ -19,6 +20,15 @@ namespace Business.Mappers
             CreateMap<User, UpdateUserDto>();
             CreateMap<UpdateUserDto, User>();
 
+        }
+
+        public static async Task<User> MapCreateDtoToUserAsync(CreateUserDto createUserDto)
+        {
+            User newUser = new User();
+            newUser.Username = createUserDto.Username;
+            newUser.Email = createUserDto.Email;
+            newUser.PhoneNumber = createUserDto.PhoneNumber;
+            return newUser;
         }
     }
 }
