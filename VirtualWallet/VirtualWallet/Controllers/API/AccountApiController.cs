@@ -13,7 +13,7 @@ using System.Text;
 namespace VirtualWallet.Controllers.API
 {
     [ApiController]
-    [Route("api/accounts")]
+    [Route("api")]
     public class AccountApiController : ControllerBase
     {
         private readonly IAuthManager authManager;
@@ -68,10 +68,9 @@ namespace VirtualWallet.Controllers.API
         {
             try
             {
-                var createdUser = await this.userService.CreateAsync(createUserDto);
-                await this.SendConfirmationEmailAsync(createdUser.Username);
-                
-               return StatusCode(StatusCodes.Status201Created, createdUser);
+               var createdUser = await this.userService.CreateAsync(createUserDto);
+              
+                return await this.SendConfirmationEmailAsync(createdUser.Username);
             }
             catch (DuplicateEntityException e)
             {
@@ -85,7 +84,7 @@ namespace VirtualWallet.Controllers.API
             var user = await this.userService.GetByUsernameAsync(username);
 
             var token = this.accountService.GenerateTokenAsync(user.Id);
-            var confirmationLink = Url.Action(nameof(ConfirmRegistrationAsync), "AccountApi",
+            var confirmationLink = Url.Action(nameof(ConfirmRegistration), "AccountApi",
                                    new { userId = user.Id, token = token.Result }, Request.Scheme);
 
             var message = await this.emailService.BuildEmailAsync(user, confirmationLink);
@@ -96,9 +95,9 @@ namespace VirtualWallet.Controllers.API
 
 
         [HttpGet("confirm-registration")]
-        public async Task<IActionResult> ConfirmRegistrationAsync([FromQuery] int userId, [FromQuery] string token)
+        public IActionResult ConfirmRegistration([FromQuery] int userId, [FromQuery] string token)
         {
-            await this.accountService.ConfirmRegistrationAsync(userId, token);
+            this.accountService.ConfirmRegistrationAsync(userId, token);
             return Ok("Registration confirmed!");
         }
 
