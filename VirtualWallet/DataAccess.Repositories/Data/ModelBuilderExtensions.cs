@@ -9,12 +9,12 @@ namespace DataAccess.Repositories.Data
         public static void SeedData(this ModelBuilder modelBuilder)
         {
             var users = new List<User>()
-            { 
-                new User { Id = 1, FirstName = "Ivan", LastName = "Draganov", Email = "i.draganov@gmail.com", Username = "ivanchoDraganchov", 
+            {
+                new User { Id = 1, FirstName = "Ivan", LastName = "Draganov", Email = "i.draganov@gmail.com", Username = "ivanchoDraganchov",
                            Password = new byte[] {0x65, 0x23, 0x25, 0x55}, PhoneNumber = "1234567890", AccountId = 1, IsAdmin = true, IsBlocked = false    },
                 new User { Id = 2, FirstName = "Mariq", LastName = "Petrova", Email = "m.petrova@gmail.com", Username = "mariicheto",
                            Password = new byte[] { 0x65, 0x23, 0x25, 0x55 }, PhoneNumber = "1134567890", AccountId = 2, IsAdmin = false, IsBlocked = false },
-                new User { Id = 3, FirstName = "Mara",  LastName = "Dobreva", Email = "m.dobreva@gmail.com", Username = "marcheto", 
+                new User { Id = 3, FirstName = "Mara",  LastName = "Dobreva", Email = "m.dobreva@gmail.com", Username = "marcheto",
                            Password = new byte[] { 0x65, 0x23, 0x25, 0x55 }, PhoneNumber = "1214567890", AccountId = 3, IsAdmin = false, IsBlocked = true  },
                 new User { Id = 4, FirstName = "Andrei", LastName = "Sokolov", Email = "a.sokolov@gmail.com", Username = "sokolov",
                            Password = new byte[] { 0x65, 0x23, 0x25, 0x55 }, PhoneNumber = "1234167890", AccountId = 4, IsAdmin = true, IsBlocked = false   },
@@ -67,7 +67,28 @@ namespace DataAccess.Repositories.Data
             var history = new List<History>()
             {
             };
-    }
-       
+
+            modelBuilder.Entity<User>()
+                .HasData(users);
+
+            modelBuilder.Entity<Account>()
+               .HasData(accounts);
+
+            modelBuilder.Entity<Card>()
+               .HasData(cards);
+
+            modelBuilder.Entity<Transaction>()
+               .HasData(transactions);
+
+            modelBuilder.Entity<Transfer>()
+               .HasData(transfers);
+
+            modelBuilder.Entity<Currency>()
+               .HasData(currencies);
+
+            modelBuilder.Entity<History>()
+               .HasData(history);
+
+        }
     }
 }

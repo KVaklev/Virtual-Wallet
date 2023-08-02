@@ -85,7 +85,7 @@ namespace VirtualWallet.Controllers.API
             var user = await this.userService.GetByUsernameAsync(username);
 
             var token = this.accountService.GenerateTokenAsync(user.Id);
-            var confirmationLink = Url.Action(nameof(ConfirmRegistrationAsync), "AuthApi",
+            var confirmationLink = Url.Action(nameof(ConfirmRegistrationAsync), "AccountApi",
                                    new { userId = user.Id, token = token.Result }, Request.Scheme);
 
             var message = await this.emailService.BuildEmailAsync(user, confirmationLink);
