@@ -49,7 +49,7 @@ namespace Business.Services.Models
 
             }
             result.Data = await this.currencyRepository.DeleteAsync(id);
-            result.Message = Constants.ModifyCurrencyDeleteErrorMessage;
+            result.Message = Constants.ModifyCurrencyDeleteMessage;
             return result;
         }
 

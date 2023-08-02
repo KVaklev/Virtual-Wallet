@@ -29,13 +29,13 @@ namespace VirtualWallet.Controllers.API
             try
             {
                 var loggedUser = await FindLoggedUserAsync();
-                var history = await this.historyService.GetByIdAsync(id, loggedUser);
-                if (!history.IsSuccessful)
+                var result = await this.historyService.GetByIdAsync(id, loggedUser);
+                if (!result.IsSuccessful)
                 {
-                    return StatusCode(StatusCodes.Status401Unauthorized, history.Message);
+                    return StatusCode(StatusCodes.Status401Unauthorized, result.Message);
                 }
 
-                return StatusCode(StatusCodes.Status200OK, history.Data);
+                return StatusCode(StatusCodes.Status200OK, result.Data);
             }
             catch (EntityNotFoundException e)
             {
@@ -49,14 +49,14 @@ namespace VirtualWallet.Controllers.API
             try
             {
                 var loggedUser = await FindLoggedUserAsync();
-                var history = await this.historyService.FilterByAsync(historyQueryParameters, loggedUser);
+                var result = await this.historyService.FilterByAsync(historyQueryParameters, loggedUser);
 
-                if (!history.IsSuccessful)
+                if (!result.IsSuccessful)
                 {
-                    return StatusCode(StatusCodes.Status401Unauthorized, history.Message);
+                    return StatusCode(StatusCodes.Status401Unauthorized, result.Message);
                 }
 
-                return StatusCode(StatusCodes.Status200OK, history.Data);
+                return StatusCode(StatusCodes.Status200OK, result.Data);
             }
             catch (EntityNotFoundException e)
             {

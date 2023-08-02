@@ -19,12 +19,7 @@ namespace Business.Services.Models
         {
             this.historyRepository = historyRepository;
         }
-        public IQueryable<GetHistoryDto> GetAll(User loggedUser)
-        {
-           var allhistoryRecords = this.historyRepository.GetAll(loggedUser);
-           var historyDto = allhistoryRecords.Select(history=> MapHistoryToDtoAsync(history)).AsQueryable();
-           return historyDto;
-        }
+
 
         public async Task<Response<GetHistoryDto>> GetByIdAsync(int id, User loggedUser)
         {
@@ -73,7 +68,7 @@ namespace Business.Services.Models
             if (history.TransactionId != null)
             {
                 historyDto.From = history.Transaction.AccountSender.User.Username;
-                historyDto.To = history.Transaction.AccountRecepient.User.Username;
+                historyDto.To = history.Transaction.AccountRecipient.User.Username;
                 historyDto.Amount = history.Transaction.Amount;
                 historyDto.CurrencyCode = history.Transaction.Currency.CurrencyCode;
                 historyDto.Direction = history.Transaction.Direction.ToString();

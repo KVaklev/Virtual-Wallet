@@ -41,6 +41,7 @@ namespace DataAccess.Models.Models
                 result.Data = exchangeRateData;
                 return result;
             }
+            //todo
             catch (HttpRequestException ex)
             {  
                 result.IsSuccessful = false;
