@@ -43,7 +43,10 @@ namespace Business.Services.Models
         }
         public async Task<GetTransactionDto> GetByIdAsync(int id, User loggedUser)
         {
-            if (!await IsTransactionSenderAsync(id, loggedUser.Id) || !loggedUser.IsAdmin)
+
+            Transaction transactionToUpdate = await this.transactionRepository.GetByIdAsync(id);
+
+            if (!await Common.IsTransactionSenderAsync(transactionToUpdate, loggedUser) || !loggedUser.IsAdmin)
             {
                 throw new UnauthorizedOperationException(Constants.ModifyAuthorizedErrorMessage);
             }
@@ -82,7 +85,9 @@ namespace Business.Services.Models
 
         public async Task<Transaction> UpdateAsync(int id, User loggedUser, CreateTransactionDto transactionDto)
         {
-            if (!await IsTransactionSenderAsync(id, loggedUser.Id))
+            Transaction transactionToGet = await this.transactionRepository.GetByIdAsync(id);
+
+            if (!await Common.IsTransactionSenderAsync(transactionToGet, loggedUser))  
             {
                 throw new UnauthorizedOperationException(Constants.ModifyAuthorizedErrorMessage);
             }
@@ -102,7 +107,9 @@ namespace Business.Services.Models
 
         public async Task<bool> DeleteAsync(int id, User loggedUser)
         {
-            if (!await IsTransactionSenderAsync(id, loggedUser.Id))
+            Transaction transactionToUpdate = await this.transactionRepository.GetByIdAsync(id);
+
+            if (!await Common.IsTransactionSenderAsync(transactionToUpdate, loggedUser))
             {
                 throw new UnauthorizedOperationException(Constants.ModifyAuthorizedErrorMessage);
             }
@@ -119,7 +126,9 @@ namespace Business.Services.Models
 
         public async Task<bool> ExecuteAsync(int transactionId, User loggedUser)
         {
-            if (!await IsTransactionSenderAsync(transactionId, loggedUser.Id))
+            Transaction transactionToUpdate = await this.transactionRepository.GetByIdAsync(transactionId);
+
+            if (!await Common.IsTransactionSenderAsync(transactionToUpdate, loggedUser))
             {
                 throw new UnauthorizedOperationException(Constants.ModifyAuthorizedErrorMessage);
             }
@@ -194,17 +203,17 @@ namespace Business.Services.Models
             return transaction;
         }
 
-        private async Task<bool> IsTransactionSenderAsync(int id, int userId)
-        {
-            bool isTransactionSender = true;
-            Transaction transactionToUpdate = await this.transactionRepository.GetByIdAsync(id);
+        //private async Task<bool> IsTransactionSenderAsync(int id, int userId)
+        //{
+        //    bool isTransactionSender = true;
+        //    Transaction transactionToUpdate = await this.transactionRepository.GetByIdAsync(id);
 
-            if (transactionToUpdate.AccountSender.User.Id != userId)
-            {
-                isTransactionSender = false;
-            }
-            return isTransactionSender;
-        }
+        //    if (transactionToUpdate.AccountSender.User.Id != userId)
+        //    {
+        //        isTransactionSender = false;
+        //    }
+        //    return isTransactionSender;
+        //}
 
     }
 }

@@ -37,5 +37,29 @@ namespace Business.Services.Helpers
             return await Task.FromResult(isAuthorized);
         }
 
+        public static async Task<bool> IsUserAuthorizedAsync(Transfer transfer, User user)
+        {
+            bool IsUserAuthorized = true;
+
+            if (transfer.Account.UserId != user.Id)
+            {
+                IsUserAuthorized = false;
+            }
+
+            return IsUserAuthorized;
+
+        }
+
+        public static async Task<bool> IsTransactionSenderAsync(Transaction transaction , User user)
+        {
+            bool isTransactionSender = true;
+                     
+            if (transaction.AccountSender.User.Id != user.Id)
+            {
+                isTransactionSender = false;
+            }
+            return isTransactionSender;
+        }
+
     }
 }

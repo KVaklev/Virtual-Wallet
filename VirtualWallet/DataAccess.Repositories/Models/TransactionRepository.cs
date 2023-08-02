@@ -17,12 +17,12 @@ namespace DataAccess.Repositories.Models
         {
             this.context = context;
         }
-        public async Task<Transaction> GetByIdAsync(int id) 
+        public async Task<Transaction> GetByIdAsync(int id)
         {
             Transaction transaction = await context.Transactions.Where(t => t.Id == id)
-                .Include(s =>s.AccountSender)
-                .Include(r =>r.AccountRecepient)
-                .Include(c =>c.Currency)
+                .Include(s => s.AccountSender)
+                .Include(r => r.AccountRecepient)
+                .Include(c => c.Currency)
                 .FirstOrDefaultAsync();
 
             //todo - filter by username
@@ -34,7 +34,7 @@ namespace DataAccess.Repositories.Models
             IQueryable<Transaction> result = context.Transactions
                     .Include(s => s.AccountSender)
                     .Include(r => r.AccountRecepient)
-                    .ThenInclude(u =>u.User)
+                    .ThenInclude(u => u.User)
                     .Include(c => c.Currency)
                     .AsQueryable();
 
@@ -104,7 +104,7 @@ namespace DataAccess.Repositories.Models
             transaction.Date = DateTime.Now;
             transaction.IsExecuted = false;
             transaction.IsDeleted = false;
-            
+
             await context.AddAsync(transaction);
             await context.SaveChangesAsync();
 
@@ -136,7 +136,7 @@ namespace DataAccess.Repositories.Models
 
                 return result.Where(t => t.Date <= date);
             }
-           return await Task.FromResult(result);
+            return await Task.FromResult(result);
         }
         private async Task<DirectionType> ParseDirectionParameterAsync(string value, string parameterName)
         {
@@ -144,8 +144,8 @@ namespace DataAccess.Repositories.Models
             {
                 return await Task.FromResult(result);
             }
-           
-           throw new EntityNotFoundException($"Invalid value for {parameterName}.");
+
+            throw new EntityNotFoundException($"Invalid value for {parameterName}.");
         }
         private async Task<IQueryable<Transaction>> FilterByDirectionAsync(IQueryable<Transaction> result, string? direction)
         {
@@ -158,15 +158,24 @@ namespace DataAccess.Repositories.Models
         }
         private async Task<IQueryable<Transaction>> SortByAsync(IQueryable<Transaction> result, string sortCriteria)
         {
-            switch (sortCriteria)
+            if (Enum.TryParse<SortCriteria>(sortCriteria, true, out var sortEnum))
             {
-                case "amount":
-                    return await Task.FromResult(result.OrderBy(t => t.Amount));
-                case "date":
-                    return await Task.FromResult(result.OrderBy(t => t.Date));
-                default:
-                    return await Task.FromResult(result);
+                switch (sortEnum)
+                {
+                    case SortCriteria.Amount:
+                        return await Task.FromResult(result.OrderBy(t => t.Amount));
+                    case SortCriteria.Date:
+                        return await Task.FromResult(result.OrderBy(t => t.Date));
+                    default:
+                        return await Task.FromResult(result);
+                }
+
             }
+            else
+            {
+                return await Task.FromResult(result);   
+            }
+
         }
     }
 }

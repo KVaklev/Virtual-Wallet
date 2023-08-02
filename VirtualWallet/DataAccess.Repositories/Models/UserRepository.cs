@@ -1,5 +1,6 @@
 ﻿using Business.Exceptions;
 using Business.QueryParameters;
+using DataAccess.Models.Enums;
 using DataAccess.Models.Models;
 using DataAccess.Repositories.Contracts;
 using DataAccess.Repositories.Data;
@@ -214,26 +215,38 @@ namespace DataAccess.Repositories.Models
         }
         private async Task<IQueryable<User>> SortByAsync(IQueryable<User> result, string? sortCriteria)
         {
-            switch (sortCriteria)
+            if (Enum.TryParse<SortCriteria>(sortCriteria, true, out var sortEnum))
+
+            switch (sortEnum)
             {
-                case "username":
+                case SortCriteria.Username:
                     return await Task.FromResult(result.OrderBy(user => user.Username));
-                case "email":
+                case SortCriteria.Email:
                     return await Task.FromResult(result.OrderBy(user => user.Email));
-                case "phoneNumber":
+                case SortCriteria.PhoneNumber:
                     return await Task.FromResult(result.OrderBy(user => user.PhoneNumber));
                 default:
                     return await Task.FromResult(result);
             }
+
+            else
+            {
+                return await Task.FromResult(result);
+            }
         }
         private async Task<IQueryable<User>> SortOrderAsync(IQueryable<User> result, string? sortOrder)
         {
-            switch (sortOrder)
+            if(Enum.TryParse<SortCriteria>(sortOrder, true, out var sortEnum))
+            switch (sortEnum)
             {
-                case "desc":
+                case SortCriteria.Desc:
                     return await Task.FromResult(result.Reverse());
                 default:
                     return await Task.FromResult(result);
+            }
+            else
+            {
+                return await Task.FromResult(result);
             }
         }
 
