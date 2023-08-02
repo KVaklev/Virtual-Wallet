@@ -165,21 +165,18 @@ namespace Business.Services.Models
             return await this.userRepository.UnblockUserAsync(id);
         }
 
-        public async Task<bool> EmailExistsAsync(string email)
+        private async Task<bool> EmailExistsAsync(string email)
         {
             return await this.userRepository.EmailExistsAsync(email);
         }
-
-        public async Task<bool> UsernameExistsAsync(string username)
+        private async Task<bool> UsernameExistsAsync(string username)
         {
             return await this.userRepository.UsernameExistsAsync(username);
         }
-
-        public async Task<bool> PhoneNumberExistsAsync(string phoneNumber)
+        private async Task<bool> PhoneNumberExistsAsync(string phoneNumber)
         {
             return await this.userRepository.PhoneNumberExistsAsync(phoneNumber);
         }
-
         private async Task<User> RegisterUserAsync(CreateUserDto createUserDto, User user)
         {
             //Benefit one of using saltkey on hash - if users enter equal password - they are stored different in the db

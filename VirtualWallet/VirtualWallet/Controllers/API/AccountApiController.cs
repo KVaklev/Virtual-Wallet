@@ -84,7 +84,7 @@ namespace VirtualWallet.Controllers.API
             var user = await this.userService.GetByUsernameAsync(username);
 
             var token = this.accountService.GenerateTokenAsync(user.Id);
-            var confirmationLink = Url.Action(nameof(ConfirmRegistration), "AccountApi",
+            var confirmationLink = Url.Action("confirm-registration", "api",
                                    new { userId = user.Id, token = token.Result }, Request.Scheme);
 
             var message = await this.emailService.BuildEmailAsync(user, confirmationLink);
@@ -95,10 +95,17 @@ namespace VirtualWallet.Controllers.API
 
 
         [HttpGet("confirm-registration")]
-        public IActionResult ConfirmRegistration([FromQuery] int userId, [FromQuery] string token)
+        public async Task<IActionResult> ConfirmRegistrationAsync([FromQuery] int userId, [FromQuery] string token)
         {
-            this.accountService.ConfirmRegistrationAsync(userId, token);
-            return Ok("Registration confirmed!");
+           var isSuccessfullConfirmation = await this.accountService.ConfirmRegistrationAsync(userId, token);
+
+            if (isSuccessfullConfirmation)
+            {
+                return Ok("Registration confirmed!");
+
+            }
+
+            return BadRequest("Your registration was not successfull.");
         }
 
 

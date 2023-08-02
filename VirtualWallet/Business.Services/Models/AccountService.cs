@@ -5,10 +5,6 @@ using Business.Services.Contracts;
 using Business.Services.Helpers;
 using DataAccess.Models.Models;
 using DataAccess.Repositories.Contracts;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
 
 namespace Business.Services.Models
 {
@@ -19,7 +15,11 @@ namespace Business.Services.Models
         private readonly ICurrencyRepository currencyRepository;
         private readonly IUserRepository userRepository;
 
-        public AccountService(IAccountRepository accountRepository, ICardRepository cardRepository, IMapper mapper, ICurrencyRepository currencyRepository, IUserRepository userRepository)
+        public AccountService(
+            IAccountRepository accountRepository, 
+            ICardRepository cardRepository,
+            ICurrencyRepository currencyRepository, 
+            IUserRepository userRepository)
         {
             this.accountRepository = accountRepository;
             this.cardRepository = cardRepository;

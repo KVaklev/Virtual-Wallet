@@ -53,12 +53,13 @@ namespace DataAccess.Repositories.Models
 
         public async Task<User> GetByIdAsync(int id)
         {
-            User? user = context.Users
+            User? user = await context.Users
                 .Where(u => u.IsDeleted == false)
                 .Where(users => users.Id == id)
                 .Include(u => u.Account)
                 .ThenInclude(c => c.Currency)
-                .FirstOrDefault();
+                .FirstOrDefaultAsync();
+
             return user ?? throw new EntityNotFoundException($"User with ID = {id} doesn't exist.");
         }
 
