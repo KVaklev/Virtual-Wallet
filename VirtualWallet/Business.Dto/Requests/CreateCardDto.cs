@@ -7,30 +7,30 @@ namespace Business.DTOs.Requests
     {
         [Required(ErrorMessage = Constants.EmptyFieldErrorMessage)]
         [CardNumber(ErrorMessage = Constants.CardNumberFieldErroMessage)]
-        [StringLength(16, ErrorMessage = Constants.CardNumberLengthErrorMessage)]
+        [StringLength(16, ErrorMessage = Constants.LengthErrorMessage)]
         public string CardNumber { get; set; }
 
-        [Required(ErrorMessage = Constants.EmptyFieldExpirationDateErrorMessage)]
+        [Required(ErrorMessage = Constants.EmptyFieldErrorMessage)]
         [ValidExpirationDate(ErrorMessage = Constants.ExpirationDateErrorMessage)]
         [DataType(DataType.Date)]
         public DateTime ExpirationDate { get; set; }
 
         [Required(ErrorMessage = Constants.EmptyFieldErrorMessage)]
-        [MinLength(Constants.CardHolderMinLength, ErrorMessage = Constants.CardHolderMinLengthErrorMessage)]
-        [MaxLength(Constants.CardHolderMaxLength, ErrorMessage = Constants.CardHolderMaxLengthErrorMessage)]
+        [MinLength(Constants.CardHolderMinLength, ErrorMessage = Constants.MinLengthErrorMessage)]
+        [MaxLength(Constants.CardHolderMaxLength, ErrorMessage = Constants.MaxLengthErrorMessage)]
         public string CardHolder { get; set; }
 
         [Required(ErrorMessage = Constants.EmptyFieldErrorMessage)]
         [CardCheckNumber(ErrorMessage = Constants.CardCheckNumberFieldErrorMessage)]
-        [StringLength(Constants.CheckNumberLength, ErrorMessage = Constants.CheckNumberLengthErrorMessage)]
+        [StringLength(Constants.CheckNumberLength, ErrorMessage = Constants.LengthErrorMessage)]
         public string CheckNumber { get; set; }
 
         [Required(ErrorMessage = Constants.EmptyFieldCardTypeErrorMessage)]
         public string CardType { get; set; }
 
         [Required(ErrorMessage = Constants.EmptyFieldErrorMessage)]
-        [MinLength(Constants.UsernameMinLength, ErrorMessage = Constants.UsernameMinLengthErrorMessage)]
-        [MaxLength(Constants.UsernameMaxLength, ErrorMessage = Constants.UsernameMaxLengthErrorMessage)]
+        [MinLength(Constants.UsernameMinLength, ErrorMessage = Constants.MinLengthErrorMessage)]
+        [MaxLength(Constants.UsernameMaxLength, ErrorMessage = Constants.MaxLengthErrorMessage)]
         public string AccountUsername { get; set; }
 
         [Required(ErrorMessage = Constants.EmptyFieldErrorMessage)]

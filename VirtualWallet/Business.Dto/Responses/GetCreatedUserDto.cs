@@ -2,7 +2,7 @@
 
 namespace Business.DTOs.Responses
 {
-    public class GetUserDto
+    public class GetCreatedUserDto
     {
         [Required]
         public string Username { get; set; }

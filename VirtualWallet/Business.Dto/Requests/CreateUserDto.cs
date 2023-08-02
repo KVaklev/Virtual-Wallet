@@ -7,8 +7,8 @@ namespace Business.DTOs.Requests
     public class CreateUserDto
     {
         [Required(ErrorMessage = Constants.EmptyFieldErrorMessage)]
-        [MinLength(Constants.UsernameMinLength, ErrorMessage = Constants.UsernameMinLengthErrorMessage)]
-        [MaxLength(Constants.UsernameMaxLength, ErrorMessage = Constants.UsernameMaxLengthErrorMessage)]
+        [MinLength(Constants.UsernameMinLength, ErrorMessage = Constants.MinLengthErrorMessage)]
+        [MaxLength(Constants.UsernameMaxLength, ErrorMessage = Constants.MaxLengthErrorMessage)]
         public string Username { get; set; }
 
         [Required(ErrorMessage = Constants.EmptyFieldErrorMessage)]
@@ -17,7 +17,7 @@ namespace Business.DTOs.Requests
 
         [Required(ErrorMessage = Constants.EmptyFieldErrorMessage)]
         [PhoneNumber(ErrorMessage = Constants.PhoneNumberFieldErroMessage)]
-        [StringLength(Constants.PhoneNumberLength, ErrorMessage = Constants.PhoneNumberLengthErrorMessage)]
+        [StringLength(Constants.PhoneNumberLength, ErrorMessage = Constants.LengthErrorMessage)]
         public string PhoneNumber { get; set; }
 
         [Required(ErrorMessage = Constants.EmptyFieldErrorMessage)]

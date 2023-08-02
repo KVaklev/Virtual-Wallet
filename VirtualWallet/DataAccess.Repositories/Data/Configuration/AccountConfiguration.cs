@@ -16,7 +16,7 @@ namespace DataAccess.Repositories.Data.Configuration
 
             builder
                 .HasMany(u => u.TransactionsRecipient)
-                .WithOne(t => t.AccountRecepient)
+                .WithOne(t => t.AccountRecipient)
                 .HasForeignKey(t => t.AccountRecepientId)
                 .OnDelete(DeleteBehavior.NoAction);
         }

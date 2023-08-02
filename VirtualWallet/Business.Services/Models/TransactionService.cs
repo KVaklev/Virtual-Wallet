@@ -11,6 +11,7 @@ using Microsoft.EntityFrameworkCore;
 using Business.DTOs.Requests;
 using Business.DTOs.Responses;
 using Business.DTOs;
+using System.Diagnostics;
 
 namespace Business.Services.Models
 {
@@ -23,7 +24,6 @@ namespace Business.Services.Models
         private readonly ICurrencyRepository currencyRepository;
         private readonly IMapper mapper;
         private readonly IExchangeRateService exchangeRateService;
-        private readonly IUserRepository userRepository;
 
         public TransactionService(
             ITransactionRepository transactionRepository,
@@ -32,8 +32,7 @@ namespace Business.Services.Models
             IAccountRepository accountRepository,
             ICurrencyRepository currencyRepository,
             IMapper mapper,
-            IExchangeRateService exchangeRateService,
-            IUserRepository userRepository
+            IExchangeRateService exchangeRateService
             )
         {
             this.transactionRepository = transactionRepository;
@@ -43,37 +42,34 @@ namespace Business.Services.Models
             this.currencyRepository = currencyRepository;
             this.mapper = mapper;
             this.exchangeRateService = exchangeRateService;
-            this.userRepository = userRepository;
         }
-        public async Task<GetTransactionDto> GetByIdAsync(int id, User loggedUser)
+        public async Task<Response<GetTransactionDto>> GetByIdAsync(int id, User loggedUser)
         {
-
-            Transaction transactionToUpdate = await this.transactionRepository.GetByIdAsync(id);
-
-            if (!await Common.IsTransactionSenderAsync(transactionToUpdate, loggedUser) || !loggedUser.IsAdmin)
+            var result = new Response<GetTransactionDto>();
+            if (!await IsTransactionSenderAsync(id, loggedUser.Id) || !loggedUser.IsAdmin)
             {
-                throw new UnauthorizedOperationException(Constants.ModifyAuthorizedErrorMessage);
+                result.IsSuccessful = false;
+                result.Message = Constants.ModifyAuthorizedErrorMessage;
+                return result;
             }
             var transaction = await this.transactionRepository.GetByIdAsync(id);
             var transactionDto = this.mapper.Map<GetTransactionDto>(transaction);
+            result.Data = transactionDto;
 
-            return transactionDto;
+            return result;
         }
 
         public async Task<PaginatedList<Transaction>> FilterByAsync(
             TransactionQueryParameters filterParameters, 
-            User loggedUser
-            )
+            User loggedUser)
         {
-            return await this.transactionRepository.FilterByAsync(filterParameters, loggedUser.Username);
+            var result = await this.transactionRepository.FilterByAsync(filterParameters, loggedUser.Username);
+            return result;
         }
 
-        public async Task<Response<GetTransactionDto>> CreateAsync(CreateTransactionDto transactionDto, string loggedUsername)
+        public async Task<Response<GetTransactionDto>> CreateOutTransactionAsync(CreateTransactionDto transactionDto, User loggedUser)
         {
             var result = new Response<GetTransactionDto>();
-            var loggedUser = await this.userRepository.GetByUsernameAsync(loggedUsername);
-            var transaction = await MapDtoТоTransactionAsync(transactionDto, loggedUser);
-
             if (loggedUser.IsBlocked)
             {
                 result.IsSuccessful = false;
@@ -81,6 +77,7 @@ namespace Business.Services.Models
                 return result;
             }
             
+            var transaction = await MapDtoТоTransactionAsync(transactionDto, loggedUser);
             if (!await this.accountRepository.HasEnoughBalanceAsync(transaction.AccountSenderId, transaction.Amount))
             {
                 result.IsSuccessful = false;
@@ -89,99 +86,128 @@ namespace Business.Services.Models
             }
 
             var newTransaction = await this.transactionRepository.CreateOutTransactionAsync(transaction);
-            var getTranactionDto = this.mapper.Map<GetTransactionDto>(newTransaction);
-            result.Data = getTranactionDto;
+            result.Data = this.mapper.Map<GetTransactionDto>(newTransaction);
 
             return result;
         }
 
-        public async Task<Transaction> UpdateAsync(int id, User loggedUser, CreateTransactionDto transactionDto)
+        public async Task<Response<GetTransactionDto>> UpdateAsync(int id, User loggedUser, CreateTransactionDto transactionDto)
         {
-            Transaction transactionToGet = await this.transactionRepository.GetByIdAsync(id);
-
-            if (!await Common.IsTransactionSenderAsync(transactionToGet, loggedUser))  
+            var result = new Response<GetTransactionDto>();
+            if (!await IsTransactionSenderAsync(id, loggedUser.Id))
             {
-                throw new UnauthorizedOperationException(Constants.ModifyAuthorizedErrorMessage);
+                result.IsSuccessful = false;
+                result.Message = Constants.ModifyAuthorizedErrorMessage;
+                return result;
             }
 
             var transactionToUpdate = await this.transactionRepository.GetByIdAsync(id);
-
-            if (transactionToUpdate.IsExecuted
-                || transactionToUpdate.Direction == DirectionType.In
-                || transactionToUpdate.IsDeleted)
+            if (!await CanModifyTransactionAsync(transactionToUpdate))
             {
-                throw new UnauthorizedOperationException(Constants.ModifyTransactionExecuteErrorMessage);
+                result.IsSuccessful = false;
+                result.Message = Constants.ModifyTransactionNotExecuteErrorMessage;
+                return result;
             }
-
             var newTransaction = await MapDtoТоTransactionAsync(transactionDto, loggedUser);
-            return await this.transactionRepository.UpdateAsync(transactionToUpdate, newTransaction);
-        }
-
-        public async Task<bool> DeleteAsync(int id, User loggedUser)
-        {
-            Transaction transactionToUpdate = await this.transactionRepository.GetByIdAsync(id);
-
-            if (!await Common.IsTransactionSenderAsync(transactionToUpdate, loggedUser))
+            if (!await this.accountRepository.HasEnoughBalanceAsync(newTransaction.AccountSenderId, newTransaction.Amount))
             {
-                throw new UnauthorizedOperationException(Constants.ModifyAuthorizedErrorMessage);
+                result.IsSuccessful = false;
+                result.Message = Constants.ModifyAccountBalancetErrorMessage;
+                return result;
             }
 
-            var trasaction = await this.transactionRepository.GetByIdAsync(id);
-            if (trasaction.IsExecuted || trasaction.Direction == DirectionType.In)
+            var updatedTransacion = await this.transactionRepository.UpdateAsync(transactionToUpdate, newTransaction);
+            result.Data = this.mapper.Map<GetTransactionDto>(updatedTransacion);
+            return result;
+        }
+
+        public async Task<Response<bool>> DeleteAsync(int id, User loggedUser)
+        {
+            var result = new Response<bool>();
+            if (!await IsTransactionSenderAsync(id, loggedUser.Id))
             {
-                throw new UnauthorizedOperationException(Constants.ModifyTransactionExecuteErrorMessage); 
+                result.IsSuccessful = false;
+                result.Message = Constants.ModifyAuthorizedErrorMessage;
+                return result;
             }
 
-            return await this.transactionRepository.DeleteAsync(trasaction);
+            var transaction = await this.transactionRepository.GetByIdAsync(id);
+            if (!await CanModifyTransactionAsync(transaction))
+            {
+                result.IsSuccessful = false;
+                result.Message = Constants.ModifyTransactionNotExecuteErrorMessage;
+                return result;
+            }
+            result.Message = Constants.ModifyTransactionDeleteMessage;
+            result.Data = await this.transactionRepository.DeleteAsync(transaction);
+            return result;
         }
 
 
-        public async Task<bool> ExecuteAsync(int transactionId, User loggedUser)
+        public async Task<Response<bool>> ExecuteAsync(int transactionId, User loggedUser)
         {
-            Transaction transactionToUpdate = await this.transactionRepository.GetByIdAsync(transactionId);
-
-            if (!await Common.IsTransactionSenderAsync(transactionToUpdate, loggedUser))
+            var result = new Response<bool>();
+            if (!await IsTransactionSenderAsync(transactionId, loggedUser.Id))
             {
-                throw new UnauthorizedOperationException(Constants.ModifyAuthorizedErrorMessage);
+                result.IsSuccessful = false;
+                result.Message = Constants.ModifyAuthorizedErrorMessage;
+                return result;
             }
 
             var transactionOut = await this.transactionRepository.GetByIdAsync(transactionId);
-            if (transactionOut.IsExecuted
-                || transactionOut.Direction == DirectionType.In
-                || transactionOut.IsDeleted)
-            {
-                throw new UnauthorizedOperationException(Constants.ModifyTransactionExecuteErrorMessage); 
+            if(!await CanModifyTransactionAsync(transactionOut))
+            { 
+                result.IsSuccessful = false;
+                result.Message = Constants.ModifyTransactionNotExecuteErrorMessage;
+                return result;
             }
 
-            transactionOut.IsExecuted = true;
-            transactionOut.Date = DateTime.Now;
-
-            var transactionInAmount = await GetTransactionInAmountAsync(transactionOut);
-            var transactionIn = await this.transactionRepository.CreateInTransactionAsync(transactionOut, transactionInAmount);
             
-            await this.accountRepository.DecreaseBalanceAsync(transactionOut.AccountSenderId, transactionOut.Amount);
-            await this.accountRepository.IncreaseBalanceAsync(transactionIn.AccountRecepientId, transactionIn.Amount);
 
+            var transactionIn = await CreateInTransactionAsync(transactionOut);
+            UpdateAccountsBalances(transactionOut, transactionIn);
             await AddTransactionToHistoryAsync(transactionOut);
             await AddTransactionToHistoryAsync(transactionIn);
 
-            return transactionOut.IsExecuted;
+            result.Message = Constants.ModifyTransactionExecuteMessage;
+            result.Data = transactionOut.IsExecuted;
+            return result;
         }
-        private async Task<decimal> GetTransactionInAmountAsync(Transaction transactionOut)
-        {
-            var transactionInAmount = transactionOut.Amount;
-            var transactionCurrencyCode = transactionOut.Currency.CurrencyCode;
-            var recepientAccountCurrencyCode = transactionOut.AccountRecepient.Currency.CurrencyCode;
-            
-            if (transactionCurrencyCode!= recepientAccountCurrencyCode)
-            {
-                transactionInAmount = await this.exchangeRateService
-                    .ExchangeAsync(transactionInAmount, transactionCurrencyCode, recepientAccountCurrencyCode);
-            }
 
-            return transactionInAmount;
+        private async Task<Transaction> CreateInTransactionAsync(Transaction transaction)
+        {
+            var amount = await GetCorrectAmountAsync(
+                transaction.Currency.CurrencyCode, 
+                transaction.AccountRecipient.Currency.CurrencyCode, 
+                transaction.Amount);
+            var transactionIn = await this.transactionRepository.CreateInTransactionAsync(transaction, amount);
+            return transactionIn;
         }
-       
+
+        private async Task<decimal> GetCorrectAmountAsync(
+            string transactionCurrencyCode, 
+            string accountCurrencyCode, 
+            decimal amount)
+        {
+            if (transactionCurrencyCode!= accountCurrencyCode)
+            {
+                amount = await this.exchangeRateService
+                    .ExchangeAsync(amount, transactionCurrencyCode, accountCurrencyCode);
+            }
+            return amount;
+        }
+
+        private async void UpdateAccountsBalances(Transaction transactionOut, Transaction transactionIn)
+        {
+             var amountSender =await GetCorrectAmountAsync(
+                 transactionOut.Currency.CurrencyCode,
+                 transactionOut.AccountSender.Currency.CurrencyCode,
+                 transactionOut.Amount );
+           
+             await this.accountRepository.DecreaseBalanceAsync(transactionOut.AccountSenderId, amountSender);
+             await this.accountRepository.IncreaseBalanceAsync(transactionIn.AccountRecepientId, transactionIn.Amount);
+        }
+
         private async Task<bool> AddTransactionToHistoryAsync(Transaction transaction)
         {
 
@@ -204,7 +230,7 @@ namespace Business.Services.Models
             var transaction = this.mapper.Map<Transaction>(transactionDto);
             transaction.AccountSenderId = (int)user.AccountId;
             transaction.AccountSender = user.Account;
-            transaction.AccountRecepient = await this.accountRepository.GetByUsernameAsync(transactionDto.RecepientUsername);
+            transaction.AccountRecipient = await this.accountRepository.GetByUsernameAsync(transactionDto.RecepientUsername);
             transaction.Currency = await this.currencyRepository.GetByCurrencyCodeAsync(transactionDto.CurrencyCode);
             transaction.AccountRecepientId = (await this.accountRepository.GetByUsernameAsync(transactionDto.RecepientUsername)).Id;
             transaction.CurrencyId = (await this.currencyRepository.GetByCurrencyCodeAsync(transactionDto.CurrencyCode)).Id;
@@ -212,17 +238,28 @@ namespace Business.Services.Models
             return transaction;
         }
 
-        //private async Task<bool> IsTransactionSenderAsync(int id, int userId)
-        //{
-        //    bool isTransactionSender = true;
-        //    Transaction transactionToUpdate = await this.transactionRepository.GetByIdAsync(id);
+        private async Task<bool> IsTransactionSenderAsync(int id, int userId)
+        {
+            bool isTransactionSender = true;
+            Transaction transactionToUpdate = await this.transactionRepository.GetByIdAsync(id);
 
-        //    if (transactionToUpdate.AccountSender.User.Id != userId)
-        //    {
-        //        isTransactionSender = false;
-        //    }
-        //    return isTransactionSender;
-        //}
+            if (transactionToUpdate.AccountSender.User.Id != userId)
+            {
+                isTransactionSender = false;
+            }
+            return isTransactionSender;
+        }
 
+        private async Task<bool> CanModifyTransactionAsync(Transaction transaction)
+        {
+                var canExecuteTransaction = true;
+                        if (transaction.IsExecuted
+                                || transaction.Direction == DirectionType.In
+                                || transaction.IsDeleted)
+                                {
+                                    canExecuteTransaction = false;
+                                }
+                return canExecuteTransaction;
+        }
     }
 }

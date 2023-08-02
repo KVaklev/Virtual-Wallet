@@ -13,14 +13,11 @@ namespace Business.Services.Contracts
         Task<User> GetByUsernameAsync(string username);
         Task<User> GetByEmailAsync(string email);
         Task<User> GetByPhoneNumberAsync(string phoneNumber);
-        Task<GetUserDto> CreateAsync(CreateUserDto createUserDto);
-        Task<User> UpdateAsync(int id, User user, User loggedUser);
+        Task<GetCreatedUserDto> CreateAsync(CreateUserDto createUserDto);
+        Task<GetUpdatedUserDto> UpdateAsync(int id, UpdateUserDto updateUserDto, User loggedUser);
         Task<bool> DeleteAsync(int id, User loggedUser);
         Task<User> PromoteAsync(int id, User loggedUser);
         Task<User> BlockUserAsync(int id, User loggedUser);
         Task<User> UnblockUserAsync(int id, User loggedUser);
-        Task<bool> UsernameExistsAsync(string username);
-        Task<bool> EmailExistsAsync(string email);
-        Task<bool> PhoneNumberExistsAsync(string phoneNumber);
     }
 }

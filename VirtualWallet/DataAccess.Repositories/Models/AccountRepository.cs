@@ -47,25 +47,12 @@ namespace DataAccess.Repositories.Models
         public async Task <bool> DeleteAsync(int id)
         {
             var accountToDelete = await this.GetByIdAsync(id);
-
             accountToDelete.IsDeleted = true;
 
-            if(accountToDelete.Cards.Count==0) 
-            {
-                throw new EntityNotFoundException("There are no cards lineked to this account");
-            }
-
-            foreach (var card in accountToDelete.Cards)
-            {
-                this.cardRepository.DeleteAsync(card.Id);
-            }
-
             await context.SaveChangesAsync();
-
             return accountToDelete.IsDeleted;
         }
                
-
         public async Task <bool> AddCardAsync(int id, Card card)
         {
             var accountToAddCard = await this.context.Accounts.FirstOrDefaultAsync(a => a.Id == id);
@@ -161,6 +148,7 @@ namespace DataAccess.Repositories.Models
 
             return accountToWithdrawFrom;
         }
+
 
         public async Task<bool> HasEnoughBalanceAsync(int id, decimal amount)
         {

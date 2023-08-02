@@ -4,13 +4,8 @@ using DataAccess.Models.Models;
 using DataAccess.Repositories.Contracts;
 using Business.Services.Helpers;
 using Business.QueryParameters;
-using DataAccess.Repositories.Models;
 using AutoMapper;
-using Business.DTOs;
-using DataAccess.Repositories.Data;
 using Business.Mappers;
-using System.Security.Cryptography;
-using System.Text;
 using Business.DTOs.Requests;
 using Business.DTOs.Responses;
 
@@ -66,75 +61,78 @@ namespace Business.Services.Models
             return await this.userRepository.GetByPhoneNumberAsync(pnoneNumber);
         }
 
-        public async Task<GetUserDto> CreateAsync(CreateUserDto createUserDto)
-        {
-            User user = await UsersMapper.MapCreateDtoToUserAsync(createUserDto);
-            
-            if (await UsernameExistsAsync(user.Username))
+        public async Task<GetCreatedUserDto> CreateAsync(CreateUserDto createUserDto)
+        {     
+            if (await UsernameExistsAsync(createUserDto.Username))
             {
-                throw new DuplicateEntityException($"User with username '{user.Username}' already exists.");
+                throw new DuplicateEntityException($"User with username '{createUserDto.Username}' already exists.");
             }
 
-            if (await EmailExistsAsync(user.Email))
+            if (await EmailExistsAsync(createUserDto.Email))
             {
-                throw new DuplicateEntityException($"User with email '{user.Email}' already exists.");
+                throw new DuplicateEntityException($"User with email '{createUserDto.Email}' already exists.");
             }
 
-            if (await PhoneNumberExistsAsync(user.PhoneNumber))
+            if (await PhoneNumberExistsAsync(createUserDto.PhoneNumber))
             {
-                throw new DuplicateEntityException($"User with phone number '{user.PhoneNumber}' already exists.");
+                throw new DuplicateEntityException($"User with phone number '{createUserDto.PhoneNumber}' already exists.");
             }
             
-            User userToCreate = await RegisterUserAsync(createUserDto, user);
-            User createdUser = await this.userRepository.CreateAsync(userToCreate);
-            await this.accountService.CreateAsync(createUserDto.CurrencyCode, createdUser);
+            User userToCreate = await UsersMapper.MapCreateDtoToUserAsync(createUserDto);
+            userToCreate = await Common.ComputePasswordHashAsync<CreateUserDto>(createUserDto, userToCreate);
+            userToCreate = await this.userRepository.CreateAsync(userToCreate);
+            await this.accountService.CreateAsync(createUserDto.CurrencyCode, userToCreate);
  
-            GetUserDto getUserDto = mapper.Map<GetUserDto>(createdUser);
+            GetCreatedUserDto createdUser = mapper.Map<GetCreatedUserDto>(userToCreate);
 
-            return getUserDto;
+            return createdUser;
         }
-
-        public async Task<User> UpdateAsync(int id, User user, User loggedUser)
+        
+        public async Task<GetUpdatedUserDto> UpdateAsync(int id, UpdateUserDto updateUserDto, User loggedUser)
         {
             User userToUpdate = await this.userRepository.GetByIdAsync(id);
-
+           
             if (!await Common.IsAuthorizedAsync(userToUpdate, loggedUser))
             {
                 throw new UnauthorizedOperationException(Constants.ModifyUserErrorMessage);
             }
 
-            if (user.Email != userToUpdate.Email)
+            if (userToUpdate.Email != updateUserDto.Email)
             {
-                if (await EmailExistsAsync(user.Email))
+                if (await EmailExistsAsync(updateUserDto.Email))
                 {
-                    throw new DuplicateEntityException($"User with email '{user.Email}' already exists.");
+                    throw new DuplicateEntityException($"User with email '{updateUserDto.Email}' already exists.");
                 }
             }
 
-            if (user.PhoneNumber != userToUpdate.PhoneNumber)
+            if (userToUpdate.PhoneNumber != updateUserDto.PhoneNumber)
             {
-                if (await PhoneNumberExistsAsync(user.PhoneNumber))
+                if (await PhoneNumberExistsAsync(updateUserDto.PhoneNumber))
                 {
-                    throw new DuplicateEntityException($"User with phone number '{user.PhoneNumber}' already exists.");
+                    throw new DuplicateEntityException($"User with phone number '{updateUserDto.PhoneNumber}' already exists.");
                 }
             }
 
-            userToUpdate = await this.userRepository.UpdateAsync(id, loggedUser);
-            return userToUpdate;
+            userToUpdate = await UsersMapper.MapUpdateDtoToUserAsync(userToUpdate, updateUserDto);
+            userToUpdate = await Common.ComputePasswordHashAsync<UpdateUserDto>(updateUserDto, userToUpdate);
+            userToUpdate = await this.userRepository.UpdateAsync(userToUpdate);
+
+            GetUpdatedUserDto updatedUser = mapper.Map<GetUpdatedUserDto>(userToUpdate);
+
+            return updatedUser;
         }
 
         public async Task<bool> DeleteAsync(int id, User loggedUser)
         {
-            User userToDelete = await this.userRepository.GetByIdAsync(id);
-
-            if (!await Common.IsAuthorizedAsync(userToDelete, loggedUser))
+            if (!await Common.IsAdminAsync(loggedUser))
             {
                 throw new UnauthorizedOperationException(Constants.ModifyUserErrorMessage);
             } 
             
+            User userToDelete = await this.userRepository.GetByIdAsync(id);
             var accountToDelete = await this.accountRepository.GetByIdAsync((int)userToDelete.AccountId);
             await this.accountService.DeleteAsync(accountToDelete.Id, loggedUser);
-
+    
             return await this.userRepository.DeleteAsync(id);
         }
 
@@ -144,6 +142,14 @@ namespace Business.Services.Models
             {
                 throw new UnauthorizedOperationException(Constants.ModifyUserErrorMessage);
             }
+
+            User userToPromote = await this.GetByIdAsync(id);
+
+            if (!userToPromote.IsAdmin)
+            {
+                userToPromote.IsAdmin = true;
+            }
+
             return await this.userRepository.PromoteAsync(id);
         }
 
@@ -153,6 +159,14 @@ namespace Business.Services.Models
             {
                 throw new UnauthorizedOperationException(Constants.ModifyUserErrorMessage);
             }
+
+            User userToBlock = await this.GetByIdAsync(id);
+
+            if (!userToBlock.IsBlocked)
+            {
+                userToBlock.IsBlocked = true;
+            }
+
             return await this.userRepository.BlockUserAsync(id);
         }
 
@@ -162,40 +176,29 @@ namespace Business.Services.Models
             {
                 throw new UnauthorizedOperationException(Constants.ModifyUserErrorMessage);
             }
+
+            User userToUnblock = await this.GetByIdAsync(id);
+
+            if (userToUnblock.IsBlocked)
+            {
+                userToUnblock.IsBlocked = false;
+            }
+
             return await this.userRepository.UnblockUserAsync(id);
         }
 
-        public async Task<bool> EmailExistsAsync(string email)
+        private async Task<bool> EmailExistsAsync(string email)
         {
             return await this.userRepository.EmailExistsAsync(email);
         }
-
-        public async Task<bool> UsernameExistsAsync(string username)
+        private async Task<bool> UsernameExistsAsync(string username)
         {
             return await this.userRepository.UsernameExistsAsync(username);
         }
-
-        public async Task<bool> PhoneNumberExistsAsync(string phoneNumber)
+        private async Task<bool> PhoneNumberExistsAsync(string phoneNumber)
         {
             return await this.userRepository.PhoneNumberExistsAsync(phoneNumber);
         }
 
-        private async Task<User> RegisterUserAsync(CreateUserDto createUserDto, User user)
-        {
-            //Benefit one of using saltkey on hash - if users enter equal password - they are stored different in the db
-            //Benefit of using SHA512 - it is not easily decrypted online over the internet available dictionaries
-
-            byte[] passwordHash, passwordKey;
-
-            using (var hmac = new HMACSHA512())
-            {
-                passwordKey = hmac.Key;
-                passwordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(createUserDto.Password));
-            }
-            user.Password = passwordHash;
-            user.PasswordKey = passwordKey;
-            
-            return await Task.FromResult(user);
-        }
     }
 }

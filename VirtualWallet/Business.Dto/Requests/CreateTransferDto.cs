@@ -14,7 +14,7 @@ namespace Business.DTOs.Requests
 
         [Required(ErrorMessage = Constants.EmptyFieldErrorMessage)]
         [CardNumber(ErrorMessage = Constants.CardNumberFieldErroMessage)]
-        [StringLength(16, ErrorMessage = Constants.CardNumberLengthErrorMessage)]
+        [StringLength(16, ErrorMessage = Constants.LengthErrorMessage)]
         public string CardNumber { get; set; }
 
         [Required(ErrorMessage = Constants.EmptyFieldTransferTypeErrorMessage)]

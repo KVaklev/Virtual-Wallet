@@ -9,31 +9,33 @@ namespace DataAccess.Models.Models
 
     {
         [Required(ErrorMessage = Constants.EmptyFieldErrorMessage)]
-        [Range(1, int.MaxValue, ErrorMessage = Constants.RangeFieldErrorMessage)]
+        [Range(Constants.IdMin, Constants.IdMax, ErrorMessage = Constants.RangeFieldErrorMessage)]
         public int Id { get; set; }
 
         [Required(ErrorMessage = Constants.EmptyFieldErrorMessage)]
-        [Range(1, int.MaxValue, ErrorMessage = Constants.RangeFieldErrorMessage)]
+        [Range(Constants.IdMin, Constants.IdMax, ErrorMessage = Constants.RangeFieldErrorMessage)]
         public int AccountSenderId { get; set; } //FK
 
         [JsonIgnore]
         public Account AccountSender { get; set; }
 
+        [Required(ErrorMessage = Constants.EmptyFieldErrorMessage)]
+        [Range(Constants.IdMin, Constants.IdMax, ErrorMessage = Constants.RangeFieldErrorMessage)]
         public int AccountRecepientId { get; set; } //FK
 
         [JsonIgnore]
-        public Account AccountRecepient { get; set; }
+        public Account AccountRecipient { get; set; }
 
         public DirectionType Direction { get; set; }
 
         [Required(ErrorMessage = Constants.EmptyFieldErrorMessage)]
-        [Range(0, double.MaxValue, ErrorMessage = Constants.RangeFieldErrorMessage)]
+        [Range(Constants.MinAmount, Constants.MaxAmount, ErrorMessage = Constants.RangeFieldErrorMessage)]
         public decimal Amount { get; set; }
 
         public DateTime Date { get; set; }
 
         [Required(ErrorMessage = Constants.EmptyFieldErrorMessage)]
-        [Range(1, int.MaxValue, ErrorMessage = Constants.RangeFieldErrorMessage)]
+        [Range(Constants.IdMin, Constants.IdMax, ErrorMessage = Constants.RangeFieldErrorMessage)]
         public int CurrencyId { get; set; } //FK
         
         [JsonIgnore]

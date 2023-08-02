@@ -13,17 +13,17 @@ namespace DataAccess.Models.Models
 
         public int Id { get; set; }
 
-        [MinLength(Constants.NameMinLength, ErrorMessage = Constants.NameMinLengthErrorMessage)]
-        [MaxLength(Constants.NameMaxLength, ErrorMessage = Constants.NameMaxLengthErrorMessage)]
+        [MinLength(Constants.NameMinLength, ErrorMessage = Constants.MinLengthErrorMessage)]
+        [MaxLength(Constants.NameMaxLength, ErrorMessage = Constants.MaxLengthErrorMessage)]
         public string? FirstName { get; set; }
 
-        [MinLength(Constants.NameMinLength, ErrorMessage = Constants.NameMinLengthErrorMessage)]
-        [MaxLength(Constants.NameMaxLength, ErrorMessage = Constants.NameMaxLengthErrorMessage)]
+        [MinLength(Constants.NameMinLength, ErrorMessage = Constants.MinLengthErrorMessage)]
+        [MaxLength(Constants.NameMaxLength, ErrorMessage = Constants.MaxLengthErrorMessage)]
         public string? LastName { get; set; }
 
         [Required(ErrorMessage = Constants.EmptyFieldErrorMessage)]
-        [MinLength(Constants.UsernameMinLength, ErrorMessage = Constants.UsernameMinLengthErrorMessage)]
-        [MaxLength(Constants.UsernameMaxLength, ErrorMessage = Constants.UsernameMaxLengthErrorMessage)]
+        [MinLength(Constants.UsernameMinLength, ErrorMessage = Constants.MinLengthErrorMessage)]
+        [MaxLength(Constants.UsernameMaxLength, ErrorMessage = Constants.MaxLengthErrorMessage)]
         public string Username { get; set; }
 
         [Required(ErrorMessage = Constants.EmptyFieldErrorMessage)]
@@ -37,7 +37,7 @@ namespace DataAccess.Models.Models
 
         [Required(ErrorMessage = Constants.EmptyFieldErrorMessage)]
         [PhoneNumber(ErrorMessage = Constants.PhoneNumberFieldErroMessage)]
-        [StringLength(Constants.PhoneNumberLength, ErrorMessage = Constants.PhoneNumberLengthErrorMessage)]
+        [StringLength(Constants.PhoneNumberLength, ErrorMessage = Constants.LengthErrorMessage)]
         public string PhoneNumber { get; set; }
 
         public bool IsBlocked { get; set; }
