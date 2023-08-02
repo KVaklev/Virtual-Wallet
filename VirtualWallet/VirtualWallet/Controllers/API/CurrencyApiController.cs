@@ -33,17 +33,17 @@ namespace VirtualWallet.Controllers.API
             try
             {
                 var loggedUser = await FindLoggedUserAsync();
-                await this.currencyService.CreateAsync(currencyDto, loggedUser);
+                var result=  await this.currencyService.CreateAsync(currencyDto, loggedUser);
+                if (!result.IsSuccessful)
+                {
+                    return StatusCode(StatusCodes.Status401Unauthorized, result.Message);
+                }
 
-                return StatusCode(StatusCodes.Status200OK, currencyDto);
+                return StatusCode(StatusCodes.Status200OK, result.Data);
             }
             catch (EntityNotFoundException e)
             {
                 return StatusCode(StatusCodes.Status404NotFound, e.Message);
-            }
-            catch (UnauthorizedOperationException e)
-            {
-                return StatusCode(StatusCodes.Status401Unauthorized, e.Message);
             }
         }
 
@@ -82,17 +82,17 @@ namespace VirtualWallet.Controllers.API
             try
             {
                 var loggedUser = await FindLoggedUserAsync();
-                var updateCurencyDto = await this.currencyService.UpdateAsync(id, currencyDto, loggedUser);
+                var result = await this.currencyService.UpdateAsync(id, currencyDto, loggedUser);
+                if (!result.IsSuccessful)
+                {
+                    return StatusCode(StatusCodes.Status401Unauthorized, result.Message);
+                }
 
-                return StatusCode(StatusCodes.Status200OK, updateCurencyDto);
+                return StatusCode(StatusCodes.Status200OK, result.Data);
             }
             catch (EntityNotFoundException e)
             {
                 return StatusCode(StatusCodes.Status404NotFound, e.Message);
-            }
-            catch (UnauthorizedOperationException e)
-            {
-                return StatusCode(StatusCodes.Status401Unauthorized, e.Message);
             }
         }
 
@@ -102,17 +102,17 @@ namespace VirtualWallet.Controllers.API
             try
             {
                 var loggedUser = await FindLoggedUserAsync();
-                var isDeleted = await this.currencyService.DeleteAsync(id, loggedUser);
+                var result = await this.currencyService.DeleteAsync(id, loggedUser);
+                if (!result.IsSuccessful)
+                {
+                    return StatusCode(StatusCodes.Status401Unauthorized, result.Message);
+                }
 
-                return StatusCode(StatusCodes.Status200OK, isDeleted);
+                return StatusCode(StatusCodes.Status200OK, result.Message);
             }
             catch (EntityNotFoundException e)
             {
                 return StatusCode(StatusCodes.Status404NotFound, e.Message);
-            }
-            catch (UnauthorizedOperationException e)
-            {
-                return StatusCode(StatusCodes.Status401Unauthorized, e.Message);
             }
 
         }

@@ -13,7 +13,7 @@ namespace DataAccess.Models.Models
         public string Name { get; set; }
 
         [Required(ErrorMessage = Constants.EmptyFieldErrorMessage)]
-        [StringLength(3,ErrorMessage = "The {0} must be {1} characters long.")]
+        [StringLength(Constants.CurrencyCodeLength, ErrorMessage = Constants.LengthErrorMessage)]
         public string CurrencyCode { get; set; }
 
         public List<Account> Accounts { get; set; } = new List<Account>();

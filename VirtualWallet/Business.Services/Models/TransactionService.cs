@@ -81,7 +81,7 @@ namespace Business.Services.Models
             if (!await this.accountRepository.HasEnoughBalanceAsync(transaction.AccountSenderId, transaction.Amount))
             {
                 result.IsSuccessful = false;
-                result.Message = Constants.ModifyTransactionAmountErrorMessage;
+                result.Message = Constants.ModifyAccountBalancetErrorMessage;
                 return result;
             }
 

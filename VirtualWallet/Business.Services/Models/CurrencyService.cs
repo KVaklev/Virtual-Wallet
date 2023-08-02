@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using Business.Dto;
-using Business.Exceptions;
+using Business.DTOs;
 using Business.Services.Contracts;
 using Business.Services.Helpers;
 using DataAccess.Models.Models;
@@ -22,25 +22,35 @@ namespace Business.Services.Models
             this.mapper = mapper;
         }
        
-        public async Task<CurrencyDto> CreateAsync(CurrencyDto currencyDto, User loggedUser)
+        public async Task<Response<CurrencyDto>> CreateAsync(CurrencyDto currencyDto, User loggedUser)
         {
+            var result = new Response<CurrencyDto>();
             if (!await Common.IsAdminAsync(loggedUser))
             {
-                throw new UnauthorizedOperationException(Constants.ModifyUserErrorMessage);
+                result.IsSuccessful = false;
+                result.Message = Constants.ModifyUserErrorMessage;
+                return result;
             }
             var currency = this.mapper.Map<Currency>(currencyDto);
             var newCurrency = await this.currencyRepository.CreateAsync(currency);
             var newCurrencyDto = this.mapper.Map<CurrencyDto>(currency);
-            return newCurrencyDto;
+            result.Data = newCurrencyDto;
+            return result;
         }
 
-        public async Task<bool> DeleteAsync(int id, User loggedUser)
+        public async Task<Response<bool>> DeleteAsync(int id, User loggedUser)
         {
-            if (!await Common.IsAdminAsync(loggedUser))
+            var result = new Response<bool>();
+            if (!loggedUser.IsAdmin)
             {
-                throw new UnauthorizedOperationException(Constants.ModifyUserErrorMessage);
+                result.IsSuccessful = false;
+                result.Message = Constants.ModifyUserErrorMessage;
+                return result;
+
             }
-            return await this.currencyRepository.DeleteAsync(id);
+            result.Data = await this.currencyRepository.DeleteAsync(id);
+            result.Message = Constants.ModifyCurrencyDeleteErrorMessage;
+            return result;
         }
 
         public List<CurrencyDto> GetAll()
@@ -60,23 +70,29 @@ namespace Business.Services.Models
             return currencyDto;
         }
 
-        public async Task<CurrencyDto> UpdateAsync(int id, CurrencyDto currencyDto, User loggedUser)
+        public async Task<Response<CurrencyDto>> UpdateAsync(int id, CurrencyDto currencyDto, User loggedUser)
         {
+            var result = new Response<CurrencyDto>();
             if (!await Common.IsAdminAsync(loggedUser))
             {
-                throw new UnauthorizedOperationException(Constants.ModifyUserErrorMessage);
+                result.IsSuccessful = false;
+                result.Message = Constants.ModifyUserErrorMessage;
+                return result;
             }
 
             var currencyToUpdate = await this.currencyRepository.GetByIdAsync(id);
             if (currencyToUpdate.IsDeleted)
             {
-                throw new EntityNotFoundException(Constants.ModifyCurrencyNotFoundErrorMessage);
+                result.IsSuccessful = false;
+                result.Message = Constants.ModifyCurrencyNotFoundErrorMessage;
+                return result;
             }
 
             var currency = this.mapper.Map<Currency>(currencyDto);
             var updatedCurrency = await this.currencyRepository.UpdateAsync(currencyToUpdate, currency);
             var updatedCurrencyDto = this.mapper.Map<CurrencyDto>(updatedCurrency);
-            return updatedCurrencyDto;
+            result.Data= updatedCurrencyDto;
+            return result;
         }
 
     }

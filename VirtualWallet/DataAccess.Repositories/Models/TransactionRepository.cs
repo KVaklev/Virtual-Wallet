@@ -91,7 +91,6 @@ namespace DataAccess.Repositories.Models
             transactionIn.CurrencyId = (int)transactionOut.AccountRecepient.CurrencyId;
             transactionIn.Direction = DirectionType.In;
             transactionIn.Date = DateTime.Now;
-            transactionIn.IsDeleted = false;
             transactionIn.IsExecuted = true;
 
             await context.AddAsync(transactionIn);
@@ -102,8 +101,6 @@ namespace DataAccess.Repositories.Models
         public async Task<Transaction> CreateOutTransactionAsync(Transaction transaction)
         {
             transaction.Date = DateTime.Now;
-            transaction.IsExecuted = false;
-            transaction.IsDeleted = false;
             
             await context.AddAsync(transaction);
             await context.SaveChangesAsync();
