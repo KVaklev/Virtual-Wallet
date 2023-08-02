@@ -7,7 +7,6 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<Folder Include="Controllers\MVC\" />
 		<PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.20" />
 		<PackageReference Include="NETCore.MailKit" Version="2.1.0" />
@@ -27,6 +26,13 @@
     <ProjectReference Include="..\Business.Services\Business.Services.csproj" />
     <ProjectReference Include="..\Business.ViewModels\Business.ViewModels.csproj" />
     <ProjectReference Include="..\Presentation.Helpers\Presentation.Helpers.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Pages\Accounts\" />
+    <Folder Include="Pages\Transactions\" />
+    <Folder Include="Pages\Transfers\" />
+    <Folder Include="Pages\Users\" />
   </ItemGroup>
 
 </Project>

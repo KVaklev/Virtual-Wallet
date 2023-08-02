@@ -70,7 +70,7 @@ namespace VirtualWallet.Controllers.API
             {
                var createdUser = await this.userService.CreateAsync(createUserDto);
               
-                return await this.SendConfirmationEmailAsync(createdUser.Username);
+               return await this.SendConfirmationEmailAsync(createdUser.Username);
             }
             catch (DuplicateEntityException e)
             {

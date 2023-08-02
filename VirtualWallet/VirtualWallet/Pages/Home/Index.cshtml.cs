@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace VirtualWallet.Pages
+namespace VirtualWallet.Pages.Home
 {
     public class IndexModel : PageModel
     {
