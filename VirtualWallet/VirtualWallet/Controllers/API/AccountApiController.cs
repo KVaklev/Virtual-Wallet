@@ -104,7 +104,6 @@ namespace VirtualWallet.Controllers.API
                 return Ok("Registration confirmed!");
 
             }
-
             return BadRequest("Your registration was not successfull.");
         }
 

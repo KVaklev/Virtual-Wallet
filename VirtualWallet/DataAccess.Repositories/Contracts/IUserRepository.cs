@@ -12,7 +12,7 @@ namespace DataAccess.Repositories.Contracts
         Task<User> GetByEmailAsync(string email);
         Task<User> GetByPhoneNumberAsync(string phoneNumber);
         Task<User> CreateAsync(User user);
-        Task<User> UpdateAsync(int id, User user);
+        Task<User> UpdateAsync(User updatedUser);
         Task<bool> DeleteAsync(int id);
         Task<User> PromoteAsync(int id);
         Task<User> BlockUserAsync(int id);

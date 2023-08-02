@@ -36,8 +36,8 @@ namespace VirtualWallet.Controllers.API
             try
             {
                 List<User> result = await userService.FilterByAsync(userQueryParameters);
-                List<GetUserDto> userDtos = result
-                    .Select(user => mapper.Map<GetUserDto>(user))
+                List<GetCreatedUserDto> userDtos = result
+                    .Select(user => mapper.Map<GetCreatedUserDto>(user))
                     .ToList();
 
                 return StatusCode(StatusCodes.Status200OK, userDtos);
@@ -54,7 +54,7 @@ namespace VirtualWallet.Controllers.API
             try
             {
                 User user = await userService.GetByIdAsync(id);
-                GetUserDto userDto = mapper.Map<GetUserDto>(user);
+                GetCreatedUserDto userDto = mapper.Map<GetCreatedUserDto>(user);
 
                 return StatusCode(StatusCodes.Status200OK, userDto);
             }
@@ -69,7 +69,7 @@ namespace VirtualWallet.Controllers.API
         {
             try
             {
-                GetUserDto createdUser = await userService.CreateAsync(createUserDto);
+                GetCreatedUserDto createdUser = await userService.CreateAsync(createUserDto);
 
                 return StatusCode(StatusCodes.Status201Created, createdUser);
             }
@@ -85,8 +85,8 @@ namespace VirtualWallet.Controllers.API
             try
             {
                 User loggedUser = await FindLoggedUserAsync();
-                User user = mapper.Map<User>(updateUserDto);
-                User updatedUser = await userService.UpdateAsync(id, user, loggedUser);
+
+                GetUpdatedUserDto updatedUser = await userService.UpdateAsync(id, updateUserDto, loggedUser);
 
                 return StatusCode(StatusCodes.Status200OK, updatedUser);
             }
@@ -107,9 +107,14 @@ namespace VirtualWallet.Controllers.API
             try
             {
                 User loggedUser = await FindLoggedUserAsync();
-                await userService.DeleteAsync(id, loggedUser);
+                var result = await userService.DeleteAsync(id, loggedUser);
 
-                return StatusCode(StatusCodes.Status200OK, "User was successfully deleted.");
+                if (result)
+                {
+                    return StatusCode(StatusCodes.Status200OK, "User was successfully deleted.");
+
+                }
+                return BadRequest();
             }
             catch (EntityNotFoundException e)
             {
