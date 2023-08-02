@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using Business.Dto;
-using Business.DTOs;
+using Business.DTOs.Requests;
+using Business.DTOs.Responses;
 using Business.Exceptions;
 using Business.QueryParameters;
 using Business.Services.Contracts;
@@ -13,13 +13,13 @@ namespace VirtualWallet.Controllers.API
 {
     [ApiController]
     [Route("api/cards")]
-    public class CardsApiController : ControllerBase
+    public class CardApiController : ControllerBase
     {
         private readonly IMapper mapper;
         private readonly IAuthManager authManager;
         private readonly ICardService cardService;
 
-        public CardsApiController(
+        public CardApiController(
             IMapper mapper,
             IAuthManager authManager,
             ICardService cardService)

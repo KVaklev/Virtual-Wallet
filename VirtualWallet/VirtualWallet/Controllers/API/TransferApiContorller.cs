@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using Business.Dto;
-using Business.DTOs;
+using Business.DTOs.Requests;
+using Business.DTOs.Responses;
 using Business.Exceptions;
 using Business.QueryParameters;
 using Business.Services.Contracts;
@@ -15,7 +15,7 @@ using System.Text.Json;
 namespace VirtualWallet.Controllers.API
 {
     [ApiController]
-    [Route("api/transfer")]
+    [Route("api/transfers")]
     public class TransferApiContorller : ControllerBase
     {
         private readonly IMapper mapper;

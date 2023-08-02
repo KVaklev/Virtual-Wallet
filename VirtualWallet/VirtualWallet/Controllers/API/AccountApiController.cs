@@ -1,4 +1,4 @@
-﻿using Business.Dto;
+﻿using Business.DTOs.Requests;
 using Business.Exceptions;
 using Business.Services.Contracts;
 using DataAccess.Models.Models;
@@ -13,15 +13,15 @@ using System.Text;
 namespace VirtualWallet.Controllers.API
 {
     [ApiController]
-    [Route("api")]
-    public class AuthApiController : ControllerBase
+    [Route("api/accounts")]
+    public class AccountApiController : ControllerBase
     {
         private readonly IAuthManager authManager;
         private readonly IUserService userService;
         private readonly IEmailService emailService;
         private readonly IAccountService accountService;
 
-        public AuthApiController(
+        public AccountApiController(
             IAuthManager authManager, 
             IUserService userService,
             IEmailService emailService,
@@ -85,7 +85,7 @@ namespace VirtualWallet.Controllers.API
             var user = await this.userService.GetByUsernameAsync(username);
 
             var token = this.accountService.GenerateTokenAsync(user.Id);
-            var confirmationLink = Url.Action(nameof(ConfirmRegistrationAsync), "AuthApi",
+            var confirmationLink = Url.Action(nameof(ConfirmRegistrationAsync), "AccountApi",
                                    new { userId = user.Id, token = token.Result }, Request.Scheme);
 
             var message = await this.emailService.BuildEmailAsync(user, confirmationLink);

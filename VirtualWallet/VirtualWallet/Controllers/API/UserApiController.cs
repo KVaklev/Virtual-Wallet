@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
-using Business.Dto;
+using Business.DTOs.Requests;
+using Business.DTOs.Responses;
 using Business.Exceptions;
 using Business.QueryParameters;
 using Business.Services.Contracts;
@@ -13,13 +14,13 @@ namespace VirtualWallet.Controllers.API
 
     [ApiController]
     [Route("api/users")]
-    public class UsersApiController : ControllerBase
+    public class UserApiController : ControllerBase
     {
         private readonly IUserService userService;
         private readonly IMapper mapper;
         private readonly IAuthManager authManager;
 
-        public UsersApiController(
+        public UserApiController(
             IUserService userService,
             IMapper mapper,
             IAuthManager authManager)

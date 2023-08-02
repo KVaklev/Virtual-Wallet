@@ -1,11 +1,10 @@
 ﻿using DataAccess.Models.ValidationAttributes;
 using System.ComponentModel.DataAnnotations;
 
-namespace Business.Dto
+namespace Business.DTOs.Requests
 {
     public class CreateTransactionDto
     {
-        //todo-validation
         [Required(ErrorMessage = Constants.EmptyFieldErrorMessage)]
         [MinLength(Constants.UsernameMinLength, ErrorMessage = Constants.UsernameMinLengthErrorMessage)]
         [MaxLength(Constants.UsernameMaxLength, ErrorMessage = Constants.UsernameMaxLengthErrorMessage)]
@@ -15,7 +14,7 @@ namespace Business.Dto
         public decimal Amount { get; set; }
 
         [Required(ErrorMessage = Constants.EmptyFieldErrorMessage)]
-        [StringLength(3, ErrorMessage = "The {0} must be {1} characters long.")]
+        [StringLength(Constants.CurrencyCodeLength, ErrorMessage = Constants.CurrencyCodeLengthErrorMessage)]
         public string CurrencyCode { get; set; }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
-using Business.Dto;
 using Business.Exceptions;
+using Business.DTOs.Responses;
+using Business.DTOs.Requests;
 using Business.Services.Contracts;
 using DataAccess.Models.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -31,7 +32,7 @@ namespace VirtualWallet.Controllers.API
         }
 
         [HttpPost, Authorize]
-        public async Task<IActionResult> CreateAsync([FromBody] CurrencyDto currencyDto)
+        public async Task<IActionResult> CreateAsync([FromBody] CreateCurrencyDto currencyDto)
         {
             try
             {
@@ -57,8 +58,8 @@ namespace VirtualWallet.Controllers.API
             try
             {
                 IQueryable<Currency> currencies = this.currencyService.GetAll();
-                List<CurrencyDto> currenciesDto = currencies
-                    .Select(currency => mapper.Map<CurrencyDto>(currency))
+                List<CreateCurrencyDto> currenciesDto = currencies
+                    .Select(currency => mapper.Map<CreateCurrencyDto>(currency))
                     .ToList();
 
                 return StatusCode(StatusCodes.Status200OK, currenciesDto);
@@ -75,7 +76,7 @@ namespace VirtualWallet.Controllers.API
             try
             {
                 var currency = await this.currencyService.GetByIdAsync(id);
-                var currencyDto = this.mapper.Map<CurrencyDto>(currency);
+                var currencyDto = this.mapper.Map<CreateCurrencyDto>(currency);
 
                 return StatusCode(StatusCodes.Status200OK, currencyDto);
             }
@@ -86,14 +87,14 @@ namespace VirtualWallet.Controllers.API
         }
 
         [HttpPut("{id}"), Authorize]
-        public async Task<IActionResult> UpdateAsync([FromRoute] int id, [FromBody] CurrencyDto currencyDto)
+        public async Task<IActionResult> UpdateAsync([FromRoute] int id, [FromBody] CreateCurrencyDto currencyDto)
         {
             try
             {
                 var loggedUser = await FindLoggedUserAsync();
                 var currency = this.mapper.Map<Currency>(currencyDto);
                 var updateCurency = await this.currencyService.UpdateAsync(id, currency, loggedUser);
-                var currencyUpdateDto = this.mapper.Map<CurrencyDto>(updateCurency);
+                var currencyUpdateDto = this.mapper.Map<CreateCurrencyDto>(updateCurency);
 
                 return StatusCode(StatusCodes.Status200OK, currencyUpdateDto);
             }

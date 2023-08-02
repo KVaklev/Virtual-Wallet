@@ -1,14 +1,14 @@
 ﻿using AutoMapper;
 using Business.Services.Contracts;
-using Business.Dto;
 using DataAccess.Models.Models;
 using Microsoft.AspNetCore.Mvc;
 using Presentation.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Business.Exceptions;
-using Business.DTOs;
 using Business.QueryParameters;
 using DataAccess.Repositories.Contracts;
+using Business.DTOs.Requests;
+using Business.DTOs.Responses;
 
 namespace VirtualWallet.Controllers.API
 {

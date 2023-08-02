@@ -2,7 +2,7 @@
 using DataAccess.Models.ValidationAttributes;
 using System.ComponentModel.DataAnnotations;
 
-namespace Business.Dto
+namespace Business.DTOs.Requests
 {
     public class CreateUserDto
     {
@@ -24,7 +24,8 @@ namespace Business.Dto
         [Password]
         public string Password { get; set; }
 
-        [StringLength(3, ErrorMessage = "The {0} must be {1} characters long.")]
+        [Required(ErrorMessage = Constants.EmptyFieldErrorMessage)]
+        [StringLength(Constants.CurrencyCodeLength, ErrorMessage = Constants.CurrencyCodeLengthErrorMessage)]
         public string CurrencyCode { get; set; }
     }
 }

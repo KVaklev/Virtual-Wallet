@@ -34,7 +34,7 @@ namespace DataAccess.Repositories.Models
 
         public async Task<Currency> CreateAsync(Currency currency)
         {
-            currency.IsDeleted = false;
+            //currency.IsDeleted = false;
             context.Add(currency);
             await context.SaveChangesAsync();
             return currency;
