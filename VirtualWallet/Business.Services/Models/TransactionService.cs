@@ -6,10 +6,10 @@ using DataAccess.Models.Enums;
 using DataAccess.Models.Models;
 using DataAccess.Repositories.Data;
 using DataAccess.Repositories.Contracts;
-using Business.Dto;
 using AutoMapper;
-using Business.DTOs;
 using Microsoft.EntityFrameworkCore;
+using Business.DTOs.Requests;
+using Business.DTOs.Responses;
 
 namespace Business.Services.Models
 {

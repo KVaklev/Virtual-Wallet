@@ -32,7 +32,8 @@ namespace DataAccess.Models.Models
 
         [Required(ErrorMessage = Constants.EmptyFieldErrorMessage)]
         [Password]
-        public string Password { get; set; }
+        public byte[] Password { get; set; }
+        public byte[]? PasswordKey { get; set; }
 
         [Required(ErrorMessage = Constants.EmptyFieldErrorMessage)]
         [PhoneNumber(ErrorMessage = Constants.PhoneNumberFieldErroMessage)]
@@ -52,6 +53,7 @@ namespace DataAccess.Models.Models
         public Account? Account { get; set; }
         public int? AccountId { get; set; }
         public bool IsDeleted { get; set; }
+        public bool IsVerified { get; set; }
 
     }
 }

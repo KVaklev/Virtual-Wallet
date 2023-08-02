@@ -9,7 +9,7 @@ using Presentation.Helpers;
 namespace VirtualWallet.Controllers.API
 {
     [ApiController]
-    [Route("api/hisrories")]
+    [Route("api/histories")]
     public class HistoryApiController : ControllerBase
     {
         private readonly IHistoryService historyService;

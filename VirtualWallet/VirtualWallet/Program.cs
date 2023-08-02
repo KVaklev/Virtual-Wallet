@@ -1,3 +1,4 @@
+using Business.Services.Additional;
 using Business.Services.Contracts;
 using Business.Services.Helpers;
 using Business.Services.Models;
@@ -7,6 +8,7 @@ using DataAccess.Repositories.Data;
 using DataAccess.Repositories.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Presentation.Helpers;
 using System.Text;
@@ -50,6 +52,7 @@ namespace VirtualWallet
             builder.Services.AddScoped<ICurrencyService, CurrencyService>();
             builder.Services.AddScoped<ITransactionService, TransactionService>();
             builder.Services.AddScoped<IHistoryService, HistoryService>();
+            builder.Services.AddScoped<IEmailService, EmailService>();
             builder.Services.AddScoped<IExchangeRateService, ExchangeRateService>();
 
             //Helpers
@@ -80,6 +83,14 @@ namespace VirtualWallet
                  };
              });
 
+            var emailConfiguration = builder.Configuration.GetSection("EmailConfiguration")
+                .Get<EmailConfiguration>();
+            //var messageConfiguration = builder.Configuration.GetSection("Message")
+              // .Get<Message>();
+
+
+            builder.Services.AddSingleton(emailConfiguration);
+            //builder.Services.AddSingleton(messageConfiguration);
             var app = builder.Build();
 
 

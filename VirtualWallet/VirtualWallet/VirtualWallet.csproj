@@ -9,6 +9,7 @@
 	<ItemGroup>
 		<PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.20" />
+		<PackageReference Include="NETCore.MailKit" Version="2.1.0" />
 
 		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
 		<PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="6.5.0" />
@@ -28,7 +29,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Pages\Currency\" />
+    <Folder Include="Pages\Accounts\" />
+    <Folder Include="Pages\Transactions\" />
+    <Folder Include="Pages\Transfers\" />
+    <Folder Include="Pages\Users\" />
   </ItemGroup>
 
 </Project>

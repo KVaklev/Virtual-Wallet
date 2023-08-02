@@ -6,9 +6,13 @@ using Business.Services.Helpers;
 using Business.QueryParameters;
 using DataAccess.Repositories.Models;
 using AutoMapper;
-using Business.Dto;
 using Business.DTOs;
 using DataAccess.Repositories.Data;
+using Business.Mappers;
+using System.Security.Cryptography;
+using System.Text;
+using Business.DTOs.Requests;
+using Business.DTOs.Responses;
 
 namespace Business.Services.Models
 {
@@ -18,21 +22,18 @@ namespace Business.Services.Models
         private readonly IAccountRepository accountRepository;
         private readonly IAccountService accountService;
         private readonly IMapper mapper;
-        private readonly ApplicationContext context;
 
         public UserService(
             IUserRepository userRepository,
             IAccountRepository accountRepository,
             IAccountService accountService,
-            IMapper mapper,
-            ApplicationContext context
+            IMapper mapper
             )
         {
             this.userRepository = userRepository;
             this.accountRepository = accountRepository;
             this.accountService = accountService;
             this.mapper = mapper;
-            this.context = context;
         }
 
         public IQueryable<User> GetAll()
@@ -49,14 +50,17 @@ namespace Business.Services.Models
         {
             return await this.userRepository.GetByIdAsync(id);
         }
+
         public async Task<User> GetByUsernameAsync(string username)
         {
             return await this.userRepository.GetByUsernameAsync(username);
         } 
+
         public async Task<User> GetByEmailAsync(string email)
         {
             return await this.userRepository.GetByEmailAsync(email);
         }
+
         public async Task<User> GetByPhoneNumberAsync(string pnoneNumber)
         {
             return await this.userRepository.GetByPhoneNumberAsync(pnoneNumber);
@@ -64,7 +68,8 @@ namespace Business.Services.Models
 
         public async Task<GetUserDto> CreateAsync(CreateUserDto createUserDto)
         {
-            User user = mapper.Map<User>(createUserDto);
+            User user = await UsersMapper.MapCreateDtoToUserAsync(createUserDto);
+            
             if (await UsernameExistsAsync(user.Username))
             {
                 throw new DuplicateEntityException($"User with username '{user.Username}' already exists.");
@@ -79,20 +84,16 @@ namespace Business.Services.Models
             {
                 throw new DuplicateEntityException($"User with phone number '{user.PhoneNumber}' already exists.");
             }
-           
-            User createdUser = await this.userRepository.CreateAsync(user);
-            var createAccountDto = new CreateAccountDto()
-            {
-                currencyCode = createUserDto.CurrencyCode
-            };
-            Account createdAcount = await this.accountService.CreateAsync(createAccountDto, createdUser);
-            createdUser.AccountId = createdAcount.Id;
-            await context.SaveChangesAsync();
+            
+            User userToCreate = await RegisterUserAsync(createUserDto, user);
+            User createdUser = await this.userRepository.CreateAsync(userToCreate);
+            await this.accountService.CreateAsync(createUserDto.CurrencyCode, createdUser);
+ 
             GetUserDto getUserDto = mapper.Map<GetUserDto>(createdUser);
 
             return getUserDto;
-
         }
+
         public async Task<User> UpdateAsync(int id, User user, User loggedUser)
         {
             User userToUpdate = await this.userRepository.GetByIdAsync(id);
@@ -131,11 +132,12 @@ namespace Business.Services.Models
                 throw new UnauthorizedOperationException(Constants.ModifyUserErrorMessage);
             } 
             
-             var accountToDelete = await this.accountRepository.GetByIdAsync((int)userToDelete.AccountId);
-             await this.accountService.DeleteAsync(accountToDelete.Id, loggedUser);
+            var accountToDelete = await this.accountRepository.GetByIdAsync((int)userToDelete.AccountId);
+            await this.accountService.DeleteAsync(accountToDelete.Id, loggedUser);
 
             return await this.userRepository.DeleteAsync(id);
         }
+
         public async Task<User> PromoteAsync(int id, User loggedUser)
         {
             if (!await Common.IsAdminAsync(loggedUser))
@@ -144,6 +146,7 @@ namespace Business.Services.Models
             }
             return await this.userRepository.PromoteAsync(id);
         }
+
         public async Task<User> BlockUserAsync(int id, User loggedUser)
         {
             if (!await Common.IsAdminAsync(loggedUser))
@@ -152,6 +155,7 @@ namespace Business.Services.Models
             }
             return await this.userRepository.BlockUserAsync(id);
         }
+
         public async Task<User> UnblockUserAsync(int id, User loggedUser)
         {
             if (!await Common.IsAdminAsync(loggedUser))
@@ -160,18 +164,38 @@ namespace Business.Services.Models
             }
             return await this.userRepository.UnblockUserAsync(id);
         }
+
         public async Task<bool> EmailExistsAsync(string email)
         {
             return await this.userRepository.EmailExistsAsync(email);
         }
+
         public async Task<bool> UsernameExistsAsync(string username)
         {
             return await this.userRepository.UsernameExistsAsync(username);
         }
+
         public async Task<bool> PhoneNumberExistsAsync(string phoneNumber)
         {
             return await this.userRepository.PhoneNumberExistsAsync(phoneNumber);
         }
-       
+
+        private async Task<User> RegisterUserAsync(CreateUserDto createUserDto, User user)
+        {
+            //Benefit one of using saltkey on hash - if users enter equal password - they are stored different in the db
+            //Benefit of using SHA512 - it is not easily decrypted online over the internet available dictionaries
+
+            byte[] passwordHash, passwordKey;
+
+            using (var hmac = new HMACSHA512())
+            {
+                passwordKey = hmac.Key;
+                passwordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(createUserDto.Password));
+            }
+            user.Password = passwordHash;
+            user.PasswordKey = passwordKey;
+            
+            return await Task.FromResult(user);
+        }
     }
 }

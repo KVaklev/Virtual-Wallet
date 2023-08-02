@@ -53,12 +53,12 @@ namespace DataAccess.Repositories.Models
 
         public async Task<User> GetByIdAsync(int id)
         {
-            User? user = await context.Users
+            User? user = context.Users
                 .Where(u => u.IsDeleted == false)
                 .Where(users => users.Id == id)
                 .Include(u => u.Account)
                 .ThenInclude(c => c.Currency)
-                .FirstOrDefaultAsync();
+                .FirstOrDefault();
             return user ?? throw new EntityNotFoundException($"User with ID = {id} doesn't exist.");
         }
 
@@ -170,23 +170,22 @@ namespace DataAccess.Repositories.Models
         {
             return await context.Users.AnyAsync(u => u.Username == username);
         }
-
         private async Task UpdatePhoneNumberAsync(User user, User userToUpdate)
         {
             if (user?.PhoneNumber != null)
             {
-                userToUpdate.PhoneNumber = user.PhoneNumber;
+                await Task.FromResult(userToUpdate.PhoneNumber = user.PhoneNumber);
             }
         }
         private async Task UpdateAdminStatusAsync(User user, User userToUpdate)
         {
             if (!userToUpdate.IsAdmin)
             {
-                userToUpdate.IsAdmin = user.IsAdmin;
+                await Task.FromResult(userToUpdate.IsAdmin = user.IsAdmin);
             }
             else
             {
-                userToUpdate.IsAdmin = true;
+                await Task.FromResult(userToUpdate.IsAdmin = true);
             }
         }
         private async Task<IQueryable<User>> FilterByUsernameAsync(IQueryable<User> result, string? username)

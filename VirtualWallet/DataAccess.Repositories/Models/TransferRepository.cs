@@ -4,6 +4,7 @@ using DataAccess.Models.Enums;
 using DataAccess.Models.Models;
 using DataAccess.Repositories.Contracts;
 using DataAccess.Repositories.Data;
+using DataAccess.Repositories.Helpers;
 using Microsoft.EntityFrameworkCore;
 
 namespace DataAccess.Repositories.Models
@@ -17,15 +18,21 @@ namespace DataAccess.Repositories.Models
             this.context = context;
         }
 
-        public IQueryable<Transfer> GetAll(string username)
+        public IQueryable<Transfer> GetAll(User user)
         {
             IQueryable<Transfer> result = context.Transfers
-                .Include(a => a.Account)
-                .ThenInclude(u => u.User)
-                .Include(t => t.Amount)
-                .Include(c => c.Currency);
+            .Include(a => a.Account)
+            .ThenInclude(u => u.User)
+            .Include(c => c.Currency)
+            .Include(t => t.Card);
+            
 
-            result = result.Where(a => a.Account.User.Username == username);
+            if (!user.IsAdmin)
+            {
+
+                result = result.Where(a => a.Account.User.Username == user.Username);
+            }
+
 
             return result ?? throw new EntityNotFoundException("There are no transfers!");
         }
@@ -35,7 +42,7 @@ namespace DataAccess.Repositories.Models
             transfer.DateCreated = DateTime.Now;
             transfer.IsConfirmed = false;
             transfer.IsCancelled = false;
-            context.Add(transfer);
+            await context.AddAsync(transfer);
             await context.SaveChangesAsync();
 
             return transfer;
@@ -56,8 +63,10 @@ namespace DataAccess.Repositories.Models
             Transfer transfer = await context.Transfers
                 .Include(t => t.Account)
                 .ThenInclude(u => u.User)
+                .Include(t=>t.Card)
                 .Include(t => t.Currency)
-                .FirstOrDefaultAsync(t => t.Id == id);
+                                .FirstOrDefaultAsync(t => t.Id == id)
+                                ;
 
             return transfer ?? throw new EntityNotFoundException($"Transfer with ID = {id} does not exist");
 
@@ -93,16 +102,16 @@ namespace DataAccess.Repositories.Models
         }
 
 
-        public PaginatedList<Transfer> FilterBy(TransferQueryParameters filterParameters, string username)
+        public async Task<PaginatedList<Transfer>> FilterByAsync(TransferQueryParameters filterParameters, User user)
         {
-            
-            IQueryable<Transfer> result = GetAll(username);
 
-            result = FilterByUsername(result, filterParameters.Username);
-            result = FilterByFromDate(result, filterParameters.FromDate);
-            result = FilterByToDate(result, filterParameters.ToDate);
-            result = FilterByTransferType(result, filterParameters.TransferType);
-            result = SortBy(result, filterParameters.SortBy);
+            IQueryable<Transfer> result = GetAll(user);
+
+            result = await FilterByUsernameAsync(result, filterParameters.Username);
+            result = await FilterByFromDateAsync(result, filterParameters.FromDate);
+            result = await FilterByToDateAsync(result, filterParameters.ToDate);
+            result = await FilterByTransferTypeAsync(result, filterParameters.TransferType);
+            result = await SortByAsync(result, filterParameters.SortBy);
 
             int finalResult = result.Count();
 
@@ -114,30 +123,23 @@ namespace DataAccess.Repositories.Models
             int totalPages = (result.Count() + filterParameters.PageSize - 1) /
                 filterParameters.PageSize;
 
-            result = Paginate(result, filterParameters.PageNumber, filterParameters.PageSize);
+            result = await Common<Transfer>.PaginateAsync(result, filterParameters.PageNumber, filterParameters.PageSize);
 
             return new PaginatedList<Transfer>(result.ToList(), totalPages, filterParameters.PageNumber);
 
 
         }
 
-        public static IQueryable<Transfer> Paginate(IQueryable<Transfer> result, int pageNumber, int pageSize)
-        {
-            return result
-                .Skip((pageNumber - 1) * pageSize)
-                .Take(pageSize);
-        }
-
-        private IQueryable<Transfer> FilterByUsername(IQueryable<Transfer> transfers, string? username)
+        private async Task<IQueryable<Transfer>> FilterByUsernameAsync(IQueryable<Transfer> transfers, string? username)
         {
             if (!string.IsNullOrEmpty(username))
             {
                 transfers = transfers.Where(t => t.Account.User.Username == username);
             }
 
-            return transfers;
+            return await Task.FromResult(transfers);
         }
-        private IQueryable<Transfer> FilterByFromDate(IQueryable<Transfer> transfers, string? fromDate)
+        private async Task<IQueryable<Transfer>> FilterByFromDateAsync(IQueryable<Transfer> transfers, string? fromDate)
         {
             if (!string.IsNullOrEmpty(fromDate))
             {
@@ -146,9 +148,9 @@ namespace DataAccess.Repositories.Models
                 transfers = transfers.Where(a => a.DateCreated >= date);
             }
 
-            return transfers;
+            return await Task.FromResult(transfers);
         }
-        private IQueryable<Transfer> FilterByToDate(IQueryable<Transfer> transfers, string? toDate)
+        private async Task<IQueryable<Transfer>> FilterByToDateAsync(IQueryable<Transfer> transfers, string? toDate)
         {
             if (!string.IsNullOrEmpty(toDate))
             {
@@ -157,19 +159,19 @@ namespace DataAccess.Repositories.Models
                 transfers = transfers.Where(a => a.DateCreated <= date);
             }
 
-            return transfers;
+            return await Task.FromResult(transfers);
         }
-        private IQueryable<Transfer> FilterByTransferType(IQueryable<Transfer> transfers, string? transfer)
+        private async Task<IQueryable<Transfer>> FilterByTransferTypeAsync(IQueryable<Transfer> transfers, string? transfer)
         {
             if (!string.IsNullOrEmpty(transfer))
             {
                 TransferDirection transferType = ParseTransferTypeParameter(transfer, "transfer");
-                return transfers.Where(t => t.TransferType == transferType);
+                return await Task.FromResult(transfers.Where(t => t.TransferType == transferType));
             }
 
             else
             {
-                return transfers;
+                return await Task.FromResult(transfers);
             }
         }
 
@@ -183,16 +185,16 @@ namespace DataAccess.Repositories.Models
             throw new EntityNotFoundException($"Invalid value for {parameter}.");
         }
 
-        private IQueryable<Transfer> SortBy(IQueryable<Transfer> transfers, string? sortCriteria)
+        private async Task<IQueryable<Transfer>> SortByAsync(IQueryable<Transfer> transfers, string? sortCriteria)
         {
             switch (sortCriteria)
             {
                 case "amount":
-                    return transfers.OrderBy(t => t.Amount);
+                    return await Task.FromResult(transfers.OrderBy(t => t.Amount));
                 case "date":
-                    return transfers.OrderBy(t => t.DateCreated);
+                    return await Task.FromResult(transfers.OrderBy(t => t.DateCreated));
                 default:
-                    return transfers;
+                    return await Task.FromResult(transfers);
 
             }
         }

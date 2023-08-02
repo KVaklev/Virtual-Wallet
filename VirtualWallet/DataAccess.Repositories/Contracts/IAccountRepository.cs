@@ -34,6 +34,8 @@ namespace DataAccess.Repositories.Contracts
 
         public bool AccountExists(int id);
 
+        Task<bool> ConfirmRegistrationAsync(int id, string token);
+
         // bool AccountExists(int id);
 
 
