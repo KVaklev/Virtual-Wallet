@@ -16,7 +16,7 @@ namespace Business.Services.Contracts
         Task<PaginatedList<Transfer>> FilterByAsync(TransferQueryParameters transferQueryParameters, User user);
         Task <GetTransferDto> GetByIdAsync(int id, User user);
         Task <Transfer> CreateAsync(CreateTransferDto transferDto, User user);
-        Task <Transfer> UpdateAsync(int id, CreateTransferDto transferDto, User user);
+        Task <Transfer> UpdateAsync(int id, UpdateTransferDto transferDto, User user);
         Task <bool> DeleteAsync(int id, User user);
         Task <bool> ExecuteAsync(int transferId, User user);
 

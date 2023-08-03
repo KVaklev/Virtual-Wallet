@@ -31,8 +31,9 @@ namespace Business.Services.Models
         private readonly ApplicationContext context;
         private readonly IMapper mapper;
         private readonly ICurrencyRepository currencyRepository;
+        private readonly ICurrencyService currencyService;
 
-        public TransferService(ITransferRepository transferRepository, IHistoryRepository historyRepository, IAccountRepository accountRepository, IUserRepository userRepository, ICardRepository cardRepository, ApplicationContext context, IMapper mapper, ICurrencyRepository currencyRepository)
+        public TransferService(ITransferRepository transferRepository, IHistoryRepository historyRepository, IAccountRepository accountRepository, IUserRepository userRepository, ICardRepository cardRepository, ApplicationContext context, IMapper mapper, ICurrencyRepository currencyRepository, ICurrencyService currencyService )
         {
             this.transferRepository = transferRepository;
             this.historyRepository = historyRepository;
@@ -42,6 +43,7 @@ namespace Business.Services.Models
             this.mapper = mapper;
             this.currencyRepository = currencyRepository;
             this.cardRepository = cardRepository;
+            this.currencyService = currencyService;
         }
 
         public IQueryable<Transfer> GetAll(User user)
@@ -90,7 +92,9 @@ namespace Business.Services.Models
         {
             var card = this.cardRepository.GetByAccountId((int)user.AccountId).FirstOrDefault(x => x.CardNumber == transferDto.CardNumber);
 
-            var transfer = await MapDtoToTransferAsync(transferDto, user, card);
+            var currency = await this.currencyRepository.GetByCurrencyCodeAsync(transferDto.CurrencyCode);
+
+            var transfer = await TransfersMapper.MapCreateDtoToTransferAsync(transferDto, user, card, currency);
 
             if (user.IsBlocked)
             {
@@ -154,11 +158,16 @@ namespace Business.Services.Models
         //    return await this.transferRepository.UpdateAsync(transferToUpdate.Id, updatedTransfer);
         //}
 
-        public async Task<Transfer> UpdateAsync(int id, CreateTransferDto transferDto, User user)
+        public async Task<Transfer> UpdateAsync(int id, UpdateTransferDto transferDto, User user)
         {
             var card = this.cardRepository.GetByAccountId((int)user.AccountId).FirstOrDefault(x => x.CardNumber == transferDto.CardNumber);
 
+            var currency = await this.currencyRepository.GetByCurrencyCodeAsync(transferDto.CurrencyCode);
+
+          
             Transfer transferToUpdate = await transferRepository.GetByIdAsync(id);
+
+            transferToUpdate = await TransfersMapper.MapUpdateDtoToTransferAsync(transferDto, user, card, currency);
 
             if (!await Common.IsUserAuthorizedAsync(transferToUpdate, user))
             {
@@ -170,18 +179,13 @@ namespace Business.Services.Models
                 throw new UnauthorizedOperationException(Constants.ModifyTransferUpdateDeleteErrorErrorMessage);
             }
 
-            
-            Transfer updatedTransfer = await MapDtoToTransferAsync(transferDto, user, card);
-
-           
-            transferToUpdate.Amount = updatedTransfer.Amount;
-            transferToUpdate.CardId = updatedTransfer.CardId;
-            transferToUpdate.CurrencyId = updatedTransfer.CurrencyId;
-
+                       
             await context.SaveChangesAsync();
 
             return transferToUpdate;
         }
+
+
 
         public async Task<PaginatedList<Transfer>> FilterByAsync(TransferQueryParameters transferQueryParameters, User loggedUser)
         {
@@ -246,21 +250,7 @@ namespace Business.Services.Models
             }
         }
 
-        public async Task<Transfer> MapDtoToTransferAsync(CreateTransferDto transferDto, User user, Card card)
-        {
-            var transfer = this.mapper.Map<Transfer>(transferDto);
-            transfer.AccountId = (int)user.AccountId;
-            transfer.Account = await this.accountRepository.GetByIdAsync((int)user.AccountId);
-            transfer.Currency = await this.currencyRepository.GetByCurrencyCodeAsync(transferDto.CurrencyCode);
-            transfer.Card = await this.cardRepository.GetByIdAsync(card.Id);
-            transfer.CardId = (int)card.Id;
-            transfer.CurrencyId = transfer.Currency.Id;
-
-            return transfer;
-
-
-        }
-
+        
     }
 
 

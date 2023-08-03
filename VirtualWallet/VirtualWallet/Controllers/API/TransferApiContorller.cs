@@ -113,15 +113,15 @@ namespace VirtualWallet.Controllers.API
 
 
         [HttpPut("{id}"), Authorize]
-        public async Task<IActionResult> UpdateAsync(int id, [FromBody] CreateTransferDto createTransferDto)
+        public async Task<IActionResult> UpdateAsync(int id, [FromBody] UpdateTransferDto updateTransferDto)
         {
             try
             {
                 var loggedUser = await FindLoggedUserAsync();
 
-                var updateTransfer = await this.transferService.UpdateAsync(id, createTransferDto, loggedUser);
+                var updateTransfer = await this.transferService.UpdateAsync(id, updateTransferDto, loggedUser);
                 
-                var updateTransferDto = this.mapper.Map<GetTransferDto>(updateTransfer);
+                var updatedTransferDto = this.mapper.Map<UpdateTransferDto>(updateTransfer);
                 return StatusCode(StatusCodes.Status200OK, updateTransferDto);
             }
             catch (EntityNotFoundException e)
