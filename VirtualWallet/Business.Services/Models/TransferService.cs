@@ -133,7 +133,7 @@ namespace Business.Services.Models
         {
             Transfer transferToDelete = await transferRepository.GetByIdAsync(id);
 
-            if (!await Security.IsUserAuthorizedAsync(transferToGet, user))
+            if (!await Security.IsUserAuthorizedAsync(transferToDelete, user))
             {
                 throw new UnauthorizedOperationException(Constants.ModifyTransferErrorMessage);
             }
@@ -179,7 +179,7 @@ namespace Business.Services.Models
 
             transferToUpdate = await TransfersMapper.MapUpdateDtoToTransferAsync(transferDto, user, card, currency);
 
-            if (!await Security.IsUserAuthorizedAsync(transferToGet, user))
+            if (!await Security.IsUserAuthorizedAsync(transferToUpdate, user))
             {
                 throw new UnauthorizedOperationException(Constants.ModifyTransferErrorMessage);
             }
