@@ -31,7 +31,6 @@ namespace DataAccess.Repositories.Models
             return transaction ?? throw new EntityNotFoundException(Constants.NoFoundErrorMessage);
         }
 
-
         public async Task<Transaction> UpdateAsync(Transaction transactionToUpdate, Transaction transaction)
         {
             transactionToUpdate.AccountRecepientId = transaction.AccountRecepientId;
@@ -105,6 +104,7 @@ namespace DataAccess.Repositories.Models
 
             return new PaginatedList<Transaction>(result.ToList(), totalPages, filterParameters.PageNumber);
         }
+        
         private IQueryable<Transaction> GetAll(string username)
         {
             IQueryable<Transaction> result = context.Transactions

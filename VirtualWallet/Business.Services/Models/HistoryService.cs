@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+﻿
 using Business.DTOs;
 using Business.DTOs.Responses;
 using Business.Exceptions;
@@ -19,6 +19,10 @@ namespace Business.Services.Models
         {
             this.historyRepository = historyRepository;
         }
+
+
+
+
 
 
         public async Task<Response<GetHistoryDto>> GetByIdAsync(int id, User loggedUser)
