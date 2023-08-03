@@ -50,7 +50,10 @@ namespace Business.Services.Models
 
         public async Task<GetTransferDto> GetByIdAsync(int id, User user)
         {
-            if (!(await IsUserAuthorizedAsync(id, user.Id) || user.IsAdmin ))
+            Transfer transferToGet = await transferRepository.GetByIdAsync(id);
+
+            if (!await Common.IsUserAuthorizedAsync(transferToGet, user) || user.IsAdmin)
+
             {
                 throw new UnauthorizedOperationException(Constants.ModifyTransferGetByIdErrorMessage);
             }
@@ -83,10 +86,12 @@ namespace Business.Services.Models
 
             return createdTransfer;
         }
-       
+
         public async Task<bool> DeleteAsync(int id, User user)
         {
-            if (!await IsUserAuthorizedAsync(id, user.Id))
+            Transfer transferToGet = await transferRepository.GetByIdAsync(id);
+
+            if (!await Common.IsUserAuthorizedAsync(transferToGet, user))
             {
                 throw new UnauthorizedOperationException(Constants.ModifyTransferErrorMessage);
             }
@@ -103,7 +108,9 @@ namespace Business.Services.Models
         {
             var card = this.cardRepository.GetByAccountId((int)user.AccountId).FirstOrDefault(x => x.CardNumber == transferDto.CardNumber);
 
-            if (!await IsUserAuthorizedAsync(id, user.Id))
+            Transfer transferToGet = await transferRepository.GetByIdAsync(id);
+
+            if (!await Common.IsUserAuthorizedAsync(transferToGet, user))
             {
                 throw new UnauthorizedOperationException(Constants.ModifyTransferErrorMessage);
             }
@@ -119,7 +126,7 @@ namespace Business.Services.Models
 
             return await this.transferRepository.UpdateAsync(transferToUpdate.Id, updatedTransfer);
         }
-      
+
         public async Task<PaginatedList<Transfer>> FilterByAsync(TransferQueryParameters transferQueryParameters, User loggedUser)
         {
             var result = await this.transferRepository.FilterByAsync(transferQueryParameters, loggedUser);
@@ -135,7 +142,9 @@ namespace Business.Services.Models
 
         public async Task<bool> ExecuteAsync(int transferId, User user)
         {
-            if (!(await IsUserAuthorizedAsync(transferId, user.Id)))
+            Transfer transferToGet = await transferRepository.GetByIdAsync(transferId);
+
+            if (!(await Common.IsUserAuthorizedAsync(transferToGet, user)))
             {
                 throw new UnauthorizedOperationException(Constants.ModifyTransferErrorMessage);
             }
@@ -163,7 +172,7 @@ namespace Business.Services.Models
             return transferToExecute.IsConfirmed;
 
         }
-       
+
         private async Task<bool> AddTransferToHistoryAsync(Transfer transfer)
         {
             var historyCount = await this.context.History.CountAsync();
@@ -179,30 +188,15 @@ namespace Business.Services.Models
             {
                 return false;
             }
-        }
-       
-        public async Task<bool> IsUserAuthorizedAsync(int id, int userId)
-        {
-            bool IsUserAuthorized = true;
+        }        
 
-            Transfer transferToGet = await this.transferRepository.GetByIdAsync(id);
-
-            if (transferToGet.Account.UserId != userId)
-            {
-                IsUserAuthorized = false;
-            }
-
-            return IsUserAuthorized;
-
-        }
-        
         public async Task<Transfer> MapDtoToTransferAsync(CreateTransferDto transferDto, User user, Card card)
         {
             var transfer = this.mapper.Map<Transfer>(transferDto);
             transfer.AccountId = (int)user.AccountId;
             transfer.Account = await this.accountRepository.GetByIdAsync((int)user.AccountId);
             transfer.Currency = await this.currencyRepository.GetByCurrencyCodeAsync(transferDto.CurrencyCode);
-            transfer.Card = await this.cardRepository.GetByIdAsync(card.Id); 
+            transfer.Card = await this.cardRepository.GetByIdAsync(card.Id);
             transfer.CardId = (int)card.Id;
             transfer.CurrencyId = transfer.Currency.Id;
 

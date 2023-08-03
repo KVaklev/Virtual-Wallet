@@ -5,6 +5,7 @@ using DataAccess.Models.Models;
 using DataAccess.Repositories.Contracts;
 using DataAccess.Repositories.Data;
 using DataAccess.Repositories.Helpers;
+using Microsoft.AspNetCore.Server.IIS.Core;
 using Microsoft.EntityFrameworkCore;
 
 namespace DataAccess.Repositories.Models
@@ -25,7 +26,7 @@ namespace DataAccess.Repositories.Models
             .ThenInclude(u => u.User)
             .Include(c => c.Currency)
             .Include(t => t.Card);
-            
+
 
             if (!user.IsAdmin)
             {
@@ -63,7 +64,7 @@ namespace DataAccess.Repositories.Models
             Transfer transfer = await context.Transfers
                 .Include(t => t.Account)
                 .ThenInclude(u => u.User)
-                .Include(t=>t.Card)
+                .Include(t => t.Card)
                 .Include(t => t.Currency)
                                 .FirstOrDefaultAsync(t => t.Id == id)
                                 ;
@@ -185,18 +186,41 @@ namespace DataAccess.Repositories.Models
             throw new EntityNotFoundException($"Invalid value for {parameter}.");
         }
 
-        private async Task<IQueryable<Transfer>> SortByAsync(IQueryable<Transfer> transfers, string? sortCriteria)
-        {
-            switch (sortCriteria)
-            {
-                case "amount":
-                    return await Task.FromResult(transfers.OrderBy(t => t.Amount));
-                case "date":
-                    return await Task.FromResult(transfers.OrderBy(t => t.DateCreated));
-                default:
-                    return await Task.FromResult(transfers);
+        //private async Task<IQueryable<Transfer>> SortByAsync(IQueryable<Transfer> transfers, string? sortCriteria)
+        //{
+        //    switch (sortCriteria)
+        //    {
+        //        case  SortCriteria.amount/*"amount"*/:
+        //            return await Task.FromResult(transfers.OrderBy(t => t.Amount));
+        //        case "date":
+        //            return await Task.FromResult(transfers.OrderBy(t => t.DateCreated));
+        //        default:
+        //            return await Task.FromResult(transfers);
 
+        //    }
+        //}
+
+        public static async Task<IQueryable<Transfer>> SortByAsync(IQueryable<Transfer> transfers, string? sortCriteria)
+        {
+            if (Enum.TryParse<SortCriteria>(sortCriteria, true, out var sortEnum))
+            {
+                switch (sortEnum)
+                {
+                    case SortCriteria.Amount:
+                        return await Task.FromResult(transfers.OrderBy(t => t.Amount));
+                    case SortCriteria.Date:
+                        return await Task.FromResult(transfers.OrderBy(t => t.DateCreated));
+                    
+                    default:
+                        return await Task.FromResult(transfers);
+                }
+            }
+            else
+            {
+                return await Task.FromResult(transfers);
+                               
             }
         }
+
     }
 }

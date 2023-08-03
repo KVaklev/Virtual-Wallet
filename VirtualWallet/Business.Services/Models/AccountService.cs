@@ -5,10 +5,6 @@ using Business.Services.Contracts;
 using Business.Services.Helpers;
 using DataAccess.Models.Models;
 using DataAccess.Repositories.Contracts;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
 
 namespace Business.Services.Models
 {
@@ -18,13 +14,20 @@ namespace Business.Services.Models
         private readonly ICardRepository cardRepository;
         private readonly ICurrencyRepository currencyRepository;
         private readonly IUserRepository userRepository;
+        private readonly ICardService cardService;
 
-        public AccountService(IAccountRepository accountRepository, ICardRepository cardRepository, IMapper mapper, ICurrencyRepository currencyRepository, IUserRepository userRepository)
+        public AccountService(
+            IAccountRepository accountRepository, 
+            ICardRepository cardRepository,
+            ICurrencyRepository currencyRepository, 
+            IUserRepository userRepository,
+            ICardService cardService)
         {
             this.accountRepository = accountRepository;
             this.cardRepository = cardRepository;
             this.currencyRepository = currencyRepository;
             this.userRepository = userRepository;
+            this.cardService = cardService;
         }
         public IQueryable<Account> GetAll()
         {
@@ -46,6 +49,20 @@ namespace Business.Services.Models
 
         public async Task <bool> DeleteAsync(int id, User loggedUser)
         { 
+            var accountToDelete = await this.accountRepository.GetByIdAsync(id);
+
+            if (!await Common.IsAdminAsync(loggedUser))
+            {
+                throw new UnauthorizedOperationException(Constants.ModifyUserErrorMessage);
+            }
+
+            if (accountToDelete.Cards.Count != 0)
+            {
+                foreach (var card in accountToDelete.Cards)
+                {
+                    await this.cardService.DeleteAsync(card.Id, loggedUser);
+                }
+            }          
             return await this.accountRepository.DeleteAsync(id);
         }
 

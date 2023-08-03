@@ -65,7 +65,9 @@ namespace Business.Services.Models
             {
                 throw new UnauthorizedOperationException(Constants.ModifyUserErrorMessage);
             }
-            return await this.cardRepository.DeleteAsync(id);
+            var cardToDelete = await this.cardRepository.DeleteAsync(id);
+
+            return cardToDelete;
         }
         public async Task<bool> CardNumberExistsAsync(string cardNumber)
         {

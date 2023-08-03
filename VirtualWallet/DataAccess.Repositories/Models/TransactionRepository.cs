@@ -117,7 +117,7 @@ namespace DataAccess.Repositories.Models
 
                 return result.Where(t => t.Date <= date);
             }
-           return await Task.FromResult(result);
+            return await Task.FromResult(result);
         }
 
         private async Task<DirectionType> ParseDirectionParameterAsync(string value, string parameterName)
@@ -126,8 +126,8 @@ namespace DataAccess.Repositories.Models
             {
                 return await Task.FromResult(result);
             }
-           
-           throw new EntityNotFoundException($"Invalid value for {parameterName}.");
+
+            throw new EntityNotFoundException($"Invalid value for {parameterName}.");
         }
 
         private async Task<IQueryable<Transaction>> FilterByDirectionAsync(IQueryable<Transaction> result, string? direction)
@@ -142,15 +142,24 @@ namespace DataAccess.Repositories.Models
 
         private async Task<IQueryable<Transaction>> SortByAsync(IQueryable<Transaction> result, string sortCriteria)
         {
-            switch (sortCriteria)
+            if (Enum.TryParse<SortCriteria>(sortCriteria, true, out var sortEnum))
             {
-                case "amount":
-                    return await Task.FromResult(result.OrderBy(t => t.Amount));
-                case "date":
-                    return await Task.FromResult(result.OrderBy(t => t.Date));
-                default:
-                    return await Task.FromResult(result);
+                switch (sortEnum)
+                {
+                    case SortCriteria.Amount:
+                        return await Task.FromResult(result.OrderBy(t => t.Amount));
+                    case SortCriteria.Date:
+                        return await Task.FromResult(result.OrderBy(t => t.Date));
+                    default:
+                        return await Task.FromResult(result);
+                }
+
             }
+            else
+            {
+                return await Task.FromResult(result);   
+            }
+
         }
     }
 }

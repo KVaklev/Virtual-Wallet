@@ -1,5 +1,6 @@
 ﻿using Business.Exceptions;
 using Business.QueryParameters;
+using DataAccess.Models.Enums;
 using DataAccess.Models.Models;
 using DataAccess.Repositories.Contracts;
 using DataAccess.Repositories.Data;
@@ -10,13 +11,13 @@ namespace DataAccess.Repositories.Models
 {
     public class UserRepository : IUserRepository
     {
-
         private readonly ApplicationContext context;
 
         public UserRepository(ApplicationContext context)
         {
             this.context = context;
         }
+
         public IQueryable<User> GetAll()
         {
             var users = context.Users
@@ -53,12 +54,13 @@ namespace DataAccess.Repositories.Models
 
         public async Task<User> GetByIdAsync(int id)
         {
-            User? user = context.Users
+            User? user = await context.Users
                 .Where(u => u.IsDeleted == false)
                 .Where(users => users.Id == id)
                 .Include(u => u.Account)
                 .ThenInclude(c => c.Currency)
-                .FirstOrDefault();
+                .FirstOrDefaultAsync();
+
             return user ?? throw new EntityNotFoundException($"User with ID = {id} doesn't exist.");
         }
 
@@ -69,6 +71,7 @@ namespace DataAccess.Repositories.Models
                 .Include(u => u.Account)
                 .Where(users => users.Username == username)
                 .FirstOrDefaultAsync();
+
             return user ?? throw new EntityNotFoundException($"User with username '{username}' doesn't exist.");
         }
 
@@ -78,6 +81,7 @@ namespace DataAccess.Repositories.Models
                 .Where(u => u.IsDeleted == false)
                 .Where(users => users.Email == email)
                 .FirstOrDefaultAsync();
+
             return user ?? throw new EntityNotFoundException($"User with email '{email}' doesn't exist.");
         }
 
@@ -87,31 +91,22 @@ namespace DataAccess.Repositories.Models
                 .Where(u => u.IsDeleted == false)
                 .Where(users => users.PhoneNumber == phoneNumber)
                 .FirstOrDefaultAsync();
+
             return user ?? throw new EntityNotFoundException($"User with pnone number '{phoneNumber}' doesn't exist.");
         }
 
         public async Task<User> CreateAsync(User user)
         {
             context.Users.Add(user);
+
             await context.SaveChangesAsync();
             return user;
         }
 
-        public async Task<User> UpdateAsync(int id, User user)
+        public async Task<User> UpdateAsync(User updatedUser)
         {
-            User userToUpdate = await this.GetByIdAsync(id);
-
-            userToUpdate.FirstName = user.FirstName ?? userToUpdate.FirstName;
-            userToUpdate.LastName = user.LastName ?? userToUpdate.LastName;
-            userToUpdate.Password = user.Password ?? userToUpdate.Password;
-            userToUpdate.Email = user.Email ?? userToUpdate.Email;
-            userToUpdate.Username = user.Username ?? userToUpdate.Username;
-            userToUpdate.IsBlocked = user.IsBlocked;
-            await UpdatePhoneNumberAsync(user, userToUpdate);
-            await UpdateAdminStatusAsync(user, userToUpdate);
-
             await context.SaveChangesAsync();
-            return userToUpdate;
+            return updatedUser;
         }
 
         public async Task<bool> DeleteAsync(int id)
@@ -126,10 +121,7 @@ namespace DataAccess.Repositories.Models
         public async Task<User> PromoteAsync(int id)
         {
             User userToPromote = await this.GetByIdAsync(id);
-            if (!userToPromote.IsAdmin)
-            {
-                userToPromote.IsAdmin = true;
-            }
+
             await context.SaveChangesAsync();
             return userToPromote;
         }
@@ -137,10 +129,7 @@ namespace DataAccess.Repositories.Models
         public async Task<User> BlockUserAsync(int id)
         {
             User userToBlock = await this.GetByIdAsync(id);
-            if (!userToBlock.IsBlocked)
-            {
-                userToBlock.IsBlocked = true;
-            }
+          
             await context.SaveChangesAsync();
             return userToBlock;
         }
@@ -148,10 +137,7 @@ namespace DataAccess.Repositories.Models
         public async Task<User> UnblockUserAsync(int id)
         {
             User userToUnblock = await this.GetByIdAsync(id);
-            if (userToUnblock.IsBlocked)
-            {
-                userToUnblock.IsBlocked = false;
-            }
+
             await context.SaveChangesAsync();
             return userToUnblock;
         }
@@ -170,24 +156,7 @@ namespace DataAccess.Repositories.Models
         {
             return await context.Users.AnyAsync(u => u.Username == username);
         }
-        private async Task UpdatePhoneNumberAsync(User user, User userToUpdate)
-        {
-            if (user?.PhoneNumber != null)
-            {
-                await Task.FromResult(userToUpdate.PhoneNumber = user.PhoneNumber);
-            }
-        }
-        private async Task UpdateAdminStatusAsync(User user, User userToUpdate)
-        {
-            if (!userToUpdate.IsAdmin)
-            {
-                await Task.FromResult(userToUpdate.IsAdmin = user.IsAdmin);
-            }
-            else
-            {
-                await Task.FromResult(userToUpdate.IsAdmin = true);
-            }
-        }
+
         private async Task<IQueryable<User>> FilterByUsernameAsync(IQueryable<User> result, string? username)
         {
             if (!string.IsNullOrEmpty(username))
@@ -214,30 +183,52 @@ namespace DataAccess.Repositories.Models
         }
         private async Task<IQueryable<User>> SortByAsync(IQueryable<User> result, string? sortCriteria)
         {
-            switch (sortCriteria)
+            if (Enum.TryParse<SortCriteria>(sortCriteria, true, out var sortEnum))
+
+            switch (sortEnum)
             {
-                case "username":
+                case SortCriteria.Username:
                     return await Task.FromResult(result.OrderBy(user => user.Username));
-                case "email":
+                case SortCriteria.Email:
                     return await Task.FromResult(result.OrderBy(user => user.Email));
-                case "phoneNumber":
+                case SortCriteria.PhoneNumber:
                     return await Task.FromResult(result.OrderBy(user => user.PhoneNumber));
                 default:
                     return await Task.FromResult(result);
             }
+
+            else
+            {
+                return await Task.FromResult(result);
+            }
         }
         private async Task<IQueryable<User>> SortOrderAsync(IQueryable<User> result, string? sortOrder)
         {
-            switch (sortOrder)
+            if(Enum.TryParse<SortCriteria>(sortOrder, true, out var sortEnum))
+            switch (sortEnum)
             {
-                case "desc":
+                case SortCriteria.Desc:
                     return await Task.FromResult(result.Reverse());
                 default:
                     return await Task.FromResult(result);
             }
+            else
+            {
+                return await Task.FromResult(result);
+            }
         }
 
+        //private async Task UpdateAdminStatusAsync(User user, User userToUpdate)
+        //{
+        //    if (!userToUpdate.IsAdmin)
+        //    {
+        //        await Task.FromResult(userToUpdate.IsAdmin = user.IsAdmin);
+        //    }
+        //    else
+        //    {
+        //        await Task.FromResult(userToUpdate.IsAdmin = true);
+        //    }
+        //}
+
     }
-
-
 }
