@@ -36,7 +36,7 @@ namespace VirtualWallet.Controllers.API
 
             if (!result.IsSuccessful)
             {
-                return StatusCode(StatusCodes.Status401Unauthorized, result.Message);
+                return BadRequest(result.Message);
             }
            
                 return StatusCode(StatusCodes.Status201Created, result.Data);

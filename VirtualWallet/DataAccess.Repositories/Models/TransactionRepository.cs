@@ -32,15 +32,10 @@ namespace DataAccess.Repositories.Models
         }
 
 
-        public async Task<Transaction> UpdateAsync(Transaction transactionToUpdate, Transaction transaction)
+        public async Task<bool> SaveChangesAsync()
         {
-            transactionToUpdate.AccountRecepientId = transaction.AccountRecepientId;
-            transactionToUpdate.Amount = transaction.Amount;
-            transactionToUpdate.CurrencyId = transaction.CurrencyId;
-            transactionToUpdate.Date = DateTime.Now;
-
             await context.SaveChangesAsync();
-            return transactionToUpdate;
+            return true;
         }
 
         public async Task<bool> DeleteAsync(Transaction transaction)
@@ -50,33 +45,9 @@ namespace DataAccess.Repositories.Models
             return transaction.IsDeleted;
         }
 
-        public async Task<bool> Execute(Transaction transaction)
-        {
-            transaction.IsExecuted = true;
-            transaction.Date = DateTime.Now;
-            await context.SaveChangesAsync();
-            return transaction.IsExecuted;
-        }
 
-        public async Task<Transaction> CreateInTransactionAsync(Transaction transactionOut, decimal amount)
-        {
-            var transactionIn = new Transaction();
-            transactionIn.AccountRecepientId = transactionOut.AccountRecepientId;
-            transactionIn.AccountSenderId = transactionOut.AccountSenderId;
-            transactionIn.Amount = amount;
-            transactionIn.CurrencyId = (int)transactionOut.AccountRecipient.CurrencyId;
-            transactionIn.Direction = DirectionType.In;
-            transactionIn.Date = DateTime.Now;
-            transactionIn.IsExecuted = true;
-
-            await context.AddAsync(transactionIn);
-            await context.SaveChangesAsync();
-            return transactionIn;
-        }
-
-        public async Task<Transaction> CreateOutTransactionAsync(Transaction transaction)
-        {
-            transaction.Date = DateTime.Now;
+        public async Task<Transaction> CreateTransactionAsync(Transaction transaction)
+        { 
             await context.AddAsync(transaction);
             await context.SaveChangesAsync();
 
@@ -105,6 +76,7 @@ namespace DataAccess.Repositories.Models
 
             return new PaginatedList<Transaction>(result.ToList(), totalPages, filterParameters.PageNumber);
         }
+        
         private IQueryable<Transaction> GetAll(string username)
         {
             IQueryable<Transaction> result = context.Transactions
@@ -145,7 +117,7 @@ namespace DataAccess.Repositories.Models
 
                 return result.Where(t => t.Date <= date);
             }
-           return await Task.FromResult(result);
+            return await Task.FromResult(result);
         }
 
         private async Task<DirectionType> ParseDirectionParameterAsync(string value, string parameterName)
@@ -154,8 +126,8 @@ namespace DataAccess.Repositories.Models
             {
                 return await Task.FromResult(result);
             }
-           
-           throw new EntityNotFoundException($"Invalid value for {parameterName}.");
+
+            throw new EntityNotFoundException($"Invalid value for {parameterName}.");
         }
 
         private async Task<IQueryable<Transaction>> FilterByDirectionAsync(IQueryable<Transaction> result, string? direction)
@@ -170,15 +142,24 @@ namespace DataAccess.Repositories.Models
 
         private async Task<IQueryable<Transaction>> SortByAsync(IQueryable<Transaction> result, string sortCriteria)
         {
-            switch (sortCriteria)
+            if (Enum.TryParse<SortCriteria>(sortCriteria, true, out var sortEnum))
             {
-                case "amount":
-                    return await Task.FromResult(result.OrderBy(t => t.Amount));
-                case "date":
-                    return await Task.FromResult(result.OrderBy(t => t.Date));
-                default:
-                    return await Task.FromResult(result);
+                switch (sortEnum)
+                {
+                    case SortCriteria.Amount:
+                        return await Task.FromResult(result.OrderBy(t => t.Amount));
+                    case SortCriteria.Date:
+                        return await Task.FromResult(result.OrderBy(t => t.Date));
+                    default:
+                        return await Task.FromResult(result);
+                }
+
             }
+            else
+            {
+                return await Task.FromResult(result);   
+            }
+
         }
     }
 }

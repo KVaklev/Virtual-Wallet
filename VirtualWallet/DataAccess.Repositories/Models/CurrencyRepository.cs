@@ -51,11 +51,10 @@ namespace DataAccess.Repositories.Models
             return currency;
         }
 
-        public async Task<Currency> UpdateAsync(Currency currencyToUpdate, Currency currency)
+        public async Task<bool> SaveChangesAsync()
         {
             await context.SaveChangesAsync();
-
-            return currencyToUpdate;
+            return true;
         }
 
         public async Task<bool> DeleteAsync(int id) 
