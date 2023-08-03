@@ -1,14 +1,9 @@
 ﻿using Business.DTOs.Requests;
 using Business.Exceptions;
 using Business.Services.Contracts;
-using DataAccess.Models.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
-using Presentation.Helpers;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
+
 
 namespace VirtualWallet.Controllers.API
 {
@@ -37,7 +32,7 @@ namespace VirtualWallet.Controllers.API
         {
             try
             {
-                var loggedUser = await this.accountService.LoginAsync(username, password);
+                var loggedUser = await this.userService.LoginAsync(username, password);
                 var token = await this.accountService.CreateApiTokenAsync(loggedUser);
 
                 Response.Cookies.Append("Cookie_JWT", token.ToString(), new CookieOptions()

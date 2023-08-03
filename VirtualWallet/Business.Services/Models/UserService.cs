@@ -184,6 +184,15 @@ namespace Business.Services.Models
             return await this.userRepository.UnblockUserAsync(id);
         }
 
+        public async Task<User> LoginAsync(string username, string password)
+        {
+            await Security.CheckForNullEntryAsync(username, password);
+            User loggedUser = await this.GetByUsernameAsync(username);
+            var authenticatedUser = await Security.AuthenticateAsync(loggedUser, username, password);
+
+            return authenticatedUser;
+        }
+
         private async Task<bool> EmailExistsAsync(string email)
         {
             return await this.userRepository.EmailExistsAsync(email);

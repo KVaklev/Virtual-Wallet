@@ -19,5 +19,6 @@ namespace Business.Services.Contracts
         Task<User> PromoteAsync(int id, User loggedUser);
         Task<User> BlockUserAsync(int id, User loggedUser);
         Task<User> UnblockUserAsync(int id, User loggedUser);
+        Task<User> LoginAsync(string username, string password);
     }
 }

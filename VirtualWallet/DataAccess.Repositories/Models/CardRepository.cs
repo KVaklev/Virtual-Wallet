@@ -12,12 +12,10 @@ namespace DataAccess.Repositories.Models
     public class CardRepository : ICardRepository
     {
         private readonly ApplicationContext context;
-        private readonly ICurrencyRepository currencyRepository;
 
-        public CardRepository(ApplicationContext context, ICurrencyRepository currencyRepository)
+        public CardRepository(ApplicationContext context)
         {
             this.context = context;
-            this.currencyRepository = currencyRepository;
         }
 
         public IQueryable<Card> GetAll()
@@ -77,38 +75,14 @@ namespace DataAccess.Repositories.Models
         }
         public async Task<Card> CreateAsync(int accountId, Card card)
         {
-            var carToCreate = new Card();
-            var currency = await currencyRepository.GetByCurrencyCodeAsync(card.Currency.CurrencyCode);
-
-            carToCreate.AccountId = accountId;
-            carToCreate.CardNumber = card.CardNumber;
-            carToCreate.CardType = card.CardType;
-            carToCreate.Balance = card.Balance;
-            carToCreate.CardHolder = card.CardHolder;
-            carToCreate.ExpirationDate = card.ExpirationDate;
-            carToCreate.CheckNumber = card.CheckNumber;
-            carToCreate.CreditLimit = card.CreditLimit;
-            carToCreate.CurrencyId = currency.Id;
-
-            context.Cards.Add(carToCreate);
+            context.Cards.Add(card);
             await context.SaveChangesAsync();
 
-            return carToCreate;
+            return card;
         }
 
-        public async Task<Card> UpdateAsync(int id, Card card)
+        public async Task<Card> UpdateAsync(int id, Card cardToUpdate)
         {
-            var cardToUpdate = await this.GetByIdAsync(id);
-            var currency = await currencyRepository.GetByCurrencyCodeAsync(card.Currency.CurrencyCode);
-
-            cardToUpdate.CardNumber = card.CardNumber ?? cardToUpdate.CardNumber;
-            cardToUpdate.CheckNumber = card.CheckNumber ?? cardToUpdate.CheckNumber;
-            cardToUpdate.CardHolder = card.CardHolder ?? cardToUpdate.CardHolder;
-            cardToUpdate.CreditLimit = card.CreditLimit ?? cardToUpdate.CreditLimit;
-            await UpdateCardTypeAsync(card, cardToUpdate);
-            await UpdateExpirationDateAsync(card, cardToUpdate);
-            await UpdateCurrencyAsync(card, cardToUpdate, currency);
-
             await context.SaveChangesAsync();
             return cardToUpdate;
         }
@@ -129,43 +103,20 @@ namespace DataAccess.Repositories.Models
 
         public async Task<Card> IncreaseBalanceAsync(int id, decimal amount)
         {
-            Card card = await this.GetByIdAsync(id);
-            card.Balance += amount;
+            Card cardToDepositTo = await this.GetByIdAsync(id);
             await context.SaveChangesAsync();
 
-            return card;
+            return cardToDepositTo;
         }
 
         public async Task<Card> DecreaseBalanceAsync(int id, decimal amount)
         {
-            Card card = await this.GetByIdAsync(id);
-            card.Balance -= amount;
+            Card cardToWithdrawFrom = await this.GetByIdAsync(id);
             await context.SaveChangesAsync();
 
-            return card;
+            return cardToWithdrawFrom;
         }
 
-        private async Task UpdateExpirationDateAsync(Card card, Card cardToUpdate)
-        {
-            if (card.ExpirationDate != null)
-            {
-                cardToUpdate.ExpirationDate = card.ExpirationDate;
-            }
-        }
-        private async Task UpdateCardTypeAsync(Card card, Card cardToUpdate)
-        {
-            if (card.CardType != null)
-            {
-                cardToUpdate.CardType = card.CardType;
-            }
-        }
-        private async Task UpdateCurrencyAsync(Card card, Card cardToUpdate, Currency currency)
-        {
-            if (card.Currency != null)
-            {
-                cardToUpdate.CurrencyId = currency.Id;
-            }
-        }
         private async Task<IQueryable<Card>> FilterByUsernameAsync(IQueryable<Card> result, string username)
         {
             result = result

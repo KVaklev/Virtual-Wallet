@@ -15,7 +15,7 @@
 
         //Constant messages for cards
 
-        public const string ModifyCardErrorMessage = "Only an admin or owner of the card can update information.";
+        public const string ModifyCardErrorMessage = "Only an admin or owner of the card can access, delete or modify the card.";
 
         //Constant messages for transactions 
 

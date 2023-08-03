@@ -4,6 +4,7 @@ using Business.DTOs.Responses;
 using Business.Exceptions;
 using Business.QueryParameters;
 using Business.Services.Contracts;
+using Business.Services.Models;
 using DataAccess.Models.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -54,7 +55,8 @@ namespace VirtualWallet.Controllers.API
         {
             try
             {
-                Card card = await cardService.GetByIdAsync(id);
+                User loggedUser = await FindLoggedUserAsync();
+                Card card = await cardService.GetByIdAsync(id, loggedUser);
                 GetCardDto cardDto = mapper.Map<GetCardDto>(card);
 
                 return StatusCode(StatusCodes.Status200OK, cardDto);
@@ -82,15 +84,14 @@ namespace VirtualWallet.Controllers.API
             }
         }
 
-        [HttpPut, Authorize]
-        public async Task<IActionResult> UpdateCardAsync(int id, [FromBody] UpdateCardDto updateCardDto)
+        [HttpPut("{id}"), Authorize]
+        public async Task<IActionResult> UpdateCard(int id, [FromBody] UpdateCardDto updateCardDto)
         {
             try
             {
                 User loggedUser = await FindLoggedUserAsync();
                 var loggedUsersAccountId = await FindLoggedUsersAccountAsync();
-                Card updateCard = mapper.Map<Card>(updateCardDto);
-                Card updatedCard = await cardService.UpdateAsync(id, loggedUser, updateCard);
+                GetUpdatedCardDto updatedCard = await this.cardService.UpdateAsync(id, loggedUser, updateCardDto);
 
                 return StatusCode(StatusCodes.Status200OK, updatedCard);
             }

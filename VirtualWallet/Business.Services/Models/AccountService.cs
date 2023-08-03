@@ -20,20 +20,19 @@ namespace Business.Services.Models
         private readonly IUserRepository userRepository;
         private readonly ICardService cardService;
         private readonly ICurrencyService currencyService;
-        private readonly IUserService userService;
 
         public AccountService(
             IAccountRepository accountRepository,  
             IUserRepository userRepository,
             ICardService cardService,
-            ICurrencyService currencyService,
-            IUserService userService)
+            ICurrencyService currencyService
+          )
         {
             this.accountRepository = accountRepository;
             this.userRepository = userRepository;
             this.cardService = cardService;
             this.currencyService = currencyService;
-            this.userService = userService;
+           
         }
         public IQueryable<Account> GetAll()
         {
@@ -140,14 +139,6 @@ namespace Business.Services.Models
         public async Task<bool> ConfirmRegistrationAsync(int id, string token)
         {
             return await this.accountRepository.ConfirmRegistrationAsync(id, token);
-        }
-        public async Task<User> LoginAsync(string username, string password)
-        {
-            await Security.CheckForNullEntryAsync(username, password);
-            var loggedUser = await this.userService.GetByUsernameAsync(username);
-            var authenticatedUser = await Security.AuthenticateAsync(loggedUser, username, password);
-
-            return authenticatedUser;
         }
 
         public async Task<Account> IncreaseBalanceAsync(int id, decimal amount, User loggedUser)

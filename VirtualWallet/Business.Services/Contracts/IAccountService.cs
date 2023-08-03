@@ -16,6 +16,5 @@ namespace Business.Services.Contracts
         Task<Account> DecreaseBalanceAsync(int id, decimal amount, User loggedUser);
         Task<string> GenerateTokenAsync(int id);
         Task<bool> ConfirmRegistrationAsync(int id, string token);
-        Task<User> LoginAsync(string username, string password);
     }
 }
