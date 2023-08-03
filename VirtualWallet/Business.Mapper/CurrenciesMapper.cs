@@ -21,4 +21,5 @@ namespace Business.Mappers
             return currencyToUpdate;
 
         }
+    }
 }
