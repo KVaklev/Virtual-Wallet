@@ -1,6 +1,7 @@
 ﻿using Business.DTOs.Requests;
 using Business.Exceptions;
 using Business.Services.Contracts;
+using DataAccess.Models.Enums;
 using DataAccess.Models.Models;
 using System.Security.Cryptography;
 using System.Text;
@@ -135,6 +136,53 @@ namespace Business.Services.Helpers
                 return false;
             }
             return true;
+        }
+
+        public static async Task<bool> IsTransactionSenderAsync(Transaction transaction, int userId)
+        {
+            bool isTransactionSender = true;
+
+            if (transaction.AccountSender.User.Id != userId)
+            {
+                isTransactionSender = false;
+            }
+            return isTransactionSender;
+        }
+
+        public static async Task<bool> IsUserAuthorizedAsync(Transfer transfer, User user)
+        {
+            bool IsUserAuthorized = true;
+
+            if (transfer.Account.UserId != user.Id)
+            {
+                IsUserAuthorized = false;
+            }
+
+            return IsUserAuthorized;
+
+        }
+
+        public static async Task<bool> CanModifyTransactionAsync(Transaction transaction)
+        {
+            var canExecuteTransaction = true;
+            if (transaction.IsExecuted
+                    || transaction.Direction == DirectionType.In
+                    || transaction.IsDeleted)
+            {
+                canExecuteTransaction = false;
+            }
+            return canExecuteTransaction;
+        }
+
+        public static async Task<bool> IsHistoryOwnerAsync(History history, User user)
+        {
+            bool isHistoryOwner = true;
+
+            if (history.AccountId != user.AccountId)
+            {
+                isHistoryOwner = false;
+            }
+            return isHistoryOwner;
         }
     }
 }

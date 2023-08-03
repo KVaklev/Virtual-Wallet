@@ -63,7 +63,7 @@ namespace Business.Services.Models
         {
             Transfer transferToGet = await transferRepository.GetByIdAsync(id);
 
-            if (!await Common.IsUserAuthorizedAsync(transferToGet, user) || user.IsAdmin)
+            if (!await Security.IsUserAuthorizedAsync(transferToGet, user) || user.IsAdmin)
 
             {
                 throw new UnauthorizedOperationException(Constants.ModifyTransferGetByIdErrorMessage);
@@ -102,7 +102,7 @@ namespace Business.Services.Models
         {
             Transfer transferToGet = await transferRepository.GetByIdAsync(id);
 
-            if (!await Common.IsUserAuthorizedAsync(transferToGet, user))
+            if (!await Security.IsUserAuthorizedAsync(transferToGet, user))
             {
                 throw new UnauthorizedOperationException(Constants.ModifyTransferErrorMessage);
             }
@@ -121,7 +121,7 @@ namespace Business.Services.Models
 
             Transfer transferToGet = await transferRepository.GetByIdAsync(id);
 
-            if (!await Common.IsUserAuthorizedAsync(transferToGet, user))
+            if (!await Security.IsUserAuthorizedAsync(transferToGet, user))
             {
                 throw new UnauthorizedOperationException(Constants.ModifyTransferErrorMessage);
             }
@@ -155,7 +155,7 @@ namespace Business.Services.Models
         {
             Transfer transferToGet = await transferRepository.GetByIdAsync(transferId);
 
-            if (!(await Common.IsUserAuthorizedAsync(transferToGet, user)))
+            if (!(await Security.IsUserAuthorizedAsync(transferToGet, user)))
             {
                 throw new UnauthorizedOperationException(Constants.ModifyTransferErrorMessage);
             }

@@ -11,6 +11,7 @@ using Business.DTOs.Requests;
 using Business.DTOs.Responses;
 using Business.DTOs;
 using Business.Mappers;
+using DataAccess.Repositories.Helpers;
 
 namespace Business.Services.Models
 {
@@ -49,7 +50,7 @@ namespace Business.Services.Models
         {
             var result = new Response<GetTransactionDto>();
             var transaction = await this.transactionRepository.GetByIdAsync(id);
-            if (!await Common.IsTransactionSenderAsync(transaction, loggedUser.Id) || !loggedUser.IsAdmin)
+            if (!await Security.IsTransactionSenderAsync(transaction, loggedUser.Id) || !loggedUser.IsAdmin)
             {
                 result.IsSuccessful = false;
                 result.Message = Constants.ModifyAuthorizedErrorMessage;
@@ -81,7 +82,7 @@ namespace Business.Services.Models
             var account = await accountRepository.GetByUsernameAsync(transactionDto.RecepientUsername);
             var currency = await currencyRepository.GetByCurrencyCodeAsync(transactionDto.CurrencyCode);
             var transaction = await TransactionsMapper.MapDtoТоTransactionAsync(transactionDto, loggedUser, account, currency);
-            if (!await this.accountRepository.HasEnoughBalanceAsync(transaction.AccountSenderId, transaction.Amount))
+            if (!await Security.HasEnoughBalanceAsync(transaction.AccountSender, transaction.Amount))
             {
                 result.IsSuccessful = false;
                 result.Message = Constants.ModifyAccountBalancetErrorMessage;
@@ -98,21 +99,21 @@ namespace Business.Services.Models
         {
             var result = new Response<GetTransactionDto>();
             var transactionToUpdate = await this.transactionRepository.GetByIdAsync(id);
-            if (!await Common.IsTransactionSenderAsync(transactionToUpdate, loggedUser.Id))
+            if (!await Security.IsTransactionSenderAsync(transactionToUpdate, loggedUser.Id))
             {
                 result.IsSuccessful = false;
                 result.Message = Constants.ModifyAuthorizedErrorMessage;
                 return result;
             }
 
-            if (!await Common.CanModifyTransactionAsync(transactionToUpdate))
+            if (!await Security.CanModifyTransactionAsync(transactionToUpdate))
             {
                 result.IsSuccessful = false;
                 result.Message = Constants.ModifyTransactionNotExecuteErrorMessage;
                 return result;
             }
 
-            if (!await this.accountRepository.HasEnoughBalanceAsync((int)loggedUser.AccountId, loggedUser.Account.Balance))
+            if (!await Security.HasEnoughBalanceAsync(loggedUser.Account, loggedUser.Account.Balance))
             {
                 result.IsSuccessful = false;
                 result.Message = Constants.ModifyAccountBalancetErrorMessage;
@@ -131,14 +132,14 @@ namespace Business.Services.Models
         {
             var result = new Response<bool>();
             var transaction = await this.transactionRepository.GetByIdAsync(id);
-            if (!await Common.IsTransactionSenderAsync(transaction, loggedUser.Id))
+            if (!await Security.IsTransactionSenderAsync(transaction, loggedUser.Id))
             {
                 result.IsSuccessful = false;
                 result.Message = Constants.ModifyAuthorizedErrorMessage;
                 return result;
             }
 
-            if (!await Common.CanModifyTransactionAsync(transaction))
+            if (!await Security.CanModifyTransactionAsync(transaction))
             {
                 result.IsSuccessful = false;
                 result.Message = Constants.ModifyTransactionNotExecuteErrorMessage;
@@ -154,14 +155,14 @@ namespace Business.Services.Models
         {
             var result = new Response<bool>();
             var transactionOut = await this.transactionRepository.GetByIdAsync(transactionId);
-            if (!await Common.IsTransactionSenderAsync(transactionOut, loggedUser.Id))
+            if (!await Security.IsTransactionSenderAsync(transactionOut, loggedUser.Id))
             {
                 result.IsSuccessful = false;
                 result.Message = Constants.ModifyAuthorizedErrorMessage;
                 return result;
             }
 
-            if (!await Common.CanModifyTransactionAsync(transactionOut))
+            if (!await Security.CanModifyTransactionAsync(transactionOut))
             {
                 result.IsSuccessful = false;
                 result.Message = Constants.ModifyTransactionNotExecuteErrorMessage;
