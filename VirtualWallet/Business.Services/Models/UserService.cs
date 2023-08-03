@@ -8,6 +8,9 @@ using AutoMapper;
 using Business.Mappers;
 using Business.DTOs.Requests;
 using Business.DTOs.Responses;
+using Business.DTOs;
+using DataAccess.Models.Enums;
+using System.Reflection.Metadata;
 
 namespace Business.Services.Models
 {
@@ -28,9 +31,23 @@ namespace Business.Services.Models
             this.mapper = mapper;
         }
 
-        public IQueryable<User> GetAll()
+        public Response<IQueryable<GetUserDto>> GetAll()
         {
-            return this.userRepository.GetAll();
+            var result = new Response<IQueryable<GetUserDto>>();
+            var users = this.userRepository.GetAll();
+
+            if (users != null && users.Any())
+            {
+                result.IsSuccessful = true;
+                result.Data = (IQueryable<GetUserDto>)users.AsQueryable();
+            }
+            else
+            {
+                result.IsSuccessful = false;
+                result.Message = Constants.NoUsersErrorMessage;
+            }
+
+            return result;
         }
 
         public async Task<PaginatedList<User>> FilterByAsync(UserQueryParameters filterParameters)
@@ -38,41 +55,58 @@ namespace Business.Services.Models
             return await this.userRepository.FilterByAsync(filterParameters);
         }
 
-        public async Task<User> GetByIdAsync(int id)
+        public async Task<Response<GetUserDto>> GetByIdAsync(int id, User loggedUser)
         {
-            return await this.userRepository.GetByIdAsync(id);
+            var result = new Response<GetUserDto>();
+
+            var user = await this.userRepository.GetByIdAsync(id);
+
+            if (!await Security.IsAuthorizedAsync(user, loggedUser))
+            {
+                result.IsSuccessful = false;
+                result.Message = Constants.ModifyAuthorizedErrorMessage;
+                return result;
+            }
+            var userDto = this.mapper.Map<GetUserDto>(user);
+            result.Data = userDto;
+
+            return result;
         }
 
-        public async Task<User> GetByUsernameAsync(string username)
+        public async Task<Response<GetUserDto>> GetByUsernameAsync(string username)
         {
-            return await this.userRepository.GetByUsernameAsync(username);
+            var result = new Response<GetUserDto>();
+
+            var user = await this.userRepository.GetByUsernameAsync(username);
+            var userDto = this.mapper.Map<GetUserDto>(user);
+            result.Data = userDto;
+
+            return result;
         } 
 
-        public async Task<User> GetByEmailAsync(string email)
+        public async Task<Response<GetCreatedUserDto>> CreateAsync(CreateUserDto createUserDto)
         {
-            return await this.userRepository.GetByEmailAsync(email);
-        }
+            var result = new Response<GetCreatedUserDto>();
 
-        public async Task<User> GetByPhoneNumberAsync(string pnoneNumber)
-        {
-            return await this.userRepository.GetByPhoneNumberAsync(pnoneNumber);
-        }
-
-        public async Task<GetCreatedUserDto> CreateAsync(CreateUserDto createUserDto)
-        {     
             if (await UsernameExistsAsync(createUserDto.Username))
             {
-                throw new DuplicateEntityException($"User with username '{createUserDto.Username}' already exists.");
+                result.IsSuccessful = false;
+                result.Message = Constants.UsernameExistsErrorMessage;
+                return result;
             }
 
             if (await EmailExistsAsync(createUserDto.Email))
             {
-                throw new DuplicateEntityException($"User with email '{createUserDto.Email}' already exists.");
+                result.IsSuccessful = false;
+                result.Message = Constants.EmailExistsErrorMessage;
+                return result;
             }
 
             if (await PhoneNumberExistsAsync(createUserDto.PhoneNumber))
             {
-                throw new DuplicateEntityException($"User with phone number '{createUserDto.PhoneNumber}' already exists.");
+                result.IsSuccessful = false;
+                result.Message = Constants.PhoneNumberExistsErrorMessage;
+                return result;
             }
             
             User userToCreate = await UsersMapper.MapCreateDtoToUserAsync(createUserDto);
@@ -80,25 +114,31 @@ namespace Business.Services.Models
             userToCreate = await this.userRepository.CreateAsync(userToCreate);
             await this.accountService.CreateAsync(createUserDto.CurrencyCode, userToCreate);
  
-            GetCreatedUserDto createdUser = mapper.Map<GetCreatedUserDto>(userToCreate);
+            result.Data = mapper.Map<GetCreatedUserDto>(userToCreate);
 
-            return createdUser;
+            return result;
         }
         
-        public async Task<GetUpdatedUserDto> UpdateAsync(int id, UpdateUserDto updateUserDto, User loggedUser)
+        public async Task<Response<GetUpdatedUserDto>> UpdateAsync(int id, UpdateUserDto updateUserDto, User loggedUser)
         {
+            var result = new Response<GetUpdatedUserDto>();
+
             User userToUpdate = await this.userRepository.GetByIdAsync(id);
            
             if (!await Security.IsAuthorizedAsync(userToUpdate, loggedUser))
             {
-                throw new UnauthorizedOperationException(Constants.ModifyUserErrorMessage);
+                result.IsSuccessful = false;
+                result.Message = Constants.ModifyUserErrorMessage;
+                return result;
             }
 
             if (userToUpdate.Email != updateUserDto.Email)
             {
                 if (await EmailExistsAsync(updateUserDto.Email))
                 {
-                    throw new DuplicateEntityException($"User with email '{updateUserDto.Email}' already exists.");
+                    result.IsSuccessful = false;
+                    result.Message = Constants.EmailExistsErrorMessage;
+                    return result;
                 }
             }
 
@@ -106,7 +146,9 @@ namespace Business.Services.Models
             {
                 if (await PhoneNumberExistsAsync(updateUserDto.PhoneNumber))
                 {
-                    throw new DuplicateEntityException($"User with phone number '{updateUserDto.PhoneNumber}' already exists.");
+                    result.IsSuccessful = false;
+                    result.Message = Constants.PhoneNumberExistsErrorMessage;
+                    return result;
                 }
             }
 
@@ -114,83 +156,112 @@ namespace Business.Services.Models
             userToUpdate = await Security.ComputePasswordHashAsync<UpdateUserDto>(updateUserDto, userToUpdate);
             userToUpdate = await this.userRepository.UpdateAsync(userToUpdate);
 
-            GetUpdatedUserDto updatedUser = mapper.Map<GetUpdatedUserDto>(userToUpdate);
+            result.Data = mapper.Map<GetUpdatedUserDto>(userToUpdate);
 
-            return updatedUser;
+            return result;
         }
 
-        public async Task<bool> DeleteAsync(int id, User loggedUser)
+        public async Task<Response<bool>> DeleteAsync(int id, User loggedUser)
         {
+            var result = new Response<bool>();
+
             if (!await Security.IsAdminAsync(loggedUser))
             {
-                throw new UnauthorizedOperationException(Constants.ModifyUserErrorMessage);
+                result.IsSuccessful = false;
+                result.Message = Constants.ModifyUserErrorMessage;
             } 
             
-            User userToDelete = await this.GetByIdAsync(id);
+            User userToDelete = await this.userRepository.GetByIdAsync(id);
             var accountToDelete = await this.accountService.GetByIdAsync((int)userToDelete.AccountId, loggedUser);
             await this.accountService.DeleteAsync(accountToDelete.Id, loggedUser);
     
-            return await this.userRepository.DeleteAsync(id);
+            result.Data = await this.userRepository.DeleteAsync(id);
+            
+            return result;
         }
 
-        public async Task<User> PromoteAsync(int id, User loggedUser)
+        public async Task<Response<GetUserDto>> PromoteAsync(int id, User loggedUser)
         {
+            var result = new Response<GetUserDto>();
+
             if (!await Security.IsAdminAsync(loggedUser))
             {
-                throw new UnauthorizedOperationException(Constants.ModifyUserErrorMessage);
+                result.IsSuccessful = false;
+                result.Message = Constants.ModifyUserErrorMessage;
+                return result;
             }
 
-            User userToPromote = await this.GetByIdAsync(id);
+            User userToPromote = await this.userRepository.GetByIdAsync(id);
 
             if (!userToPromote.IsAdmin)
             {
                 userToPromote.IsAdmin = true;
             }
 
-            return await this.userRepository.PromoteAsync(id);
+            userToPromote = await this.userRepository.PromoteAsync(id);
+            result.Data = mapper.Map<GetUserDto>(userToPromote);
+
+            return result;
         }
 
-        public async Task<User> BlockUserAsync(int id, User loggedUser)
+        public async Task<Response<GetUserDto>> BlockUserAsync(int id, User loggedUser)
         {
+            var result = new Response<GetUserDto>();
+
             if (!await Security.IsAdminAsync(loggedUser))
             {
-                throw new UnauthorizedOperationException(Constants.ModifyUserErrorMessage);
+                result.IsSuccessful = false;
+                result.Message = Constants.ModifyUserErrorMessage;
+                return result;
             }
 
-            User userToBlock = await this.GetByIdAsync(id);
+            User userToBlock = await this.userRepository.GetByIdAsync(id);
 
             if (!userToBlock.IsBlocked)
             {
                 userToBlock.IsBlocked = true;
             }
 
-            return await this.userRepository.BlockUserAsync(id);
+            userToBlock = await this.userRepository.BlockUserAsync(id);
+            result.Data = mapper.Map<GetUserDto>(userToBlock);
+
+            return result;
         }
 
-        public async Task<User> UnblockUserAsync(int id, User loggedUser)
+        public async Task<Response<GetUserDto>> UnblockUserAsync(int id, User loggedUser)
         {
+            var result = new Response<GetUserDto>();
+
             if (!await Security.IsAdminAsync(loggedUser))
             {
-                throw new UnauthorizedOperationException(Constants.ModifyUserErrorMessage);
+                result.IsSuccessful = false;
+                result.Message = Constants.ModifyUserErrorMessage;
+                return result;
             }
 
-            User userToUnblock = await this.GetByIdAsync(id);
+            User userToUnblock = await this.userRepository.GetByIdAsync(id);
 
             if (userToUnblock.IsBlocked)
             {
                 userToUnblock.IsBlocked = false;
             }
 
-            return await this.userRepository.UnblockUserAsync(id);
+            userToUnblock = await this.userRepository.UnblockUserAsync(id);
+            result.Data = mapper.Map<GetUserDto>(userToUnblock);
+
+            return result;
         }
 
-        public async Task<User> LoginAsync(string username, string password)
+        public async Task<Response<GetUserDto>> LoginAsync(string username, string password)
         {
+            var result = new Response<GetUserDto>();
+
             await Security.CheckForNullEntryAsync(username, password);
-            User loggedUser = await this.GetByUsernameAsync(username);
+            User loggedUser = await this.userRepository.GetByUsernameAsync(username);
             var authenticatedUser = await Security.AuthenticateAsync(loggedUser, username, password);
 
-            return authenticatedUser;
+            result.Data = mapper.Map<GetUserDto>(authenticatedUser);
+            return result;
         }
 
         private async Task<bool> EmailExistsAsync(string email)

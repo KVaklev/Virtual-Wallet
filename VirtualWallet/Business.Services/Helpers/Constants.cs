@@ -7,6 +7,13 @@
         public const string ModifyUserErrorMessage = "Only an admin is authorized to perform the specified action.";
         public const string ModifyUsernameErrorMessage = "Username change is not allowed.";
 
+        public const string NoUsersErrorMessage = "No users found.";
+        public const string NoUsersAfterFilterErrorMessage = "No users match the specified filter criteria.";
+
+        public const string UsernameExistsErrorMessage = "User with this username already exists.";
+        public const string EmailExistsErrorMessage = "User with this email already exists.";
+        public const string PhoneNumberExistsErrorMessage = "User with this phone number already exists.";
+
         //Constant messages for account
 
         public const string ModifyAccountErrorMessage = "Only an admin or owner of the account can access, delete or modify the acount.";
