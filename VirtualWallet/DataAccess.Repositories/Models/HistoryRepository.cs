@@ -33,7 +33,6 @@ namespace DataAccess.Repositories.Models
             return history ?? throw new EntityNotFoundException(Constants.NoFoundErrorMessage);
         }
 
-        
         public async Task<History> CreateAsync(History history)
         {
             await this.context.AddAsync(history);
