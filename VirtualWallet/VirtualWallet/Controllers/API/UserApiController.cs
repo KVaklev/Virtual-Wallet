@@ -183,7 +183,7 @@ namespace VirtualWallet.Controllers.API
         private async Task<User> FindLoggedUserAsync()
         {
             var loggedUsersUsername = User.Claims.FirstOrDefault(claim => claim.Type == "Username").Value;
-            var loggedUser = await authManager.TryGetUserByUsernameAsync(loggedUsersUsername);
+            var loggedUser = await this.userService.GetByUsernameAsync(loggedUsersUsername);
             return loggedUser;
         }
     }

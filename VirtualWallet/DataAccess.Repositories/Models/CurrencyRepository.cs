@@ -30,32 +30,8 @@ namespace DataAccess.Repositories.Models
             var currency = await this.context.Currencies
                 .Where(c => c.Id == id)
                 .FirstOrDefaultAsync();
+
             return currency ?? throw new EntityNotFoundException(Constants.NoFoundErrorMessage);
-        }
-
-        public async Task<Currency> CreateAsync(Currency currency)
-        {
-            context.Add(currency);
-            await context.SaveChangesAsync();
-            return currency;
-        }
-
-        public async Task<Currency> UpdateAsync(Currency currencyToUpdate, Currency currency)
-        {
-            currencyToUpdate.Name = currency.Name;
-            currencyToUpdate.CurrencyCode = currency.CurrencyCode;
-            await context.SaveChangesAsync();
-
-            return currencyToUpdate;
-        }
-
-        public async Task<bool> DeleteAsync(int id) 
-        {
-            var currencyToDelete = await this.GetByIdAsync(id);
-            currencyToDelete.IsDeleted = true;
-            await context.SaveChangesAsync();
-
-            return currencyToDelete.IsDeleted;
         }
 
         public async Task<Currency> GetByCurrencyCodeAsync(string currencyCode)
@@ -67,5 +43,28 @@ namespace DataAccess.Repositories.Models
             return currency ?? throw new EntityNotFoundException(Constants.NoFoundErrorMessage);
         }
 
+        public async Task<Currency> CreateAsync(Currency currency)
+        {
+            context.Add(currency);
+            await context.SaveChangesAsync();
+
+            return currency;
+        }
+
+        public async Task<Currency> UpdateAsync(Currency currencyToUpdate, Currency currency)
+        {
+            await context.SaveChangesAsync();
+
+            return currencyToUpdate;
+        }
+
+        public async Task<bool> DeleteAsync(int id) 
+        {
+            var currencyToDelete = await this.GetByIdAsync(id);
+            currencyToDelete.IsDeleted = true;
+
+            await context.SaveChangesAsync();
+            return currencyToDelete.IsDeleted;
+        }
     }
 }

@@ -99,6 +99,10 @@ namespace Business.Services.Models
             }
 
             var currency = this.mapper.Map<Currency>(currencyDto);
+
+            currencyToUpdate.Name = currency.Name;
+            currencyToUpdate.CurrencyCode = currency.CurrencyCode;
+
             var updatedCurrency = await this.currencyRepository.UpdateAsync(currencyToUpdate, currency);
             var updatedCurrencyDto = this.mapper.Map<CreateCurrencyDto>(updatedCurrency);
             result.Data= updatedCurrencyDto;

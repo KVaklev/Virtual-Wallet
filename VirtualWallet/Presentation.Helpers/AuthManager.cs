@@ -13,17 +13,17 @@ namespace Presentation.Helpers
         {
             this.userService = userService;
         }
-        public async Task<User> TryGetUserByUsernameAsync(string username)
-        {
-            try
-            {
-                return await this.userService.GetByUsernameAsync(username);
-            }
-            catch (EntityNotFoundException)
-            {
-                throw new UnauthorizedOperationException("Invalid username!");
-            }
-        }
+        //public async Task<User> TryGetUserByUsernameAsync(string username)
+        //{
+        //    try
+        //    {
+        //        return await this.userService.GetByUsernameAsync(username);
+        //    }
+        //    catch (EntityNotFoundException)
+        //    {
+        //        throw new UnauthorizedOperationException("Invalid username!");
+        //    }
+        //}
 
         //public Task CheckForNullEntryAsync(string username, string password)
         //{
