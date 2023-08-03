@@ -7,7 +7,6 @@ namespace DataAccess.Repositories.Contracts
     {
         Task<History> GetByIdAsync(int id);
         Task<PaginatedList<History>> FilterByAsync(HistoryQueryParameters filterParameters, User loggedUser);
-        Task<History> CreateWithTransactionAsync(Transaction transaction);
-        Task<History> CreateWithTransferAsync(Transfer transfer);
+        Task<History> CreateAsync(History history);
     }
 }

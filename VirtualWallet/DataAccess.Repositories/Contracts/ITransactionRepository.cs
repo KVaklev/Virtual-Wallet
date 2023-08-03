@@ -8,10 +8,8 @@ namespace DataAccess.Repositories.Contracts
     {
         Task<Transaction> GetByIdAsync(int id);
         Task<PaginatedList<Transaction>> FilterByAsync(TransactionQueryParameters filterParameters, string username);
-        Task<Transaction> UpdateAsync(Transaction transactionToUpdate, Transaction transaction);
+        Task<bool> SaveChangesAsync();
         Task<bool> DeleteAsync(Transaction transaction);
-        Task<Transaction> CreateInTransactionAsync(Transaction transactionOut, decimal amount);
-        Task<Transaction> CreateOutTransactionAsync(Transaction trasaction);
-
+        Task<Transaction> CreateTransactionAsync(Transaction trasaction);
     }
 }
