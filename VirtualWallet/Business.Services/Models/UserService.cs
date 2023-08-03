@@ -14,19 +14,16 @@ namespace Business.Services.Models
     public class UserService : IUserService
     {
         private readonly IUserRepository userRepository;
-        private readonly IAccountRepository accountRepository;
         private readonly IAccountService accountService;
         private readonly IMapper mapper;
 
         public UserService(
             IUserRepository userRepository,
-            IAccountRepository accountRepository,
             IAccountService accountService,
             IMapper mapper
             )
         {
             this.userRepository = userRepository;
-            this.accountRepository = accountRepository;
             this.accountService = accountService;
             this.mapper = mapper;
         }
@@ -129,8 +126,8 @@ namespace Business.Services.Models
                 throw new UnauthorizedOperationException(Constants.ModifyUserErrorMessage);
             } 
             
-            User userToDelete = await this.userRepository.GetByIdAsync(id);
-            var accountToDelete = await this.accountRepository.GetByIdAsync((int)userToDelete.AccountId);
+            User userToDelete = await this.GetByIdAsync(id);
+            var accountToDelete = await this.accountService.GetByIdAsync((int)userToDelete.AccountId, loggedUser);
             await this.accountService.DeleteAsync(accountToDelete.Id, loggedUser);
     
             return await this.userRepository.DeleteAsync(id);

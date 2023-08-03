@@ -20,7 +20,6 @@ namespace Business.Services.Models
             this.historyRepository = historyRepository;
         }
 
-
         public async Task<Response<GetHistoryDto>> GetByIdAsync(int id, User loggedUser)
         {
             var result = new Response<GetHistoryDto>();

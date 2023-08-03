@@ -29,8 +29,18 @@ namespace Business.Services.Models
         private readonly ApplicationContext context;
         private readonly IMapper mapper;
         private readonly ICurrencyRepository currencyRepository;
+        private readonly IAccountService accountService;
 
-        public TransferService(ITransferRepository transferRepository, IHistoryRepository historyRepository, IAccountRepository accountRepository, IUserRepository userRepository, ICardRepository cardRepository, ApplicationContext context, IMapper mapper, ICurrencyRepository currencyRepository)
+        public TransferService(
+            ITransferRepository transferRepository, 
+            IHistoryRepository historyRepository, 
+            IAccountRepository accountRepository, 
+            IUserRepository userRepository, 
+            ICardRepository cardRepository, 
+            ApplicationContext context, 
+            IMapper mapper, 
+            ICurrencyRepository currencyRepository,
+            IAccountService accountService)
         {
             this.transferRepository = transferRepository;
             this.historyRepository = historyRepository;
@@ -40,6 +50,7 @@ namespace Business.Services.Models
             this.mapper = mapper;
             this.currencyRepository = currencyRepository;
             this.cardRepository = cardRepository;
+            this.accountService = accountService;
         }
 
         public IQueryable<Transfer> GetAll(User user)
@@ -73,7 +84,7 @@ namespace Business.Services.Models
             }
 
 
-            if (!await this.accountRepository.HasEnoughBalanceAsync(transfer.AccountId, transfer.Amount))
+            if (!await Security.HasEnoughBalanceAsync(transfer.Account, transfer.Amount))
             {
                 throw new UnauthorizedOperationException(Constants.ModifyAccountBalancetErrorMessage);
             }
@@ -145,14 +156,14 @@ namespace Business.Services.Models
 
             if (transferToExecute.TransferType == TransferDirection.Deposit)
             {
-                this.accountRepository.IncreaseBalanceAsync(transferToExecute.AccountId, transferToExecute.Amount);
+                this.accountService.IncreaseBalanceAsync(transferToExecute.AccountId, transferToExecute.Amount, user);
 
                 this.cardRepository.DecreaseBalanceAsync(transferToExecute.CardId, transferToExecute.Amount);
             }
 
             if (transferToExecute.TransferType == TransferDirection.Withdrawal)
             {
-                this.accountRepository.DecreaseBalanceAsync(transferToExecute.AccountId, transferToExecute.Amount);
+                this.accountService.DecreaseBalanceAsync(transferToExecute.AccountId, transferToExecute.Amount, user);
 
                 this.cardRepository.IncreaseBalanceAsync(transferToExecute.CardId, transferToExecute.Amount);
             }

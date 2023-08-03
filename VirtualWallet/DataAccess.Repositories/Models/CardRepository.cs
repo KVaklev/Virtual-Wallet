@@ -27,6 +27,7 @@ namespace DataAccess.Repositories.Models
                .Include(c=>c.Account)
                .ThenInclude(c=>c.User)
                .AsQueryable();
+
             return cards ?? throw new EntityNotFoundException("There are no cards.");
         }
 
@@ -123,7 +124,7 @@ namespace DataAccess.Repositories.Models
 
         public async Task<bool> CardNumberExistsAsync(string cardNumber)
         {
-            return context.Cards.Any(u => u.CardNumber == cardNumber);
+            return await context.Cards.AnyAsync(u => u.CardNumber == cardNumber);
         }
 
         public async Task<Card> IncreaseBalanceAsync(int id, decimal amount)

@@ -9,6 +9,7 @@ namespace Business.Services.Contracts
     {
         IQueryable<CreateCurrencyDto> GetAll();
         Task<CreateCurrencyDto> GetByIdAsync(int id);
+        Task<Currency> GetByCurrencyCodeAsync(string id);
         Task<Response<CreateCurrencyDto>> CreateAsync(CreateCurrencyDto currencyDto, User loggedUser);
         Task<Response<CreateCurrencyDto>> UpdateAsync(int id, CreateCurrencyDto currencyDto, User loggedUser);
         Task<Response<bool>> DeleteAsync(int id, User loggedUser);

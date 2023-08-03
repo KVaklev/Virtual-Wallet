@@ -24,6 +24,7 @@ namespace Business.Services.Models
         private readonly ICurrencyRepository currencyRepository;
         private readonly IMapper mapper;
         private readonly IExchangeRateService exchangeRateService;
+        private readonly IAccountService accountService;
 
         public TransactionService(
             ITransactionRepository transactionRepository,
@@ -32,7 +33,8 @@ namespace Business.Services.Models
             IAccountRepository accountRepository,
             ICurrencyRepository currencyRepository,
             IMapper mapper,
-            IExchangeRateService exchangeRateService
+            IExchangeRateService exchangeRateService,
+            IAccountService accountService
             )
         {
             this.transactionRepository = transactionRepository;
@@ -42,6 +44,7 @@ namespace Business.Services.Models
             this.currencyRepository = currencyRepository;
             this.mapper = mapper;
             this.exchangeRateService = exchangeRateService;
+            this.accountService = accountService;
         }
         public async Task<Response<GetTransactionDto>> GetByIdAsync(int id, User loggedUser)
         {
@@ -78,7 +81,7 @@ namespace Business.Services.Models
             }
             
             var transaction = await MapDtoТоTransactionAsync(transactionDto, loggedUser);
-            if (!await this.accountRepository.HasEnoughBalanceAsync(transaction.AccountSenderId, transaction.Amount))
+            if (!await Security.HasEnoughBalanceAsync(transaction.AccountSender, transaction.Amount))
             {
                 result.IsSuccessful = false;
                 result.Message = Constants.ModifyAccountBalancetErrorMessage;
@@ -109,7 +112,7 @@ namespace Business.Services.Models
                 return result;
             }
             var newTransaction = await MapDtoТоTransactionAsync(transactionDto, loggedUser);
-            if (!await this.accountRepository.HasEnoughBalanceAsync(newTransaction.AccountSenderId, newTransaction.Amount))
+            if (!await Security.HasEnoughBalanceAsync(newTransaction.AccountSender, newTransaction.Amount))
             {
                 result.IsSuccessful = false;
                 result.Message = Constants.ModifyAccountBalancetErrorMessage;
@@ -204,8 +207,8 @@ namespace Business.Services.Models
                  transactionOut.AccountSender.Currency.CurrencyCode,
                  transactionOut.Amount );
            
-             await this.accountRepository.DecreaseBalanceAsync(transactionOut.AccountSenderId, amountSender);
-             await this.accountRepository.IncreaseBalanceAsync(transactionIn.AccountRecepientId, transactionIn.Amount);
+             await this.accountService.DecreaseBalanceAsync(transactionOut.AccountSenderId, amountSender, transactionOut.AccountSender.User);
+             await this.accountService.IncreaseBalanceAsync(transactionIn.AccountRecepientId, transactionIn.Amount, transactionIn.AccountRecipient.User);
         }
 
         private async Task<bool> AddTransactionToHistoryAsync(Transaction transaction)

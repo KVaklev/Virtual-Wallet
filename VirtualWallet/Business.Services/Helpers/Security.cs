@@ -1,5 +1,6 @@
 ﻿using Business.DTOs.Requests;
 using Business.Exceptions;
+using Business.Services.Contracts;
 using DataAccess.Models.Models;
 using System.Security.Cryptography;
 using System.Text;
@@ -127,6 +128,13 @@ namespace Business.Services.Helpers
 
             return await Task.FromResult(user);
         }
-
+        public static async Task<bool> HasEnoughBalanceAsync(Account account, decimal amount)
+        {
+            if (account.Balance < amount)
+            {
+                return false;
+            }
+            return true;
+        }
     }
 }

@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
+using Business.DTOs.Requests;
 using Business.Exceptions;
+using Business.Mappers;
 using Business.Services.Additional;
 using Business.Services.Contracts;
 using Business.Services.Helpers;
@@ -15,45 +17,58 @@ namespace Business.Services.Models
     public class AccountService : IAccountService
     {
         private readonly IAccountRepository accountRepository;
-        private readonly ICardRepository cardRepository;
-        private readonly ICurrencyRepository currencyRepository;
         private readonly IUserRepository userRepository;
         private readonly ICardService cardService;
+        private readonly ICurrencyService currencyService;
+        private readonly IUserService userService;
 
         public AccountService(
-            IAccountRepository accountRepository, 
-            ICardRepository cardRepository,
-            ICurrencyRepository currencyRepository, 
+            IAccountRepository accountRepository,  
             IUserRepository userRepository,
-            ICardService cardService)
+            ICardService cardService,
+            ICurrencyService currencyService,
+            IUserService userService)
         {
             this.accountRepository = accountRepository;
-            this.cardRepository = cardRepository;
-            this.currencyRepository = currencyRepository;
             this.userRepository = userRepository;
             this.cardService = cardService;
+            this.currencyService = currencyService;
+            this.userService = userService;
         }
         public IQueryable<Account> GetAll()
         {
             return accountRepository.GetAll();
         }
-
+        public async Task<Account> GetByIdAsync(int id, User user)
+        {
+            if (!await Security.IsUserAuthorized(id, user))
+            {
+                throw new UnauthorizedOperationException(Constants.ModifyAccountErrorMessage);
+            }
+            return await this.accountRepository.GetByIdAsync(id);
+        }
+        public async Task<Account> GetByUsernameAsync(int id, User user)
+        {
+            if (!await Security.IsUserAuthorized(id, user))
+            {
+                throw new UnauthorizedOperationException(Constants.ModifyAccountErrorMessage);
+            }
+            return await accountRepository.GetByUsernameAsync(user.Username);
+        }
         public async Task<Account> CreateAsync(string currencyCode, User user)
         {
-            Account account = new Account();
-            account.Currency = await currencyRepository.GetByCurrencyCodeAsync(currencyCode);
-            account.CurrencyId = account.Currency.Id;
-
+            var accountToCreate = new Account();
+            var currency = await currencyService.GetByCurrencyCodeAsync(currencyCode);
+            accountToCreate = await AccountsMapper.MapCreateDtoToAccountAsync(accountToCreate, currency, user);
+            
             user.AccountId = user.Id;
-
-            Account accountToCreate = await this.accountRepository.CreateAsync(account, user);
+            accountToCreate = await this.accountRepository.CreateAsync(accountToCreate);
 
             return accountToCreate;
         }
-
         public async Task<bool> DeleteAsync(int id, User loggedUser)
         { 
-            var accountToDelete = await this.accountRepository.GetByIdAsync(id);
+            var accountToDelete = await this.GetByIdAsync(id, loggedUser);
 
             if (!await Security.IsAdminAsync(loggedUser))
             {
@@ -69,43 +84,31 @@ namespace Business.Services.Models
             }          
             return await this.accountRepository.DeleteAsync(id);
         }
-
-        public async Task<Account> GetByIdAsync(int id, User user)
-        {
-            if (!await Security.IsUserAuthorized(id, user))
-            {
-                throw new UnauthorizedOperationException(Constants.ModifyAccountErrorMessage);
-            }
-            return await this.accountRepository.GetByIdAsync(id);
-        }
-
-        public async Task<Account> GetByUsernameAsync(int id, User user)
-        {
-            if (!await Security.IsUserAuthorized(id, user))
-            {
-                throw new UnauthorizedOperationException(Constants.ModifyAccountErrorMessage);
-            }
-            return await accountRepository.GetByUsernameAsync(user.Username);
-        }
-
         public async Task<bool> AddCardAsync(int id, Card card, User user)
         {
             if (!await Security.IsUserAuthorized(id, user))
             {
                 throw new UnauthorizedOperationException(Constants.ModifyAccountCardErrorMessage);
             }
-            return await this.accountRepository.AddCardAsync(id, card);
-        }
 
+            if (!await this.cardService.CardNumberExistsAsync(card.CardNumber))
+            {
+                return await this.accountRepository.AddCardAsync(id, card);
+            }
+            return true;
+        }
         public async Task<bool> RemoveCardAsync(int id, Card card, User user)
         {
             if (!await Security.IsUserAuthorized(id, user))
             {
                 throw new UnauthorizedOperationException(Constants.ModifyAccountCardErrorMessage);
             }
-            return await this.accountRepository.RemoveCardAsync(id, card);
+            if (!await this.cardService.CardNumberExistsAsync(card.CardNumber))
+            {
+                return await this.accountRepository.RemoveCardAsync(id, card);
+            }
+            return true;
         }
-
         public async Task<string> CreateApiTokenAsync(User loggedUser)
         {
             var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("This is my secret testing key"));
@@ -141,10 +144,26 @@ namespace Business.Services.Models
         public async Task<User> LoginAsync(string username, string password)
         {
             await Security.CheckForNullEntryAsync(username, password);
-            var loggedUser = await this.userRepository.GetByUsernameAsync(username);
+            var loggedUser = await this.userService.GetByUsernameAsync(username);
             var authenticatedUser = await Security.AuthenticateAsync(loggedUser, username, password);
 
             return authenticatedUser;
+        }
+
+        public async Task<Account> IncreaseBalanceAsync(int id, decimal amount, User loggedUser)
+        {
+            Account accountToDepositTo = await this.GetByIdAsync(id, loggedUser);
+            accountToDepositTo.Balance += amount;
+
+            return await this.accountRepository.IncreaseBalanceAsync(id, amount);
+        }
+
+        public async Task<Account> DecreaseBalanceAsync(int id, decimal amount, User loggedUser)
+        {
+            Account accountToWithdrawFrom = await this.GetByIdAsync(id, loggedUser);
+            accountToWithdrawFrom.Balance -= amount;
+
+            return await this.accountRepository.DecreaseBalanceAsync(id, amount);
         }
     }
 }

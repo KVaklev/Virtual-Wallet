@@ -63,6 +63,11 @@ namespace Business.Services.Models
             return currenciesDto;
         }
 
+        public Task<Currency> GetByCurrencyCodeAsync(string currencyCode)
+        {
+            return this.currencyRepository.GetByCurrencyCodeAsync(currencyCode);
+        }
+
         public async Task<CreateCurrencyDto> GetByIdAsync(int id)
         {
             var currency= await this.currencyRepository.GetByIdAsync(id);
