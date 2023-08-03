@@ -33,37 +33,9 @@ namespace DataAccess.Repositories.Models
             return history ?? throw new EntityNotFoundException(Constants.NoFoundErrorMessage);
         }
 
-        public async Task<History> CreateWithTransactionAsync(Transaction transaction)
-        {
-            var history = new History();
-
-            history.EventTime = DateTime.Now;
-            history.TransactionId = transaction.Id;
-            history.NameOperation = NameOperation.Transaction;
-
-            if (transaction.Direction == DirectionType.Out)
-            {
-                history.AccountId = transaction.AccountSenderId;
-            }
-            else
-            {
-                history.AccountId = transaction.AccountRecepientId;
-            }
-            await this.context.AddAsync(history);
-            await this.context.SaveChangesAsync();
-
-            return history;
-        }
         
-        public async Task<History> CreateWithTransferAsync(Transfer transfer)
+        public async Task<History> CreateAsync(History history)
         {
-            var history = new History();
-            
-            history.EventTime = DateTime.Now;
-            history.TransferId = transfer.Id;
-            history.NameOperation = NameOperation.Transfer;
-            history.AccountId = transfer.AccountId;
-
             await this.context.AddAsync(history);
             await this.context.SaveChangesAsync();
             return history;

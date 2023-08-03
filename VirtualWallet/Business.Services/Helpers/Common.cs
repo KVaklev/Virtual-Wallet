@@ -1,4 +1,5 @@
 ﻿using Business.DTOs.Requests;
+using DataAccess.Models.Enums;
 using DataAccess.Models.Models;
 using DataAccess.Repositories.Contracts;
 using System.Runtime.CompilerServices;
@@ -81,16 +82,41 @@ namespace Business.Services.Helpers
 
         }
 
-        public static async Task<bool> IsTransactionSenderAsync(Transaction transaction , User user)
+
+        public static async Task<bool> IsTransactionSenderAsync(Transaction transaction, int userId)
         {
             bool isTransactionSender = true;
                      
-            if (transaction.AccountSender.User.Id != user.Id)
+            if (transaction.AccountSender.User.Id != userId)
             {
                 isTransactionSender = false;
             }
             return isTransactionSender;
         }
+       
+        public static async Task<bool> CanModifyTransactionAsync(Transaction transaction)
+        {
+            var canExecuteTransaction = true;
+            if (transaction.IsExecuted
+                    || transaction.Direction == DirectionType.In
+                    || transaction.IsDeleted)
+            {
+                canExecuteTransaction = false;
+            }
+            return canExecuteTransaction;
+        }
 
+
+        public static async Task<bool> IsHistoryOwnerAsync(History history, User user)
+        {
+            bool isHistoryOwner = true;
+
+            if (history.AccountId != user.AccountId)
+            {
+                isHistoryOwner = false;
+            }
+            return isHistoryOwner;
+        }
     }
 }
+

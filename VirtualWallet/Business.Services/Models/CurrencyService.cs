@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Business.DTOs;
 using Business.DTOs.Requests;
+using Business.Mappers;
 using Business.Services.Contracts;
 using Business.Services.Helpers;
 using DataAccess.Models.Models;
@@ -16,7 +17,7 @@ namespace Business.Services.Models
         public CurrencyService(
             ICurrencyRepository currencyRepository,
             IMapper mapper
-            )
+      )
         {
             this.currencyRepository = currencyRepository;
             this.mapper = mapper;
@@ -89,9 +90,9 @@ namespace Business.Services.Models
             }
 
             var currency = this.mapper.Map<Currency>(currencyDto);
-            var updatedCurrency = await this.currencyRepository.UpdateAsync(currencyToUpdate, currency);
-            var updatedCurrencyDto = this.mapper.Map<CreateCurrencyDto>(updatedCurrency);
-            result.Data= updatedCurrencyDto;
+            var updatedCurrency = await CurrenciesMapper.MapUpdateAsync(currencyToUpdate, currency);
+            this.currencyRepository.SaveChangesAsync();
+            result.Data= this.mapper.Map<CreateCurrencyDto>(updatedCurrency); 
             return result;
         }
 

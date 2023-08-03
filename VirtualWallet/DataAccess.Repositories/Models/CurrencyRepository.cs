@@ -40,13 +40,10 @@ namespace DataAccess.Repositories.Models
             return currency;
         }
 
-        public async Task<Currency> UpdateAsync(Currency currencyToUpdate, Currency currency)
+        public async Task<bool> SaveChangesAsync()
         {
-            currencyToUpdate.Name = currency.Name;
-            currencyToUpdate.CurrencyCode = currency.CurrencyCode;
             await context.SaveChangesAsync();
-
-            return currencyToUpdate;
+            return true;
         }
 
         public async Task<bool> DeleteAsync(int id) 

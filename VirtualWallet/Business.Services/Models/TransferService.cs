@@ -3,6 +3,7 @@ using Business.DTOs;
 using Business.DTOs.Requests;
 using Business.DTOs.Responses;
 using Business.Exceptions;
+using Business.Mappers;
 using Business.QueryParameters;
 using Business.Services.Contracts;
 using Business.Services.Helpers;
@@ -232,7 +233,7 @@ namespace Business.Services.Models
         {
             var historyCount = await this.context.History.CountAsync();
 
-            var history = await this.historyRepository.CreateWithTransferAsync(transfer);
+            var history = await HistoryMapper.MapCreateWithTransferAsync(transfer);
             int historyCountNewHistoryAdded = await this.context.History.CountAsync();
 
             if (historyCount + 1 == historyCountNewHistoryAdded)

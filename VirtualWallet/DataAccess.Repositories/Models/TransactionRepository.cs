@@ -32,15 +32,10 @@ namespace DataAccess.Repositories.Models
         }
 
 
-        public async Task<Transaction> UpdateAsync(Transaction transactionToUpdate, Transaction transaction)
+        public async Task<bool> SaveChangesAsync()
         {
-            transactionToUpdate.AccountRecepientId = transaction.AccountRecepientId;
-            transactionToUpdate.Amount = transaction.Amount;
-            transactionToUpdate.CurrencyId = transaction.CurrencyId;
-            transactionToUpdate.Date = DateTime.Now;
-
             await context.SaveChangesAsync();
-            return transactionToUpdate;
+            return true;
         }
 
         public async Task<bool> DeleteAsync(Transaction transaction)
@@ -50,33 +45,9 @@ namespace DataAccess.Repositories.Models
             return transaction.IsDeleted;
         }
 
-        public async Task<bool> Execute(Transaction transaction)
-        {
-            transaction.IsExecuted = true;
-            transaction.Date = DateTime.Now;
-            await context.SaveChangesAsync();
-            return transaction.IsExecuted;
-        }
 
-        public async Task<Transaction> CreateInTransactionAsync(Transaction transactionOut, decimal amount)
-        {
-            var transactionIn = new Transaction();
-            transactionIn.AccountRecepientId = transactionOut.AccountRecepientId;
-            transactionIn.AccountSenderId = transactionOut.AccountSenderId;
-            transactionIn.Amount = amount;
-            transactionIn.CurrencyId = (int)transactionOut.AccountRecipient.CurrencyId;
-            transactionIn.Direction = DirectionType.In;
-            transactionIn.Date = DateTime.Now;
-            transactionIn.IsExecuted = true;
-
-            await context.AddAsync(transactionIn);
-            await context.SaveChangesAsync();
-            return transactionIn;
-        }
-
-        public async Task<Transaction> CreateOutTransactionAsync(Transaction transaction)
-        {
-            transaction.Date = DateTime.Now;
+        public async Task<Transaction> CreateTransactionAsync(Transaction transaction)
+        { 
             await context.AddAsync(transaction);
             await context.SaveChangesAsync();
 
@@ -105,6 +76,7 @@ namespace DataAccess.Repositories.Models
 
             return new PaginatedList<Transaction>(result.ToList(), totalPages, filterParameters.PageNumber);
         }
+        
         private IQueryable<Transaction> GetAll(string username)
         {
             IQueryable<Transaction> result = context.Transactions
