@@ -5,6 +5,14 @@ namespace Business.DTOs.Requests
 {
     public class UpdateUserDto
     {
+        [MinLength(Constants.NameMinLength, ErrorMessage = Constants.MinLengthErrorMessage)]
+        [MaxLength(Constants.NameMaxLength, ErrorMessage = Constants.MaxLengthErrorMessage)]
+        public string? FirstName { get; set; }
+
+        [MinLength(Constants.NameMinLength, ErrorMessage = Constants.MinLengthErrorMessage)]
+        [MaxLength(Constants.NameMaxLength, ErrorMessage = Constants.MaxLengthErrorMessage)]
+        public string? LastName { get; set; }
+
         [EmailAddress(ErrorMessage = Constants.EmailFieldErrorMessage)]
         public string? Email { get; set; }
 
@@ -14,13 +22,5 @@ namespace Business.DTOs.Requests
 
         [Password]
         public string? Password { get; set; }
-
-        [MinLength(Constants.NameMinLength, ErrorMessage = Constants.MinLengthErrorMessage)]
-        [MaxLength(Constants.NameMaxLength, ErrorMessage = Constants.MaxLengthErrorMessage)]
-        public string? FirstName { get; set; }
-
-        [MinLength(Constants.NameMinLength, ErrorMessage = Constants.MinLengthErrorMessage)]
-        [MaxLength(Constants.NameMaxLength, ErrorMessage = Constants.MaxLengthErrorMessage)]
-        public string? LastName { get; set; }
     }
 }

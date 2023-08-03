@@ -40,7 +40,6 @@ namespace DataAccess.Repositories.Models
             result = await SortOrderAsync(result, filterParameters.SortOrder);
 
             int totalItems = await result.CountAsync();
-
             if (totalItems == 0)
             {
                 throw new EntityNotFoundException("No users match the specified filter criteria.");
@@ -146,17 +145,14 @@ namespace DataAccess.Repositories.Models
         {
             return await context.Users.AnyAsync(u => u.PhoneNumber == phoneNumber);
         }
-
         public async Task<bool> EmailExistsAsync(string email)
         {
             return await context.Users.AnyAsync(u => u.Email == email);
         }
-
         public async Task<bool> UsernameExistsAsync(string username)
         {
             return await context.Users.AnyAsync(u => u.Username == username);
         }
-
         private async Task<IQueryable<User>> FilterByUsernameAsync(IQueryable<User> result, string? username)
         {
             if (!string.IsNullOrEmpty(username))

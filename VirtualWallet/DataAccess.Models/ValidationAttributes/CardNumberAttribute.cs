@@ -4,21 +4,22 @@ namespace DataAccess.Models.ValidationAttributes
 {
     public class CardNumberAttribute : ValidationAttribute
     {
-        public override bool IsValid(object value)
+        protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
-            var cardNumber = value as string;
-
-            if (string.IsNullOrEmpty(cardNumber))
+            if (value == null)
             {
-                return false;
+                return ValidationResult.Success;
             }
 
-            if (!IsDigitsOnly(cardNumber))
+            if (value is string cardNumber)
             {
-                return false;
+                if (IsDigitsOnly(cardNumber))
+                {
+                    return ValidationResult.Success;
+                }
             }
 
-            return true;
+            return new ValidationResult(ErrorMessage);
         }
 
         private bool IsDigitsOnly(string value)
@@ -30,7 +31,6 @@ namespace DataAccess.Models.ValidationAttributes
                     return false;
                 }
             }
-
             return true;
         }
     }

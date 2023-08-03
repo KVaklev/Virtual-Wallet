@@ -13,14 +13,14 @@ namespace VirtualWallet.Controllers.API
     public class HistoryApiController : ControllerBase
     {
         private readonly IHistoryService historyService;
-        private readonly IAuthManager authManager;
+        private readonly IUserService userService;
 
         public HistoryApiController(
             IHistoryService historyService,
-            IAuthManager authManager)
+            IUserService userService)
         {
             this.historyService = historyService;
-            this.authManager = authManager;
+            this.userService = userService;
         }
 
         [HttpGet("{id}"), Authorize]
@@ -67,7 +67,7 @@ namespace VirtualWallet.Controllers.API
         private async Task<User> FindLoggedUserAsync()
         {
             var loggedUsersUsername = User.Claims.FirstOrDefault(claim => claim.Type == "Username").Value;
-            var loggedUser = await authManager.TryGetUserByUsernameAsync(loggedUsersUsername);
+            var loggedUser = await this.userService.GetByUsernameAsync(loggedUsersUsername);
             return loggedUser;
         }
     }

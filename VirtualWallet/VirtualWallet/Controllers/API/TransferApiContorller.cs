@@ -19,30 +19,18 @@ namespace VirtualWallet.Controllers.API
     public class TransferApiContorller : ControllerBase
     {
         private readonly IMapper mapper;
-        private readonly IAuthManager authManager;
         private readonly ITransferService transferService;
-        private readonly IAccountService accountService;
-        private readonly ICardService cardService;
         private readonly IUserService userService;
-        private readonly ICurrencyService currencyService;
 
         public TransferApiContorller(
             IMapper mapper,
-            IAuthManager authManager,
             ITransferService transferService,
-            IAccountService accountService,
-            ICardService cardService,
-            IUserService userService,
-            ICurrencyService currencyService
+            IUserService userService
             )
         {
             this.mapper = mapper;
-            this.authManager = authManager;
             this.transferService = transferService;
-            this.accountService = accountService;
             this.userService = userService;
-            this.currencyService = currencyService;
-
         }
         [HttpGet, Authorize] 
         public async Task<IActionResult> GetTransferAsync([FromQuery] TransferQueryParameters filterParameters)
@@ -173,12 +161,11 @@ namespace VirtualWallet.Controllers.API
             {
                 return StatusCode(StatusCodes.Status401Unauthorized, e.Message);
             }
-
         }
         private async Task <User> FindLoggedUserAsync()
         {
             var loggedUsersUsername = User.Claims.FirstOrDefault(claim => claim.Type == "Username").Value;
-            var loggedUser = await authManager.TryGetUserByUsernameAsync(loggedUsersUsername);
+            var loggedUser = await this.userService.GetByUsernameAsync(loggedUsersUsername);
             return loggedUser;
         }
 

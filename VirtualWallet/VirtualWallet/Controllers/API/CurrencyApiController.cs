@@ -15,16 +15,13 @@ namespace VirtualWallet.Controllers.API
     {
         private readonly ICurrencyService currencyService;
         private readonly IUserService userService;
-        private readonly IAuthManager authManager;
 
         public CurrencyApiController(
             ICurrencyService currencyService,
-            IUserService userService,
-            IAuthManager authManager)
+            IUserService userService)
         {
             this.currencyService = currencyService;
             this.userService = userService;
-            this.authManager = authManager;
         }
 
         [HttpPost, Authorize]
@@ -120,7 +117,7 @@ namespace VirtualWallet.Controllers.API
         private async Task<User> FindLoggedUserAsync()
         {
             var loggedUsersUsername = User.Claims.FirstOrDefault(claim => claim.Type == "Username").Value;
-            var loggedUser = await authManager.TryGetUserByUsernameAsync(loggedUsersUsername);
+            var loggedUser = await this.userService.GetByUsernameAsync(loggedUsersUsername);
             return loggedUser;
         }
     }

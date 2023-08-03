@@ -28,7 +28,7 @@ namespace Business.Services.Models
         {
             var result = new Response<GetHistoryDto>();
             var history = await historyRepository.GetByIdAsync(id);
-            if (!await Common.IsHistoryOwnerAsync(history, loggedUser))
+            if (!await Security.IsHistoryOwnerAsync(history, loggedUser))
             {
                 result.IsSuccessful = false;
                 result.Message = Constants.ModifyAuthorizedErrorMessage;

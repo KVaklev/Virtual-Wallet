@@ -31,9 +31,18 @@ namespace Business.Services.Models
         private readonly ApplicationContext context;
         private readonly IMapper mapper;
         private readonly ICurrencyRepository currencyRepository;
-        private readonly ICurrencyService currencyService;
+        private readonly IAccountService accountService;
 
-        public TransferService(ITransferRepository transferRepository, IHistoryRepository historyRepository, IAccountRepository accountRepository, IUserRepository userRepository, ICardRepository cardRepository, ApplicationContext context, IMapper mapper, ICurrencyRepository currencyRepository, ICurrencyService currencyService )
+        public TransferService(
+            ITransferRepository transferRepository, 
+            IHistoryRepository historyRepository, 
+            IAccountRepository accountRepository, 
+            IUserRepository userRepository, 
+            ICardRepository cardRepository, 
+            ApplicationContext context, 
+            IMapper mapper, 
+            ICurrencyRepository currencyRepository,
+            IAccountService accountService)
         {
             this.transferRepository = transferRepository;
             this.historyRepository = historyRepository;
@@ -43,7 +52,7 @@ namespace Business.Services.Models
             this.mapper = mapper;
             this.currencyRepository = currencyRepository;
             this.cardRepository = cardRepository;
-            this.currencyService = currencyService;
+            this.accountService = accountService;
         }
 
         public IQueryable<Transfer> GetAll(User user)
@@ -55,7 +64,7 @@ namespace Business.Services.Models
         {
             Transfer transferToGet = await transferRepository.GetByIdAsync(id);
 
-            if (!await Common.IsUserAuthorizedAsync(transferToGet, user) || user.IsAdmin)
+            if (!await Security.IsUserAuthorizedAsync(transferToGet, user) || user.IsAdmin)
 
             {
                 throw new UnauthorizedOperationException(Constants.ModifyTransferGetByIdErrorMessage);
@@ -101,7 +110,8 @@ namespace Business.Services.Models
                 throw new UnauthorizedOperationException(Constants.ModifyTransferErrorMessage);
             }
 
-            if (!await this.accountRepository.HasEnoughBalanceAsync(transfer.AccountId, transfer.Amount))
+
+            if (!await Security.HasEnoughBalanceAsync(transfer.Account, transfer.Amount))
             {
                 throw new UnauthorizedOperationException(Constants.ModifyAccountBalancetErrorMessage);
             }
@@ -123,7 +133,7 @@ namespace Business.Services.Models
         {
             Transfer transferToDelete = await transferRepository.GetByIdAsync(id);
 
-            if (!await Common.IsUserAuthorizedAsync(transferToDelete, user))
+            if (!await Security.IsUserAuthorizedAsync(transferToGet, user))
             {
                 throw new UnauthorizedOperationException(Constants.ModifyTransferErrorMessage);
             }
@@ -169,7 +179,7 @@ namespace Business.Services.Models
 
             transferToUpdate = await TransfersMapper.MapUpdateDtoToTransferAsync(transferDto, user, card, currency);
 
-            if (!await Common.IsUserAuthorizedAsync(transferToUpdate, user))
+            if (!await Security.IsUserAuthorizedAsync(transferToGet, user))
             {
                 throw new UnauthorizedOperationException(Constants.ModifyTransferErrorMessage);
             }
@@ -204,7 +214,7 @@ namespace Business.Services.Models
         {
             Transfer transferToGet = await transferRepository.GetByIdAsync(transferId);
 
-            if (!(await Common.IsUserAuthorizedAsync(transferToGet, user)))
+            if (!(await Security.IsUserAuthorizedAsync(transferToGet, user)))
             {
                 throw new UnauthorizedOperationException(Constants.ModifyTransferErrorMessage);
             }
@@ -215,14 +225,14 @@ namespace Business.Services.Models
 
             if (transferToExecute.TransferType == TransferDirection.Deposit)
             {
-                this.accountRepository.IncreaseBalanceAsync(transferToExecute.AccountId, transferToExecute.Amount);
+                this.accountService.IncreaseBalanceAsync(transferToExecute.AccountId, transferToExecute.Amount, user);
 
                 this.cardRepository.DecreaseBalanceAsync(transferToExecute.CardId, transferToExecute.Amount);
             }
 
             if (transferToExecute.TransferType == TransferDirection.Withdrawal)
             {
-                this.accountRepository.DecreaseBalanceAsync(transferToExecute.AccountId, transferToExecute.Amount);
+                this.accountService.DecreaseBalanceAsync(transferToExecute.AccountId, transferToExecute.Amount, user);
 
                 this.cardRepository.IncreaseBalanceAsync(transferToExecute.CardId, transferToExecute.Amount);
             }

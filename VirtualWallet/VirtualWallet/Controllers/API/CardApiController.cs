@@ -16,18 +16,17 @@ namespace VirtualWallet.Controllers.API
     public class CardApiController : ControllerBase
     {
         private readonly IMapper mapper;
-        private readonly IAuthManager authManager;
         private readonly ICardService cardService;
+        private readonly IUserService userService;
 
         public CardApiController(
             IMapper mapper,
-            IAuthManager authManager,
-            ICardService cardService)
+            ICardService cardService,
+            IUserService userService)
         {
             this.mapper = mapper;
-            this.authManager = authManager;
             this.cardService = cardService;
-
+            this.userService = userService;
         }
 
         [HttpGet, Authorize]
@@ -54,7 +53,8 @@ namespace VirtualWallet.Controllers.API
         {
             try
             {
-                Card card = await cardService.GetByIdAsync(id);
+                User loggedUser = await FindLoggedUserAsync();
+                Card card = await cardService.GetByIdAsync(id, loggedUser);
                 GetCardDto cardDto = mapper.Map<GetCardDto>(card);
 
                 return StatusCode(StatusCodes.Status200OK, cardDto);
@@ -82,15 +82,14 @@ namespace VirtualWallet.Controllers.API
             }
         }
 
-        [HttpPut, Authorize]
-        public async Task<IActionResult> UpdateCardAsync(int id, [FromBody] UpdateCardDto updateCardDto)
+        [HttpPut("{id}"), Authorize]
+        public async Task<IActionResult> UpdateCard(int id, [FromBody] UpdateCardDto updateCardDto)
         {
             try
             {
                 User loggedUser = await FindLoggedUserAsync();
                 var loggedUsersAccountId = await FindLoggedUsersAccountAsync();
-                Card updateCard = mapper.Map<Card>(updateCardDto);
-                Card updatedCard = await cardService.UpdateAsync(id, loggedUser, updateCard);
+                GetUpdatedCardDto updatedCard = await this.cardService.UpdateAsync(id, loggedUser, updateCardDto);
 
                 return StatusCode(StatusCodes.Status200OK, updatedCard);
             }
@@ -126,7 +125,7 @@ namespace VirtualWallet.Controllers.API
         private async Task<User> FindLoggedUserAsync()
         {
             var loggedUsersUsername = User.Claims.FirstOrDefault(claim => claim.Type == "Username").Value;
-            var loggedUser = await authManager.TryGetUserByUsernameAsync(loggedUsersUsername);
+            var loggedUser = await this.userService.GetByUsernameAsync(loggedUsersUsername);
             return loggedUser;
         }
         private async Task<int> FindLoggedUsersAccountAsync()

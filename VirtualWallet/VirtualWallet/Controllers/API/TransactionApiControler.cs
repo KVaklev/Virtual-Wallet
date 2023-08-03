@@ -15,16 +15,16 @@ namespace VirtualWallet.Controllers.API
     [Route("api/transactions")]
     public class TransactionApiControler : ControllerBase
     { 
-        private readonly IAuthManager authManager;
         private readonly ITransactionService transactionService;
+        private readonly IUserService userService;
         
         public TransactionApiControler(
-            IAuthManager authManager,
-            ITransactionService transactionService
+            ITransactionService transactionService,
+            IUserService userService
             )
         {
-            this.authManager = authManager;
             this.transactionService = transactionService; 
+            this.userService = userService;
         }
 
         [HttpPost, Authorize]
@@ -137,7 +137,7 @@ namespace VirtualWallet.Controllers.API
             private async Task<User> FindLoggedUserAsync()
             {
                 var loggedUsersUsername = User.Claims.FirstOrDefault(claim => claim.Type == "Username").Value;
-                var loggedUser = await authManager.TryGetUserByUsernameAsync(loggedUsersUsername);
+                var loggedUser = await this.userService.GetByUsernameAsync(loggedUsersUsername);
                 return loggedUser;
             }
    }

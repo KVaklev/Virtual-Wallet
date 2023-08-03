@@ -14,19 +14,16 @@ namespace Business.Services.Models
     public class UserService : IUserService
     {
         private readonly IUserRepository userRepository;
-        private readonly IAccountRepository accountRepository;
         private readonly IAccountService accountService;
         private readonly IMapper mapper;
 
         public UserService(
             IUserRepository userRepository,
-            IAccountRepository accountRepository,
             IAccountService accountService,
             IMapper mapper
             )
         {
             this.userRepository = userRepository;
-            this.accountRepository = accountRepository;
             this.accountService = accountService;
             this.mapper = mapper;
         }
@@ -79,7 +76,7 @@ namespace Business.Services.Models
             }
             
             User userToCreate = await UsersMapper.MapCreateDtoToUserAsync(createUserDto);
-            userToCreate = await Common.ComputePasswordHashAsync<CreateUserDto>(createUserDto, userToCreate);
+            userToCreate = await Security.ComputePasswordHashAsync<CreateUserDto>(createUserDto, userToCreate);
             userToCreate = await this.userRepository.CreateAsync(userToCreate);
             await this.accountService.CreateAsync(createUserDto.CurrencyCode, userToCreate);
  
@@ -92,7 +89,7 @@ namespace Business.Services.Models
         {
             User userToUpdate = await this.userRepository.GetByIdAsync(id);
            
-            if (!await Common.IsAuthorizedAsync(userToUpdate, loggedUser))
+            if (!await Security.IsAuthorizedAsync(userToUpdate, loggedUser))
             {
                 throw new UnauthorizedOperationException(Constants.ModifyUserErrorMessage);
             }
@@ -114,7 +111,7 @@ namespace Business.Services.Models
             }
 
             userToUpdate = await UsersMapper.MapUpdateDtoToUserAsync(userToUpdate, updateUserDto);
-            userToUpdate = await Common.ComputePasswordHashAsync<UpdateUserDto>(updateUserDto, userToUpdate);
+            userToUpdate = await Security.ComputePasswordHashAsync<UpdateUserDto>(updateUserDto, userToUpdate);
             userToUpdate = await this.userRepository.UpdateAsync(userToUpdate);
 
             GetUpdatedUserDto updatedUser = mapper.Map<GetUpdatedUserDto>(userToUpdate);
@@ -124,13 +121,13 @@ namespace Business.Services.Models
 
         public async Task<bool> DeleteAsync(int id, User loggedUser)
         {
-            if (!await Common.IsAdminAsync(loggedUser))
+            if (!await Security.IsAdminAsync(loggedUser))
             {
                 throw new UnauthorizedOperationException(Constants.ModifyUserErrorMessage);
             } 
             
-            User userToDelete = await this.userRepository.GetByIdAsync(id);
-            var accountToDelete = await this.accountRepository.GetByIdAsync((int)userToDelete.AccountId);
+            User userToDelete = await this.GetByIdAsync(id);
+            var accountToDelete = await this.accountService.GetByIdAsync((int)userToDelete.AccountId, loggedUser);
             await this.accountService.DeleteAsync(accountToDelete.Id, loggedUser);
     
             return await this.userRepository.DeleteAsync(id);
@@ -138,7 +135,7 @@ namespace Business.Services.Models
 
         public async Task<User> PromoteAsync(int id, User loggedUser)
         {
-            if (!await Common.IsAdminAsync(loggedUser))
+            if (!await Security.IsAdminAsync(loggedUser))
             {
                 throw new UnauthorizedOperationException(Constants.ModifyUserErrorMessage);
             }
@@ -155,7 +152,7 @@ namespace Business.Services.Models
 
         public async Task<User> BlockUserAsync(int id, User loggedUser)
         {
-            if (!await Common.IsAdminAsync(loggedUser))
+            if (!await Security.IsAdminAsync(loggedUser))
             {
                 throw new UnauthorizedOperationException(Constants.ModifyUserErrorMessage);
             }
@@ -172,7 +169,7 @@ namespace Business.Services.Models
 
         public async Task<User> UnblockUserAsync(int id, User loggedUser)
         {
-            if (!await Common.IsAdminAsync(loggedUser))
+            if (!await Security.IsAdminAsync(loggedUser))
             {
                 throw new UnauthorizedOperationException(Constants.ModifyUserErrorMessage);
             }
@@ -185,6 +182,15 @@ namespace Business.Services.Models
             }
 
             return await this.userRepository.UnblockUserAsync(id);
+        }
+
+        public async Task<User> LoginAsync(string username, string password)
+        {
+            await Security.CheckForNullEntryAsync(username, password);
+            User loggedUser = await this.GetByUsernameAsync(username);
+            var authenticatedUser = await Security.AuthenticateAsync(loggedUser, username, password);
+
+            return authenticatedUser;
         }
 
         private async Task<bool> EmailExistsAsync(string email)

@@ -26,7 +26,7 @@ namespace Business.Services.Models
         public async Task<Response<CreateCurrencyDto>> CreateAsync(CreateCurrencyDto currencyDto, User loggedUser)
         {
             var result = new Response<CreateCurrencyDto>();
-            if (!await Common.IsAdminAsync(loggedUser))
+            if (!await Security.IsAdminAsync(loggedUser))
             {
                 result.IsSuccessful = false;
                 result.Message = Constants.ModifyUserErrorMessage;
@@ -64,6 +64,11 @@ namespace Business.Services.Models
             return currenciesDto;
         }
 
+        public Task<Currency> GetByCurrencyCodeAsync(string currencyCode)
+        {
+            return this.currencyRepository.GetByCurrencyCodeAsync(currencyCode);
+        }
+
         public async Task<CreateCurrencyDto> GetByIdAsync(int id)
         {
             var currency= await this.currencyRepository.GetByIdAsync(id);
@@ -71,10 +76,15 @@ namespace Business.Services.Models
             return currencyDto;
         }
 
+        public async Task<Currency> GetCurrencyByIdAsync(int id)
+        {
+            return await this.currencyRepository.GetByIdAsync(id);
+        }
+
         public async Task<Response<CreateCurrencyDto>> UpdateAsync(int id, CreateCurrencyDto currencyDto, User loggedUser)
         {
             var result = new Response<CreateCurrencyDto>();
-            if (!await Common.IsAdminAsync(loggedUser))
+            if (!await Security.IsAdminAsync(loggedUser))
             {
                 result.IsSuccessful = false;
                 result.Message = Constants.ModifyUserErrorMessage;
