@@ -38,10 +38,10 @@ namespace VirtualWallet.Controllers.API
             try
             {
                 var loggedUser = await FindLoggedUserAsync();
-                var transfers = await this.transferService.FilterByAsync(filterParameters, loggedUser);
-                List<GetTransferDto> transferDtos = transfers.Select(transfer => mapper.Map<GetTransferDto>(transfer)).ToList();
-
-                return StatusCode(StatusCodes.Status200OK, transferDtos);
+                
+                var result = await this.transferService.FilterByAsync(filterParameters, loggedUser);
+                
+                return StatusCode(StatusCodes.Status200OK, result.Data);
             }
             catch (EntityNotFoundException e)
             {

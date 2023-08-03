@@ -60,6 +60,12 @@ namespace DataAccess.Repositories.Models
             return transferToDelete.IsCancelled;
         }
 
+        public async Task<bool> SaveChangesAsync()
+        {
+            await context.SaveChangesAsync();
+            return true;
+        }
+
         public async Task<Transfer> GetByIdAsync(int id)
         {
             Transfer transfer = await context.Transfers
