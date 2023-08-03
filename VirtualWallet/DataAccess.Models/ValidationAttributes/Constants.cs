@@ -1,4 +1,6 @@
-﻿namespace DataAccess.Models.ValidationAttributes
+﻿using System.Globalization;
+
+namespace DataAccess.Models.ValidationAttributes
 {
     public static class Constants
     {
@@ -38,7 +40,9 @@
         ////Message for tranfer
         public const string EmptyFieldTransferTypeErrorMessage = 
             "The field is required. Specify 'Deposit' or 'Withdrawal' tranfer ";
-              
+        public const string TransferIsConfirmedErrorMessage = "Transfer is confirmed! You are not authorized to modify it";
+        public const string TransferDirectionInputError = "Transfer direction should be either Deposit or Withdrawal.";
+
 
         //Common
         public const string NoFoundErrorMessage = "No matches found.";

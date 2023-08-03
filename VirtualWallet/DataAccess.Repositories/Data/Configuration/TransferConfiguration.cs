@@ -20,6 +20,8 @@ namespace DataAccess.Repositories.Data.Configuration
                 .WithMany()
                 .HasForeignKey(t => t.CurrencyId)
                 .OnDelete(DeleteBehavior.NoAction);
+
+            builder.Property(t => t.Amount).HasColumnType("decimal(18, 2)");
         }
     }
 }

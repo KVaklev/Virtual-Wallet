@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Business.DTOs;
 using Business.DTOs.Requests;
 using Business.DTOs.Responses;
 using Business.Exceptions;
@@ -57,12 +58,32 @@ namespace Business.Services.Models
                 throw new UnauthorizedOperationException(Constants.ModifyTransferGetByIdErrorMessage);
             }
 
-            var transfer = await transferRepository.GetByIdAsync(id);
-
-            var transferDto = this.mapper.Map<GetTransferDto>(transfer);
+            var transferDto = this.mapper.Map<GetTransferDto>(transferToGet);
 
             return transferDto;
         }
+
+        //public async Task<Transfer> CreateAsync(CreateTransferDto transferDto, User user)
+        //{
+        //    var card = this.cardRepository.GetByAccountId((int)user.AccountId).FirstOrDefault(x => x.CardNumber == transferDto.CardNumber);
+
+        //    var transfer = await MapDtoToTransferAsync(transferDto, user, card);
+
+        //    if (user.IsBlocked)
+        //    {
+        //        throw new UnauthorizedOperationException(Constants.ModifyTransferErrorMessage);
+        //    }
+
+
+        //    if (!await this.accountRepository.HasEnoughBalanceAsync(transfer.AccountId, transfer.Amount))
+        //    {
+        //        throw new UnauthorizedOperationException(Constants.ModifyAccountBalancetErrorMessage);
+        //    }
+
+        //    var createdTransfer = await this.transferRepository.CreateAsync(transfer);
+
+        //    return createdTransfer;
+        //}
 
         public async Task<Transfer> CreateAsync(CreateTransferDto transferDto, User user)
         {
@@ -75,55 +96,90 @@ namespace Business.Services.Models
                 throw new UnauthorizedOperationException(Constants.ModifyTransferErrorMessage);
             }
 
-
             if (!await this.accountRepository.HasEnoughBalanceAsync(transfer.AccountId, transfer.Amount))
             {
                 throw new UnauthorizedOperationException(Constants.ModifyAccountBalancetErrorMessage);
             }
 
-            var createdTransfer = await this.transferRepository.CreateAsync(transfer);
+            // Set additional properties before creating the entity
+            transfer.DateCreated = DateTime.Now;
+            transfer.IsConfirmed = false;
+            transfer.IsCancelled = false;
 
-            return createdTransfer;
+            // Create the entity in the repository
+            await this.transferRepository.CreateAsync(transfer);
+
+            // Return the created transfer after it has been saved to the database
+            return transfer;
         }
+
 
         public async Task<bool> DeleteAsync(int id, User user)
         {
-            Transfer transferToGet = await transferRepository.GetByIdAsync(id);
+            Transfer transferToDelete = await transferRepository.GetByIdAsync(id);
 
-            if (!await Common.IsUserAuthorizedAsync(transferToGet, user))
+            if (!await Common.IsUserAuthorizedAsync(transferToDelete, user))
             {
                 throw new UnauthorizedOperationException(Constants.ModifyTransferErrorMessage);
             }
 
-            var transfer = await this.transferRepository.GetByIdAsync(id);
-            if (transfer.IsCancelled || transfer.IsConfirmed)
+
+            if (transferToDelete.IsCancelled || transferToDelete.IsConfirmed)
             {
                 throw new InvalidOperationException(Constants.ModifyTransferUpdateDeleteErrorErrorMessage);
             }
             return await this.transferRepository.DeleteAsync(id);
         }
 
+        
+        //public async Task<Transfer> UpdateAsync(int id, CreateTransferDto transferDto, User user)
+        //{
+        //    var card = this.cardRepository.GetByAccountId((int)user.AccountId).FirstOrDefault(x => x.CardNumber == transferDto.CardNumber);
+
+        //    Transfer transferToUpdate = await transferRepository.GetByIdAsync(id);
+
+        //    if (!await Common.IsUserAuthorizedAsync(transferToUpdate, user))
+        //    {
+        //        throw new UnauthorizedOperationException(Constants.ModifyTransferErrorMessage);
+        //    }
+
+        //    if (transferToUpdate.IsConfirmed || transferToUpdate.IsCancelled)
+        //    {
+        //        throw new UnauthorizedOperationException(Constants.ModifyTransferUpdateDeleteErrorErrorMessage);
+        //    }
+
+        //    var updatedTransfer = await MapDtoToTransferAsync(transferDto, user, card);
+
+        //    return await this.transferRepository.UpdateAsync(transferToUpdate.Id, updatedTransfer);
+        //}
+
         public async Task<Transfer> UpdateAsync(int id, CreateTransferDto transferDto, User user)
         {
             var card = this.cardRepository.GetByAccountId((int)user.AccountId).FirstOrDefault(x => x.CardNumber == transferDto.CardNumber);
 
-            Transfer transferToGet = await transferRepository.GetByIdAsync(id);
+            Transfer transferToUpdate = await transferRepository.GetByIdAsync(id);
 
-            if (!await Common.IsUserAuthorizedAsync(transferToGet, user))
+            if (!await Common.IsUserAuthorizedAsync(transferToUpdate, user))
             {
                 throw new UnauthorizedOperationException(Constants.ModifyTransferErrorMessage);
             }
-
-            var transferToUpdate = await this.transferRepository.GetByIdAsync(id);
 
             if (transferToUpdate.IsConfirmed || transferToUpdate.IsCancelled)
             {
                 throw new UnauthorizedOperationException(Constants.ModifyTransferUpdateDeleteErrorErrorMessage);
             }
 
-            var updatedTransfer = await MapDtoToTransferAsync(transferDto, user, card);
+            
+            Transfer updatedTransfer = await MapDtoToTransferAsync(transferDto, user, card);
 
-            return await this.transferRepository.UpdateAsync(transferToUpdate.Id, updatedTransfer);
+           
+            transferToUpdate.Amount = updatedTransfer.Amount;
+            transferToUpdate.CardId = updatedTransfer.CardId;
+            transferToUpdate.CurrencyId = updatedTransfer.CurrencyId;
+
+            await context.SaveChangesAsync();
+
+            return transferToUpdate;
         }
 
         public async Task<PaginatedList<Transfer>> FilterByAsync(TransferQueryParameters transferQueryParameters, User loggedUser)
@@ -187,7 +243,7 @@ namespace Business.Services.Models
             {
                 return false;
             }
-        }        
+        }
 
         public async Task<Transfer> MapDtoToTransferAsync(CreateTransferDto transferDto, User user, Card card)
         {

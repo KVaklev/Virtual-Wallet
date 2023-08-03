@@ -19,6 +19,9 @@ namespace DataAccess.Repositories.Data.Configuration
                 .WithMany(u => u.TransactionsRecipient)
                 .HasForeignKey(c => c.AccountRecepientId)
                 .OnDelete(DeleteBehavior.NoAction);
+
+            builder.Property(t => t.Amount).HasColumnType("decimal(18, 2)");
+
         }
     }
 }
