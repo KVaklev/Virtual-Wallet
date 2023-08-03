@@ -57,6 +57,5 @@ namespace Business.Services.Models
 
             return emailMessage;
         }
-
     }
 }

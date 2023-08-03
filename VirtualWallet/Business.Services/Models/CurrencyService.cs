@@ -25,7 +25,7 @@ namespace Business.Services.Models
         public async Task<Response<CreateCurrencyDto>> CreateAsync(CreateCurrencyDto currencyDto, User loggedUser)
         {
             var result = new Response<CreateCurrencyDto>();
-            if (!await Common.IsAdminAsync(loggedUser))
+            if (!await Security.IsAdminAsync(loggedUser))
             {
                 result.IsSuccessful = false;
                 result.Message = Constants.ModifyUserErrorMessage;
@@ -73,7 +73,7 @@ namespace Business.Services.Models
         public async Task<Response<CreateCurrencyDto>> UpdateAsync(int id, CreateCurrencyDto currencyDto, User loggedUser)
         {
             var result = new Response<CreateCurrencyDto>();
-            if (!await Common.IsAdminAsync(loggedUser))
+            if (!await Security.IsAdminAsync(loggedUser))
             {
                 result.IsSuccessful = false;
                 result.Message = Constants.ModifyUserErrorMessage;

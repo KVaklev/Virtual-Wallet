@@ -50,7 +50,7 @@ namespace Business.Services.Models
             {
                 throw new DuplicateEntityException($"Card with card number '{card.CardNumber}' already exists.");
             }
-            if (!await Common.IsAuthorizedAsync(cardToUpdate, loggedUser))
+            if (!await Security.IsAuthorizedAsync(cardToUpdate, loggedUser))
             {
                 throw new UnauthorizedOperationException(Constants.ModifyCardErrorMessage);
             }
@@ -61,7 +61,7 @@ namespace Business.Services.Models
         }
         public async Task<bool> DeleteAsync(int id, User loggedUser)
         {
-            if (!await Common.IsAdminAsync(loggedUser))
+            if (!await Security.IsAdminAsync(loggedUser))
             {
                 throw new UnauthorizedOperationException(Constants.ModifyUserErrorMessage);
             }

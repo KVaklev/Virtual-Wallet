@@ -107,14 +107,9 @@ namespace VirtualWallet.Controllers.API
             try
             {
                 User loggedUser = await FindLoggedUserAsync();
-                var result = await userService.DeleteAsync(id, loggedUser);
+                await userService.DeleteAsync(id, loggedUser);
 
-                if (result)
-                {
-                    return StatusCode(StatusCodes.Status200OK, "User was successfully deleted.");
-
-                }
-                return BadRequest();
+                return StatusCode(StatusCodes.Status200OK, "User was successfully deleted.");
             }
             catch (EntityNotFoundException e)
             {

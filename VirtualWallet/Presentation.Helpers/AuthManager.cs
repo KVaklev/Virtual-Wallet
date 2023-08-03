@@ -25,52 +25,53 @@ namespace Presentation.Helpers
             }
         }
 
-        public void CheckForNullEntry(string username, string password)
-        {
-            if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
-            {
-                throw new ArgumentException("Username and/or Password not specified");
-            }
-        }
+        //public Task CheckForNullEntryAsync(string username, string password)
+        //{
+        //    if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
+        //    {
+        //        throw new ArgumentException("Username and/or Password not specified");
+        //    }
+        //    return Task.FromResult(true);
+        //}
 
-        public async Task<User> AuthenticateAsync(User loggedUser, string username, string password)
-        {
-            if (!await IsPasswordHashMatchedAsync(password, loggedUser.Password, loggedUser.PasswordKey))
-            {
-                throw new UnauthorizedOperationException("Nice try! Invalid credentials!");
-            }
+        //public async Task<User> AuthenticateAsync(User loggedUser, string username, string password)
+        //{
+        //    if (!await IsPasswordHashMatchedAsync(password, loggedUser.Password, loggedUser.PasswordKey))
+        //    {
+        //        throw new UnauthorizedOperationException("Nice try! Invalid credentials!");
+        //    }
 
-            if (!await IsEmailConfirmedAsync(loggedUser))
-            {
-                throw new UnauthorizedOperationException("Your email is not confirmed, please check your inbox folder and follow the link!");
-            }
+        //    if (!await IsEmailConfirmedAsync(loggedUser))
+        //    {
+        //        throw new UnauthorizedOperationException("Your email is not confirmed, please check your inbox folder and follow the link!");
+        //    }
 
-            return loggedUser;
-        }
+        //    return loggedUser;
+        //}
 
-        private async Task<bool> IsPasswordHashMatchedAsync(string passwordFilled, byte[] password, byte[]? passwordKey)
-        {
-            using (var hmac = new HMACSHA512(passwordKey))
-            {
-                var passwordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(passwordFilled));
-                for (var i = 0; i < passwordHash.Length; i++)
-                {
-                    if (passwordHash[i] != password[i])
-                    {
-                        return await Task.FromResult(false);
-                    }
-                }
-                return await Task.FromResult(true);
-            }
-        }
-        private async Task<bool> IsEmailConfirmedAsync(User loggedUser)
-        {
-            if (!loggedUser.IsVerified)
-            {
-                return await Task.FromResult(false);
-            }
-            return await Task.FromResult(true);
-        }
+        //private async Task<bool> IsPasswordHashMatchedAsync(string passwordFilled, byte[] password, byte[]? passwordKey)
+        //{
+        //    using (var hmac = new HMACSHA512(passwordKey))
+        //    {
+        //        var passwordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(passwordFilled));
+        //        for (var i = 0; i < passwordHash.Length; i++)
+        //        {
+        //            if (passwordHash[i] != password[i])
+        //            {
+        //                return await Task.FromResult(false);
+        //            }
+        //        }
+        //        return await Task.FromResult(true);
+        //    }
+        //}
+        //private async Task<bool> IsEmailConfirmedAsync(User loggedUser)
+        //{
+        //    if (!loggedUser.IsVerified)
+        //    {
+        //        return await Task.FromResult(false);
+        //    }
+        //    return await Task.FromResult(true);
+        //}
 
 
         //public async Task<User> TryGetUserAsync(string credentials)

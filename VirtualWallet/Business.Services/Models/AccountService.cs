@@ -5,6 +5,10 @@ using Business.Services.Contracts;
 using Business.Services.Helpers;
 using DataAccess.Models.Models;
 using DataAccess.Repositories.Contracts;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 
 namespace Business.Services.Models
 {
@@ -47,11 +51,11 @@ namespace Business.Services.Models
             return accountToCreate;
         }
 
-        public async Task <bool> DeleteAsync(int id, User loggedUser)
+        public async Task<bool> DeleteAsync(int id, User loggedUser)
         { 
             var accountToDelete = await this.accountRepository.GetByIdAsync(id);
 
-            if (!await Common.IsAdminAsync(loggedUser))
+            if (!await Security.IsAdminAsync(loggedUser))
             {
                 throw new UnauthorizedOperationException(Constants.ModifyUserErrorMessage);
             }
@@ -66,67 +70,81 @@ namespace Business.Services.Models
             return await this.accountRepository.DeleteAsync(id);
         }
 
-        public async Task <Account> GetByIdAsync(int id, User user)
+        public async Task<Account> GetByIdAsync(int id, User user)
         {
-            if (!(await IsUserAuthorized(id, user)))
+            if (!await Security.IsUserAuthorized(id, user))
             {
                 throw new UnauthorizedOperationException(Constants.ModifyAccountErrorMessage);
             }
             return await this.accountRepository.GetByIdAsync(id);
         }
 
-        public async Task <Account> GetByUsernameAsync(int id, User user)
+        public async Task<Account> GetByUsernameAsync(int id, User user)
         {
-            if (!(await IsUserAuthorized(id, user)))
+            if (!await Security.IsUserAuthorized(id, user))
             {
                 throw new UnauthorizedOperationException(Constants.ModifyAccountErrorMessage);
             }
             return await accountRepository.GetByUsernameAsync(user.Username);
         }
 
-        public async Task <bool> AddCardAsync(int id, Card card, User user)
+        public async Task<bool> AddCardAsync(int id, Card card, User user)
         {
-            if (!(await IsUserAuthorized(id, user)))
+            if (!await Security.IsUserAuthorized(id, user))
             {
                 throw new UnauthorizedOperationException(Constants.ModifyAccountCardErrorMessage);
             }
             return await this.accountRepository.AddCardAsync(id, card);
         }
 
-        public async Task <bool> RemoveCardAsync(int id, Card card, User user)
+        public async Task<bool> RemoveCardAsync(int id, Card card, User user)
         {
-            if (!(await IsUserAuthorized(id, user)))
+            if (!await Security.IsUserAuthorized(id, user))
             {
                 throw new UnauthorizedOperationException(Constants.ModifyAccountCardErrorMessage);
             }
             return await this.accountRepository.RemoveCardAsync(id, card);
         }
 
-        public async Task <bool> IsUserAuthorized(int id, User user)
+        public async Task<string> CreateApiTokenAsync(User loggedUser)
         {
-            bool isUserAccountOwnerOrAdminId = false;
-
-            Account accountToGet = await this.accountRepository.GetByIdAsync(id);
-
-            if (accountToGet.UserId == user.Id || user.IsAdmin)
-            {
-                isUserAccountOwnerOrAdminId = true;
-            }
-
-            return isUserAccountOwnerOrAdminId;
+            var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("This is my secret testing key"));
+            var signinCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256);
+            var jwtSecurityToken = new JwtSecurityToken(
+                    issuer: "VirtualWallet",
+                    audience: "Where is that audience",
+                    claims: new[] {
+                new Claim("LoggedUserId", loggedUser.Id.ToString()),
+                new Claim("Username", loggedUser.Username),
+                new Claim("IsAdmin", loggedUser.IsAdmin.ToString()),
+                new Claim("UsersAccountId", loggedUser.Account.Id.ToString()),//null check
+                new Claim(JwtRegisteredClaimNames.Email, loggedUser.Email),
+                new Claim(JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString())
+        },
+            expires: DateTime.Now.AddMinutes(30),
+                    signingCredentials: signinCredentials
+                );
+            string token = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
+         
+            return await Task.FromResult(token);
         }
-
         public async Task<string> GenerateTokenAsync(int id)
         {
             var user = await this.userRepository.GetByIdAsync(id);
             var token = (DateTime.Now.ToString() + user.Username).ComputeSha256Hash();
             return token;
         }
-
         public async Task<bool> ConfirmRegistrationAsync(int id, string token)
         {
             return await this.accountRepository.ConfirmRegistrationAsync(id, token);
         }
+        public async Task<User> LoginAsync(string username, string password)
+        {
+            await Security.CheckForNullEntryAsync(username, password);
+            var loggedUser = await this.userRepository.GetByUsernameAsync(username);
+            var authenticatedUser = await Security.AuthenticateAsync(loggedUser, username, password);
 
+            return authenticatedUser;
+        }
     }
 }

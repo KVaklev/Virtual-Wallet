@@ -18,24 +18,24 @@
         public const string ModifyCardErrorMessage = "Only an admin or owner of the card can update information.";
 
         //Constant messages for transactions 
-       
-        public const string ModifyTransactionExecuteMessage = "The transacion is successful execute.";
-        public const string ModifyTransactionDeleteMessage = "The transacion is successful delete.";
-        public const string ModifyTransactionNotExecuteErrorMessage = "You can't update or delete a completed transaction!";
+
+        public const string ModifyTransactionExecuteMessage = "The transaction has been successfully executed.";
+        public const string ModifyTransactionDeleteMessage = "The transacion has been successfully deleted.";
+        public const string ModifyTransactionNotExecuteErrorMessage = "You cannot update or delete a completed transaction!";
         public const string ModifyTransactionBlockedErrorMessage = "You are not allowed to make transactions while being blocked!";
         
 
         //Constant messages for transfers
 
         public const string ModifyTransferErrorMessage = "You are not authorized to create, delete or modify the transfer.";
-        public const string ModifyTransferNoDataErrorMessage = "There are no results related to these parameters";
+        public const string ModifyTransferNoDataErrorMessage = "There are no results related to these parameters.";
         public const string ModifyTransferGetByIdErrorMessage = "You are not authorized for the specified action.";
         public const string ModifyTransferUpdateDeleteErrorErrorMessage = "The transfer is either processed or cancelled so you cannot update or delete it.";
 
         //Constant messages for curencies
 
-        public const string ModifyCurrencyDeleteMessage = "The currency is successful delete.";
-        public const string ModifyCurrencyNotFoundErrorMessage = "The currency does not exist";
+        public const string ModifyCurrencyDeleteMessage = "The currency has been successfully deleted.";
+        public const string ModifyCurrencyNotFoundErrorMessage = "This currency does not exist.";
 
         //Constant messages for Authorized
 
