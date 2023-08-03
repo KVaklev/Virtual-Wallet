@@ -14,7 +14,7 @@ namespace DataAccess.Repositories.Contracts
 
         Task<Transfer> CreateAsync(Transfer transfer);
 
-        Task<Transfer> UpdateAsync(int id, Transfer transfer);
+        Task<Transfer> UpdateAsync(Transfer transfer);
 
         Task<bool> DeleteAsync(int id);
 
