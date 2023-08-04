@@ -1,9 +1,11 @@
 ﻿using AutoMapper;
+using Business.DTOs;
 using Business.DTOs.Requests;
 using Business.DTOs.Responses;
 using Business.Exceptions;
 using Business.QueryParameters;
 using Business.Services.Contracts;
+using Business.Services.Helpers;
 using Business.Services.Models;
 using DataAccess.Models.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -34,7 +36,7 @@ namespace VirtualWallet.Controllers.API
         }
 
         [HttpPost, Authorize]
-        public async Task<IActionResult> CreateAsync([FromBody] CreateTransferDto createTransferDto)
+        public async Response<Task<IActionResult>> CreateAsync([FromBody] CreateTransferDto createTransferDto)
 
         {
             var loggedUser = await FindLoggedUserAsync();
@@ -43,51 +45,57 @@ namespace VirtualWallet.Controllers.API
 
             if (!result.IsSuccessful)
             {
-                return BadRequest(result.Message);
+                //return BadRequest(result.Message);
+                return new Response<IActionResult>
+                {
+                    IsSuccessful = false,
+                    Message = result.Message
+
+                };
             }
 
-            return StatusCode(StatusCodes.Status201Created, result.Data);
-            //try
-            //{
-            //    var loggedUser = await FindLoggedUserAsync();
-            //    var newTransfer = await this.transferService.CreateAsync(createTransferDto, loggedUser);
-            //    var newTransferDto = this.mapper.Map<GetTransferDto>(newTransfer);
+            return new Response<IActionResult>
+            {
+                IsSuccessful = true,
+                Data = StatusCode(StatusCodes.Status201Created, result.Data)
+            };
 
-            //    return StatusCode(StatusCodes.Status201Created, newTransferDto);
 
-            //}
-
-            //catch (EntityNotFoundException e)
-            //{
-            //    return StatusCode(StatusCodes.Status404NotFound, e.Message);
-            //}
-
-            //catch (UnauthorizedOperationException e)
-            //{
-            //    return StatusCode(StatusCodes.Status401Unauthorized, e.Message);
-            //}
         }
-        [HttpGet, Authorize] 
-        public async Task<IActionResult> GetTransferAsync([FromQuery] TransferQueryParameters filterParameters)
-        {
-            try
-            {
-                var loggedUser = await FindLoggedUserAsync();
-                
-                var result = await this.transferService.FilterByAsync(filterParameters, loggedUser);
-                
-                return StatusCode(StatusCodes.Status200OK, result.Data);
-            }
-            catch (EntityNotFoundException e)
-            {
-                return StatusCode(StatusCodes.Status404NotFound, e.Message);
-            }
+        //[HttpGet, Authorize]
+        //public async Response<Task<IActionResult>> GetTransferAsync([FromQuery] TransferQueryParameters filterParameters)
+        //{
+        //    var loggedUser = await FindLoggedUserAsync();
+
+        //    var result = await this.transferService.FilterByAsync(filterParameters, loggedUser);
+
+        //    if (!result.IsSuccessful)
+        //    {
+               
+        //        result.IsSuccessful = false;
+        //        result.Message = Constants.ModifyTransferErrorMessage;
+        //        return result;
+
             
-        }
+        //    }
+        //    ////try
+        //    ////{
+        //    ////    var loggedUser = await FindLoggedUserAsync();
+
+        //    ////    var result = await this.transferService.FilterByAsync(filterParameters, loggedUser);
+
+        //    ////    return StatusCode(StatusCodes.Status200OK, result.Data);
+        //    ////}
+        //    //catch (EntityNotFoundException e)
+        //    //{
+        //    //    return StatusCode(StatusCodes.Status404NotFound, e.Message);
+        //    //}
+
+        //}
 
         [HttpGet("{id}"), Authorize]
 
-        public async Task<IActionResult>GetTransferByIdAsync(int id)
+        public async Task<IActionResult> GetTransferByIdAsync(int id)
         {
             try
             {
@@ -106,7 +114,7 @@ namespace VirtualWallet.Controllers.API
             }
         }
 
-        
+
 
 
         [HttpPut("{id}"), Authorize]
@@ -117,7 +125,7 @@ namespace VirtualWallet.Controllers.API
                 var loggedUser = await FindLoggedUserAsync();
 
                 var updateTransfer = await this.transferService.UpdateAsync(id, updateTransferDto, loggedUser);
-                
+
                 var updatedTransferDto = this.mapper.Map<UpdateTransferDto>(updateTransfer);
                 return StatusCode(StatusCodes.Status200OK, updateTransferDto);
             }
@@ -159,7 +167,7 @@ namespace VirtualWallet.Controllers.API
             try
             {
                 var loggedUser = await FindLoggedUserAsync();
-                var isConfirmed= await this.transferService.ExecuteAsync(id, loggedUser);
+                var isConfirmed = await this.transferService.ExecuteAsync(id, loggedUser);
                 return StatusCode(StatusCodes.Status200OK, isConfirmed);
             }
             catch (EntityNotFoundException e)
@@ -171,7 +179,7 @@ namespace VirtualWallet.Controllers.API
                 return StatusCode(StatusCodes.Status401Unauthorized, e.Message);
             }
         }
-        private async Task <User> FindLoggedUserAsync()
+        private async Task<User> FindLoggedUserAsync()
         {
             var loggedUsersUsername = User.Claims.FirstOrDefault(claim => claim.Type == "Username").Value;
             var loggedUser = await this.userService.GetByUsernameAsync(loggedUsersUsername);

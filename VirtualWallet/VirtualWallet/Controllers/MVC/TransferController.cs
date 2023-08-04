@@ -2,7 +2,7 @@
 
 namespace VirtualWallet.Controllers.MVC
 {
-    public class TransferController1 : Controller
+    public class TransferController : Controller
     {
         public IActionResult Index()
         {
