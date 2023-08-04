@@ -68,6 +68,7 @@ namespace Business.Services.Models
         public async Task<Response<GetTransferDto>> GetByIdAsync(int id, User user)
         {
             var result = new Response<GetTransferDto>();
+
             Transfer transferToGet = await transferRepository.GetByIdAsync(id);
 
             if (!await Security.IsUserAuthorizedAsync(transferToGet, user) || user.IsAdmin)
