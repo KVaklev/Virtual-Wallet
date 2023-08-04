@@ -28,7 +28,10 @@
 
         //Constant messages for cards
 
+        public const string NoCardsErrorMessage = "No cards are found.";
         public const string ModifyCardErrorMessage = "Only an admin or owner of the card can access, delete or modify the card.";
+        public const string CardNumberAddErrorMessage = "Card with the specified card number has already been registered.";
+        public const string SuccessfullDeletedCardMessage = "Card has been successfully deleted.";
 
         //Constant messages for transactions 
 

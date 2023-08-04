@@ -33,20 +33,21 @@ namespace Business.Mappers
             CreateMap<Card, GetUpdatedCardDto>();
         }
 
-        public static Task<Card> MapCreateDtoToCardAsync(int accountId, Card cardToCreate, Currency currency, Card card)
+        public static Task<Card> MapCreateDtoToCardAsync(int accountId, Card cardToCreate, Currency currency, CreateCardDto card)
         {
             cardToCreate.AccountId = accountId;
-            cardToCreate.CardNumber = card.CardNumber;
-            cardToCreate.CardType = card.CardType;
+            cardToCreate.CardNumber = card.CardNumber;     
             cardToCreate.Balance = card.Balance;
             cardToCreate.CardHolder = card.CardHolder;
             cardToCreate.ExpirationDate = card.ExpirationDate;
             cardToCreate.CheckNumber = card.CheckNumber;
             cardToCreate.CreditLimit = card.CreditLimit;
             cardToCreate.CurrencyId = currency.Id;
+            AddCardType(card, cardToCreate);
 
             return Task.FromResult(cardToCreate);
         }
+
 
         public async static Task<Card> MapUpdateDtoToCardAsync(Card cardToUpdate, UpdateCardDto updateCardDto, Currency currency)
         {
@@ -61,14 +62,15 @@ namespace Business.Mappers
 
             return cardToUpdate;
         }
-
-        private static Task UpdateExpirationDateAsync(UpdateCardDto updateCardDto, Card cardToUpdate)
+        private static Task AddCardType(CreateCardDto createCardDto, Card cardToCreate)
         {
-            if (updateCardDto.ExpirationDate != null)
+            if (!string.IsNullOrEmpty(createCardDto.CardType))
             {
-                cardToUpdate.ExpirationDate = (DateTime)updateCardDto.ExpirationDate;
+                if (Enum.TryParse(createCardDto.CardType, out CardType parsedCardType))
+                {
+                    cardToCreate.CardType = parsedCardType;
+                }
             }
-
             return Task.FromResult(true);
         }
         private static Task UpdateCardTypeAsync(UpdateCardDto updateCardDto, Card cardToUpdate)
@@ -80,6 +82,15 @@ namespace Business.Mappers
                     cardToUpdate.CardType = parsedCardType;
                 }
             }
+            return Task.FromResult(true);
+        }
+        private static Task UpdateExpirationDateAsync(UpdateCardDto updateCardDto, Card cardToUpdate)
+        {
+            if (updateCardDto.ExpirationDate != null)
+            {
+                cardToUpdate.ExpirationDate = (DateTime)updateCardDto.ExpirationDate;
+            }
+
             return Task.FromResult(true);
         }
         private static Task UpdateCurrencyAsync(UpdateCardDto updateCardDto, Card cardToUpdate, Currency currency)

@@ -17,18 +17,15 @@ namespace VirtualWallet.Controllers.API
     {
         private readonly IMapper mapper;
         private readonly ICardService cardService;
-        private readonly IUserService userService;
         private readonly IUserRepository userRepository;
 
         public CardApiController(
             IMapper mapper,
             ICardService cardService,
-            IUserService userService,
             IUserRepository userRepository)
         {
             this.mapper = mapper;
             this.cardService = cardService;
-            this.userService = userService;
             this.userRepository = userRepository;
         }
 
@@ -39,11 +36,7 @@ namespace VirtualWallet.Controllers.API
             {
                 List<Card> result = await cardService.FilterByAsync(cardQueryParameters);
 
-                List<GetCardDto> cardDtos = result
-                    .Select(card => mapper.Map<GetCardDto>(card))
-                    .ToList();
-
-                return StatusCode(StatusCodes.Status200OK, cardDtos);
+                return StatusCode(StatusCodes.Status200OK, result);
             }
             catch (EntityNotFoundException e)
             {
@@ -57,10 +50,14 @@ namespace VirtualWallet.Controllers.API
             try
             {
                 User loggedUser = await FindLoggedUserAsync();
-                Card card = await cardService.GetByIdAsync(id, loggedUser);
-                GetCardDto cardDto = mapper.Map<GetCardDto>(card);
+                var result = await cardService.GetByIdAsync(id, loggedUser);
 
-                return StatusCode(StatusCodes.Status200OK, cardDto);
+                if (!result.IsSuccessful)
+                {
+                    return BadRequest(result.Message);
+                }
+
+                return StatusCode(StatusCodes.Status200OK, result.Data);
             }
             catch (EntityNotFoundException e)
             {
@@ -71,39 +68,32 @@ namespace VirtualWallet.Controllers.API
         [HttpPost, Authorize]
         public async Task<IActionResult> CreateCardAsync([FromBody] CreateCardDto createCardDto)
         {
-            try
-            {
-                var loggedUsersAccountId = await FindLoggedUsersAccountAsync();
-                Card createCard = mapper.Map<Card>(createCardDto);
-                Card createdCard = await cardService.CreateAsync(loggedUsersAccountId, createCard);
+        
+            var loggedUsersAccountId = await FindLoggedUsersAccountAsync();
 
-                return StatusCode(StatusCodes.Status201Created, createdCard);
-            }
-            catch (DuplicateEntityException e)
+            var result = await cardService.CreateAsync(loggedUsersAccountId, createCardDto);
+
+            if (!result.IsSuccessful) 
             {
-                return StatusCode(StatusCodes.Status409Conflict, e.Message);
+                return BadRequest(result.Message);
             }
+
+            return StatusCode(StatusCodes.Status201Created, result);          
         }
 
         [HttpPut("{id}"), Authorize]
         public async Task<IActionResult> UpdateCard(int id, [FromBody] UpdateCardDto updateCardDto)
         {
-            try
-            {
-                User loggedUser = await FindLoggedUserAsync();
-                var loggedUsersAccountId = await FindLoggedUsersAccountAsync();
-                GetUpdatedCardDto updatedCard = await this.cardService.UpdateAsync(id, loggedUser, updateCardDto);
+          
+            User loggedUser = await FindLoggedUserAsync();
+            var result = await this.cardService.UpdateAsync(id, loggedUser, updateCardDto);
 
-                return StatusCode(StatusCodes.Status200OK, updatedCard);
-            }
-            catch (UnauthorizedOperationException e)
+            if (!result.IsSuccessful)
             {
-                return StatusCode(StatusCodes.Status401Unauthorized, e.Message);
+                return BadRequest(result.Message);
             }
-            catch (DuplicateEntityException e)
-            {
-                return StatusCode(StatusCodes.Status409Conflict, e.Message);
-            }
+
+            return StatusCode(StatusCodes.Status200OK, result);
         }
 
         [HttpDelete("{id}"), Authorize]
@@ -112,14 +102,16 @@ namespace VirtualWallet.Controllers.API
             try
             {
                 User loggedUser = await FindLoggedUserAsync();
-                var isDeleted = await this.cardService.DeleteAsync(id, loggedUser);
+                var result = await this.cardService.DeleteAsync(id, loggedUser);
 
-                return StatusCode(StatusCodes.Status200OK);
+                if (!result.IsSuccessful)
+                {
+                    return BadRequest(result.Message);
+                }
+
+                return StatusCode(StatusCodes.Status200OK, result.Message);
             }
-            catch (UnauthorizedOperationException e)
-            {
-                return StatusCode(StatusCodes.Status401Unauthorized, e.Message);
-            }
+           
             catch (EntityNotFoundException e)
             {
                 return StatusCode(StatusCodes.Status404NotFound, e.Message);

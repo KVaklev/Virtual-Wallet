@@ -81,21 +81,10 @@ namespace VirtualWallet
 
             var emailConfiguration = builder.Configuration.GetSection("EmailConfiguration")
                 .Get<EmailConfiguration>();
-            //var messageConfiguration = builder.Configuration.GetSection("Message")
-              // .Get<Message>();
-
 
             builder.Services.AddSingleton(emailConfiguration);
-            //builder.Services.AddSingleton(messageConfiguration);
+
             var app = builder.Build();
-
-
-            // Configure the HTTP request pipeline.
-
-            //if (!app.Environment.IsDevelopment())
-            //{
-            //    app.UseExceptionHandler("/Error");
-            //}
 
             app.UseDeveloperExceptionPage();
             app.UseRouting();
@@ -107,7 +96,6 @@ namespace VirtualWallet
             {
                 endpoints.MapDefaultControllerRoute().RequireAuthorization();
             });
-          //  app.UseSession();
 
             if (app.Environment.IsDevelopment())
             {

@@ -24,13 +24,15 @@ namespace Business.Services.Models
         private readonly ICardService cardService;
         private readonly ICurrencyService currencyService;
         private readonly IMapper mapper;
+        private readonly ICardRepository cardRepository;
 
         public AccountService(
             IAccountRepository accountRepository,  
             IUserRepository userRepository,
             ICardService cardService,
             ICurrencyService currencyService,
-            IMapper mapper
+            IMapper mapper,
+            ICardRepository cardRepository
           )
         {
             this.accountRepository = accountRepository;
@@ -38,7 +40,7 @@ namespace Business.Services.Models
             this.cardService = cardService;
             this.currencyService = currencyService;
             this.mapper = mapper;
-           
+            this.cardRepository = cardRepository;           
         }
         public Response<IQueryable<GetAccountDto>> GetAll()
         {
@@ -148,7 +150,7 @@ namespace Business.Services.Models
                 return result;
             }
 
-            if (!await this.cardService.CardNumberExistsAsync(card.CardNumber))
+            if (!await this.cardRepository.CardNumberExistsAsync(card.CardNumber))
             {
                 result.IsSuccessful = true;
                 result.Data = await this.accountRepository.AddCardAsync(id, card);
@@ -167,7 +169,7 @@ namespace Business.Services.Models
                 result.Message = Constants.ModifyAccountCardErrorMessage;
                 return result;
             }
-            if (!await this.cardService.CardNumberExistsAsync(card.CardNumber))
+            if (!await this.cardRepository.CardNumberExistsAsync(card.CardNumber))
             {
                 result.IsSuccessful = true;
                 result.Data = await this.accountRepository.AddCardAsync(id, card);
