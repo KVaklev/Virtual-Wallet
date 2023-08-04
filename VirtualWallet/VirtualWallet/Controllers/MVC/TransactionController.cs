@@ -12,8 +12,8 @@ namespace VirtualWallet.Controllers.MVC
     [Authorize]
     public class TransactionController : Controller
     {
-        private readonly ITransactionService transactionService; 
-        private readonly IUserRepository userRepository; 
+        private readonly ITransactionService transactionService;
+        private readonly IUserRepository userRepository;
 
         public TransactionController(
             ITransactionService transactionService,
@@ -23,7 +23,7 @@ namespace VirtualWallet.Controllers.MVC
             this.userRepository = userRepository;
         }
 
-        
+
         [HttpGet]
         public async Task<IActionResult> Index([FromQuery] TransactionQueryParameters parameters)
         {
@@ -43,8 +43,8 @@ namespace VirtualWallet.Controllers.MVC
         [HttpGet]
         public async Task<IActionResult> Create([FromQuery] TransactionQueryParameters parameters)
         {
-           
-           if ((this.HttpContext.Session.GetString("IsBlocked")) == "True")
+
+            if ((this.HttpContext.Session.GetString("IsBlocked")) == "True")
             {
                 return BlockedErrorView();
             }
@@ -63,13 +63,13 @@ namespace VirtualWallet.Controllers.MVC
                 {
                     return this.View(transactionDto);
                 }
-                    var loggedUser = await GetLoggedUserAsync();
-                    var result = await this.transactionService.CreateOutTransactionAsync(transactionDto, loggedUser);
-                    if (!result.IsSuccessful)
-                    {
-                        return await EntityErrorViewAsync(result.Message);
-                    }
-                    return this.RedirectToAction("Index", "Transacion", new { username = result.Data.SenderUsername });
+                var loggedUser = await GetLoggedUserAsync();
+                var result = await this.transactionService.CreateOutTransactionAsync(transactionDto, loggedUser);
+                if (!result.IsSuccessful)
+                {
+                    return await EntityErrorViewAsync(result.Message);
+                }
+                return this.RedirectToAction("Index", "Transacion", new { username = result.Data.SenderUsername });
             }
             catch (EntityNotFoundException ex)
             {
@@ -82,13 +82,13 @@ namespace VirtualWallet.Controllers.MVC
         {
             try
             {
-                  var loggedUser = await GetLoggedUserAsync();
-                  var result = await this.transactionService.GetByIdAsync(id, loggedUser);
+                var loggedUser = await GetLoggedUserAsync();
+                var result = await this.transactionService.GetByIdAsync(id, loggedUser);
                 if (!result.IsSuccessful)
                 {
                     return await EntityErrorViewAsync(result.Message);
                 }
-                    return this.View(result.Data);
+                return this.View(result.Data);
             }
             catch (EntityNotFoundException ex)
             {
@@ -97,7 +97,7 @@ namespace VirtualWallet.Controllers.MVC
         }
 
         [HttpPost]
-        public IActionResult Edit([FromRoute] int id, CreateTransactionDto transactionDto)
+        public async Task<IActionResult> EditAsync([FromRoute] int id, CreateTransactionDto transactionDto)
         {
             try
             {
@@ -105,20 +105,77 @@ namespace VirtualWallet.Controllers.MVC
                 {
                     return View(transactionDto);
                 }
-                var loggedUser = await GetLoggedUser();
-                var updatedComment = this.commentService.Update(id, inputComment, loggedUser);
-
-                return this.RedirectToAction("Filter", "Comments", new { Username = updatedComment.CreatedBy.Username });
+                var loggedUser = await GetLoggedUserAsync();
+                var result = await this.transactionService.UpdateAsync(id, loggedUser, transactionDto);
+                if (!result.IsSuccessful)
+                {
+                    return await EntityErrorViewAsync(result.Message);
+                }
+                return this.RedirectToAction("Index", "Transaction", new { Username = loggedUser.Username });
             }
             catch (EntityNotFoundException ex)
             {
-                return EntityErrorView(ex.Message);
+                return await EntityErrorViewAsync(ex.Message);
             }
-            catch (UnauthorizedOperationException ex)
-            {
-                return UnauthorizedErrorView(ex.Message);
-            }
+        }
 
+        [HttpGet]
+        public async Task<IActionResult> DeleteAsync([FromRoute] int id)
+        {
+            try
+            {
+                var loggedUser = await GetLoggedUserAsync();
+                var result = await this.transactionService.GetByIdAsync(id, loggedUser);
+                if (!result.IsSuccessful)
+                {
+                    return await EntityErrorViewAsync(result.Message);
+                }
+                return this.View(result.Data);
+            }
+            catch (EntityNotFoundException ex)
+            {
+                return await EntityErrorViewAsync(ex.Message);
+            }
+        }
+
+        [HttpPost, ActionName("Delete")]
+        public async Task<IActionResult> DeleteConfirmed([FromRoute] int id)
+        {
+            try
+            {
+                var loggedUser = await GetLoggedUserAsync();
+                var result = await this.transactionService.DeleteAsync(id, loggedUser);
+                if (!result.IsSuccessful)
+                {
+                    return await EntityErrorViewAsync(result.Message);
+                }
+
+                return this.RedirectToAction("Index", "Transaction", new { Username = loggedUser.Username });
+            }
+            catch (EntityNotFoundException ex)
+            {
+                return await EntityErrorViewAsync(ex.Message);
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Execute([FromRoute] int id)
+        {
+            try
+            {
+                var loggedUser = await GetLoggedUserAsync();
+                var result = await this.transactionService.ExecuteAsync(id, loggedUser);
+                if (!result.IsSuccessful)
+                {
+                    return await EntityErrorViewAsync(result.Message);
+                }
+
+                return this.RedirectToAction("Index", "Transaction", new { Username = loggedUser.Username });
+            }
+            catch (EntityNotFoundException ex)
+            {
+                return await EntityErrorViewAsync(ex.Message);
+            }
         }
 
         private async Task<IActionResult> EntityErrorViewAsync(string message)
