@@ -7,8 +7,21 @@
         public const string ModifyUserErrorMessage = "Only an admin is authorized to perform the specified action.";
         public const string ModifyUsernameErrorMessage = "Username change is not allowed.";
 
+        public const string NoUsersErrorMessage = "No users are found.";
+        public const string NoUsersAfterFilterErrorMessage = "No users match the specified filter criteria.";
+
+        public const string UsernameExistsErrorMessage = "User with this username already exists.";
+        public const string EmailExistsErrorMessage = "User with this email already exists.";
+        public const string PhoneNumberExistsErrorMessage = "User with this phone number already exists.";
+
+        public const string SuccessfullDeletedUserMessage = "User was successfully deleted.";
+        public const string SuccessfullPromoteddUserMessage = "User was successfully promoted with admin rights.";
+        public const string SuccessfullBlockedUserMessage = "User was successfully blocked.";
+        public const string SuccessfullUnblockedUserMessage = "User was successfully unblocked.";
+
         //Constant messages for account
 
+        public const string NoAccountsErrorMessage = "No accounts are found.";
         public const string ModifyAccountErrorMessage = "Only an admin or owner of the account can access, delete or modify the acount.";
         public const string ModifyAccountCardErrorMessage = "Only an admin or owner of the account can add or remove a card.";
         public const string ModifyAccountBalancetErrorMessage = "Insufficient balance.";
@@ -47,5 +60,16 @@
 
         public const string ModifyHttpRequestExceptionErrorMessage = "No such host is known.";
         public const string ModifyJsonExceptionErrorMessage = "JSON Deserialization Error.";
+
+        //Constant messages for token
+
+        public const string GenerateTokenErrorMessage = "An error occurred in generating the token";
+        public const string SuccessfullTokenMessage = "Logged in successfully. Token: ";
+
+        //Constant messages for registration 
+
+        public const string ConfirmedRegistrationMessage = "Registration confirmed!";
+        public const string NotSuccessfullRegistrationMessage = "Your registration was not successfull.";
+        public const string SuccessfullConfirmationEmailSentMessage = "Confirmation email was sent successfully. Please check your inbox folder.";
     }
 }

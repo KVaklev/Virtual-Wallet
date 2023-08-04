@@ -1,13 +1,15 @@
 ﻿using AutoMapper;
+using Business.DTOs;
 using Business.DTOs.Requests;
 using Business.DTOs.Responses;
 using Business.Exceptions;
 using Business.QueryParameters;
 using Business.Services.Contracts;
+using Business.Services.Helpers;
 using DataAccess.Models.Models;
+using DataAccess.Repositories.Contracts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Presentation.Helpers;
 
 namespace VirtualWallet.Controllers.API
 {
@@ -17,17 +19,14 @@ namespace VirtualWallet.Controllers.API
     public class UserApiController : ControllerBase
     {
         private readonly IUserService userService;
-        private readonly IMapper mapper;
-        private readonly IAuthManager authManager;
+        private readonly IUserRepository userRepository;
 
         public UserApiController(
             IUserService userService,
-            IMapper mapper,
-            IAuthManager authManager)
+            IUserRepository userRepository)
         {
             this.userService = userService;
-            this.mapper = mapper;
-            this.authManager = authManager;
+            this.userRepository = userRepository;
         }
        
         [HttpGet, Authorize]
@@ -35,12 +34,9 @@ namespace VirtualWallet.Controllers.API
         {
             try
             {
-                List<User> result = await userService.FilterByAsync(userQueryParameters);
-                List<GetCreatedUserDto> userDtos = result
-                    .Select(user => mapper.Map<GetCreatedUserDto>(user))
-                    .ToList();
+                var result = await userService.FilterByAsync(userQueryParameters);
 
-                return StatusCode(StatusCodes.Status200OK, userDtos);
+                return StatusCode(StatusCodes.Status200OK, result);
             }
             catch (EntityNotFoundException e)
             {
@@ -53,10 +49,15 @@ namespace VirtualWallet.Controllers.API
         {
             try
             {
-                User user = await userService.GetByIdAsync(id);
-                GetCreatedUserDto userDto = mapper.Map<GetCreatedUserDto>(user);
+                User loggedUser = await FindLoggedUserAsync();
+                var result = await this.userService.GetByIdAsync(id, loggedUser);
 
-                return StatusCode(StatusCodes.Status200OK, userDto);
+                if (!result.IsSuccessful)
+                {
+                    return BadRequest(result.Message);
+                }
+
+                return StatusCode(StatusCodes.Status200OK, result.Data);
             }
             catch (EntityNotFoundException e)
             {
@@ -67,39 +68,30 @@ namespace VirtualWallet.Controllers.API
         [HttpPost]
         public async Task<IActionResult> CreateUserAsync([FromBody] CreateUserDto createUserDto)
         {
-            try
-            {
-                GetCreatedUserDto createdUser = await userService.CreateAsync(createUserDto);
+            var result = await userService.CreateAsync(createUserDto);
 
-                return StatusCode(StatusCodes.Status201Created, createdUser);
-            }
-            catch (DuplicateEntityException e)
+            if (!result.IsSuccessful)
             {
-                return StatusCode(StatusCodes.Status409Conflict, e.Message);
+                return BadRequest(result.Message);
             }
+          
+            return StatusCode(StatusCodes.Status201Created, result.Data);
         }
 
         [HttpPut("{id}"), Authorize]
         public async Task<IActionResult> UpdateUser(int id, [FromBody] UpdateUserDto updateUserDto)
         {
-            try
-            {
-                User loggedUser = await FindLoggedUserAsync();
+            User loggedUser = await FindLoggedUserAsync();
+            var result = await userService.UpdateAsync(id, updateUserDto, loggedUser);
 
-                GetUpdatedUserDto updatedUser = await userService.UpdateAsync(id, updateUserDto, loggedUser);
+            if (!result.IsSuccessful)
+            {
+                return BadRequest(result.Message);
+            }
 
-                return StatusCode(StatusCodes.Status200OK, updatedUser);
-            }
-            catch (UnauthorizedOperationException e)
-            {
-                return StatusCode(StatusCodes.Status401Unauthorized, e.Message);
-            }
-            catch (DuplicateEntityException e)
-            {
-                return StatusCode(StatusCodes.Status409Conflict, e.Message);
-            }
+            return StatusCode(StatusCodes.Status200OK, result.Data);
+           
         }
-
 
         [HttpDelete("{id}"), Authorize]
         public async Task<IActionResult> DeleteUser(int id)
@@ -107,17 +99,20 @@ namespace VirtualWallet.Controllers.API
             try
             {
                 User loggedUser = await FindLoggedUserAsync();
-                await userService.DeleteAsync(id, loggedUser);
+                var result = await userService.DeleteAsync(id, loggedUser);
 
-                return StatusCode(StatusCodes.Status200OK, "User was successfully deleted.");
+                if (!result.IsSuccessful)
+                {
+                    return BadRequest(result.Message);
+                }
+
+                result.Message = Constants.SuccessfullDeletedUserMessage;
+
+                return StatusCode(StatusCodes.Status200OK, result.Message);
             }
             catch (EntityNotFoundException e)
             {
                 return StatusCode(StatusCodes.Status404NotFound, e.Message);
-            }
-            catch (UnauthorizedOperationException e)
-            {
-                return StatusCode(StatusCodes.Status401Unauthorized, e.Message);
             }
         }
 
@@ -127,17 +122,20 @@ namespace VirtualWallet.Controllers.API
             try
             {
                 User loggedUser = await FindLoggedUserAsync();
-                var promotedUser = await userService.PromoteAsync(id, loggedUser);
+                var result = await userService.PromoteAsync(id, loggedUser);
 
-                return StatusCode(StatusCodes.Status200OK, "User was successfully promoted with admin rights.");
+                if (!result.IsSuccessful)
+                {
+                    return BadRequest(result.Message);
+                }
+
+                result.Message = Constants.SuccessfullPromoteddUserMessage;
+
+                return StatusCode(StatusCodes.Status200OK, result.Message);
             }
             catch (EntityNotFoundException e)
             {
                 return StatusCode(StatusCodes.Status404NotFound, e.Message);
-            }
-            catch (UnauthorizedOperationException e)
-            {
-                return StatusCode(StatusCodes.Status401Unauthorized, e.Message);
             }
         }
 
@@ -147,17 +145,20 @@ namespace VirtualWallet.Controllers.API
             try
             {
                 User loggedUser = await FindLoggedUserAsync();
-                var blockedUser = await userService.BlockUserAsync(id, loggedUser);
+                var result = await userService.BlockUserAsync(id, loggedUser);
 
-                return StatusCode(StatusCodes.Status200OK, "User was successfully blocked.");
+                if (!result.IsSuccessful)
+                {
+                    return BadRequest(result.Message);
+                }
+
+                result.Message = Constants.SuccessfullBlockedUserMessage;
+
+                return StatusCode(StatusCodes.Status200OK, result.Message);
             }
             catch (EntityNotFoundException e)
             {
                 return StatusCode(StatusCodes.Status404NotFound, e.Message);
-            }
-            catch (UnauthorizedOperationException e)
-            {
-                return StatusCode(StatusCodes.Status401Unauthorized, e.Message);
             }
         }
 
@@ -167,23 +168,26 @@ namespace VirtualWallet.Controllers.API
             try
             {
                 User loggedUser = await FindLoggedUserAsync();
-                var unblockedUser = await userService.UnblockUserAsync(id, loggedUser);
+                var result = await userService.UnblockUserAsync(id, loggedUser);
 
-                return StatusCode(StatusCodes.Status200OK, "User was successfully unblocked.");
+                if (!result.IsSuccessful)
+                {
+                    return BadRequest(result.Message);
+                }
+
+                result.Message = Constants.SuccessfullUnblockedUserMessage;
+
+                return StatusCode(StatusCodes.Status200OK, result.Message);
             }
             catch (EntityNotFoundException e)
             {
                 return StatusCode(StatusCodes.Status404NotFound, e.Message);
             }
-            catch (UnauthorizedOperationException e)
-            {
-                return StatusCode(StatusCodes.Status401Unauthorized, e.Message);
-            }
         }
         private async Task<User> FindLoggedUserAsync()
         {
             var loggedUsersUsername = User.Claims.FirstOrDefault(claim => claim.Type == "Username").Value;
-            var loggedUser = await this.userService.GetByUsernameAsync(loggedUsersUsername);
+            var loggedUser = await this.userRepository.GetByUsernameAsync(loggedUsersUsername);
             return loggedUser;
         }
     }

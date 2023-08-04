@@ -1,11 +1,10 @@
-﻿
-using Business.Exceptions;
+﻿using Business.Exceptions;
 using Business.DTOs.Requests;
 using Business.Services.Contracts;
 using DataAccess.Models.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Presentation.Helpers;
+using DataAccess.Repositories.Contracts;
 
 namespace VirtualWallet.Controllers.API
 {
@@ -15,13 +14,16 @@ namespace VirtualWallet.Controllers.API
     {
         private readonly ICurrencyService currencyService;
         private readonly IUserService userService;
+        private readonly IUserRepository userRepository;
 
         public CurrencyApiController(
             ICurrencyService currencyService,
-            IUserService userService)
+            IUserService userService,
+            IUserRepository userRepository)
         {
             this.currencyService = currencyService;
             this.userService = userService;
+            this.userRepository = userRepository;
         }
 
         [HttpPost, Authorize]
@@ -117,7 +119,7 @@ namespace VirtualWallet.Controllers.API
         private async Task<User> FindLoggedUserAsync()
         {
             var loggedUsersUsername = User.Claims.FirstOrDefault(claim => claim.Type == "Username").Value;
-            var loggedUser = await this.userService.GetByUsernameAsync(loggedUsersUsername);
+            var loggedUser = await this.userRepository.GetByUsernameAsync(loggedUsersUsername);
             return loggedUser;
         }
     }

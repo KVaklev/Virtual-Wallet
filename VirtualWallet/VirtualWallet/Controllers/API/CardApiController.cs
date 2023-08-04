@@ -5,9 +5,9 @@ using Business.Exceptions;
 using Business.QueryParameters;
 using Business.Services.Contracts;
 using DataAccess.Models.Models;
+using DataAccess.Repositories.Contracts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Presentation.Helpers;
 
 namespace VirtualWallet.Controllers.API
 {
@@ -18,15 +18,18 @@ namespace VirtualWallet.Controllers.API
         private readonly IMapper mapper;
         private readonly ICardService cardService;
         private readonly IUserService userService;
+        private readonly IUserRepository userRepository;
 
         public CardApiController(
             IMapper mapper,
             ICardService cardService,
-            IUserService userService)
+            IUserService userService,
+            IUserRepository userRepository)
         {
             this.mapper = mapper;
             this.cardService = cardService;
             this.userService = userService;
+            this.userRepository = userRepository;
         }
 
         [HttpGet, Authorize]
@@ -125,7 +128,7 @@ namespace VirtualWallet.Controllers.API
         private async Task<User> FindLoggedUserAsync()
         {
             var loggedUsersUsername = User.Claims.FirstOrDefault(claim => claim.Type == "Username").Value;
-            var loggedUser = await this.userService.GetByUsernameAsync(loggedUsersUsername);
+            var loggedUser = await this.userRepository.GetByUsernameAsync(loggedUsersUsername);
             return loggedUser;
         }
         private async Task<int> FindLoggedUsersAccountAsync()

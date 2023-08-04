@@ -74,26 +74,6 @@ namespace DataAccess.Repositories.Models
             return user ?? throw new EntityNotFoundException($"User with username '{username}' doesn't exist.");
         }
 
-        public async Task<User> GetByEmailAsync(string email)
-        {
-            User? user = await context.Users
-                .Where(u => u.IsDeleted == false)
-                .Where(users => users.Email == email)
-                .FirstOrDefaultAsync();
-
-            return user ?? throw new EntityNotFoundException($"User with email '{email}' doesn't exist.");
-        }
-
-        public async Task<User> GetByPhoneNumberAsync(string phoneNumber)
-        {
-            User? user = await context.Users
-                .Where(u => u.IsDeleted == false)
-                .Where(users => users.PhoneNumber == phoneNumber)
-                .FirstOrDefaultAsync();
-
-            return user ?? throw new EntityNotFoundException($"User with pnone number '{phoneNumber}' doesn't exist.");
-        }
-
         public async Task<User> CreateAsync(User user)
         {
             context.Users.Add(user);

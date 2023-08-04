@@ -1,24 +1,24 @@
-﻿using Business.DTOs.Requests;
+﻿using Business.DTOs;
+using Business.DTOs.Requests;
 using Business.DTOs.Responses;
 using Business.QueryParameters;
+using DataAccess.Models.Enums;
 using DataAccess.Models.Models;
 
 namespace Business.Services.Contracts
 {
     public interface IUserService
     {
-        IQueryable<User> GetAll();
+        Response<IQueryable<GetUserDto>> GetAll();
         Task<PaginatedList<User>> FilterByAsync(UserQueryParameters queryParameters);
-        Task<User> GetByIdAsync(int id);
-        Task<User> GetByUsernameAsync(string username);
-        Task<User> GetByEmailAsync(string email);
-        Task<User> GetByPhoneNumberAsync(string phoneNumber);
-        Task<GetCreatedUserDto> CreateAsync(CreateUserDto createUserDto);
-        Task<GetUpdatedUserDto> UpdateAsync(int id, UpdateUserDto updateUserDto, User loggedUser);
-        Task<bool> DeleteAsync(int id, User loggedUser);
-        Task<User> PromoteAsync(int id, User loggedUser);
-        Task<User> BlockUserAsync(int id, User loggedUser);
-        Task<User> UnblockUserAsync(int id, User loggedUser);
+        Task<Response<GetUserDto>> GetByIdAsync(int id, User loggedUser);
+        Task<Response<GetUserDto>> GetByUsernameAsync(string username);
+        Task<Response<GetCreatedUserDto>> CreateAsync(CreateUserDto createUserDto);
+        Task<Response<GetUpdatedUserDto>> UpdateAsync(int id, UpdateUserDto updateUserDto, User loggedUser);
+        Task<Response<bool>> DeleteAsync(int id, User loggedUser);
+        Task<Response<GetUserDto>> PromoteAsync(int id, User loggedUser);
+        Task<Response<GetUserDto>> BlockUserAsync(int id, User loggedUser);
+        Task<Response<GetUserDto>> UnblockUserAsync(int id, User loggedUser);
         Task<User> LoginAsync(string username, string password);
     }
 }

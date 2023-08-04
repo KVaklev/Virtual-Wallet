@@ -8,9 +8,7 @@ using DataAccess.Repositories.Data;
 using DataAccess.Repositories.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
-using Presentation.Helpers;
 using System.Text;
 using VirtualWallet.Models;
 
@@ -56,8 +54,6 @@ namespace VirtualWallet
             builder.Services.AddScoped<IExchangeRateService, ExchangeRateService>();
 
             //Helpers
-            builder.Services.AddScoped<IAuthManager, AuthManager>();
-            builder.Services.AddScoped<AuthManager>();
             builder.Services.AddSwaggerGen();
             
 

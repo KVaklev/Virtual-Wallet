@@ -30,8 +30,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataAccess.Repositories", "
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Presentation", "Presentation", "{16709868-9869-4FCA-B0EB-10B3995684DD}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Presentation.Helpers", "Presentation.Helpers\Presentation.Helpers.csproj", "{626A91E6-7D1B-4C1C-837E-BEFA06DB3A91}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -74,10 +72,6 @@ Global
 		{C08FF9BA-6DB7-49CE-9AA9-8363114A37C3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C08FF9BA-6DB7-49CE-9AA9-8363114A37C3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C08FF9BA-6DB7-49CE-9AA9-8363114A37C3}.Release|Any CPU.Build.0 = Release|Any CPU
-		{626A91E6-7D1B-4C1C-837E-BEFA06DB3A91}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{626A91E6-7D1B-4C1C-837E-BEFA06DB3A91}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{626A91E6-7D1B-4C1C-837E-BEFA06DB3A91}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{626A91E6-7D1B-4C1C-837E-BEFA06DB3A91}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -92,7 +86,6 @@ Global
 		{6A33CCA8-644D-4DF5-A8BE-E8874E019BF8} = {A1AF3D17-77E4-4610-94C8-FE86171D0D91}
 		{5762E91C-DC83-421A-9415-4155FFE6D426} = {B313DCCF-AF4E-44EB-BE53-D5B2E5D5EE82}
 		{C08FF9BA-6DB7-49CE-9AA9-8363114A37C3} = {B313DCCF-AF4E-44EB-BE53-D5B2E5D5EE82}
-		{626A91E6-7D1B-4C1C-837E-BEFA06DB3A91} = {16709868-9869-4FCA-B0EB-10B3995684DD}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {155515E4-BF27-4C9B-9C17-3842C06C62F8}
