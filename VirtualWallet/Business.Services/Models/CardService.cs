@@ -1,78 +1,186 @@
-﻿using Business.Exceptions;
+﻿using AutoMapper;
+using Business.DTOs;
+using Business.DTOs.Requests;
+using Business.DTOs.Responses;
+using Business.Exceptions;
+using Business.Mappers;
 using Business.QueryParameters;
 using Business.Services.Contracts;
 using Business.Services.Helpers;
 using DataAccess.Models.Models;
 using DataAccess.Repositories.Contracts;
+using DataAccess.Repositories.Models;
 
 namespace Business.Services.Models
 {
     public class CardService : ICardService
     {
         private readonly ICardRepository cardRepository;
+        private readonly ICurrencyService currencyService;
+        private readonly IMapper mapper;
 
-        public CardService(ICardRepository repository)
+        public CardService(
+            ICardRepository repository,
+            ICurrencyService currencyService,
+            IMapper mapper)
         {
             this.cardRepository = repository;
+            this.currencyService = currencyService;
+            this.mapper = mapper;
         }
-        public IQueryable<Card> GetAll()
+        public Response<IQueryable<GetCardDto>> GetAll()
         {
-            return this.cardRepository.GetAll();
+            var result = new Response<IQueryable<GetCardDto>>();
+            var cards = this.cardRepository.GetAll();
+
+            if (cards != null && cards.Any())
+            {
+                result.IsSuccessful = true;
+                result.Data = (IQueryable<GetCardDto>)cards.AsQueryable();
+            }
+            else
+            {
+                result.IsSuccessful = false;
+                result.Message = Constants.NoCardsErrorMessage;
+            }
+
+            return result;
         }
         public async Task<PaginatedList<Card>> FilterByAsync(CardQueryParameters filterParameters)
         {
-            return await this.cardRepository.FilterByAsync(filterParameters);
+            var result = await this.cardRepository.FilterByAsync(filterParameters);
+
+            List<GetCardDto> cardDtos = result
+                    .Select(card => mapper.Map<GetCardDto>(card))
+                    .ToList();
+            return result;
         }
-        public async Task<Card> GetByIdAsync(int id)
+        public async Task<Response<GetCardDto>> GetByIdAsync(int id, User loggedUser)
         {
-            return await this.cardRepository.GetByIdAsync(id);
-        }
-        public IQueryable<Card> GetByAccountId(int accountId)
-        {
-            return this.cardRepository.GetByAccountId(accountId);
-        }
-        public async Task<Card> CreateAsync(int accountId, Card card)
-        {
-            if (await CardNumberExistsAsync(card.CardNumber))
+            var result = new Response<GetCardDto>();
+
+            var card = await this.cardRepository.GetByIdAsync(id);
+            
+            if (!await Security.IsUserAuthorized(id, loggedUser))
             {
-                throw new DuplicateEntityException($"Card with card number '{card.CardNumber}' already exists.");
+                result.IsSuccessful = false;
+                result.Message = Constants.ModifyCardErrorMessage;
+                return result;
             }
 
-           var createdCard = await this.cardRepository.CreateAsync(accountId, card);
-           return createdCard;
+            var cardDto = this.mapper.Map<GetCardDto>(card);
+            result.Data = cardDto;
+
+            return result;
         }
 
-        public async Task<Card> UpdateAsync(int id, User loggedUser, Card card)
+        public Response<IQueryable<GetCardDto>> GetByAccountId(int accountId)
         {
+            var result = new Response<IQueryable<GetCardDto>>();
+
+            var cards = this.cardRepository.GetByAccountId(accountId);
+
+            if (cards != null && cards.Any())
+            {
+                result.IsSuccessful = true;
+                result.Data = (IQueryable<GetCardDto>)cards.AsQueryable();
+            }
+            else
+            {
+                result.IsSuccessful = false;
+                result.Message = Constants.NoCardsErrorMessage;
+            }
+
+            return result;
+        }
+        public async Task<Response<GetCreatedCardDto>> CreateAsync(int accountId, CreateCardDto card)
+        {
+            var result = new Response<GetCreatedCardDto>();
+
+            if (await CardNumberExistsAsync(card.CardNumber))
+            {
+                result.IsSuccessful = false;
+                result.Message = Constants.CardNumberAddErrorMessage;
+                return result;
+            }
+
+            var cardToCreate = new Card();
+            var currency = await currencyService.GetByCurrencyCodeAsync(card.CurrencyCode);
+            cardToCreate = await CardsMapper.MapCreateDtoToCardAsync(accountId, cardToCreate, currency, card);
+            var createdCard = await this.cardRepository.CreateAsync(accountId, cardToCreate);
+            
+            var cardDto = this.mapper.Map<GetCreatedCardDto>(createdCard);
+
+            result.Data = cardDto;
+
+            return result;
+        }
+
+        public async Task<Response<GetUpdatedCardDto>> UpdateAsync(int id, User loggedUser, UpdateCardDto updateCardDto)
+        {
+            var result = new Response<GetUpdatedCardDto>();
+
             Card cardToUpdate = await this.cardRepository.GetByIdAsync(id);
 
-            if (await CardNumberExistsAsync(card.CardNumber))
+            if (await CardNumberExistsAsync(updateCardDto.CardNumber))
             {
-                throw new DuplicateEntityException($"Card with card number '{card.CardNumber}' already exists.");
-            }
-            if (!await Common.IsAuthorizedAsync(cardToUpdate, loggedUser))
-            {
-                throw new UnauthorizedOperationException(Constants.ModifyCardErrorMessage);
+                result.IsSuccessful = false;
+                result.Message = Constants.CardNumberAddErrorMessage;
+                return result;
             }
 
-            var updatedCard = await this.cardRepository.UpdateAsync(id, card);
-            return updatedCard;
+            if (!await Security.IsAuthorizedAsync(cardToUpdate, loggedUser))
+            {
+                result.IsSuccessful = false;
+                result.Message = Constants.ModifyCardErrorMessage;
+                return result;
+            }
 
+            var currency = await currencyService.GetCurrencyByIdAsync((int)cardToUpdate.CurrencyId);
+            cardToUpdate = await CardsMapper.MapUpdateDtoToCardAsync(cardToUpdate, updateCardDto, currency);
+            cardToUpdate = await this.cardRepository.UpdateAsync(id, cardToUpdate);
+
+            var cardDto = mapper.Map<GetUpdatedCardDto>(cardToUpdate);
+            result.Data = cardDto;
+
+            return result;
         }
-        public async Task<bool> DeleteAsync(int id, User loggedUser)
+        public async Task<Response<bool>> DeleteAsync(int id, User loggedUser)
         {
-            if (!await Common.IsAdminAsync(loggedUser))
-            {
-                throw new UnauthorizedOperationException(Constants.ModifyUserErrorMessage);
-            }
-            var cardToDelete = await this.cardRepository.DeleteAsync(id);
+            var result = new Response<bool>();
 
-            return cardToDelete;
+            if (!await Security.IsAdminAsync(loggedUser))
+            {
+                result.IsSuccessful = false;
+                result.Message = Constants.ModifyUserErrorMessage;
+                return result;
+            }
+
+            result.Data = await this.cardRepository.DeleteAsync(id);
+            result.Message = Constants.SuccessfullDeletedCardMessage;
+
+            return result;
         }
-        public async Task<bool> CardNumberExistsAsync(string cardNumber)
+
+        public async Task<Card> IncreaseBalanceAsync(int id, decimal amount, User loggedUser)
+        {
+            Card cardToDepositTo = await this.cardRepository.GetByIdAsync(id);
+            cardToDepositTo.Balance += amount;
+
+            return await this.cardRepository.IncreaseBalanceAsync(id, amount);
+        }
+
+        public async Task<Card> DecreaseBalanceAsync(int id, decimal amount, User loggedUser)
+        {
+            Card cardToWithdrawFrom = await this.cardRepository.GetByIdAsync(id);
+            cardToWithdrawFrom.Balance -= amount;
+
+            return await this.cardRepository.DecreaseBalanceAsync(id, amount);
+        }
+
+        private async Task<bool> CardNumberExistsAsync(string cardNumber)
         {
             return await this.cardRepository.CardNumberExistsAsync(cardNumber);
         }
-
     }
 }

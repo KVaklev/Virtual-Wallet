@@ -19,6 +19,10 @@ namespace DataAccess.Repositories.Data.Configuration
                .WithMany(a => a.Cards)
                .HasForeignKey(c => c.AccountId)
                .OnDelete(DeleteBehavior.NoAction);
+
+            builder.Property(t => t.Balance).HasColumnType("decimal(18, 2)");
+            builder.Property(t => t.CreditLimit).HasColumnType("decimal(18, 2)");
+
         }
     }
 }

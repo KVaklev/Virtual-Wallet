@@ -2,9 +2,9 @@
 using Business.QueryParameters;
 using Business.Services.Contracts;
 using DataAccess.Models.Models;
+using DataAccess.Repositories.Contracts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Presentation.Helpers;
 
 namespace VirtualWallet.Controllers.API
 {
@@ -13,14 +13,17 @@ namespace VirtualWallet.Controllers.API
     public class HistoryApiController : ControllerBase
     {
         private readonly IHistoryService historyService;
-        private readonly IAuthManager authManager;
+        private readonly IUserService userService;
+        private readonly IUserRepository userRepository;
 
         public HistoryApiController(
             IHistoryService historyService,
-            IAuthManager authManager)
+            IUserService userService,
+            IUserRepository userRepository)
         {
             this.historyService = historyService;
-            this.authManager = authManager;
+            this.userService = userService;
+            this.userRepository = userRepository;
         }
 
         [HttpGet("{id}"), Authorize]
@@ -67,7 +70,7 @@ namespace VirtualWallet.Controllers.API
         private async Task<User> FindLoggedUserAsync()
         {
             var loggedUsersUsername = User.Claims.FirstOrDefault(claim => claim.Type == "Username").Value;
-            var loggedUser = await authManager.TryGetUserByUsernameAsync(loggedUsersUsername);
+            var loggedUser = await this.userRepository.GetByUsernameAsync(loggedUsersUsername);
             return loggedUser;
         }
     }

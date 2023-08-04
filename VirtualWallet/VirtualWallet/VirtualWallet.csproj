@@ -25,7 +25,6 @@
   <ItemGroup>
     <ProjectReference Include="..\Business.Services\Business.Services.csproj" />
     <ProjectReference Include="..\Business.ViewModels\Business.ViewModels.csproj" />
-    <ProjectReference Include="..\Presentation.Helpers\Presentation.Helpers.csproj" />
   </ItemGroup>
 
   <ItemGroup>

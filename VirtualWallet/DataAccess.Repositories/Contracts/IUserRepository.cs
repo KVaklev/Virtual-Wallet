@@ -1,4 +1,5 @@
 ﻿using Business.QueryParameters;
+using DataAccess.Models.Enums;
 using DataAccess.Models.Models;
 
 namespace DataAccess.Repositories.Contracts
@@ -9,8 +10,6 @@ namespace DataAccess.Repositories.Contracts
         Task<PaginatedList<User>> FilterByAsync(UserQueryParameters queryParameters);
         Task<User> GetByIdAsync(int id);
         Task<User> GetByUsernameAsync(string username);
-        Task<User> GetByEmailAsync(string email);
-        Task<User> GetByPhoneNumberAsync(string phoneNumber);
         Task<User> CreateAsync(User user);
         Task<User> UpdateAsync(User updatedUser);
         Task<bool> DeleteAsync(int id);

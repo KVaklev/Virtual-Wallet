@@ -17,7 +17,6 @@ namespace Business.Mappers
             CreateMap<GetUpdatedUserDto, User>();
             CreateMap<User, GetUpdatedUserDto>();
             CreateMap<CreateUserDto, User>();
-            // CreateMap<User, GetUserDto>(); - TODO - check is this necessary
             CreateMap<User, CreateUserDto>();
             CreateMap<User, UpdateUserDto>();
             CreateMap<UpdateUserDto, User>();

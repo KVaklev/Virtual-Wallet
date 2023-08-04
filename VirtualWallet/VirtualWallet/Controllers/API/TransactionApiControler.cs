@@ -1,13 +1,11 @@
-﻿using AutoMapper;
-using Business.Services.Contracts;
-using DataAccess.Models.Models;
+﻿using Business.Services.Contracts;
 using Microsoft.AspNetCore.Mvc;
-using Presentation.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Business.Exceptions;
 using Business.QueryParameters;
 using Business.DTOs.Requests;
-
+using DataAccess.Models.Models;
+using DataAccess.Repositories.Contracts;
 
 namespace VirtualWallet.Controllers.API
 {
@@ -15,16 +13,19 @@ namespace VirtualWallet.Controllers.API
     [Route("api/transactions")]
     public class TransactionApiControler : ControllerBase
     { 
-        private readonly IAuthManager authManager;
         private readonly ITransactionService transactionService;
+        private readonly IUserService userService;
+        private readonly IUserRepository userRepository;
         
         public TransactionApiControler(
-            IAuthManager authManager,
-            ITransactionService transactionService
+            ITransactionService transactionService,
+            IUserService userService,
+            IUserRepository userRepository
             )
         {
-            this.authManager = authManager;
             this.transactionService = transactionService; 
+            this.userService = userService;
+            this.userRepository = userRepository;
         }
 
         [HttpPost, Authorize]
@@ -39,7 +40,7 @@ namespace VirtualWallet.Controllers.API
                 return BadRequest(result.Message);
             }
            
-                return StatusCode(StatusCodes.Status201Created, result.Data);
+            return StatusCode(StatusCodes.Status201Created, result.Data);
         }
 
 
@@ -134,13 +135,13 @@ namespace VirtualWallet.Controllers.API
                 return StatusCode(StatusCodes.Status404NotFound, e.Message);
             }
         }
-            private async Task<User> FindLoggedUserAsync()
-            {
-                var loggedUsersUsername = User.Claims.FirstOrDefault(claim => claim.Type == "Username").Value;
-                var loggedUser = await authManager.TryGetUserByUsernameAsync(loggedUsersUsername);
-                return loggedUser;
-            }
-   }
+        private async Task<User> FindLoggedUserAsync()
+        {
+            var loggedUsersUsername = User.Claims.FirstOrDefault(claim => claim.Type == "Username").Value;
+            var loggedUser = await this.userRepository.GetByUsernameAsync(loggedUsersUsername);
+            return loggedUser;
+        }
+    }
 }  
     
 

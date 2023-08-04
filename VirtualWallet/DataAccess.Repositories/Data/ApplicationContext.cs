@@ -1,4 +1,5 @@
 ﻿using DataAccess.Models.Models;
+using DataAccess.Repositories.Data.Configuration;
 using Microsoft.EntityFrameworkCore;
 
 namespace DataAccess.Repositories.Data
@@ -27,6 +28,8 @@ namespace DataAccess.Repositories.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            //modelBuilder.ApplyConfiguration(new TransferConfiguration());
             modelBuilder.ApplyConfigurationsFromAssembly(this.GetType().Assembly);
             modelBuilder.SeedData();
         }

@@ -11,6 +11,8 @@ using Business.DTOs.Requests;
 using Business.DTOs.Responses;
 using Business.DTOs;
 using Business.Mappers;
+using DataAccess.Repositories.Helpers;
+using DataAccess.Repositories.Models;
 
 namespace Business.Services.Models
 {
@@ -23,6 +25,7 @@ namespace Business.Services.Models
         private readonly ICurrencyRepository currencyRepository;
         private readonly IMapper mapper;
         private readonly IExchangeRateService exchangeRateService;
+        private readonly IAccountService accountService;
 
         public TransactionService(
             ITransactionRepository transactionRepository,
@@ -31,7 +34,8 @@ namespace Business.Services.Models
             IAccountRepository accountRepository,
             ICurrencyRepository currencyRepository,
             IMapper mapper,
-            IExchangeRateService exchangeRateService
+            IExchangeRateService exchangeRateService,
+            IAccountService accountService
             )
         {
             this.transactionRepository = transactionRepository;
@@ -41,12 +45,13 @@ namespace Business.Services.Models
             this.currencyRepository = currencyRepository;
             this.mapper = mapper;
             this.exchangeRateService = exchangeRateService;
+            this.accountService = accountService;
         }
         public async Task<Response<GetTransactionDto>> GetByIdAsync(int id, User loggedUser)
         {
             var result = new Response<GetTransactionDto>();
             var transaction = await this.transactionRepository.GetByIdAsync(id);
-            if (!await Common.IsTransactionSenderAsync(transaction, loggedUser.Id) || !loggedUser.IsAdmin)
+            if (!await Security.IsTransactionSenderAsync(transaction, loggedUser.Id) || !loggedUser.IsAdmin)
             {
                 result.IsSuccessful = false;
                 result.Message = Constants.ModifyAuthorizedErrorMessage;
@@ -78,13 +83,14 @@ namespace Business.Services.Models
             var account = await accountRepository.GetByUsernameAsync(transactionDto.RecepientUsername);
             var currency = await currencyRepository.GetByCurrencyCodeAsync(transactionDto.CurrencyCode);
             var transaction = await TransactionsMapper.MapDtoТоTransactionAsync(transactionDto, loggedUser, account, currency);
-            if (!await this.accountRepository.HasEnoughBalanceAsync(transaction.AccountSenderId, transaction.Amount))
+            if (!await Security.HasEnoughBalanceAsync(transaction.AccountSender, transaction.Amount))
             {
                 result.IsSuccessful = false;
                 result.Message = Constants.ModifyAccountBalancetErrorMessage;
                 return result;
             }
             transaction.Date = DateTime.UtcNow;
+
             var newTransaction = await this.transactionRepository.CreateTransactionAsync(transaction);
             result.Data = this.mapper.Map<GetTransactionDto>(newTransaction);
 
@@ -95,21 +101,21 @@ namespace Business.Services.Models
         {
             var result = new Response<GetTransactionDto>();
             var transactionToUpdate = await this.transactionRepository.GetByIdAsync(id);
-            if (!await Common.IsTransactionSenderAsync(transactionToUpdate, loggedUser.Id))
+            if (!await Security.IsTransactionSenderAsync(transactionToUpdate, loggedUser.Id))
             {
                 result.IsSuccessful = false;
                 result.Message = Constants.ModifyAuthorizedErrorMessage;
                 return result;
             }
 
-            if (!await Common.CanModifyTransactionAsync(transactionToUpdate))
+            if (!await Security.CanModifyTransactionAsync(transactionToUpdate))
             {
                 result.IsSuccessful = false;
                 result.Message = Constants.ModifyTransactionNotExecuteErrorMessage;
                 return result;
             }
 
-            if (!await this.accountRepository.HasEnoughBalanceAsync((int)loggedUser.AccountId, loggedUser.Account.Balance))
+            if (!await Security.HasEnoughBalanceAsync(loggedUser.Account, loggedUser.Account.Balance))
             {
                 result.IsSuccessful = false;
                 result.Message = Constants.ModifyAccountBalancetErrorMessage;
@@ -117,25 +123,25 @@ namespace Business.Services.Models
             }
             var account = await accountRepository.GetByUsernameAsync(transactionDto.RecepientUsername);
             var currency = await currencyRepository.GetByCurrencyCodeAsync(transactionDto.CurrencyCode);
+
             var newTransaction = await TransactionsMapper.MapDtoТоTransactionAsync(transactionDto, loggedUser, account, currency);
             var updatedTransacion = await TransactionsMapper.MapUpdateDtoToTransactionAsync(transactionToUpdate, newTransaction);
             await this.transactionRepository.SaveChangesAsync();
             result.Data = this.mapper.Map<GetTransactionDto>(updatedTransacion);
             return result;
         }
-
         public async Task<Response<bool>> DeleteAsync(int id, User loggedUser)
         {
             var result = new Response<bool>();
             var transaction = await this.transactionRepository.GetByIdAsync(id);
-            if (!await Common.IsTransactionSenderAsync(transaction, loggedUser.Id))
+            if (!await Security.IsTransactionSenderAsync(transaction, loggedUser.Id))
             {
                 result.IsSuccessful = false;
                 result.Message = Constants.ModifyAuthorizedErrorMessage;
                 return result;
             }
 
-            if (!await Common.CanModifyTransactionAsync(transaction))
+            if (!await Security.CanModifyTransactionAsync(transaction))
             {
                 result.IsSuccessful = false;
                 result.Message = Constants.ModifyTransactionNotExecuteErrorMessage;
@@ -151,14 +157,14 @@ namespace Business.Services.Models
         {
             var result = new Response<bool>();
             var transactionOut = await this.transactionRepository.GetByIdAsync(transactionId);
-            if (!await Common.IsTransactionSenderAsync(transactionOut, loggedUser.Id))
+            if (!await Security.IsTransactionSenderAsync(transactionOut, loggedUser.Id))
             {
                 result.IsSuccessful = false;
                 result.Message = Constants.ModifyAuthorizedErrorMessage;
                 return result;
             }
 
-            if (!await Common.CanModifyTransactionAsync(transactionOut))
+            if (!await Security.CanModifyTransactionAsync(transactionOut))
             {
                 result.IsSuccessful = false;
                 result.Message = Constants.ModifyTransactionNotExecuteErrorMessage;
@@ -210,8 +216,8 @@ namespace Business.Services.Models
                 transactionOut.AccountSender.Currency.CurrencyCode,
                 transactionOut.Amount);
 
-            await this.accountRepository.DecreaseBalanceAsync(transactionOut.AccountSenderId, amountSender);
-            await this.accountRepository.IncreaseBalanceAsync(transactionIn.AccountRecepientId, transactionIn.Amount);
+            await this.accountService.DecreaseBalanceAsync(transactionOut.AccountSenderId, amountSender, transactionOut.AccountSender.User);
+            await this.accountService.IncreaseBalanceAsync(transactionIn.AccountRecepientId, transactionIn.Amount, transactionIn.AccountRecipient.User);
         }
 
         private async Task<bool> AddTransactionToHistoryAsync(Transaction transaction)
@@ -232,5 +238,5 @@ namespace Business.Services.Models
         }
 
     }
-        
+
 }

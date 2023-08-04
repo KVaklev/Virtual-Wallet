@@ -8,9 +8,7 @@ using DataAccess.Repositories.Data;
 using DataAccess.Repositories.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
-using Presentation.Helpers;
 using System.Text;
 using VirtualWallet.Models;
 
@@ -29,8 +27,17 @@ namespace VirtualWallet
             });
 
 
+            builder.Services.AddSession(options =>
+            {
+                options.IdleTimeout = TimeSpan.FromSeconds(1000);
+                options.Cookie.HttpOnly = true;
+                options.Cookie.IsEssential = true;
+            });
+
+            builder.Services.AddControllersWithViews();
+            builder.Services.AddHttpContextAccessor();
+
             builder.Services.AddRazorPages();
-            builder.Services.AddControllers();
             builder.Services.AddAutoMapper(typeof(CustomAutoMapper).Assembly);
             builder.Services.AddAuthorization();
 
@@ -56,8 +63,7 @@ namespace VirtualWallet
             builder.Services.AddScoped<IExchangeRateService, ExchangeRateService>();
 
             //Helpers
-            builder.Services.AddScoped<Presentation.Helpers.ITransactionService, AuthManager>();
-            builder.Services.AddScoped<AuthManager>();
+            builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             builder.Services.AddSwaggerGen();
             
 
@@ -85,24 +91,14 @@ namespace VirtualWallet
 
             var emailConfiguration = builder.Configuration.GetSection("EmailConfiguration")
                 .Get<EmailConfiguration>();
-            //var messageConfiguration = builder.Configuration.GetSection("Message")
-              // .Get<Message>();
-
 
             builder.Services.AddSingleton(emailConfiguration);
-            //builder.Services.AddSingleton(messageConfiguration);
+
             var app = builder.Build();
-
-
-            // Configure the HTTP request pipeline.
-
-            //if (!app.Environment.IsDevelopment())
-            //{
-            //    app.UseExceptionHandler("/Error");
-            //}
 
             app.UseDeveloperExceptionPage();
             app.UseRouting();
+            app.UseSession();
 
             app.UseAuthentication();
             app.UseAuthorization();
@@ -111,7 +107,6 @@ namespace VirtualWallet
             {
                 endpoints.MapDefaultControllerRoute().RequireAuthorization();
             });
-          //  app.UseSession();
 
             if (app.Environment.IsDevelopment())
             {

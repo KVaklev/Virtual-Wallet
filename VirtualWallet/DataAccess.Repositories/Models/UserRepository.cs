@@ -40,7 +40,6 @@ namespace DataAccess.Repositories.Models
             result = await SortOrderAsync(result, filterParameters.SortOrder);
 
             int totalItems = await result.CountAsync();
-
             if (totalItems == 0)
             {
                 throw new EntityNotFoundException("No users match the specified filter criteria.");
@@ -73,26 +72,6 @@ namespace DataAccess.Repositories.Models
                 .FirstOrDefaultAsync();
 
             return user ?? throw new EntityNotFoundException($"User with username '{username}' doesn't exist.");
-        }
-
-        public async Task<User> GetByEmailAsync(string email)
-        {
-            User? user = await context.Users
-                .Where(u => u.IsDeleted == false)
-                .Where(users => users.Email == email)
-                .FirstOrDefaultAsync();
-
-            return user ?? throw new EntityNotFoundException($"User with email '{email}' doesn't exist.");
-        }
-
-        public async Task<User> GetByPhoneNumberAsync(string phoneNumber)
-        {
-            User? user = await context.Users
-                .Where(u => u.IsDeleted == false)
-                .Where(users => users.PhoneNumber == phoneNumber)
-                .FirstOrDefaultAsync();
-
-            return user ?? throw new EntityNotFoundException($"User with pnone number '{phoneNumber}' doesn't exist.");
         }
 
         public async Task<User> CreateAsync(User user)
@@ -146,17 +125,14 @@ namespace DataAccess.Repositories.Models
         {
             return await context.Users.AnyAsync(u => u.PhoneNumber == phoneNumber);
         }
-
         public async Task<bool> EmailExistsAsync(string email)
         {
             return await context.Users.AnyAsync(u => u.Email == email);
         }
-
         public async Task<bool> UsernameExistsAsync(string username)
         {
             return await context.Users.AnyAsync(u => u.Username == username);
         }
-
         private async Task<IQueryable<User>> FilterByUsernameAsync(IQueryable<User> result, string? username)
         {
             if (!string.IsNullOrEmpty(username))

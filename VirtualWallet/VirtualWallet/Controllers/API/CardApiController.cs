@@ -5,9 +5,9 @@ using Business.Exceptions;
 using Business.QueryParameters;
 using Business.Services.Contracts;
 using DataAccess.Models.Models;
+using DataAccess.Repositories.Contracts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Presentation.Helpers;
 
 namespace VirtualWallet.Controllers.API
 {
@@ -16,18 +16,17 @@ namespace VirtualWallet.Controllers.API
     public class CardApiController : ControllerBase
     {
         private readonly IMapper mapper;
-        private readonly IAuthManager authManager;
         private readonly ICardService cardService;
+        private readonly IUserRepository userRepository;
 
         public CardApiController(
             IMapper mapper,
-            IAuthManager authManager,
-            ICardService cardService)
+            ICardService cardService,
+            IUserRepository userRepository)
         {
             this.mapper = mapper;
-            this.authManager = authManager;
             this.cardService = cardService;
-
+            this.userRepository = userRepository;
         }
 
         [HttpGet, Authorize]
@@ -37,11 +36,7 @@ namespace VirtualWallet.Controllers.API
             {
                 List<Card> result = await cardService.FilterByAsync(cardQueryParameters);
 
-                List<GetCardDto> cardDtos = result
-                    .Select(card => mapper.Map<GetCardDto>(card))
-                    .ToList();
-
-                return StatusCode(StatusCodes.Status200OK, cardDtos);
+                return StatusCode(StatusCodes.Status200OK, result);
             }
             catch (EntityNotFoundException e)
             {
@@ -54,10 +49,15 @@ namespace VirtualWallet.Controllers.API
         {
             try
             {
-                Card card = await cardService.GetByIdAsync(id);
-                GetCardDto cardDto = mapper.Map<GetCardDto>(card);
+                User loggedUser = await FindLoggedUserAsync();
+                var result = await cardService.GetByIdAsync(id, loggedUser);
 
-                return StatusCode(StatusCodes.Status200OK, cardDto);
+                if (!result.IsSuccessful)
+                {
+                    return BadRequest(result.Message);
+                }
+
+                return StatusCode(StatusCodes.Status200OK, result.Data);
             }
             catch (EntityNotFoundException e)
             {
@@ -68,40 +68,32 @@ namespace VirtualWallet.Controllers.API
         [HttpPost, Authorize]
         public async Task<IActionResult> CreateCardAsync([FromBody] CreateCardDto createCardDto)
         {
-            try
-            {
-                var loggedUsersAccountId = await FindLoggedUsersAccountAsync();
-                Card createCard = mapper.Map<Card>(createCardDto);
-                Card createdCard = await cardService.CreateAsync(loggedUsersAccountId, createCard);
+        
+            var loggedUsersAccountId = await FindLoggedUsersAccountAsync();
 
-                return StatusCode(StatusCodes.Status201Created, createdCard);
-            }
-            catch (DuplicateEntityException e)
+            var result = await cardService.CreateAsync(loggedUsersAccountId, createCardDto);
+
+            if (!result.IsSuccessful) 
             {
-                return StatusCode(StatusCodes.Status409Conflict, e.Message);
+                return BadRequest(result.Message);
             }
+
+            return StatusCode(StatusCodes.Status201Created, result);          
         }
 
-        [HttpPut, Authorize]
-        public async Task<IActionResult> UpdateCardAsync(int id, [FromBody] UpdateCardDto updateCardDto)
+        [HttpPut("{id}"), Authorize]
+        public async Task<IActionResult> UpdateCard(int id, [FromBody] UpdateCardDto updateCardDto)
         {
-            try
-            {
-                User loggedUser = await FindLoggedUserAsync();
-                var loggedUsersAccountId = await FindLoggedUsersAccountAsync();
-                Card updateCard = mapper.Map<Card>(updateCardDto);
-                Card updatedCard = await cardService.UpdateAsync(id, loggedUser, updateCard);
+          
+            User loggedUser = await FindLoggedUserAsync();
+            var result = await this.cardService.UpdateAsync(id, loggedUser, updateCardDto);
 
-                return StatusCode(StatusCodes.Status200OK, updatedCard);
-            }
-            catch (UnauthorizedOperationException e)
+            if (!result.IsSuccessful)
             {
-                return StatusCode(StatusCodes.Status401Unauthorized, e.Message);
+                return BadRequest(result.Message);
             }
-            catch (DuplicateEntityException e)
-            {
-                return StatusCode(StatusCodes.Status409Conflict, e.Message);
-            }
+
+            return StatusCode(StatusCodes.Status200OK, result);
         }
 
         [HttpDelete("{id}"), Authorize]
@@ -110,14 +102,16 @@ namespace VirtualWallet.Controllers.API
             try
             {
                 User loggedUser = await FindLoggedUserAsync();
-                var isDeleted = await this.cardService.DeleteAsync(id, loggedUser);
+                var result = await this.cardService.DeleteAsync(id, loggedUser);
 
-                return StatusCode(StatusCodes.Status200OK);
+                if (!result.IsSuccessful)
+                {
+                    return BadRequest(result.Message);
+                }
+
+                return StatusCode(StatusCodes.Status200OK, result.Message);
             }
-            catch (UnauthorizedOperationException e)
-            {
-                return StatusCode(StatusCodes.Status401Unauthorized, e.Message);
-            }
+           
             catch (EntityNotFoundException e)
             {
                 return StatusCode(StatusCodes.Status404NotFound, e.Message);
@@ -126,7 +120,7 @@ namespace VirtualWallet.Controllers.API
         private async Task<User> FindLoggedUserAsync()
         {
             var loggedUsersUsername = User.Claims.FirstOrDefault(claim => claim.Type == "Username").Value;
-            var loggedUser = await authManager.TryGetUserByUsernameAsync(loggedUsersUsername);
+            var loggedUser = await this.userRepository.GetByUsernameAsync(loggedUsersUsername);
             return loggedUser;
         }
         private async Task<int> FindLoggedUsersAccountAsync()

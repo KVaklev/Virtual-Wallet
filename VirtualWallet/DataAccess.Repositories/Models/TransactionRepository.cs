@@ -31,10 +31,10 @@ namespace DataAccess.Repositories.Models
             return transaction ?? throw new EntityNotFoundException(Constants.NoFoundErrorMessage);
         }
 
-
         public async Task<bool> SaveChangesAsync()
         {
             await context.SaveChangesAsync();
+
             return true;
         }
 
@@ -42,9 +42,9 @@ namespace DataAccess.Repositories.Models
         {
             transaction.IsDeleted = true;
             await context.SaveChangesAsync();
+
             return transaction.IsDeleted;
         }
-
 
         public async Task<Transaction> CreateTransactionAsync(Transaction transaction)
         { 
@@ -98,7 +98,6 @@ namespace DataAccess.Repositories.Models
             }
             return await Task.FromResult(result);
         }
-
         private async Task<IQueryable<Transaction>> FilterByFromDataAsync(IQueryable<Transaction> result, string? fromData)
         {
             if (!string.IsNullOrEmpty(fromData))
@@ -108,7 +107,6 @@ namespace DataAccess.Repositories.Models
             }
             return await Task.FromResult(result);
         }
-
         private async Task<IQueryable<Transaction>> FilterByToDataAsync(IQueryable<Transaction> result, string? toData)
         {
             if (!string.IsNullOrEmpty(toData))
@@ -119,7 +117,6 @@ namespace DataAccess.Repositories.Models
             }
             return await Task.FromResult(result);
         }
-
         private async Task<DirectionType> ParseDirectionParameterAsync(string value, string parameterName)
         {
             if (Enum.TryParse(value, true, out DirectionType result))
@@ -129,7 +126,6 @@ namespace DataAccess.Repositories.Models
 
             throw new EntityNotFoundException($"Invalid value for {parameterName}.");
         }
-
         private async Task<IQueryable<Transaction>> FilterByDirectionAsync(IQueryable<Transaction> result, string? direction)
         {
             if (!string.IsNullOrEmpty(direction))
@@ -139,7 +135,6 @@ namespace DataAccess.Repositories.Models
             }
             return await Task.FromResult(result);
         }
-
         private async Task<IQueryable<Transaction>> SortByAsync(IQueryable<Transaction> result, string sortCriteria)
         {
             if (Enum.TryParse<SortCriteria>(sortCriteria, true, out var sortEnum))

@@ -1,14 +1,12 @@
 ﻿using Business.DTOs.Requests;
 using Business.Exceptions;
 using Business.Services.Contracts;
+using Business.Services.Helpers;
 using DataAccess.Models.Models;
+using DataAccess.Repositories.Contracts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
-using Presentation.Helpers;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
+
 
 namespace VirtualWallet.Controllers.API
 {
@@ -16,121 +14,91 @@ namespace VirtualWallet.Controllers.API
     [Route("api")]
     public class AccountApiController : ControllerBase
     {
-        private readonly IAuthManager authManager;
         private readonly IUserService userService;
         private readonly IEmailService emailService;
         private readonly IAccountService accountService;
+        private readonly IUserRepository userRepository;
 
-        public AccountApiController(
-            IAuthManager authManager, 
+        public AccountApiController( 
             IUserService userService,
             IEmailService emailService,
-            IAccountService accountService
+            IAccountService accountService,
+            IUserRepository userRepository
             )
         {
-            this.authManager = authManager;
             this.userService = userService;
             this.emailService = emailService;
             this.accountService = accountService;
+            this.userRepository = userRepository;
         }
 
         [AllowAnonymous]
         [HttpPost("login")]
         public async Task<IActionResult> LoginAsync(string username, string password)
         {
-            try
-            {
-                this.authManager.CheckForNullEntry(username, password);
-                var loggedUser = await this.authManager.TryGetUserByUsernameAsync(username);
-                var authenticatedUser = await this.authManager.AuthenticateAsync(loggedUser, username, password);
 
-                string token = await CreateApiTokenAsync(loggedUser);
+            var loggedUser = await this.userService.LoginAsync(username, password);
+            var result = await this.accountService.CreateApiTokenAsync(loggedUser);
 
-                return Ok("Logged in successfully. Token: " + token);
-            }
-            catch (ArgumentException e)
+            Response.Cookies.Append("Cookie_JWT", result.Data.ToString(), new CookieOptions()
             {
-                return StatusCode(StatusCodes.Status400BadRequest, e.Message);
-            }
-            catch (UnauthorizedOperationException e)
+                HttpOnly = false,
+                SameSite = SameSiteMode.Strict
+            });
+
+            if (!result.IsSuccessful)
             {
-                return StatusCode(StatusCodes.Status401Unauthorized, e.Message);
+                return BadRequest(result.Message);
             }
-            catch
-            {
-                return BadRequest("An error occurred in generating the token");
-            }
+
+            result.Message = Constants.SuccessfullTokenMessage;
+
+            return Ok(result.Message + result.Data.ToString());
+   
         }
 
         [AllowAnonymous]
         [HttpPost("register")]
         public async Task<IActionResult> RegisterAsync([FromBody] CreateUserDto createUserDto)
         {
-            try
+   
+           var result = await this.userService.CreateAsync(createUserDto);
+
+            if (!result.IsSuccessful)
             {
-               var createdUser = await this.userService.CreateAsync(createUserDto);
-              
-               return await this.SendConfirmationEmailAsync(createdUser.Username);
+                return BadRequest(result.Message);
             }
-            catch (DuplicateEntityException e)
-            {
-                return StatusCode(StatusCodes.Status409Conflict, e.Message);
-            }
+
+           return await this.SendConfirmationEmailAsync(result.Data.Username);
+            
         }
 
         [HttpGet("confirm-email")]
         public async Task<IActionResult> SendConfirmationEmailAsync(string username)
         {
-            var user = await this.userService.GetByUsernameAsync(username);
-
+            var user = await this.userRepository.GetByUsernameAsync(username);
             var token = this.accountService.GenerateTokenAsync(user.Id);
-            var confirmationLink = Url.Action("confirm-registration", "api",
-                                   new { userId = user.Id, token = token.Result }, Request.Scheme);
-
+            var confirmationLink = Url.Action("confirm-registration", "api", new { userId = user.Id, token = token.Result }, Request.Scheme);
+            
             var message = await this.emailService.BuildEmailAsync(user, confirmationLink);
+            
             await emailService.SendEMailAsync(message);
 
-            return Ok("Confirmation email was sent successfully. Please check your inbox folder.");
+            return Ok(Constants.SuccessfullConfirmationEmailSentMessage);
         }
 
 
         [HttpGet("confirm-registration")]
         public async Task<IActionResult> ConfirmRegistrationAsync([FromQuery] int userId, [FromQuery] string token)
         {
-           var isSuccessfullConfirmation = await this.accountService.ConfirmRegistrationAsync(userId, token);
+           var result = await this.accountService.ConfirmRegistrationAsync(userId, token);
 
-            if (isSuccessfullConfirmation)
+            if (!result.IsSuccessful)
             {
-                return Ok("Registration confirmed!");
+                return BadRequest(Constants.NotSuccessfullRegistrationMessage);
 
             }
-            return BadRequest("Your registration was not successfull.");
-        }
-
-
-        private async Task<string> CreateApiTokenAsync(User loggedUser)
-        {
-            var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("This is my secret testing key"));
-            var signinCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256);
-            var jwtSecurityToken = new JwtSecurityToken(
-                    issuer: "VirtualWallet",
-                    audience: "Where is that audience",
-                    claims: new[] {
-                new Claim("LoggedUserId", loggedUser.Id.ToString()),
-                new Claim("Username", loggedUser.Username),
-                new Claim("IsAdmin", loggedUser.IsAdmin.ToString()),
-                new Claim("UsersAccountId", loggedUser.Account.Id.ToString()),//null check
-                new Claim(JwtRegisteredClaimNames.Email, loggedUser.Email),
-                new Claim(JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString())
-        },
-            expires: DateTime.Now.AddMinutes(30),
-                    signingCredentials: signinCredentials
-                );
-            string token = new JwtSecurityTokenHandler()
-
-            .WriteToken(jwtSecurityToken);
-            Response.Cookies.Append("Cookie_JWT", token);
-            return await Task.FromResult(token);
+            return Ok(result.Message);
         }
     }
 }

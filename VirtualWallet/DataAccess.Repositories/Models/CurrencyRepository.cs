@@ -30,6 +30,16 @@ namespace DataAccess.Repositories.Models
             var currency = await this.context.Currencies
                 .Where(c => c.Id == id)
                 .FirstOrDefaultAsync();
+
+            return currency ?? throw new EntityNotFoundException(Constants.NoFoundErrorMessage);
+        }
+
+        public async Task<Currency> GetByCurrencyCodeAsync(string currencyCode)
+        {
+            var currency = await context.Currencies
+                    .Where(c => c.CurrencyCode == currencyCode)
+                    .FirstOrDefaultAsync();
+ 
             return currency ?? throw new EntityNotFoundException(Constants.NoFoundErrorMessage);
         }
 
@@ -37,6 +47,7 @@ namespace DataAccess.Repositories.Models
         {
             context.Add(currency);
             await context.SaveChangesAsync();
+
             return currency;
         }
 
@@ -50,19 +61,9 @@ namespace DataAccess.Repositories.Models
         {
             var currencyToDelete = await this.GetByIdAsync(id);
             currencyToDelete.IsDeleted = true;
-            await context.SaveChangesAsync();
 
+            await context.SaveChangesAsync();
             return currencyToDelete.IsDeleted;
         }
-
-        public async Task<Currency> GetByCurrencyCodeAsync(string currencyCode)
-        {
-            var currency = await context.Currencies
-                    .Where(c => c.CurrencyCode == currencyCode)
-                    .FirstOrDefaultAsync();
- 
-            return currency ?? throw new EntityNotFoundException(Constants.NoFoundErrorMessage);
-        }
-
     }
 }

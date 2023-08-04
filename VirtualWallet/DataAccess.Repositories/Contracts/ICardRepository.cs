@@ -15,6 +15,5 @@ namespace DataAccess.Repositories.Contracts
         Task<Card> IncreaseBalanceAsync(int id, decimal amount);
         Task<Card> DecreaseBalanceAsync(int id, decimal amount);
         Task<bool> DeleteAsync(int id);
-
     }
 }

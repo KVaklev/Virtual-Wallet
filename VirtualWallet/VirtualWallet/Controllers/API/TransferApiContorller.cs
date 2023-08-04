@@ -4,13 +4,10 @@ using Business.DTOs.Responses;
 using Business.Exceptions;
 using Business.QueryParameters;
 using Business.Services.Contracts;
-using Business.Services.Models;
 using DataAccess.Models.Models;
+using DataAccess.Repositories.Contracts;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Presentation.Helpers;
-using System.Text.Json;
 
 namespace VirtualWallet.Controllers.API
 {
@@ -19,30 +16,21 @@ namespace VirtualWallet.Controllers.API
     public class TransferApiContorller : ControllerBase
     {
         private readonly IMapper mapper;
-        private readonly IAuthManager authManager;
         private readonly ITransferService transferService;
-        private readonly IAccountService accountService;
-        private readonly ICardService cardService;
         private readonly IUserService userService;
-        private readonly ICurrencyService currencyService;
+        private readonly IUserRepository userRepository;
 
         public TransferApiContorller(
             IMapper mapper,
-            IAuthManager authManager,
             ITransferService transferService,
-            IAccountService accountService,
-            ICardService cardService,
             IUserService userService,
-            ICurrencyService currencyService
+            IUserRepository userRepository
             )
         {
             this.mapper = mapper;
-            this.authManager = authManager;
             this.transferService = transferService;
-            this.accountService = accountService;
             this.userService = userService;
-            this.currencyService = currencyService;
-
+            this.userRepository = userRepository;
         }
         [HttpGet, Authorize] 
         public async Task<IActionResult> GetTransferAsync([FromQuery] TransferQueryParameters filterParameters)
@@ -50,10 +38,10 @@ namespace VirtualWallet.Controllers.API
             try
             {
                 var loggedUser = await FindLoggedUserAsync();
-                var transfers = await this.transferService.FilterByAsync(filterParameters, loggedUser);
-                List<GetTransferDto> transferDtos = transfers.Select(transfer => mapper.Map<GetTransferDto>(transfer)).ToList();
-
-                return StatusCode(StatusCodes.Status200OK, transferDtos);
+                
+                var result = await this.transferService.FilterByAsync(filterParameters, loggedUser);
+                
+                return StatusCode(StatusCodes.Status200OK, result.Data);
             }
             catch (EntityNotFoundException e)
             {
@@ -113,15 +101,15 @@ namespace VirtualWallet.Controllers.API
 
 
         [HttpPut("{id}"), Authorize]
-        public async Task<IActionResult> UpdateAsync(int id, [FromBody] CreateTransferDto createTransferDto)
+        public async Task<IActionResult> UpdateAsync(int id, [FromBody] UpdateTransferDto updateTransferDto)
         {
             try
             {
                 var loggedUser = await FindLoggedUserAsync();
 
-                var updateTransfer = await this.transferService.UpdateAsync(id, createTransferDto, loggedUser);
+                var updateTransfer = await this.transferService.UpdateAsync(id, updateTransferDto, loggedUser);
                 
-                var updateTransferDto = this.mapper.Map<GetTransferDto>(updateTransfer);
+                var updatedTransferDto = this.mapper.Map<UpdateTransferDto>(updateTransfer);
                 return StatusCode(StatusCodes.Status200OK, updateTransferDto);
             }
             catch (EntityNotFoundException e)
@@ -173,14 +161,12 @@ namespace VirtualWallet.Controllers.API
             {
                 return StatusCode(StatusCodes.Status401Unauthorized, e.Message);
             }
-
         }
-        private async Task <User> FindLoggedUserAsync()
+        private async Task<User> FindLoggedUserAsync()
         {
             var loggedUsersUsername = User.Claims.FirstOrDefault(claim => claim.Type == "Username").Value;
-            var loggedUser = await authManager.TryGetUserByUsernameAsync(loggedUsersUsername);
+            var loggedUser = await this.userRepository.GetByUsernameAsync(loggedUsersUsername);
             return loggedUser;
         }
-
     }
 }

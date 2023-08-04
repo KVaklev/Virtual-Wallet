@@ -2,6 +2,7 @@
 using Business.QueryParameters;
 using DataAccess.Models.Enums;
 using DataAccess.Models.Models;
+using DataAccess.Models.ValidationAttributes;
 using DataAccess.Repositories.Contracts;
 using DataAccess.Repositories.Data;
 using DataAccess.Repositories.Helpers;
@@ -35,14 +36,14 @@ namespace DataAccess.Repositories.Models
             }
 
 
-            return result ?? throw new EntityNotFoundException("There are no transfers!");
+            return result ?? throw new EntityNotFoundException(Constants.NoFoundErrorMessage);
         }
 
         public async Task<Transfer> CreateAsync(Transfer transfer)
         {
-            transfer.DateCreated = DateTime.Now;
-            transfer.IsConfirmed = false;
-            transfer.IsCancelled = false;
+            //transfer.DateCreated = DateTime.Now;
+            //transfer.IsConfirmed = false;
+            //transfer.IsCancelled = false;
             await context.AddAsync(transfer);
             await context.SaveChangesAsync();
 
@@ -53,10 +54,16 @@ namespace DataAccess.Repositories.Models
         {
             Transfer transferToDelete = await GetByIdAsync(id);
             transferToDelete.IsCancelled = true;
-            context.Transfers.Remove(transferToDelete);
+            //context.Transfers.Remove(transferToDelete);
             await context.SaveChangesAsync();
 
             return transferToDelete.IsCancelled;
+        }
+
+        public async Task<bool> SaveChangesAsync()
+        {
+            await context.SaveChangesAsync();
+            return true;
         }
 
         public async Task<Transfer> GetByIdAsync(int id)
@@ -66,10 +73,10 @@ namespace DataAccess.Repositories.Models
                 .ThenInclude(u => u.User)
                 .Include(t => t.Card)
                 .Include(t => t.Currency)
-                                .FirstOrDefaultAsync(t => t.Id == id)
-                                ;
+                .FirstOrDefaultAsync(t => t.Id == id);
 
-            return transfer ?? throw new EntityNotFoundException($"Transfer with ID = {id} does not exist");
+
+            return transfer ?? throw new EntityNotFoundException(Constants.NoFoundErrorMessage);
 
         }
 
@@ -80,28 +87,33 @@ namespace DataAccess.Repositories.Models
                 .ThenInclude(u => u.User)
                 .FirstOrDefaultAsync(t => t.Account.User.Id == userId);
 
-            return transfer ?? throw new EntityNotFoundException($"Transfer with UserId = {userId} does not exist");
+            return transfer ?? throw new EntityNotFoundException(Constants.NoFoundErrorMessage);
         }
 
-        public async Task<Transfer> UpdateAsync(int id, Transfer transfer)
+        //public async Task<Transfer> UpdateAsync(int id, Transfer transfer)
+        //{
+        //    var transferToUpdate = await GetByIdAsync(id);
+
+        //    if (transferToUpdate.IsConfirmed)
+        //    {
+        //        throw new UnauthorizedOperationException(Constants.TransferIsConfirmedErrorMessage);
+        //    }
+
+        //    transferToUpdate.Amount = transfer.Amount;
+        //    transferToUpdate.CardId = transfer.CardId;
+        //    transferToUpdate.CurrencyId = transfer.CurrencyId;
+
+
+        //    await context.SaveChangesAsync();
+        //    return transferToUpdate;
+
+        //}
+
+        public async Task<Transfer> UpdateAsync(Transfer transferToUpdate)
         {
-            var transferToUpdate = await GetByIdAsync(id);
-
-            if (transferToUpdate.IsConfirmed)
-            {
-                throw new UnauthorizedOperationException("Transfer is confirmed! You are not authorized to modify it");
-            }
-
-            transferToUpdate.Amount = transfer.Amount;
-            transferToUpdate.CardId = transfer.CardId;
-            transferToUpdate.CurrencyId = transfer.CurrencyId;
-
-
             await context.SaveChangesAsync();
             return transferToUpdate;
-
         }
-
 
         public async Task<PaginatedList<Transfer>> FilterByAsync(TransferQueryParameters filterParameters, User user)
         {
@@ -118,7 +130,7 @@ namespace DataAccess.Repositories.Models
 
             if (finalResult == 0)
             {
-                throw new EntityNotFoundException("No results found by the specified filter criteria.");
+                throw new EntityNotFoundException(Constants.NoFoundErrorMessage);
             }
 
             int totalPages = (result.Count() + filterParameters.PageSize - 1) /
@@ -183,22 +195,8 @@ namespace DataAccess.Repositories.Models
                 return result;
             }
 
-            throw new EntityNotFoundException($"Invalid value for {parameter}.");
+            throw new EntityNotFoundException(Constants.TransferDirectionInputError);
         }
-
-        //private async Task<IQueryable<Transfer>> SortByAsync(IQueryable<Transfer> transfers, string? sortCriteria)
-        //{
-        //    switch (sortCriteria)
-        //    {
-        //        case  SortCriteria.amount/*"amount"*/:
-        //            return await Task.FromResult(transfers.OrderBy(t => t.Amount));
-        //        case "date":
-        //            return await Task.FromResult(transfers.OrderBy(t => t.DateCreated));
-        //        default:
-        //            return await Task.FromResult(transfers);
-
-        //    }
-        //}
 
         public static async Task<IQueryable<Transfer>> SortByAsync(IQueryable<Transfer> transfers, string? sortCriteria)
         {
@@ -210,7 +208,7 @@ namespace DataAccess.Repositories.Models
                         return await Task.FromResult(transfers.OrderBy(t => t.Amount));
                     case SortCriteria.Date:
                         return await Task.FromResult(transfers.OrderBy(t => t.DateCreated));
-                    
+
                     default:
                         return await Task.FromResult(transfers);
                 }
@@ -218,7 +216,7 @@ namespace DataAccess.Repositories.Models
             else
             {
                 return await Task.FromResult(transfers);
-                               
+
             }
         }
 

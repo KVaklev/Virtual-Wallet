@@ -1,4 +1,5 @@
-﻿using Business.DTOs.Requests;
+﻿using Business.DTOs;
+using Business.DTOs.Requests;
 using Business.DTOs.Responses;
 using Business.QueryParameters;
 using DataAccess.Models.Models;
@@ -13,12 +14,12 @@ namespace Business.Services.Contracts
     public interface ITransferService
     {
         IQueryable <Transfer> GetAll(User user);
-        Task<PaginatedList<Transfer>> FilterByAsync(TransferQueryParameters transferQueryParameters, User user);
-        Task <GetTransferDto> GetByIdAsync(int id, User user);
-        Task <Transfer> CreateAsync(CreateTransferDto transferDto, User user);
-        Task <Transfer> UpdateAsync(int id, CreateTransferDto transferDto, User user);
-        Task <bool> DeleteAsync(int id, User user);
-        Task <bool> ExecuteAsync(int transferId, User user);
+        Task<Response<List<GetTransferDto>>> FilterByAsync(TransferQueryParameters transferQueryParameters, User user);
+        Task<Response<GetTransferDto>> GetByIdAsync(int id, User user);
+        Task <Response<GetTransferDto>> CreateAsync(CreateTransferDto transferDto, User user);
+        Task<Response<GetTransferDto>> UpdateAsync(int id, UpdateTransferDto transferDto, User user);
+        Task<Response<bool>> DeleteAsync(int id, User user);
+        Task<Response<bool>> ExecuteAsync(int transferId, User user);
 
 
     }
