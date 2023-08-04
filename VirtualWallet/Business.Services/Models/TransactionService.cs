@@ -63,7 +63,7 @@ namespace Business.Services.Models
             User loggedUser)
         {
             var result = await this.transactionRepository.FilterByAsync(filterParameters, loggedUser.Username);
-            return result;
+            return result;//todo paginated
         }
 
         public async Task<Response<GetTransactionDto>> CreateOutTransactionAsync(CreateTransactionDto transactionDto, User loggedUser)

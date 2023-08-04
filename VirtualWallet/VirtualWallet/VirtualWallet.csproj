@@ -30,7 +30,6 @@
 
   <ItemGroup>
     <Folder Include="Pages\Accounts\" />
-    <Folder Include="Pages\Transactions\" />
     <Folder Include="Pages\Transfers\" />
     <Folder Include="Pages\Users\" />
   </ItemGroup>

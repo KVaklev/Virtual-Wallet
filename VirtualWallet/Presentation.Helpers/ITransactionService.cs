@@ -2,7 +2,7 @@
 
 namespace Presentation.Helpers
 {
-    public interface IAuthManager
+    public interface ITransactionService
     {
         Task<User> TryGetUserByUsernameAsync(string username);
         Task<User> AuthenticateAsync(User loggedUser, string username, string password);
