@@ -1,17 +1,13 @@
 ﻿using AutoMapper;
-using Business.DTOs;
 using Business.DTOs.Requests;
 using Business.DTOs.Responses;
 using Business.Exceptions;
 using Business.QueryParameters;
 using Business.Services.Contracts;
-using Business.Services.Models;
 using DataAccess.Models.Models;
+using DataAccess.Repositories.Contracts;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Presentation.Helpers;
-using System.Text.Json;
 
 namespace VirtualWallet.Controllers.API
 {
@@ -22,16 +18,19 @@ namespace VirtualWallet.Controllers.API
         private readonly IMapper mapper;
         private readonly ITransferService transferService;
         private readonly IUserService userService;
+        private readonly IUserRepository userRepository;
 
         public TransferApiContorller(
             IMapper mapper,
             ITransferService transferService,
-            IUserService userService
+            IUserService userService,
+            IUserRepository userRepository
             )
         {
             this.mapper = mapper;
             this.transferService = transferService;
             this.userService = userService;
+            this.userRepository = userRepository;
         }
         [HttpGet, Authorize] 
         public async Task<IActionResult> GetTransferAsync([FromQuery] TransferQueryParameters filterParameters)
@@ -163,12 +162,11 @@ namespace VirtualWallet.Controllers.API
                 return StatusCode(StatusCodes.Status401Unauthorized, e.Message);
             }
         }
-        private async Task<Response<GetUserDto>> FindLoggedUserAsync()
+        private async Task<User> FindLoggedUserAsync()
         {
             var loggedUsersUsername = User.Claims.FirstOrDefault(claim => claim.Type == "Username").Value;
-            var loggedUser = await this.userService.GetByUsernameAsync(loggedUsersUsername);
+            var loggedUser = await this.userRepository.GetByUsernameAsync(loggedUsersUsername);
             return loggedUser;
         }
-
     }
 }

@@ -177,8 +177,7 @@ namespace Business.Services.Models
             } 
             
             User userToDelete = await this.userRepository.GetByIdAsync(id);
-            var accountToDelete = await this.accountService.GetByIdAsync((int)userToDelete.AccountId, loggedUser);
-            await this.accountService.DeleteAsync(accountToDelete.Id, loggedUser);
+            await this.accountService.DeleteAsync((int)userToDelete.AccountId, loggedUser);
     
             result.Data = await this.userRepository.DeleteAsync(id);
             
@@ -257,16 +256,13 @@ namespace Business.Services.Models
             return result;
         }
 
-        public async Task<Response<GetUserDto>> LoginAsync(string username, string password)
+        public async Task<User> LoginAsync(string username, string password)
         {
-            var result = new Response<GetUserDto>();
-
             await Security.CheckForNullEntryAsync(username, password);
             User loggedUser = await this.userRepository.GetByUsernameAsync(username);
             var authenticatedUser = await Security.AuthenticateAsync(loggedUser, username, password);
 
-            result.Data = mapper.Map<GetUserDto>(authenticatedUser);
-            return result;
+            return authenticatedUser;
         }
 
         private async Task<bool> EmailExistsAsync(string email)

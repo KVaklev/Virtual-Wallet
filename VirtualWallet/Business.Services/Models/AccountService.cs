@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
+using Business.DTOs;
 using Business.DTOs.Requests;
+using Business.DTOs.Responses;
 using Business.Exceptions;
 using Business.Mappers;
 using Business.Services.Additional;
@@ -10,6 +12,7 @@ using DataAccess.Repositories.Contracts;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Principal;
 using System.Text;
 
 namespace Business.Services.Models
@@ -20,58 +23,106 @@ namespace Business.Services.Models
         private readonly IUserRepository userRepository;
         private readonly ICardService cardService;
         private readonly ICurrencyService currencyService;
+        private readonly IMapper mapper;
 
         public AccountService(
             IAccountRepository accountRepository,  
             IUserRepository userRepository,
             ICardService cardService,
-            ICurrencyService currencyService
+            ICurrencyService currencyService,
+            IMapper mapper
           )
         {
             this.accountRepository = accountRepository;
             this.userRepository = userRepository;
             this.cardService = cardService;
             this.currencyService = currencyService;
+            this.mapper = mapper;
            
         }
-        public IQueryable<Account> GetAll()
+        public Response<IQueryable<GetAccountDto>> GetAll()
         {
-            return accountRepository.GetAll();
+            var result = new Response<IQueryable<GetAccountDto>>();
+            var accounts = accountRepository.GetAll();
+
+            if (accounts != null && accounts.Any())
+            {
+                result.IsSuccessful = true;
+                result.Data = (IQueryable<GetAccountDto>)accounts.AsQueryable();
+            }
+            else
+            {
+                result.IsSuccessful = false;
+                result.Message = Constants.NoAccountsErrorMessage;
+            }
+
+            return result;
         }
-        public async Task<Account> GetByIdAsync(int id, User user)
+
+        public async Task<Response<GetAccountDto>> GetByIdAsync(int id, User user)
         {
+            var result = new Response<GetAccountDto>();
+
+            var account = await this.accountRepository.GetByIdAsync(id);
+            
             if (!await Security.IsUserAuthorized(id, user))
             {
-                throw new UnauthorizedOperationException(Constants.ModifyAccountErrorMessage);
+                result.IsSuccessful = false;
+                result.Message = Constants.ModifyAccountErrorMessage;
+                return result;
             }
-            return await this.accountRepository.GetByIdAsync(id);
+            var accountDto = this.mapper.Map<GetAccountDto>(account);
+            result.Data = accountDto;
+
+            return result;
         }
-        public async Task<Account> GetByUsernameAsync(int id, User user)
+
+        public async Task<Response<GetAccountDto>> GetByUsernameAsync(int id, User user)
         {
+            var result = new Response<GetAccountDto>();
+            
+            var account = await accountRepository.GetByUsernameAsync(user.Username);
+
             if (!await Security.IsUserAuthorized(id, user))
             {
-                throw new UnauthorizedOperationException(Constants.ModifyAccountErrorMessage);
+                result.IsSuccessful = false;
+                result.Message = Constants.ModifyAccountErrorMessage;
+                return result;
             }
-            return await accountRepository.GetByUsernameAsync(user.Username);
+
+            var accountDto = this.mapper.Map<GetAccountDto>(account);
+            result.Data = accountDto;
+
+            return result;
         }
-        public async Task<Account> CreateAsync(string currencyCode, User user)
+
+        public async Task<Response<GetAccountDto>> CreateAsync(string currencyCode, User user)
         {
+            var result = new Response<GetAccountDto>();
+
             var accountToCreate = new Account();
             var currency = await currencyService.GetByCurrencyCodeAsync(currencyCode);
             accountToCreate = await AccountsMapper.MapCreateDtoToAccountAsync(accountToCreate, currency, user);
             
             user.AccountId = user.Id;
-            accountToCreate = await this.accountRepository.CreateAsync(accountToCreate);
+            var createdAccount = await this.accountRepository.CreateAsync(accountToCreate);
+            var accountDto = this.mapper.Map<GetAccountDto>(createdAccount);
+            
+            result.Data = accountDto;
 
-            return accountToCreate;
+            return result;
         }
-        public async Task<bool> DeleteAsync(int id, User loggedUser)
-        { 
-            var accountToDelete = await this.GetByIdAsync(id, loggedUser);
+        public async Task<Response<bool>> DeleteAsync(int id, User loggedUser)
+        {
+            var result = new Response<bool>();
+
+            var accountToDelete = await this.accountRepository.GetByIdAsync(id);
 
             if (!await Security.IsAdminAsync(loggedUser))
             {
-                throw new UnauthorizedOperationException(Constants.ModifyUserErrorMessage);
+                result.IsSuccessful = false;
+                result.Message = Constants.ModifyUserErrorMessage;
+                return result;
             }
 
             if (accountToDelete.Cards.Count != 0)
@@ -81,35 +132,54 @@ namespace Business.Services.Models
                     await this.cardService.DeleteAsync(card.Id, loggedUser);
                 }
             }          
-            return await this.accountRepository.DeleteAsync(id);
+
+            result.Data = await this.accountRepository.DeleteAsync(id);
+
+            return result;
         }
-        public async Task<bool> AddCardAsync(int id, Card card, User user)
+        public async Task<Response<bool>> AddCardAsync(int id, Card card, User user)
         {
+            var result = new Response<bool>();
+
             if (!await Security.IsUserAuthorized(id, user))
             {
-                throw new UnauthorizedOperationException(Constants.ModifyAccountCardErrorMessage);
+                result.IsSuccessful = false;
+                result.Message = Constants.ModifyAccountCardErrorMessage;
+                return result;
             }
 
             if (!await this.cardService.CardNumberExistsAsync(card.CardNumber))
             {
-                return await this.accountRepository.AddCardAsync(id, card);
+                result.IsSuccessful = true;
+                result.Data = await this.accountRepository.AddCardAsync(id, card);
+                return result;
             }
-            return true;
+
+            return result;
         }
-        public async Task<bool> RemoveCardAsync(int id, Card card, User user)
+        public async Task<Response<bool>> RemoveCardAsync(int id, Card card, User user)
         {
+            var result = new Response<bool>();
+
             if (!await Security.IsUserAuthorized(id, user))
             {
-                throw new UnauthorizedOperationException(Constants.ModifyAccountCardErrorMessage);
+                result.IsSuccessful = false;
+                result.Message = Constants.ModifyAccountCardErrorMessage;
+                return result;
             }
             if (!await this.cardService.CardNumberExistsAsync(card.CardNumber))
             {
-                return await this.accountRepository.RemoveCardAsync(id, card);
+                result.IsSuccessful = true;
+                result.Data = await this.accountRepository.AddCardAsync(id, card);
+                return result;
             }
-            return true;
+
+            return result;
         }
-        public async Task<string> CreateApiTokenAsync(User loggedUser)
+        public async Task<Response<string>> CreateApiTokenAsync(User loggedUser)
         {
+            var result = new Response<string>();
+
             var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("This is my secret testing key"));
             var signinCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256);
             var jwtSecurityToken = new JwtSecurityToken(
@@ -120,31 +190,43 @@ namespace Business.Services.Models
                 new Claim("Username", loggedUser.Username),
                 new Claim("IsAdmin", loggedUser.IsAdmin.ToString()),
                 new Claim("UsersAccountId", loggedUser.Account.Id.ToString()),//null check
-                new Claim(ClaimTypes.Role, loggedUser.IsAdmin.ToString()),
                 new Claim(JwtRegisteredClaimNames.Email, loggedUser.Email),
                 new Claim(JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString())
         },
             expires: DateTime.Now.AddMinutes(30),
                     signingCredentials: signinCredentials
                 );
-            string token = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
-         
-            return await Task.FromResult(token);
+            
+            result.Data = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
+           
+            if (!result.IsSuccessful)
+            {
+                result.Message = Constants.GenerateTokenErrorMessage;
+            }
+
+            return await Task.FromResult(result);
         }
-        public async Task<string> GenerateTokenAsync(int id)
+        public async Task<Response<string>> GenerateTokenAsync(int id)
         {
+            var result = new Response<string>();
+
             var user = await this.userRepository.GetByIdAsync(id);
-            var token = (DateTime.Now.ToString() + user.Username).ComputeSha256Hash();
-            return token;
+            result.Data = (DateTime.Now.ToString() + user.Username).ComputeSha256Hash();
+           
+            return result;
         }
-        public async Task<bool> ConfirmRegistrationAsync(int id, string token)
+        public async Task<Response<bool>> ConfirmRegistrationAsync(int id, string token)
         {
-            return await this.accountRepository.ConfirmRegistrationAsync(id, token);
+            var result = new Response<bool>();
+
+            result.Data = await this.accountRepository.ConfirmRegistrationAsync(id, token);
+            result.Message = Constants.ConfirmedRegistrationMessage;
+            return result;
         }
 
         public async Task<Account> IncreaseBalanceAsync(int id, decimal amount, User loggedUser)
         {
-            Account accountToDepositTo = await this.GetByIdAsync(id, loggedUser);
+            Account accountToDepositTo = await this.accountRepository.GetByIdAsync(id);
             accountToDepositTo.Balance += amount;
 
             return await this.accountRepository.IncreaseBalanceAsync(id, amount);
@@ -152,7 +234,7 @@ namespace Business.Services.Models
 
         public async Task<Account> DecreaseBalanceAsync(int id, decimal amount, User loggedUser)
         {
-            Account accountToWithdrawFrom = await this.GetByIdAsync(id, loggedUser);
+            Account accountToWithdrawFrom = await this.accountRepository.GetByIdAsync(id);
             accountToWithdrawFrom.Balance -= amount;
 
             return await this.accountRepository.DecreaseBalanceAsync(id, amount);

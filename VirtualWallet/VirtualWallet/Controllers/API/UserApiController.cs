@@ -19,16 +19,13 @@ namespace VirtualWallet.Controllers.API
     public class UserApiController : ControllerBase
     {
         private readonly IUserService userService;
-        private readonly IMapper mapper;
         private readonly IUserRepository userRepository;
 
         public UserApiController(
             IUserService userService,
-            IMapper mapper,
             IUserRepository userRepository)
         {
             this.userService = userService;
-            this.mapper = mapper;
             this.userRepository = userRepository;
         }
        
