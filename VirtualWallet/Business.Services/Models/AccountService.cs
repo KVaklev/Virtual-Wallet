@@ -120,6 +120,7 @@ namespace Business.Services.Models
                 new Claim("Username", loggedUser.Username),
                 new Claim("IsAdmin", loggedUser.IsAdmin.ToString()),
                 new Claim("UsersAccountId", loggedUser.Account.Id.ToString()),//null check
+                new Claim(ClaimTypes.Role, loggedUser.IsAdmin.ToString()),
                 new Claim(JwtRegisteredClaimNames.Email, loggedUser.Email),
                 new Claim(JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString())
         },

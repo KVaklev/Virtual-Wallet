@@ -14,6 +14,11 @@
         public const string EmailExistsErrorMessage = "User with this email already exists.";
         public const string PhoneNumberExistsErrorMessage = "User with this phone number already exists.";
 
+        public const string SuccessfullDeletedUserMessage = "User was successfully deleted.";
+        public const string SuccessfullPromoteddUserMessage = "User was successfully promoted with admin rights.";
+        public const string SuccessfullBlockedUserMessage = "User was successfully blocked.";
+        public const string SuccessfullUnblockedUserMessage = "User was successfully unblocked.";
+
         //Constant messages for account
 
         public const string ModifyAccountErrorMessage = "Only an admin or owner of the account can access, delete or modify the acount.";

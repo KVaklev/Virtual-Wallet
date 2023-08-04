@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Business.DTOs;
 using Business.DTOs.Requests;
 using Business.DTOs.Responses;
 using Business.Exceptions;
@@ -122,7 +123,7 @@ namespace VirtualWallet.Controllers.API
                 return StatusCode(StatusCodes.Status404NotFound, e.Message);
             }
         }
-        private async Task<User> FindLoggedUserAsync()
+        private async Task<Response<GetUserDto>> FindLoggedUserAsync()
         {
             var loggedUsersUsername = User.Claims.FirstOrDefault(claim => claim.Type == "Username").Value;
             var loggedUser = await this.userService.GetByUsernameAsync(loggedUsersUsername);

@@ -25,39 +25,39 @@ namespace VirtualWallet.Controllers.MVC
             return this.View(loginViewModel);
         }
 
-        [HttpPost]
-        public async Task<IActionResult> Login(LoginViewModel loginViewModel)
-        {
-            if (!this.ModelState.IsValid)
-            {
-                return this.View(loginViewModel);
-            }
+        //[HttpPost]
+        //public async Task<IActionResult> Login(LoginViewModel loginViewModel)
+        //{
+        //    if (!this.ModelState.IsValid)
+        //    {
+        //        return this.View(loginViewModel);
+        //    }
 
-            try
-            {
-                var loggedUser = await this.userService.LoginAsync(loginViewModel.Username, loginViewModel.Password);
-                var token = await this.accountService.CreateApiTokenAsync(loggedUser);
+        //    try
+        //    {
+        //        var loggedUser = await this.userService.LoginAsync(loginViewModel.Username, loginViewModel.Password);
+        //        var token = await this.accountService.CreateApiTokenAsync(loggedUser);
 
-                Response.Cookies.Append("Cookie_JWT", token.ToString(), new CookieOptions()
-                {
-                    HttpOnly = false,
-                    SameSite = SameSiteMode.Strict
-                });
+        //        Response.Cookies.Append("Cookie_JWT", token.ToString(), new CookieOptions()
+        //        {
+        //            HttpOnly = false,
+        //            SameSite = SameSiteMode.Strict
+        //        });
 
-                return Ok("Logged in successfully. Token: " + token);
-            }
-            catch (ArgumentException e)
-            {
-                return StatusCode(StatusCodes.Status400BadRequest, e.Message);
-            }
-            catch (UnauthorizedOperationException e)
-            {
-                return StatusCode(StatusCodes.Status401Unauthorized, e.Message);
-            }
-            catch
-            {
-                return BadRequest("An error occurred in generating the token");
-            }
-        }
+        //        return Ok("Logged in successfully. Token: " + token);
+        //    }
+        //    catch (ArgumentException e)
+        //    {
+        //        return StatusCode(StatusCodes.Status400BadRequest, e.Message);
+        //    }
+        //    catch (UnauthorizedOperationException e)
+        //    {
+        //        return StatusCode(StatusCodes.Status401Unauthorized, e.Message);
+        //    }
+        //    catch
+        //    {
+        //        return BadRequest("An error occurred in generating the token");
+        //    }
+        //}
     }
 }

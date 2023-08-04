@@ -1,4 +1,6 @@
-﻿using Business.Exceptions;
+﻿using Business.DTOs.Responses;
+using Business.DTOs;
+using Business.Exceptions;
 using Business.QueryParameters;
 using Business.Services.Contracts;
 using DataAccess.Models.Models;
@@ -64,7 +66,7 @@ namespace VirtualWallet.Controllers.API
             }
         }
 
-        private async Task<User> FindLoggedUserAsync()
+        private async Task<Response<GetUserDto>> FindLoggedUserAsync()
         {
             var loggedUsersUsername = User.Claims.FirstOrDefault(claim => claim.Type == "Username").Value;
             var loggedUser = await this.userService.GetByUsernameAsync(loggedUsersUsername);

@@ -7,7 +7,8 @@ using Microsoft.AspNetCore.Authorization;
 using Business.Exceptions;
 using Business.QueryParameters;
 using Business.DTOs.Requests;
-
+using Business.DTOs;
+using Business.DTOs.Responses;
 
 namespace VirtualWallet.Controllers.API
 {
@@ -134,13 +135,13 @@ namespace VirtualWallet.Controllers.API
                 return StatusCode(StatusCodes.Status404NotFound, e.Message);
             }
         }
-            private async Task<User> FindLoggedUserAsync()
-            {
-                var loggedUsersUsername = User.Claims.FirstOrDefault(claim => claim.Type == "Username").Value;
-                var loggedUser = await this.userService.GetByUsernameAsync(loggedUsersUsername);
-                return loggedUser;
-            }
-   }
+        private async Task<Response<GetUserDto>> FindLoggedUserAsync()
+        {
+            var loggedUsersUsername = User.Claims.FirstOrDefault(claim => claim.Type == "Username").Value;
+            var loggedUser = await this.userService.GetByUsernameAsync(loggedUsersUsername);
+            return loggedUser;
+        }
+    }
 }  
     
 

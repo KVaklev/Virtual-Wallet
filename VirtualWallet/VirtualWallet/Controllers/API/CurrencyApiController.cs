@@ -6,6 +6,8 @@ using DataAccess.Models.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Presentation.Helpers;
+using Business.DTOs.Responses;
+using Business.DTOs;
 
 namespace VirtualWallet.Controllers.API
 {
@@ -114,7 +116,7 @@ namespace VirtualWallet.Controllers.API
             }
 
         }
-        private async Task<User> FindLoggedUserAsync()
+        private async Task<Response<GetUserDto>> FindLoggedUserAsync()
         {
             var loggedUsersUsername = User.Claims.FirstOrDefault(claim => claim.Type == "Username").Value;
             var loggedUser = await this.userService.GetByUsernameAsync(loggedUsersUsername);

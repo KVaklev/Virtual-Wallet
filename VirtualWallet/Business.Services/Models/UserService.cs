@@ -52,7 +52,12 @@ namespace Business.Services.Models
 
         public async Task<PaginatedList<User>> FilterByAsync(UserQueryParameters filterParameters)
         {
-            return await this.userRepository.FilterByAsync(filterParameters);
+            var result = await this.userRepository.FilterByAsync(filterParameters);
+
+            List<GetCreatedUserDto> userDtos = result
+                    .Select(user => mapper.Map<GetCreatedUserDto>(user))
+                    .ToList();
+            return result;
         }
 
         public async Task<Response<GetUserDto>> GetByIdAsync(int id, User loggedUser)
