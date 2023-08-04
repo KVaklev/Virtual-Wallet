@@ -18,6 +18,8 @@ namespace DataAccess.Repositories.Contracts
 
         Task<bool> DeleteAsync(int id);
 
+        Task<bool> SaveChangesAsync();
+
 
 
 

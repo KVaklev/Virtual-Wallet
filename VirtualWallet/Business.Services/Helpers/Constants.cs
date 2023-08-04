@@ -44,6 +44,8 @@
         public const string ModifyTransferNoDataErrorMessage = "There are no results related to these parameters.";
         public const string ModifyTransferGetByIdErrorMessage = "You are not authorized for the specified action.";
         public const string ModifyTransferUpdateDeleteErrorErrorMessage = "The transfer is either processed or cancelled so you cannot update or delete it.";
+        public const string ModifyDeleteTransfer = "The transfer has been successfully deleted.";
+        public const string ModifyExecutedTransfer = "The transfer has been successfully confirmed.";
 
         //Constant messages for curencies
 

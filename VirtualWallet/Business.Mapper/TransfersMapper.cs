@@ -3,6 +3,7 @@ using Business.DTOs.Requests;
 using Business.DTOs.Responses;
 using Business.Exceptions;
 using DataAccess.Models.Models;
+using System.Security.Cryptography.Xml;
 
 namespace Business.Mappers
 {
@@ -54,11 +55,11 @@ namespace Business.Mappers
             transfer.Card = card;
             transfer.CardId = (int)card.Id;
             transfer.CurrencyId = transfer.Currency.Id;
-
             return transfer;
-
-
         }
+
+       
+
 
     }
 }

@@ -12,6 +12,7 @@ using Business.DTOs.Responses;
 using Business.DTOs;
 using Business.Mappers;
 using DataAccess.Repositories.Helpers;
+using DataAccess.Repositories.Models;
 
 namespace Business.Services.Models
 {
@@ -89,6 +90,7 @@ namespace Business.Services.Models
                 return result;
             }
             transaction.Date = DateTime.UtcNow;
+
             var newTransaction = await this.transactionRepository.CreateTransactionAsync(transaction);
             result.Data = this.mapper.Map<GetTransactionDto>(newTransaction);
 
@@ -121,13 +123,13 @@ namespace Business.Services.Models
             }
             var account = await accountRepository.GetByUsernameAsync(transactionDto.RecepientUsername);
             var currency = await currencyRepository.GetByCurrencyCodeAsync(transactionDto.CurrencyCode);
+
             var newTransaction = await TransactionsMapper.MapDtoТоTransactionAsync(transactionDto, loggedUser, account, currency);
             var updatedTransacion = await TransactionsMapper.MapUpdateDtoToTransactionAsync(transactionToUpdate, newTransaction);
             await this.transactionRepository.SaveChangesAsync();
             result.Data = this.mapper.Map<GetTransactionDto>(updatedTransacion);
             return result;
         }
-
         public async Task<Response<bool>> DeleteAsync(int id, User loggedUser)
         {
             var result = new Response<bool>();
@@ -209,13 +211,13 @@ namespace Business.Services.Models
 
         private async void UpdateAccountsBalances(Transaction transactionOut, Transaction transactionIn)
         {
-             var amountSender =await GetCorrectAmountAsync(
-                 transactionOut.Currency.CurrencyCode,
-                 transactionOut.AccountSender.Currency.CurrencyCode,
-                 transactionOut.Amount );
-           
-             await this.accountService.DecreaseBalanceAsync(transactionOut.AccountSenderId, amountSender, transactionOut.AccountSender.User);
-             await this.accountService.IncreaseBalanceAsync(transactionIn.AccountRecepientId, transactionIn.Amount, transactionIn.AccountRecipient.User);
+            var amountSender = await GetCorrectAmountAsync(
+                transactionOut.Currency.CurrencyCode,
+                transactionOut.AccountSender.Currency.CurrencyCode,
+                transactionOut.Amount);
+
+            await this.accountService.DecreaseBalanceAsync(transactionOut.AccountSenderId, amountSender, transactionOut.AccountSender.User);
+            await this.accountService.IncreaseBalanceAsync(transactionIn.AccountRecepientId, transactionIn.Amount, transactionIn.AccountRecipient.User);
         }
 
         private async Task<bool> AddTransactionToHistoryAsync(Transaction transaction)
@@ -236,5 +238,5 @@ namespace Business.Services.Models
         }
 
     }
-        
+
 }

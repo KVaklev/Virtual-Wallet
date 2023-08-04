@@ -16,6 +16,8 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http.Headers;
+using System.Security.Cryptography.Xml;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -32,17 +34,19 @@ namespace Business.Services.Models
         private readonly IMapper mapper;
         private readonly ICurrencyRepository currencyRepository;
         private readonly IAccountService accountService;
+        private readonly IExchangeRateService exchangeRateService;
 
         public TransferService(
-            ITransferRepository transferRepository, 
-            IHistoryRepository historyRepository, 
-            IAccountRepository accountRepository, 
-            IUserRepository userRepository, 
-            ICardRepository cardRepository, 
-            ApplicationContext context, 
-            IMapper mapper, 
+            ITransferRepository transferRepository,
+            IHistoryRepository historyRepository,
+            IAccountRepository accountRepository,
+            IUserRepository userRepository,
+            ICardRepository cardRepository,
+            ApplicationContext context,
+            IMapper mapper,
             ICurrencyRepository currencyRepository,
-            IAccountService accountService)
+            IAccountService accountService,
+            IExchangeRateService exchangeRateService)
         {
             this.transferRepository = transferRepository;
             this.historyRepository = historyRepository;
@@ -53,6 +57,7 @@ namespace Business.Services.Models
             this.currencyRepository = currencyRepository;
             this.cardRepository = cardRepository;
             this.accountService = accountService;
+            this.exchangeRateService = exchangeRateService;
         }
 
         public IQueryable<Transfer> GetAll(User user)
@@ -60,19 +65,23 @@ namespace Business.Services.Models
             return transferRepository.GetAll(user);
         }
 
-        public async Task<GetTransferDto> GetByIdAsync(int id, User user)
+        public async Task<Response<GetTransferDto>> GetByIdAsync(int id, User user)
         {
+            var result = new Response<GetTransferDto>();
             Transfer transferToGet = await transferRepository.GetByIdAsync(id);
 
             if (!await Security.IsUserAuthorizedAsync(transferToGet, user) || user.IsAdmin)
 
             {
-                throw new UnauthorizedOperationException(Constants.ModifyTransferGetByIdErrorMessage);
+                result.IsSuccessful = false;
+                result.Message = Constants.ModifyTransferGetByIdErrorMessage;
+                return result;
             }
 
             var transferDto = this.mapper.Map<GetTransferDto>(transferToGet);
+            result.Data = transferDto;
 
-            return transferDto;
+            return result;
         }
 
         //public async Task<Transfer> CreateAsync(CreateTransferDto transferDto, User user)
@@ -97,151 +106,211 @@ namespace Business.Services.Models
         //    return createdTransfer;
         //}
 
-        public async Task<Transfer> CreateAsync(CreateTransferDto transferDto, User user)
+        public async Task<Response<GetTransferDto>> CreateAsync(CreateTransferDto transferDto, User user)
         {
+
+            var result = new Response<GetTransferDto>();
+
+
+            if (user.IsBlocked)
+            {
+                result.IsSuccessful = false;
+                result.Message = Constants.ModifyTransferErrorMessage;
+                return result;
+            }
+
             var card = this.cardRepository.GetByAccountId((int)user.AccountId).FirstOrDefault(x => x.CardNumber == transferDto.CardNumber);
 
             var currency = await this.currencyRepository.GetByCurrencyCodeAsync(transferDto.CurrencyCode);
 
             var transfer = await TransfersMapper.MapCreateDtoToTransferAsync(transferDto, user, card, currency);
 
-            if (user.IsBlocked)
-            {
-                throw new UnauthorizedOperationException(Constants.ModifyTransferErrorMessage);
-            }
-
 
             if (!await Security.HasEnoughBalanceAsync(transfer.Account, transfer.Amount))
             {
-                throw new UnauthorizedOperationException(Constants.ModifyAccountBalancetErrorMessage);
+                result.IsSuccessful = false;
+                result.Message = Constants.ModifyAccountBalancetErrorMessage;
+
+                return result;
+
             }
 
-            // Set additional properties before creating the entity
-            transfer.DateCreated = DateTime.Now;
+            transfer.DateCreated = DateTime.UtcNow;
             transfer.IsConfirmed = false;
             transfer.IsCancelled = false;
 
-            // Create the entity in the repository
+            var newTransfer =
             await this.transferRepository.CreateAsync(transfer);
 
-            // Return the created transfer after it has been saved to the database
-            return transfer;
+            result.Data = this.mapper.Map<GetTransferDto>(newTransfer);
+
+            return result;
         }
 
 
-        public async Task<bool> DeleteAsync(int id, User user)
+        public async Task<Response<bool>> DeleteAsync(int id, User user)
         {
+            var result = new Response<bool>();
+
             Transfer transferToDelete = await transferRepository.GetByIdAsync(id);
 
             if (!await Security.IsUserAuthorizedAsync(transferToDelete, user))
             {
-                throw new UnauthorizedOperationException(Constants.ModifyTransferErrorMessage);
+                result.IsSuccessful = false;
+                result.Message = Constants.ModifyTransferErrorMessage;
+                return result;
+
             }
 
 
             if (transferToDelete.IsCancelled || transferToDelete.IsConfirmed)
             {
-                throw new InvalidOperationException(Constants.ModifyTransferUpdateDeleteErrorErrorMessage);
+                result.IsSuccessful = false;
+                result.Message = Constants.ModifyTransferUpdateDeleteErrorErrorMessage;
+                return result;
+
             }
-            return await this.transferRepository.DeleteAsync(id);
+
+            result.Message = Constants.ModifyTransferErrorMessage;
+            result.Data = await this.transferRepository.DeleteAsync(id);
+            return result;
         }
 
-        
-        //public async Task<Transfer> UpdateAsync(int id, CreateTransferDto transferDto, User user)
-        //{
-        //    var card = this.cardRepository.GetByAccountId((int)user.AccountId).FirstOrDefault(x => x.CardNumber == transferDto.CardNumber);
 
-        //    Transfer transferToUpdate = await transferRepository.GetByIdAsync(id);
-
-        //    if (!await Common.IsUserAuthorizedAsync(transferToUpdate, user))
-        //    {
-        //        throw new UnauthorizedOperationException(Constants.ModifyTransferErrorMessage);
-        //    }
-
-        //    if (transferToUpdate.IsConfirmed || transferToUpdate.IsCancelled)
-        //    {
-        //        throw new UnauthorizedOperationException(Constants.ModifyTransferUpdateDeleteErrorErrorMessage);
-        //    }
-
-        //    var updatedTransfer = await MapDtoToTransferAsync(transferDto, user, card);
-
-        //    return await this.transferRepository.UpdateAsync(transferToUpdate.Id, updatedTransfer);
-        //}
-
-        public async Task<Transfer> UpdateAsync(int id, UpdateTransferDto transferDto, User user)
+        public async Task<Response<GetTransferDto>> UpdateAsync(int id, UpdateTransferDto transferDto, User user)
         {
+            var result = new Response<GetTransferDto>();
+
+            Transfer transfer = await transferRepository.GetByIdAsync(id);
+
+            if (!await Security.IsUserAuthorizedAsync(transfer, user))
+            {
+                result.IsSuccessful = false;
+                result.Message = Constants.ModifyTransferErrorMessage;
+                return result;
+            }
+
+            if (!await Security.HasEnoughBalanceAsync(transfer.Account, transfer.Account.Balance))
+            {
+                result.IsSuccessful = false;
+                result.Message = Constants.ModifyAccountBalancetErrorMessage;
+                return result;
+            }
+
+            if (transfer.IsConfirmed || transfer.IsCancelled)
+            {
+                result.IsSuccessful = false;
+                result.Message = Constants.ModifyTransferUpdateDeleteErrorErrorMessage;
+                return result;
+            }
+
             var card = this.cardRepository.GetByAccountId((int)user.AccountId).FirstOrDefault(x => x.CardNumber == transferDto.CardNumber);
 
             var currency = await this.currencyRepository.GetByCurrencyCodeAsync(transferDto.CurrencyCode);
 
-          
-            Transfer transferToUpdate = await transferRepository.GetByIdAsync(id);
+            await TransfersMapper.MapUpdateDtoToTransferAsync(transferDto, user, card, currency);
 
-            transferToUpdate = await TransfersMapper.MapUpdateDtoToTransferAsync(transferDto, user, card, currency);
+            await this.transferRepository.SaveChangesAsync();
 
-            if (!await Security.IsUserAuthorizedAsync(transferToUpdate, user))
-            {
-                throw new UnauthorizedOperationException(Constants.ModifyTransferErrorMessage);
-            }
+            result.Data = this.mapper.Map<GetTransferDto>(transfer);
 
-            if (transferToUpdate.IsConfirmed || transferToUpdate.IsCancelled)
-            {
-                throw new UnauthorizedOperationException(Constants.ModifyTransferUpdateDeleteErrorErrorMessage);
-            }
+            result.IsSuccessful = true;
 
-                       
-            await context.SaveChangesAsync();
-
-            return transferToUpdate;
+            return result;
         }
 
 
-
-        public async Task<PaginatedList<Transfer>> FilterByAsync(TransferQueryParameters transferQueryParameters, User loggedUser)
+        public async Task<Response<List<GetTransferDto>>> FilterByAsync(TransferQueryParameters transferQueryParameters, User loggedUser)
         {
-            var result = await this.transferRepository.FilterByAsync(transferQueryParameters, loggedUser);
+            var transfers = await this.transferRepository.FilterByAsync(transferQueryParameters, loggedUser);
 
-            if (result.Count == 0)
+            var result = new Response<List<GetTransferDto>>();
+
+            if (transfers.Count == 0)
             {
                 throw new EntityNotFoundException(Constants.ModifyTransferNoDataErrorMessage);
             }
 
-            return await Task.FromResult(result);
+            List<GetTransferDto> transferDtos = transfers.Select(transfer => mapper.Map<GetTransferDto>(transfer)).ToList();
+
+
+            result.Data = transferDtos;
+
+            return result;
 
         }
 
-        public async Task<bool> ExecuteAsync(int transferId, User user)
+        public async Task<Response<bool>> ExecuteAsync(int transferId, User user)
         {
-            Transfer transferToGet = await transferRepository.GetByIdAsync(transferId);
+            var result = new Response<bool>();
 
-            if (!(await Security.IsUserAuthorizedAsync(transferToGet, user)))
+            Transfer transferToExecute = await transferRepository.GetByIdAsync(transferId);
+
+            if (!(await Security.IsUserAuthorizedAsync(transferToExecute, user)))
             {
-                throw new UnauthorizedOperationException(Constants.ModifyTransferErrorMessage);
+                result.IsSuccessful = false;
+                result.Message = Constants.ModifyTransferErrorMessage;
+                return result;
             }
 
-            var transferToExecute = await this.transferRepository.GetByIdAsync(transferId);
+            if (transferToExecute.IsConfirmed || transferToExecute.IsCancelled)
+            {
+                result.IsSuccessful = false;
+                result.Message = Constants.ModifyTransferUpdateDeleteErrorErrorMessage;
+                return result;
+            }
+
+
             transferToExecute.IsConfirmed = true;
-            transferToExecute.DateCreated = DateTime.Now;
+            transferToExecute.DateCreated = DateTime.UtcNow;
 
-            if (transferToExecute.TransferType == TransferDirection.Deposit)
-            {
-                this.accountService.IncreaseBalanceAsync(transferToExecute.AccountId, transferToExecute.Amount, user);
+            await UpdateAccountsBalanceAsync(transferToExecute, user);
 
-                this.cardRepository.DecreaseBalanceAsync(transferToExecute.CardId, transferToExecute.Amount);
-            }
+            await AddTransferToHistoryAsync(transferToExecute);
 
-            if (transferToExecute.TransferType == TransferDirection.Withdrawal)
-            {
-                this.accountService.DecreaseBalanceAsync(transferToExecute.AccountId, transferToExecute.Amount, user);
+            await transferRepository.SaveChangesAsync();
 
-                this.cardRepository.IncreaseBalanceAsync(transferToExecute.CardId, transferToExecute.Amount);
-            }
-
-            AddTransferToHistoryAsync(transferToExecute);
-
-            return transferToExecute.IsConfirmed;
+            result.Message = Constants.ModifyExecutedTransfer;
+            result.Data = transferToExecute.IsConfirmed;
+            return result;
 
         }
+
+
+        private async Task<decimal> GetCorrectAmountAsync(string transferCurrencyCode, string accountCurrencyCode, decimal amount)
+        {
+            if (transferCurrencyCode != accountCurrencyCode)
+            {
+                amount = await this.exchangeRateService.ExchangeAsync(amount, transferCurrencyCode, accountCurrencyCode);
+            }
+            return amount;
+        }
+
+        private async Task<bool> UpdateAccountsBalanceAsync(Transfer transfer, User user)
+        {
+            var accountAmount = await GetCorrectAmountAsync(transfer.Currency.CurrencyCode, transfer.Account.Currency.CurrencyCode, transfer.Amount);
+
+            var cardAmount = await GetCorrectAmountAsync(transfer.Currency.CurrencyCode, transfer.Card.Currency.CurrencyCode, transfer.Amount);
+
+            if (transfer.TransferType == TransferDirection.Deposit)
+            {
+
+                this.accountService.IncreaseBalanceAsync(transfer.AccountId, accountAmount, user);
+
+                this.cardRepository.DecreaseBalanceAsync(transfer.CardId, cardAmount);
+            }
+
+            if (transfer.TransferType == TransferDirection.Withdrawal)
+            {
+                this.accountService.DecreaseBalanceAsync(transfer.AccountId, accountAmount, user);
+
+                this.cardRepository.IncreaseBalanceAsync(transfer.CardId, cardAmount);
+            }
+
+            return true;
+        }
+
+
 
         private async Task<bool> AddTransferToHistoryAsync(Transfer transfer)
         {
@@ -260,7 +329,7 @@ namespace Business.Services.Models
             }
         }
 
-        
+
     }
 
 
