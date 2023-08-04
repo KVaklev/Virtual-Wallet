@@ -35,33 +35,33 @@ namespace VirtualWallet.Controllers.API
             this.userService = userService;
         }
 
-        [HttpPost, Authorize]
-        public async Response<Task<IActionResult>> CreateAsync([FromBody] CreateTransferDto createTransferDto)
+        //[HttpPost, Authorize]
+        //public async Response<Task<IActionResult>> CreateAsync([FromBody] CreateTransferDto createTransferDto)
 
-        {
-            var loggedUser = await FindLoggedUserAsync();
+        //{
+        //    var loggedUser = await FindLoggedUserAsync();
 
-            var result = await this.transferService.CreateAsync(createTransferDto, loggedUser);
+        //    var result = await this.transferService.CreateAsync(createTransferDto, loggedUser);
 
-            if (!result.IsSuccessful)
-            {
-                //return BadRequest(result.Message);
-                return new Response<IActionResult>
-                {
-                    IsSuccessful = false,
-                    Message = result.Message
+        //    if (!result.IsSuccessful)
+        //    {
+        //        //return BadRequest(result.Message);
+        //        return new Response<IActionResult>
+        //        {
+        //            IsSuccessful = false,
+        //            Message = result.Message
 
-                };
-            }
+        //        };
+        //    }
 
-            return new Response<IActionResult>
-            {
-                IsSuccessful = true,
-                Data = StatusCode(StatusCodes.Status201Created, result.Data)
-            };
+        //    return new Response<IActionResult>
+        //    {
+        //        IsSuccessful = true,
+        //        Data = StatusCode(StatusCodes.Status201Created, result.Data)
+        //    };
 
 
-        }
+        //}
         //[HttpGet, Authorize]
         //public async Response<Task<IActionResult>> GetTransferAsync([FromQuery] TransferQueryParameters filterParameters)
         //{
