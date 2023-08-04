@@ -74,5 +74,13 @@
         public const string ConfirmedRegistrationMessage = "Registration confirmed!";
         public const string NotSuccessfullRegistrationMessage = "Your registration was not successfull.";
         public const string SuccessfullConfirmationEmailSentMessage = "Confirmation email was sent successfully. Please check your inbox folder.";
+
+        //Constant messages for login
+
+        public const string CredentialsErrorMessage = "Username and/or Password not specified";
+        public const string FailedLoginAtemptErrorMessage = "Nice try! Invalid credentials!";
+        public const string NotConfirmedEmailErrorMessage = "Your email is not confirmed, please check your inbox folder and follow the link!";
+
+
     }
 }

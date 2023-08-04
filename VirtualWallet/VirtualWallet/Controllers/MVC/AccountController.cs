@@ -1,6 +1,7 @@
-﻿using Business.Exceptions;
-using Business.Services.Contracts;
+﻿using Business.Services.Contracts;
+using Business.Services.Helpers;
 using Business.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace VirtualWallet.Controllers.MVC
@@ -17,6 +18,7 @@ namespace VirtualWallet.Controllers.MVC
             this.userService = userService;
             this.accountService = accountService;
         }
+
         [HttpGet]
         public async Task<IActionResult> Login()
         {
@@ -25,39 +27,49 @@ namespace VirtualWallet.Controllers.MVC
             return this.View(loginViewModel);
         }
 
-        //[HttpPost]
-        //public async Task<IActionResult> Login(LoginViewModel loginViewModel)
-        //{
-        //    if (!this.ModelState.IsValid)
-        //    {
-        //        return this.View(loginViewModel);
-        //    }
+        [HttpPost]
+        public async Task<IActionResult> Login(LoginViewModel loginViewModel)
+        {
+            if (!this.ModelState.IsValid)
+            {
+                return this.View(loginViewModel);
+            }
 
-        //    try
-        //    {
-        //        var loggedUser = await this.userService.LoginAsync(loginViewModel.Username, loginViewModel.Password);
-        //        var token = await this.accountService.CreateApiTokenAsync(loggedUser);
+            var loggedUser = await this.userService.LoginAsync(loginViewModel.Username, loginViewModel.Password);
+           
+                if (!loggedUser.IsSuccessful)
+                {
+                    return BadRequest(loggedUser.Message);
+                }
 
-        //        Response.Cookies.Append("Cookie_JWT", token.ToString(), new CookieOptions()
-        //        {
-        //            HttpOnly = false,
-        //            SameSite = SameSiteMode.Strict
-        //        });
+            var result = await this.accountService.CreateApiTokenAsync(loggedUser.Data);
 
-        //        return Ok("Logged in successfully. Token: " + token);
-        //    }
-        //    catch (ArgumentException e)
-        //    {
-        //        return StatusCode(StatusCodes.Status400BadRequest, e.Message);
-        //    }
-        //    catch (UnauthorizedOperationException e)
-        //    {
-        //        return StatusCode(StatusCodes.Status401Unauthorized, e.Message);
-        //    }
-        //    catch
-        //    {
-        //        return BadRequest("An error occurred in generating the token");
-        //    }
-        //}
+                if (!result.IsSuccessful)
+                {
+                    return BadRequest(result.Message);
+                }
+
+            Response.Cookies.Append("Cookie_JWT", result.Data.ToString(), new CookieOptions()
+            {
+                HttpOnly = false,
+                SameSite = SameSiteMode.Strict
+            });
+
+            result.Message = Constants.SuccessfullTokenMessage;
+
+            return RedirectToAction("Index", "Home");
+        }
+
+        [HttpGet()]
+        public IActionResult Logout()
+        {
+
+            if (Request.Cookies["Cookie_JWT"] != null)
+            {
+                Response.Cookies.Delete("Cookie_JWT");
+            }
+
+            return RedirectToAction("Index", "Home");
+        }
     }
 }

@@ -174,6 +174,7 @@ namespace Business.Services.Models
             {
                 result.IsSuccessful = false;
                 result.Message = Constants.ModifyUserErrorMessage;
+                return result;
             } 
             
             User userToDelete = await this.userRepository.GetByIdAsync(id);
@@ -256,11 +257,12 @@ namespace Business.Services.Models
             return result;
         }
 
-        public async Task<User> LoginAsync(string username, string password)
+        public async Task<Response<User>> LoginAsync(string username, string password)
         {
+
             await Security.CheckForNullEntryAsync(username, password);
             User loggedUser = await this.userRepository.GetByUsernameAsync(username);
-            var authenticatedUser = await Security.AuthenticateAsync(loggedUser, username, password);
+            var authenticatedUser = await Security.AuthenticateAsync(loggedUser, password);
 
             return authenticatedUser;
         }

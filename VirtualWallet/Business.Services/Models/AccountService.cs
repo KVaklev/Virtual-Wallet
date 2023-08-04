@@ -204,6 +204,7 @@ namespace Business.Services.Models
             if (!result.IsSuccessful)
             {
                 result.Message = Constants.GenerateTokenErrorMessage;
+                return result;
             }
 
             return await Task.FromResult(result);

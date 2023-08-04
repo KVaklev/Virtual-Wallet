@@ -32,24 +32,29 @@ namespace VirtualWallet.Controllers.API
             this.userRepository = userRepository;
         }
 
-        [AllowAnonymous]
         [HttpPost("login")]
         public async Task<IActionResult> LoginAsync(string username, string password)
         {
 
             var loggedUser = await this.userService.LoginAsync(username, password);
-            var result = await this.accountService.CreateApiTokenAsync(loggedUser);
+
+            if (!loggedUser.IsSuccessful)
+            {
+                return BadRequest(loggedUser.Message);
+            }
+
+            var result = await this.accountService.CreateApiTokenAsync(loggedUser.Data);
+
+            if (!result.IsSuccessful)
+            {
+                return BadRequest(result.Message);
+            }
 
             Response.Cookies.Append("Cookie_JWT", result.Data.ToString(), new CookieOptions()
             {
                 HttpOnly = false,
                 SameSite = SameSiteMode.Strict
             });
-
-            if (!result.IsSuccessful)
-            {
-                return BadRequest(result.Message);
-            }
 
             result.Message = Constants.SuccessfullTokenMessage;
 
