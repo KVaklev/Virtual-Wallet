@@ -5,6 +5,9 @@ namespace Business.DTOs.Responses
     public class GetTransactionDto
     {
         [Required]
+        public string SenderUsername { get; set; }
+
+        [Required]
         public string RecipientUsername { get; set; }
 
         [Required]

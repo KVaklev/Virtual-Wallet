@@ -1,17 +1,26 @@
-﻿using Business.Exceptions;
+﻿using Business.DTOs.Requests;
+using Business.Exceptions;
 using Business.QueryParameters;
+using Business.Services.Contracts;
+using DataAccess.Models.Models;
+using DataAccess.Repositories.Contracts;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Presentation.Helpers;
 
 namespace VirtualWallet.Controllers.MVC
 {
+    [Authorize]
     public class TransactionController : Controller
     {
         private readonly ITransactionService transactionService; 
+        private readonly IUserRepository userRepository; 
 
-        public TransactionController(ITransactionService transactionService)
+        public TransactionController(
+            ITransactionService transactionService,
+            IUserRepository userRepository)
         {
             this.transactionService = transactionService;
+            this.userRepository = userRepository;
         }
 
         
@@ -20,44 +29,119 @@ namespace VirtualWallet.Controllers.MVC
         {
             try
             {
-                var result = await this.transactionService.FilterByAsync(parameters);
+                var loggedUser = await GetLoggedUserAsync();
+                var result = await this.transactionService.FilterByAsync(parameters, loggedUser);
 
-                return View(result.Data);
+                return View(result);
+            }
+            catch (EntityNotFoundException ex)
+            {
+                return await EntityErrorViewAsync(ex.Message);
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Create([FromQuery] TransactionQueryParameters parameters)
+        {
+           
+           if ((this.HttpContext.Session.GetString("IsBlocked")) == "True")
+            {
+                return BlockedErrorView();
+            }
+            else
+            {
+                return this.View();
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateAsync([FromRoute] CreateTransactionDto transactionDto)
+        {
+            try
+            {
+                if (!this.ModelState.IsValid)
+                {
+                    return this.View(transactionDto);
+                }
+                    var loggedUser = await GetLoggedUserAsync();
+                    var result = await this.transactionService.CreateOutTransactionAsync(transactionDto, loggedUser);
+                    if (!result.IsSuccessful)
+                    {
+                        return await EntityErrorViewAsync(result.Message);
+                    }
+                    return this.RedirectToAction("Index", "Transacion", new { username = result.Data.SenderUsername });
+            }
+            catch (EntityNotFoundException ex)
+            {
+                return await EntityErrorViewAsync(ex.Message);
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Edit([FromRoute] int id)
+        {
+            try
+            {
+                  var loggedUser = await GetLoggedUserAsync();
+                  var result = await this.transactionService.GetByIdAsync(id, loggedUser);
+                if (!result.IsSuccessful)
+                {
+                    return await EntityErrorViewAsync(result.Message);
+                }
+                    return this.View(result.Data);
+            }
+            catch (EntityNotFoundException ex)
+            {
+                return await EntityErrorViewAsync(ex.Message);
+            }
+        }
+
+        [HttpPost]
+        public IActionResult Edit([FromRoute] int id, CreateTransactionDto transactionDto)
+        {
+            try
+            {
+                if (!this.ModelState.IsValid)
+                {
+                    return View(transactionDto);
+                }
+                var loggedUser = await GetLoggedUser();
+                var updatedComment = this.commentService.Update(id, inputComment, loggedUser);
+
+                return this.RedirectToAction("Filter", "Comments", new { Username = updatedComment.CreatedBy.Username });
             }
             catch (EntityNotFoundException ex)
             {
                 return EntityErrorView(ex.Message);
             }
+            catch (UnauthorizedOperationException ex)
+            {
+                return UnauthorizedErrorView(ex.Message);
+            }
+
         }
 
-        private IActionResult EntityErrorViewAsync(string message)
+        private async Task<IActionResult> EntityErrorViewAsync(string message)
         {
             this.HttpContext.Response.StatusCode = StatusCodes.Status404NotFound;
             this.ViewData["ErrorMessage"] = message;
 
             return this.View("Error404");
         }
-        [HttpGet]
-        public async Task<IActionResult> Create([FromQuery] TransactionQueryParameters parameters)
-        {
-            try
-            {
-                var result = await this.transactionService.Create(parameters);
 
-                return View(result.Data);
-            }
-            catch (EntityNotFoundException ex)
-            {
-                return await EntityErrorView(ex.Message);
-            }
+        private IActionResult BlockedErrorView()
+        {
+            this.HttpContext.Response.StatusCode = StatusCodes.Status401Unauthorized;
+            this.ViewData["ErrorMessage"] = "You are a \"BLOCKED USER\"!";
+            return this.View("UnauthorizedError");
         }
 
-        private async Task<IActionResult> EntityErrorView(string message)
-        {
-            this.HttpContext.Response.StatusCode = StatusCodes.Status404NotFound;
-            this.ViewData["ErrorMessage"] = message;
 
-            return this.View("Error404");
+        private async Task<User> GetLoggedUserAsync()
+        {
+            var username = this.HttpContext.Session.GetString("LoggedUser");
+            var user = await this.userRepository.GetByUsernameAsync(username);
+            return user;
         }
     }
 }

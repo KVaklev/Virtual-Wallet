@@ -80,6 +80,7 @@ namespace DataAccess.Repositories.Models
         private IQueryable<Transaction> GetAll(string username)
         {
             IQueryable<Transaction> result = context.Transactions
+                    .Where(u => u.AccountSender.User.Username == username)
                     .Include(s => s.AccountSender)
                     .Include(r => r.AccountRecipient)
                     .ThenInclude(u =>u.User)

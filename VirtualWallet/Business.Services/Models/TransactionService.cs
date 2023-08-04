@@ -80,17 +80,19 @@ namespace Business.Services.Models
                 result.Message = Constants.ModifyTransactionBlockedErrorMessage;
                 return result;
             }
+            
             var account = await accountRepository.GetByUsernameAsync(transactionDto.RecepientUsername);
             var currency = await currencyRepository.GetByCurrencyCodeAsync(transactionDto.CurrencyCode);
             var transaction = await TransactionsMapper.MapDtoТоTransactionAsync(transactionDto, loggedUser, account, currency);
+            
             if (!await Security.HasEnoughBalanceAsync(transaction.AccountSender, transaction.Amount))
             {
                 result.IsSuccessful = false;
                 result.Message = Constants.ModifyAccountBalancetErrorMessage;
                 return result;
             }
-            transaction.Date = DateTime.UtcNow;
 
+            transaction.Date = DateTime.UtcNow;
             var newTransaction = await this.transactionRepository.CreateTransactionAsync(transaction);
             result.Data = this.mapper.Map<GetTransactionDto>(newTransaction);
 
