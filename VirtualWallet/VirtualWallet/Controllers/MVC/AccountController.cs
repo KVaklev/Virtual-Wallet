@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace VirtualWallet.Controllers.MVC
 {
+    [AllowAnonymous]
     public class AccountController : Controller
     {
         private readonly IUserService userService;

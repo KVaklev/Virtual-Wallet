@@ -147,6 +147,15 @@ namespace Business.Services.Helpers
             return true;
         }
 
+        public static async Task<bool> HasEnoughCardBalanceAsync(Card card, decimal amount)
+        {
+            if (card.Balance < amount)
+            {
+                return false;
+            }
+            return true;
+        }
+
         public static async Task<bool> IsTransactionSenderAsync(Transaction transaction, int userId)
         {
             bool isTransactionSender = true;

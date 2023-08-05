@@ -70,8 +70,11 @@ namespace DataAccess.Repositories.Models
         {
             Transfer transfer = await context.Transfers
                 .Include(t => t.Account)
+                .ThenInclude(t => t.Currency)
+                 .Include(t => t.Account)
                 .ThenInclude(u => u.User)
                 .Include(t => t.Card)
+                .ThenInclude(c=>c.Currency)
                 .Include(t => t.Currency)
                 .FirstOrDefaultAsync(t => t.Id == id);
 
