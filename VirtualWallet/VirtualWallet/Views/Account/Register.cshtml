@@ -1,1 +1,46 @@
-﻿
+﻿@model CreateUserModel
+
+@{
+    this.ViewData["Title"] = "Speed Pay - Quick and Trustworthy Money Transfers ";
+}
+
+<!-- Content
+ ============================================= -->
+<div id="content">
+    <div class="container py-5">
+        <div class="row">
+            <div class="col-md-9 col-lg-7 col-xl-5 mx-auto">
+                <div class="bg-white shadow-md rounded p-3 pt-sm-4 pb-sm-5 px-sm-5">
+                    <h3 class="fw-400 text-center mb-4">Sign Up</h3>
+                    <hr class="mx-n3 mx-sm-n5">
+                    <p class="lead text-center">Your information is safe with us.</p>
+                    <form id="signupForm" method="post">
+                        <div class="mb-3">
+                            <label for="username" class="form-label">Username</label>
+                            <input type="text" class="form-control" id="username" required placeholder="Enter Your Username">
+                        </div>
+                        <div class="mb-3">
+                            <label for="emailAddress" class="form-label">Email Address</label>
+                            <input type="email" class="form-control" id="emailAddress" required placeholder="Enter Your Email">
+                        </div>
+                        <div class="mb-3">
+                            <label for="loginPassword" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="loginPassword" required placeholder="Enter Password">
+                        </div>
+                         <div class="mb-3">
+                            <label for="phoneNumber" class="form-label">Phone number</label>
+                            <input type="number" class="form-control" required placeholder="Enter Phone Number">
+                        </div>
+                        <div class="mb-3">
+                            <label for="currencyCode" class="form-label">Currency</label>
+                            <input type="text" class="form-control" required placeholder="Enter Password">
+                        </div>
+                        <div class="d-grid mt-4 mb-3"><button class="btn btn-primary" type="submit">Sign Up</button></div>
+                    </form>
+                    <p class="text-3 text-muted text-center mb-0">Already have an account? <a class="btn-link" href="login-3.html">Log In</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Content end --> 

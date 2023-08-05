@@ -2,7 +2,7 @@
 
 namespace Business.ViewModels
 {
-    public class LoginViewModel
+    public class LoginUserModel
     {
         [Required]
         public string Username { get; set; }

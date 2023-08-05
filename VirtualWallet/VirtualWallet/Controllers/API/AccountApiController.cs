@@ -64,7 +64,7 @@ namespace VirtualWallet.Controllers.API
 
         [AllowAnonymous]
         [HttpPost("register")]
-        public async Task<IActionResult> RegisterAsync([FromBody] CreateUserDto createUserDto)
+        public async Task<IActionResult> RegisterAsync([FromBody] CreateUserModel createUserDto)
         {
    
            var result = await this.userService.CreateAsync(createUserDto);

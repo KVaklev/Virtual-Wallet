@@ -29,6 +29,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Views\Transfer\" />
     <Folder Include="Views\Transaction\" />
     <Folder Include="Views\User\" />
   </ItemGroup>

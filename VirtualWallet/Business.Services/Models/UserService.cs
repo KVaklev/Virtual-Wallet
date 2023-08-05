@@ -89,7 +89,7 @@ namespace Business.Services.Models
             return result;
         } 
 
-        public async Task<Response<GetCreatedUserDto>> CreateAsync(CreateUserDto createUserDto)
+        public async Task<Response<GetCreatedUserDto>> CreateAsync(CreateUserModel createUserDto)
         {
             var result = new Response<GetCreatedUserDto>();
 
@@ -115,7 +115,7 @@ namespace Business.Services.Models
             }
             
             User userToCreate = await UsersMapper.MapCreateDtoToUserAsync(createUserDto);
-            userToCreate = await Security.ComputePasswordHashAsync<CreateUserDto>(createUserDto, userToCreate);
+            userToCreate = await Security.ComputePasswordHashAsync<CreateUserModel>(createUserDto, userToCreate);
             userToCreate = await this.userRepository.CreateAsync(userToCreate);
             await this.accountService.CreateAsync(createUserDto.CurrencyCode, userToCreate);
  

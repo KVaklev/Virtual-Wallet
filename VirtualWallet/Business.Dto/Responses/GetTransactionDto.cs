@@ -5,6 +5,9 @@ namespace Business.DTOs.Responses
     public class GetTransactionDto
     {
         [Required]
+        public string SenderUsername { get; set; }
+
+        [Required]
         public string RecipientUsername { get; set; }
 
         [Required]
@@ -18,5 +21,11 @@ namespace Business.DTOs.Responses
 
         [Required]
         public string Direction { get; set; }
+
+        [Required]
+        public bool IsExecuted { get; set; }
+
+        [Required]
+        public bool IsDeleted { get; set; }
     }
 }
