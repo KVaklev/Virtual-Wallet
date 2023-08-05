@@ -2,7 +2,10 @@
 using Business.DTOs.Requests;
 using Business.DTOs.Responses;
 using Business.Exceptions;
+using DataAccess.Models.Enums;
 using DataAccess.Models.Models;
+
+
 using System.Security.Cryptography.Xml;
 
 namespace Business.Mappers
@@ -31,7 +34,7 @@ namespace Business.Mappers
 
         }
 
-        public static async Task<Transfer> MapCreateDtoToTransferAsync(CreateTransferDto transferDto, User user, Card card, Currency currency)
+        public static async Task<Transfer> MapCreateDtoToTransferAsync(CreateTransferDto transferDto, User user, Card card, Currency currency, TransferDirection transferDirection)
         {
             var transfer = new Transfer();
             transfer.Amount = transferDto.Amount;
@@ -41,6 +44,9 @@ namespace Business.Mappers
             transfer.Card = card;
             transfer.CardId = (int)card.Id;
             transfer.CurrencyId = transfer.Currency.Id;
+            transfer.TransferType = transferDirection;
+            
+            
 
             return transfer;
 
@@ -58,7 +64,7 @@ namespace Business.Mappers
             return transfer;
         }
 
-       
+
 
 
     }

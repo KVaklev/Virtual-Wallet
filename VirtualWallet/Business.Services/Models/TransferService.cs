@@ -34,6 +34,7 @@ namespace Business.Services.Models
         private readonly IMapper mapper;
         private readonly ICurrencyRepository currencyRepository;
         private readonly IAccountService accountService;
+        private readonly ICardService cardService;
         private readonly IExchangeRateService exchangeRateService;
 
         public TransferService(
@@ -46,6 +47,7 @@ namespace Business.Services.Models
             IMapper mapper,
             ICurrencyRepository currencyRepository,
             IAccountService accountService,
+            ICardService cardService,
             IExchangeRateService exchangeRateService)
         {
             this.transferRepository = transferRepository;
@@ -57,6 +59,7 @@ namespace Business.Services.Models
             this.currencyRepository = currencyRepository;
             this.cardRepository = cardRepository;
             this.accountService = accountService;
+            this.cardService = cardService;
             this.exchangeRateService = exchangeRateService;
         }
 
@@ -124,17 +127,34 @@ namespace Business.Services.Models
 
             var currency = await this.currencyRepository.GetByCurrencyCodeAsync(transferDto.CurrencyCode);
 
-            var transfer = await TransfersMapper.MapCreateDtoToTransferAsync(transferDto, user, card, currency);
+            var transferType = Enum.Parse<TransferDirection>(transferDto.TransferType, true);
+            
+            var transfer = await TransfersMapper.MapCreateDtoToTransferAsync(transferDto, user, card, currency, transferType);
 
 
-            if (!await Security.HasEnoughBalanceAsync(transfer.Account, transfer.Amount))
+            if (transfer.TransferType == TransferDirection.Deposit)
             {
-                result.IsSuccessful = false;
-                result.Message = Constants.ModifyAccountBalancetErrorMessage;
+                if (!await Security.HasEnoughCardBalanceAsync(transfer.Card, transfer.Amount))
+                {
+                    result.IsSuccessful = false;
+                    result.Message = Constants.ModifyAccountBalancetErrorMessage;
 
-                return result;
+                    return result;
 
+                }
             }
+            else
+            {
+                if (!await Security.HasEnoughBalanceAsync(transfer.Account, transfer.Amount))
+                {
+                    result.IsSuccessful = false;
+                    result.Message = Constants.ModifyAccountBalancetErrorMessage;
+
+                    return result;
+
+                }
+            }
+           
 
             transfer.DateCreated = DateTime.UtcNow;
             transfer.IsConfirmed = false;
@@ -296,16 +316,16 @@ namespace Business.Services.Models
             if (transfer.TransferType == TransferDirection.Deposit)
             {
 
-                this.accountService.IncreaseBalanceAsync(transfer.AccountId, accountAmount, user);
+                await this.accountService.IncreaseBalanceAsync(transfer.AccountId, accountAmount, user);
 
-                this.cardRepository.DecreaseBalanceAsync(transfer.CardId, cardAmount);
+                await this.cardService.DecreaseBalanceAsync(transfer.CardId, cardAmount, user);
             }
 
             if (transfer.TransferType == TransferDirection.Withdrawal)
             {
-                this.accountService.DecreaseBalanceAsync(transfer.AccountId, accountAmount, user);
+                await this.accountService.DecreaseBalanceAsync(transfer.AccountId, accountAmount, user);
 
-                this.cardRepository.IncreaseBalanceAsync(transfer.CardId, cardAmount);
+                await this.cardService.IncreaseBalanceAsync(transfer.CardId, cardAmount, user);
             }
 
             return true;
