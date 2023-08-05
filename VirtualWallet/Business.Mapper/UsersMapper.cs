@@ -16,14 +16,14 @@ namespace Business.Mappers
                 .ReverseMap();
             CreateMap<GetUpdatedUserDto, User>();
             CreateMap<User, GetUpdatedUserDto>();
-            CreateMap<CreateUserDto, User>();
-            CreateMap<User, CreateUserDto>();
+            CreateMap<CreateUserModel, User>();
+            CreateMap<User, CreateUserModel>();
             CreateMap<User, UpdateUserDto>();
             CreateMap<UpdateUserDto, User>();
 
         }
 
-        public static async Task<User> MapCreateDtoToUserAsync(CreateUserDto createUserDto)
+        public static async Task<User> MapCreateDtoToUserAsync(CreateUserModel createUserDto)
         {
             User newUser = new User();
             newUser.Username = createUserDto.Username;

@@ -13,7 +13,7 @@ namespace Business.Services.Contracts
         Task<PaginatedList<User>> FilterByAsync(UserQueryParameters queryParameters);
         Task<Response<GetUserDto>> GetByIdAsync(int id, User loggedUser);
         Task<Response<GetUserDto>> GetByUsernameAsync(string username);
-        Task<Response<GetCreatedUserDto>> CreateAsync(CreateUserDto createUserDto);
+        Task<Response<GetCreatedUserDto>> CreateAsync(CreateUserModel createUserDto);
         Task<Response<GetUpdatedUserDto>> UpdateAsync(int id, UpdateUserDto updateUserDto, User loggedUser);
         Task<Response<bool>> DeleteAsync(int id, User loggedUser);
         Task<Response<GetUserDto>> PromoteAsync(int id, User loggedUser);

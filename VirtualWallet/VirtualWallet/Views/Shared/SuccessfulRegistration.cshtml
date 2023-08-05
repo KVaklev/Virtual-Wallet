@@ -1,0 +1,10 @@
+﻿@using Business.Services.Helpers
+@{
+	this.ViewData["Title"] = "Successful registration";
+}
+
+<h2 class="label-error">@Constants.ConfirmedRegistrationMessage</h2>
+<p>
+	Status Code: @this.Context.Response.StatusCode<br />
+	Message: @this.ViewData["Successful registration"]
+</p>
