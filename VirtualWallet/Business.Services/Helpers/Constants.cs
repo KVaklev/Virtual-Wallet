@@ -68,6 +68,7 @@
 
         public const string GenerateTokenErrorMessage = "An error occurred in generating the token";
         public const string SuccessfullTokenMessage = "Logged in successfully. Token: ";
+        public const string SuccessfullLoggedInMessage = "Logged in successfully!";
 
         //Constant messages for registration 
 
