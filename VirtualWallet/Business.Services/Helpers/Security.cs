@@ -119,7 +119,7 @@ namespace Business.Services.Helpers
             byte[] passwordHash, passwordKey;
             string password = string.Empty;
 
-            if (dto is CreateUserDto createDto)
+            if (dto is CreateUserModel createDto)
             {
                 password = createDto.Password;
             }
