@@ -24,6 +24,7 @@ namespace DataAccess.Repositories.Models
             Transaction transaction = await context.Transactions.Where(t => t.Id == id)
                 .Include(s =>s.AccountSender)
                 .Include(r =>r.AccountRecipient)
+                .ThenInclude(c=>c.Currency)
                 .Include(c =>c.Currency)
                 .FirstOrDefaultAsync();
 
