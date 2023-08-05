@@ -66,6 +66,7 @@ namespace Business.Services.Models
         public IQueryable<Transfer> GetAll(User user)
         {
             return transferRepository.GetAll(user);
+
         }
 
         public async Task<Response<GetTransferDto>> GetByIdAsync(int id, User user)
@@ -349,6 +350,8 @@ namespace Business.Services.Models
                 return false;
             }
         }
+
+
 
 
     }
