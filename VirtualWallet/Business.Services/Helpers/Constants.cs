@@ -28,7 +28,10 @@
 
         //Constant messages for cards
 
+        public const string NoCardsErrorMessage = "No cards are found.";
         public const string ModifyCardErrorMessage = "Only an admin or owner of the card can access, delete or modify the card.";
+        public const string CardNumberAddErrorMessage = "Card with the specified card number has already been registered.";
+        public const string SuccessfullDeletedCardMessage = "Card has been successfully deleted.";
 
         //Constant messages for transactions 
 
@@ -71,5 +74,13 @@
         public const string ConfirmedRegistrationMessage = "Registration confirmed!";
         public const string NotSuccessfullRegistrationMessage = "Your registration was not successfull.";
         public const string SuccessfullConfirmationEmailSentMessage = "Confirmation email was sent successfully. Please check your inbox folder.";
+
+        //Constant messages for login
+
+        public const string CredentialsErrorMessage = "Username and/or Password not specified";
+        public const string FailedLoginAtemptErrorMessage = "Nice try! Invalid credentials!";
+        public const string NotConfirmedEmailErrorMessage = "Your email is not confirmed, please check your inbox folder and follow the link!";
+
+
     }
 }

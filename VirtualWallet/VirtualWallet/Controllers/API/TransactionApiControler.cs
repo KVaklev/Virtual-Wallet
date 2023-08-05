@@ -40,7 +40,7 @@ namespace VirtualWallet.Controllers.API
                 return BadRequest(result.Message);
             }
            
-                return StatusCode(StatusCodes.Status201Created, result.Data);
+            return StatusCode(StatusCodes.Status201Created, result.Data);
         }
 
 

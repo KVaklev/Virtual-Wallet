@@ -1,6 +1,5 @@
-﻿using Business.DTOs.Requests;
-using Business.Exceptions;
-using Business.Services.Contracts;
+﻿using Business.DTOs;
+using Business.DTOs.Requests;
 using DataAccess.Models.Enums;
 using DataAccess.Models.Models;
 using System.Security.Cryptography;
@@ -45,37 +44,47 @@ namespace Business.Services.Helpers
         {
             bool isUserAccountOwnerOrAdminId = false;
 
-            //Account accountToGet = await this.accountRepository.GetByIdAsync(id);
-
             if (accountId == user.Id || user.IsAdmin)
             {
                 isUserAccountOwnerOrAdminId = true;
             }
-
             return await Task.FromResult(isUserAccountOwnerOrAdminId);
         }
-        public static Task CheckForNullEntryAsync(string username, string password)
+
+        public async static Task<Response<bool>> CheckForNullEntryAsync(string username, string password)
         {
+            var result = new Response<bool>();
+
             if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
             {
-                throw new ArgumentException("Username and/or Password not specified");
+                result.IsSuccessful = false;
+                result.Message = Constants.CredentialsErrorMessage;
             }
-            return Task.FromResult(true);
+
+            return result;
         }
 
-        public static async Task<User> AuthenticateAsync(User loggedUser, string username, string password)
+        public static async Task<Response<User>> AuthenticateAsync(User loggedUser, string password)
         {
+            var result = new Response<User>();
+
             if (!await IsPasswordHashMatchedAsync(password, loggedUser.Password, loggedUser.PasswordKey))
             {
-                throw new UnauthorizedOperationException("Nice try! Invalid credentials!");
+                result.IsSuccessful = false;
+                result.Message = Constants.FailedLoginAtemptErrorMessage;
+                return result;
             }
 
             if (!await IsEmailConfirmedAsync(loggedUser))
             {
-                throw new UnauthorizedOperationException("Your email is not confirmed, please check your inbox folder and follow the link!");
+                result.IsSuccessful = false;
+                result.Message = Constants.NotConfirmedEmailErrorMessage;
+                return result;
             }
 
-            return loggedUser;
+            result.Data = loggedUser;
+
+            return result;
         }
 
         private static async Task<bool> IsPasswordHashMatchedAsync(string passwordFilled, byte[] password, byte[]? passwordKey)
@@ -90,7 +99,7 @@ namespace Business.Services.Helpers
                         return await Task.FromResult(false);
                     }
                 }
-                return await Task.FromResult(true);
+              return await Task.FromResult(true);
             }
         }
         private static async Task<bool> IsEmailConfirmedAsync(User loggedUser)
@@ -168,7 +177,6 @@ namespace Business.Services.Helpers
             }
 
             return IsUserAuthorized;
-
         }
 
         public static async Task<bool> CanModifyTransactionAsync(Transaction transaction)
