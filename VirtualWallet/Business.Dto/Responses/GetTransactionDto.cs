@@ -21,5 +21,11 @@ namespace Business.DTOs.Responses
 
         [Required]
         public string Direction { get; set; }
+
+        [Required]
+        public bool IsExecuted { get; set; }
+
+        [Required]
+        public bool IsDeleted { get; set; }
     }
 }
