@@ -23,13 +23,13 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Business.Dto\Business.DTOs.csproj" />
     <ProjectReference Include="..\Business.Services\Business.Services.csproj" />
     <ProjectReference Include="..\Business.ViewModels\Business.ViewModels.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="Views\Transaction\" />
-    <Folder Include="Views\Transfer\" />
     <Folder Include="Views\User\" />
   </ItemGroup>
 
