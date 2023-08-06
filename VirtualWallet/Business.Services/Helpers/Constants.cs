@@ -95,6 +95,11 @@
             public const string NotConfirmedEmail = "NotConfirmedEmail";
             public const string UsernameDoesntExist = "UsernameDoesntExist";
         }
+
+        public const string NoFoundResulte = "No found result.";
+        public const string NoHostError= "No such host is known.";
+        public const string JsonDeserializationError = "JSON Deserialization Error";
+
     }
 
 

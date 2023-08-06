@@ -61,7 +61,7 @@ namespace Business.Services.Models
                 result.Message = Constants.NoFoundResulte;
                 return result;
             }
-            var resultDto = historyRecords
+             var resultDto = historyRecords
                              .Select(history => HistoryMapper.MapHistoryToDtoAsync(history)) 
                              .ToList();
 

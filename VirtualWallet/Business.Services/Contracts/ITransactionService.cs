@@ -9,7 +9,9 @@ namespace Business.Services.Contracts
     public interface ITransactionService
     {
         Task<Response<GetTransactionDto>> GetByIdAsync(int id, User loggedUser);
-        Task<PaginatedList<Transaction>> FilterByAsync(TransactionQueryParameters filterParameters, User loggedUser);
+        Task<Response<PaginatedList<GetTransactionDto>>> FilterByAsync(
+            TransactionQueryParameters filterParameters,
+            User loggedUser);
         Task<Response<GetTransactionDto>> CreateOutTransactionAsync(CreateTransactionDto transactionDto, User loggedUser);
         Task<Response<GetTransactionDto>> UpdateAsync(int id, User loggedUser, CreateTransactionDto transactionDto);
         Task<Response<bool>> DeleteAsync(int id, User loggedUser);

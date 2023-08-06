@@ -27,9 +27,8 @@ namespace DataAccess.Repositories.Models
                 .ThenInclude(c=>c.Currency)
                 .Include(c =>c.Currency)
                 .FirstOrDefaultAsync();
-
-            //todo - filter by loggetusername
-            return transaction ?? throw new EntityNotFoundException(Constants.NotFoundErrorMessage);
+            
+            return transaction;
         }
 
         public async Task<bool> SaveChangesAsync()
@@ -67,11 +66,6 @@ namespace DataAccess.Repositories.Models
 
             int totalItems = await result.CountAsync();
 
-            if (totalItems == 0)
-            {
-                throw new EntityNotFoundException(Constants.NotFoundErrorMessage);
-            }
-
             int totalPages = (result.Count() + filterParameters.PageSize - 1) / filterParameters.PageSize;
             result = await Common<Transaction>.PaginateAsync(result, filterParameters.PageNumber, filterParameters.PageSize);
 
@@ -89,7 +83,7 @@ namespace DataAccess.Repositories.Models
                     .AsQueryable();
 
             //todo - filter by username
-            return result ?? throw new EntityNotFoundException(Constants.NotFoundErrorMessage);
+            return result;
         }
 
         private async Task<IQueryable<Transaction>> FilterByRecipientAsync(IQueryable<Transaction> result, string? username)
@@ -107,7 +101,7 @@ namespace DataAccess.Repositories.Models
                 DateTime date = DateTime.Parse(fromData);
                 return result.Where(t => t.Date >= date);
             }
-            return await Task.FromResult(result);
+            return result;
         }
         private async Task<IQueryable<Transaction>> FilterByToDataAsync(IQueryable<Transaction> result, string? toData)
         {
@@ -117,25 +111,20 @@ namespace DataAccess.Repositories.Models
 
                 return result.Where(t => t.Date <= date);
             }
-            return await Task.FromResult(result);
+            return result;
         }
-        private async Task<DirectionType> ParseDirectionParameterAsync(string value, string parameterName)
-        {
-            if (Enum.TryParse(value, true, out DirectionType result))
-            {
-                return await Task.FromResult(result);
-            }
-
-            throw new EntityNotFoundException($"Invalid value for {parameterName}.");
-        }
+        
         private async Task<IQueryable<Transaction>> FilterByDirectionAsync(IQueryable<Transaction> result, string? direction)
         {
             if (!string.IsNullOrEmpty(direction))
             {
-                DirectionType directionType = await ParseDirectionParameterAsync(direction, "direction");
-                return await Task.FromResult(result.Where(t => t.Direction == directionType));
+                if (Enum.TryParse<DirectionType>(direction, true, out var directionEnum))
+                {
+                    DirectionType directionType = directionEnum;
+                    return await Task.FromResult(result.Where(t => t.Direction == directionType));
+                }
             }
-            return await Task.FromResult(result);
+            return result;
         }
         private async Task<IQueryable<Transaction>> SortByAsync(IQueryable<Transaction> result, string sortCriteria)
         {
@@ -154,7 +143,7 @@ namespace DataAccess.Repositories.Models
             }
             else
             {
-                return await Task.FromResult(result);   
+                return result;   
             }
 
         }

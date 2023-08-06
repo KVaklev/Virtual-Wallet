@@ -227,7 +227,7 @@ namespace Business.Services.Models
             
             result.Data = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
            
-            //todo - why
+          
             if (!result.IsSuccessful)
             {
                 result.Message = GenerateTokenErrorMessage;

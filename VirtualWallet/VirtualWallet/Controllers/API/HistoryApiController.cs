@@ -1,9 +1,7 @@
-﻿using Business.Exceptions;
-using Business.QueryParameters;
+﻿using Business.QueryParameters;
 using Business.Services.Contracts;
 using Business.Services.Helpers;
 using DataAccess.Models.Models;
-using DataAccess.Repositories.Contracts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -30,7 +28,7 @@ namespace VirtualWallet.Controllers.API
             var loggedUserResult = await FindLoggedUserAsync();
             if (!loggedUserResult.IsSuccessful)
             {
-                return StatusCode(StatusCodes.Status404NotFound, e.Message);
+                return StatusCode(StatusCodes.Status404NotFound, loggedUserResult.Message);
 
             }
                 var result = await this.historyService.GetByIdAsync(id, loggedUserResult.Data);
@@ -52,22 +50,29 @@ namespace VirtualWallet.Controllers.API
         [HttpGet, Authorize]
         public async Task<IActionResult> GetHistoryAsync([FromQuery] HistoryQueryParameters historyQueryParameters) 
         {
-            try
-            {
+           
                 var loggedUserResult = await FindLoggedUserAsync();
-                var result = await this.historyService.FilterByAsync(historyQueryParameters, loggedUserResult);
-
-                if (!result.IsSuccessful)
+                if (!loggedUserResult.IsSuccessful)
                 {
-                    return StatusCode(StatusCodes.Status401Unauthorized, result.Message);
+                    return StatusCode(StatusCodes.Status404NotFound, loggedUserResult.Message);
                 }
 
-                return StatusCode(StatusCodes.Status200OK, result.Data);
-            }
-            catch (EntityNotFoundException e)
+                var result = await this.historyService.FilterByAsync(historyQueryParameters, loggedUserResult.Data);
+
+            if (!result.IsSuccessful)
             {
-                return StatusCode(StatusCodes.Status404NotFound, e.Message);
+                if (result.Message == Constants.NoFoundResulte)
+                {
+                    return StatusCode(StatusCodes.Status404NotFound, loggedUserResult.Message);
+                }
+                else
+                {
+                    return StatusCode(StatusCodes.Status401Unauthorized, result.Message);
+
+                }
             }
+                return StatusCode(StatusCodes.Status200OK, result.Data);
+           
         }
 
         private async Task<Response<User>> FindLoggedUserAsync()
