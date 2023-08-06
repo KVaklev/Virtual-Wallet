@@ -33,7 +33,7 @@ namespace VirtualWallet.Controllers.MVC
                 var loggedUser = await GetLoggedUserAsync();
                 //var model = transferService.GetAll(loggedUser).Select(m => new GetTransferDto { Username = m.Account.User.Username, DateCreated = m.DateCreated }).ToList();
                 var result = await transferService.FilterByAsync(parameters, loggedUser);
-                return View(result);
+                return View(result.Data);
 
             }
             catch (EntityNotFoundException ex)
@@ -220,8 +220,8 @@ namespace VirtualWallet.Controllers.MVC
 
         private async Task<User> GetLoggedUserAsync()
         {
-            var userName = this.HttpContext.Session.GetString("LoggedUser");
-            var user = await this.userRepository.GetByUsernameAsync(userName);
+            //var userName = this.HttpContext.Session.GetString("LoggedUser");
+            var user = await this.userRepository.GetByUsernameAsync("kristian");
             return user;
 
         }
