@@ -9,8 +9,8 @@ using Business.Mappers;
 using Business.DTOs.Requests;
 using Business.DTOs.Responses;
 using Business.DTOs;
-using DataAccess.Models.Enums;
-using System.Reflection.Metadata;
+using static Business.Services.Helpers.Constants;
+
 
 namespace Business.Services.Models
 {
@@ -44,7 +44,7 @@ namespace Business.Services.Models
             else
             {
                 result.IsSuccessful = false;
-                result.Message = Constants.NoUsersErrorMessage;
+                result.Message = NoUsersErrorMessage;
             }
 
             return result;
@@ -96,21 +96,22 @@ namespace Business.Services.Models
             if (await UsernameExistsAsync(createUserDto.Username))
             {
                 result.IsSuccessful = false;
-                result.Message = Constants.UsernameExistsErrorMessage;
+                result.Message = UsernameExistsErrorMessage;
+                result.Error = new Error(PropertyName.Username);
                 return result;
             }
 
             if (await EmailExistsAsync(createUserDto.Email))
             {
                 result.IsSuccessful = false;
-                result.Message = Constants.EmailExistsErrorMessage;
+                result.Message = EmailExistsErrorMessage;
                 return result;
             }
 
             if (await PhoneNumberExistsAsync(createUserDto.PhoneNumber))
             {
                 result.IsSuccessful = false;
-                result.Message = Constants.PhoneNumberExistsErrorMessage;
+                result.Message = PhoneNumberExistsErrorMessage;
                 return result;
             }
             

@@ -8,6 +8,9 @@ namespace Business.DTOs
         public string Message { get; set; } = string.Empty;
 
         public TItem Data { get; set; }
+
+        public Error Error { get; set; }
+
     }
 }
 

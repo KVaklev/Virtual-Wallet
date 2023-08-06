@@ -1,7 +1,6 @@
 ﻿using Business.DTOs.Requests;
 using Business.Services.Contracts;
 using Business.Services.Helpers;
-using Business.ViewModels;
 using DataAccess.Repositories.Contracts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -88,6 +87,7 @@ namespace VirtualWallet.Controllers.MVC
             return this.View(createUserModel);
         }
 
+ 
         [HttpPost]
         public async Task<IActionResult> Register(CreateUserModel createUserModel)
         {
@@ -100,34 +100,37 @@ namespace VirtualWallet.Controllers.MVC
 
             if (!result.IsSuccessful)
             {
-                return BadRequest(result.Message);
+                this.ModelState.AddModelError(result.Error.InvalidPropertyName, result.Message);
+                return View(createUserModel);
             }
 
-            return await this.SendConfirmationEmailAsync(result.Data.Username);
+            return await SendConfirmationEmailAsync(result.Data.Username);
         }
 
         public async Task<IActionResult> SendConfirmationEmailAsync(string username)
         {
             var user = await this.userRepository.GetByUsernameAsync(username);
-            var generatedToken = this.accountService.GenerateTokenAsync(user.Id);
+            var generatedToken = await this.accountService.GenerateTokenAsync(user.Id);
 
-            if (!generatedToken.IsCompletedSuccessfully)
+            if (!generatedToken.IsSuccessful)
             {
                 return RedirectToAction("Register", "Account");
             }
-            var confirmationLink = Url.Action("confirm-registration", "api", new { userId = user.Id, token = generatedToken.Result }, Request.Scheme);
+            var confirmationLink = Url.Action("confirm-registration", "api", new { userId = user.Id, token = generatedToken }, Request.Scheme);
 
             var message = await this.emailService.BuildEmailAsync(user, confirmationLink);
 
             await emailService.SendEMailAsync(message);
-
-            return RedirectToAction("RegistrationSuccessful", "Account");
+                
+            return RedirectToAction("SuccessfulRegistration", "Account");
         }
 
-        public IActionResult RegistrationSuccessful()
+        [AllowAnonymous]
+        public IActionResult SuccessfulRegistration()
         {
-			return this.View("RegistrationSuccessful");
+			return this.View();
 		}
+
 
         [HttpGet("confirm-registration")]
         public async Task<IActionResult> ConfirmRegistrationAsync([FromQuery] int userId, [FromQuery] string token)

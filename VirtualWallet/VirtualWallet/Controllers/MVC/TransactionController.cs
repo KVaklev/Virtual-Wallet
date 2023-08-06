@@ -2,6 +2,7 @@
 using Business.Exceptions;
 using Business.QueryParameters;
 using Business.Services.Contracts;
+using Business.ViewModels;
 using DataAccess.Models.Models;
 using DataAccess.Repositories.Contracts;
 using Microsoft.AspNetCore.Authorization;
@@ -9,7 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace VirtualWallet.Controllers.MVC
 {
-    [Authorize]
+    [AllowAnonymous]
     public class TransactionController : Controller
     {
         private readonly ITransactionService transactionService;
@@ -27,31 +28,36 @@ namespace VirtualWallet.Controllers.MVC
         [HttpGet]
         public async Task<IActionResult> Index([FromQuery] TransactionQueryParameters parameters)
         {
-            try
-            {
-                var loggedUser = await GetLoggedUserAsync();
-                var result = await this.transactionService.FilterByAsync(parameters, loggedUser);
+			//try
+			//{
+			//    var loggedUser = await GetLoggedUserAsync();
+			//    var result = await this.transactionService.FilterByAsync(parameters, loggedUser);
 
-                return View(result);
-            }
-            catch (EntityNotFoundException ex)
-            {
-                return await EntityErrorViewAsync(ex.Message);
-            }
-        }
+			//    return View(result);
+			//}
+			//catch (EntityNotFoundException ex)
+			//{
+			//    return await EntityErrorViewAsync(ex.Message);
+			//}
+
+			return View();
+		}
 
         [HttpGet]
         public async Task<IActionResult> Create([FromQuery] TransactionQueryParameters parameters)
         {
 
-            if ((this.HttpContext.Session.GetString("IsBlocked")) == "True")
-            {
-                return BlockedErrorView();
-            }
-            else
-            {
-                return this.View();
-            }
+            //if ((this.HttpContext.Session.GetString("IsBlocked")) == "True")
+            //{
+            //    return BlockedErrorView();
+            //}
+            //else
+            //{
+            //    return this.View();
+            //}
+            var createTransaction = new CreateTransactionDto();
+
+            return this.View(createTransaction);
         }
 
         [HttpPost]
