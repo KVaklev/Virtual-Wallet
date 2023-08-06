@@ -50,19 +50,23 @@ namespace Business.Services.Models
             return result;
         }
 
-        public async Task<PaginatedList<User>> FilterByAsync(UserQueryParameters filterParameters)
+        public async Task<Response<PaginatedList<GetCreatedUserDto>>> FilterByAsync(UserQueryParameters filterParameters)
         {
-
+            var result = new Response<PaginatedList<GetCreatedUserDto>>();
             var users = await this.userRepository.FilterByAsync(filterParameters);
-            if (users.Contains==0)
+            if (users.Count==0)
             {
-
+                result.IsSuccessful = false;
+                result.Message= NoUsersErrorMessage;
+                return result;
             }
-
+            var userTotalPages=users.TotalPages;
+            var userPageNumber=users.PageNumber;
             List<GetCreatedUserDto> userDtos = users
                     .Select(user => mapper.Map<GetCreatedUserDto>(user))
                     .ToList();
-            return users;
+            result.Data = new PaginatedList<GetCreatedUserDto>(userDtos,userTotalPages,userPageNumber);
+            return result;
         }
 
         public async Task<Response<GetUserDto>> GetByIdAsync(int id, User loggedUser)
@@ -70,6 +74,12 @@ namespace Business.Services.Models
             var result = new Response<GetUserDto>();
 
             var user = await this.userRepository.GetByIdAsync(id);
+            if (user == null) 
+            {
+                result.IsSuccessful = false;
+                result.Message = NoUsersErrorMessage;
+                return result;
+            }
 
             if (!await Security.IsAuthorizedAsync(user, loggedUser))
             {
@@ -88,6 +98,12 @@ namespace Business.Services.Models
             var result = new Response<GetUserDto>();
 
             var user = await this.userRepository.GetByUsernameAsync(username);
+            if (user == null)
+            {
+                result.IsSuccessful = false;
+                result.Message = NoUsersErrorMessage;
+                return result;
+            }
             var userDto = this.mapper.Map<GetUserDto>(user);
             result.Data = userDto;
 
@@ -137,7 +153,13 @@ namespace Business.Services.Models
             var result = new Response<GetUpdatedUserDto>();
 
             User userToUpdate = await this.userRepository.GetByIdAsync(id);
-           
+            if (userToUpdate == null)
+            {
+                result.IsSuccessful = false;
+                result.Message = NoUsersErrorMessage;
+                return result;
+            }
+
             if (!await Security.IsAuthorizedAsync(userToUpdate, loggedUser))
             {
                 result.IsSuccessful = false;
@@ -188,6 +210,13 @@ namespace Business.Services.Models
             } 
             
             User userToDelete = await this.userRepository.GetByIdAsync(id);
+            if (userToDelete == null)
+            {
+                result.IsSuccessful = false;
+                result.Message = NoUsersErrorMessage;
+                return result;
+            }
+
             await this.accountService.DeleteAsync((int)userToDelete.AccountId, loggedUser);
     
             result.Data = await this.userRepository.DeleteAsync(id);
@@ -207,6 +236,12 @@ namespace Business.Services.Models
             }
 
             User userToPromote = await this.userRepository.GetByIdAsync(id);
+            if (userToPromote == null)
+            {
+                result.IsSuccessful = false;
+                result.Message = NoUsersErrorMessage;
+                return result;
+            }
 
             if (!userToPromote.IsAdmin)
             {
@@ -231,6 +266,12 @@ namespace Business.Services.Models
             }
 
             User userToBlock = await this.userRepository.GetByIdAsync(id);
+            if (userToBlock == null)
+            {
+                result.IsSuccessful = false;
+                result.Message = NoUsersErrorMessage;
+                return result;
+            }
 
             if (!userToBlock.IsBlocked)
             {
@@ -255,6 +296,12 @@ namespace Business.Services.Models
             }
 
             User userToUnblock = await this.userRepository.GetByIdAsync(id);
+            if (userToUnblock == null)
+            {
+                result.IsSuccessful = false;
+                result.Message = NoUsersErrorMessage;
+                return result;
+            }
 
             if (userToUnblock.IsBlocked)
             {
@@ -274,10 +321,32 @@ namespace Business.Services.Models
             await Security.CheckForNullEntryAsync(username, password);
 
             User loggedUser = await this.userRepository.GetByUsernameAsync(username);
+            if (loggedUser == null)
+            {
+                result.IsSuccessful = false;
+                result.Message = NoUsersErrorMessage;
+                return result;
+            }
 
-           var authenticatedUser = await Security.AuthenticateAsync(loggedUser, password);
+            var authenticatedUser = await Security.AuthenticateAsync(loggedUser, password);
            return authenticatedUser;
 
+        }
+
+        public async Task<Response<User>> GetLoggedUserByUsernameAsync(string username)
+        {
+            var result = new Response<User>();
+
+            var user = await this.userRepository.GetByUsernameAsync(username);
+            if (user == null)
+            {
+                result.IsSuccessful = false;
+                result.Message = NoUsersErrorMessage;
+                return result;
+            }
+            result.Data = user;
+
+            return result;
         }
 
         private async Task<bool> EmailExistsAsync(string email)
