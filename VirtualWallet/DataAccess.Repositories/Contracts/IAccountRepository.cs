@@ -12,8 +12,7 @@ namespace DataAccess.Repositories.Contracts
         Task<bool> AddCardAsync(int id, Card card);
         Task<bool> RemoveCardAsync(int id, Card card);
         Task<bool> DeleteAsync(int id);
-        Task<Account> IncreaseBalanceAsync(int id, decimal amount);
-        Task<Account> DecreaseBalanceAsync(int id, decimal amount);
+        Task<bool> SaveChangesAsync();
         Task<bool> ConfirmRegistrationAsync(int id, string token);
     }
 }

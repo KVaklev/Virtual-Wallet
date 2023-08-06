@@ -10,6 +10,7 @@ using DataAccess.Repositories.Contracts;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Principal;
 using System.Text;
 using static Business.Services.Helpers.Constants;
 
@@ -64,6 +65,12 @@ namespace Business.Services.Models
             var result = new Response<GetAccountDto>();
 
             var account = await this.accountRepository.GetByIdAsync(id);
+            if (account==null)
+            {
+                result.IsSuccessful = false;
+                result.Message = Constants.NoAccountsErrorMessage;
+                return result;
+            }
             
             if (!await Security.IsUserAuthorized(id, user))
             {
@@ -82,6 +89,12 @@ namespace Business.Services.Models
             var result = new Response<GetAccountDto>();
             
             var account = await accountRepository.GetByUsernameAsync(user.Username);
+            if (account == null)
+            {
+                result.IsSuccessful = false;
+                result.Message = Constants.NoUsersErrorMessage;
+                return result;
+            }
 
             if (!await Security.IsUserAuthorized(id, user))
             {
@@ -102,6 +115,12 @@ namespace Business.Services.Models
 
             var accountToCreate = new Account();
             var currency = await currencyService.GetByCurrencyCodeAsync(currencyCode);
+            if (currency == null)
+            {
+                result.IsSuccessful = false;
+                result.Message = Constants.CurrencyNotFoundErrorMessage;
+                return result;
+            }
             accountToCreate = await AccountsMapper.MapCreateDtoToAccountAsync(accountToCreate, currency, user);
             
             user.AccountId = user.Id;
@@ -117,6 +136,13 @@ namespace Business.Services.Models
             var result = new Response<bool>();
 
             var accountToDelete = await this.accountRepository.GetByIdAsync(id);
+            if (accountToDelete == null)
+            {
+                result.IsSuccessful = false;
+                result.Message = Constants.NoAccountsErrorMessage;
+                return result;
+            }
+
 
             if (!await Security.IsAdminAsync(loggedUser))
             {
@@ -201,6 +227,7 @@ namespace Business.Services.Models
             
             result.Data = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
            
+            //todo - why
             if (!result.IsSuccessful)
             {
                 result.Message = GenerateTokenErrorMessage;
@@ -214,6 +241,13 @@ namespace Business.Services.Models
             var result = new Response<string>();
 
             var user = await this.userRepository.GetByIdAsync(id);
+            if (user == null)
+            {
+                result.IsSuccessful = false;
+                result.Message = Constants.NoUsersErrorMessage;
+                return result;
+            }
+
             result.Data = (DateTime.Now.ToString() + user.Username).ComputeSha256Hash();
            
             return result;
@@ -227,20 +261,37 @@ namespace Business.Services.Models
             return result;
         }
 
-        public async Task<Account> IncreaseBalanceAsync(int id, decimal amount, User loggedUser)
+        public async Task <Response<Account>> IncreaseBalanceAsync(int id, decimal amount, User loggedUser)
         {
+            var result = new Response<Account>();
             Account accountToDepositTo = await this.accountRepository.GetByIdAsync(id);
+            if (accountToDepositTo == null)
+            {
+                result.IsSuccessful = false;
+                result.Message = Constants.NoAccountsErrorMessage;
+                return result;
+            }
             accountToDepositTo.Balance += amount;
-
-            return await this.accountRepository.IncreaseBalanceAsync(id, amount);
+            await this.accountRepository.SaveChangesAsync();
+            result.Data = accountToDepositTo;
+            return result;
+            
         }
 
-        public async Task<Account> DecreaseBalanceAsync(int id, decimal amount, User loggedUser)
+        public async Task<Response<Account>> DecreaseBalanceAsync(int id, decimal amount, User loggedUser)
         {
+            var result = new Response<Account>();
             Account accountToWithdrawFrom = await this.accountRepository.GetByIdAsync(id);
+            if (accountToWithdrawFrom == null)
+            {
+                result.IsSuccessful = false;
+                result.Message = Constants.NoAccountsErrorMessage;
+                return result;
+            }
             accountToWithdrawFrom.Balance -= amount;
-
-            return await this.accountRepository.DecreaseBalanceAsync(id, amount);
+            await this.accountRepository.SaveChangesAsync();
+            result.Data = accountToWithdrawFrom;
+            return result;
         }
     }
 }

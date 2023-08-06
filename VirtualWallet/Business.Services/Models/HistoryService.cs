@@ -23,6 +23,12 @@ namespace Business.Services.Models
         {
             var result = new Response<GetHistoryDto>();
             var history = await historyRepository.GetByIdAsync(id);
+            if (history == null) 
+            {
+                result.IsSuccessful = false;
+                result.Message = Constants.NoFoundResulte;
+                return result;
+            }
             if (!await Security.IsHistoryOwnerAsync(history, loggedUser))
             {
                 result.IsSuccessful = false;
@@ -35,11 +41,12 @@ namespace Business.Services.Models
             return result;
         }
 
-        public async Task<Response<IQueryable<GetHistoryDto>>> FilterByAsync(
+        public async Task<Response<PaginatedList<GetHistoryDto>>> FilterByAsync(
             HistoryQueryParameters filterParameters, 
             User loggedUser)
         {
-            var result = new Response<IQueryable<GetHistoryDto>>();
+            var result = new Response<PaginatedList<GetHistoryDto>>();
+            
             if (filterParameters.Username != null && !loggedUser.IsAdmin)
             {
                 result.IsSuccessful = false;
@@ -48,11 +55,18 @@ namespace Business.Services.Models
             }
             
             var historyRecords = await this.historyRepository.FilterByAsync(filterParameters, loggedUser);
+            if (historyRecords.Count == null)
+            {
+                result.IsSuccessful = false;
+                result.Message = Constants.NoFoundResulte;
+                return result;
+            }
             var resultDto = historyRecords
                              .Select(history => HistoryMapper.MapHistoryToDtoAsync(history)) 
-                             .AsQueryable();
-            result.Data = (IQueryable<GetHistoryDto>)resultDto;
-            return result; // todo - PaginatedList<GetHistoryDto>
+                             .ToList();
+
+            result.Data = new PaginatedList<GetHistoryDto>(resultDto, historyRecords.TotalPages, historyRecords.PageNumber);
+            return result;
            
         }
 

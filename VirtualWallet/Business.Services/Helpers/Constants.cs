@@ -54,7 +54,7 @@
         //Constant messages for curencies
 
         public const string ModifyCurrencyDeleteMessage = "The currency has been successfully deleted.";
-        public const string ModifyCurrencyNotFoundErrorMessage = "This currency does not exist.";
+        public const string CurrencyNotFoundErrorMessage = "This currency does not exist.";
 
         //Constant messages for Authorized
 

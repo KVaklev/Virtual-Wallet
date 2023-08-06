@@ -1,6 +1,7 @@
 ﻿using Business.Exceptions;
 using Business.QueryParameters;
 using Business.Services.Contracts;
+using Business.Services.Helpers;
 using DataAccess.Models.Models;
 using DataAccess.Repositories.Contracts;
 using Microsoft.AspNetCore.Authorization;
@@ -14,36 +15,38 @@ namespace VirtualWallet.Controllers.API
     {
         private readonly IHistoryService historyService;
         private readonly IUserService userService;
-        private readonly IUserRepository userRepository;
 
         public HistoryApiController(
             IHistoryService historyService,
-            IUserService userService,
-            IUserRepository userRepository)
+            IUserService userService)
         {
             this.historyService = historyService;
             this.userService = userService;
-            this.userRepository = userRepository;
         }
 
         [HttpGet("{id}"), Authorize]
         public async Task<IActionResult> GetbyIdAsync(int id)
         {
-            try
+            var loggedUserResult = await FindLoggedUserAsync();
+            if (!loggedUserResult.IsSuccessful)
             {
-                var loggedUser = await FindLoggedUserAsync();
-                var result = await this.historyService.GetByIdAsync(id, loggedUser);
+                return StatusCode(StatusCodes.Status404NotFound, e.Message);
+
+            }
+                var result = await this.historyService.GetByIdAsync(id, loggedUserResult.Data);
                 if (!result.IsSuccessful)
                 {
-                    return StatusCode(StatusCodes.Status401Unauthorized, result.Message);
+                    if (result.Message == Constants.NoFoundResulte)
+                    {
+                        return StatusCode(StatusCodes.Status404NotFound, result.Message);
+                    }
+                    else
+                    {
+                        return StatusCode(StatusCodes.Status401Unauthorized, result.Message);
+                    }
                 }
 
                 return StatusCode(StatusCodes.Status200OK, result.Data);
-            }
-            catch (EntityNotFoundException e)
-            {
-                return StatusCode(StatusCodes.Status404NotFound, e.Message);
-            }
         }
 
         [HttpGet, Authorize]
@@ -51,8 +54,8 @@ namespace VirtualWallet.Controllers.API
         {
             try
             {
-                var loggedUser = await FindLoggedUserAsync();
-                var result = await this.historyService.FilterByAsync(historyQueryParameters, loggedUser);
+                var loggedUserResult = await FindLoggedUserAsync();
+                var result = await this.historyService.FilterByAsync(historyQueryParameters, loggedUserResult);
 
                 if (!result.IsSuccessful)
                 {
@@ -67,11 +70,11 @@ namespace VirtualWallet.Controllers.API
             }
         }
 
-        private async Task<User> FindLoggedUserAsync()
+        private async Task<Response<User>> FindLoggedUserAsync()
         {
             var loggedUsersUsername = User.Claims.FirstOrDefault(claim => claim.Type == "Username").Value;
-            var loggedUser = await this.userRepository.GetByUsernameAsync(loggedUsersUsername);
-            return loggedUser;
+            var loggedUserResult = await this.userService.GetLoggedUserByUsernameAsync(loggedUsersUsername);
+            return loggedUserResult;
         }
     }
 }
