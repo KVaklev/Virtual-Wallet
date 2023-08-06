@@ -1,5 +1,4 @@
-﻿
-namespace DataAccess.Models.Models.DTOs
+﻿namespace DataAccess.Models.Models
 {
     public class Response<TItem>
     {
@@ -8,6 +7,8 @@ namespace DataAccess.Models.Models.DTOs
         public string Message { get; set; } = string.Empty;
 
         public TItem Data { get; set; }
+
+        public Error Error { get; set; }
     }
 }
 

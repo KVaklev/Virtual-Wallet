@@ -1,4 +1,4 @@
-﻿namespace Business.DTOs
+﻿namespace DataAccess.Models.Models
 {
     public class Error
     {
@@ -7,5 +7,7 @@
             this.InvalidPropertyName = invalidPropertyName;
         }
         public string InvalidPropertyName { get; set; }
+
+
     }
 }
