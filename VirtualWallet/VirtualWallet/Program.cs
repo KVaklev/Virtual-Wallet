@@ -1,7 +1,3 @@
-using DataAccess.Models.Models.Services.Additional;
-using DataAccess.Models.Models.Services.Contracts;
-using DataAccess.Models.Models.Services.Helpers;
-using DataAccess.Models.Models.Services.Models;
 using DataAccess.Models.Models;
 using DataAccess.Repositories.Contracts;
 using DataAccess.Repositories.Data;
@@ -11,6 +7,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using VirtualWallet.Models;
+using Business.Services.Contracts;
+using Business.Services.Models;
+using Business.Services.Additional;
 
 namespace VirtualWallet
 {
@@ -57,7 +56,7 @@ namespace VirtualWallet
             builder.Services.AddScoped<ITransferService, TransferService>();
             builder.Services.AddScoped<IAccountService, AccountService>();
             builder.Services.AddScoped<ICurrencyService, CurrencyService>();
-            builder.Services.AddScoped<DataAccess.Models.Models.Services.Contracts.ITransactionService, TransactionService>();
+            builder.Services.AddScoped< Business.Services.Contracts.ITransactionService, TransactionService>();
             builder.Services.AddScoped<IHistoryService, HistoryService>();
             builder.Services.AddScoped<IEmailService, EmailService>();
             builder.Services.AddScoped<IExchangeRateService, ExchangeRateService>();

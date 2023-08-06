@@ -1,4 +1,4 @@
-﻿@model CreateTransactionViewModel
+﻿@model Business.ViewModels.CreateTransactionViewModel
 
 
 @{
@@ -84,8 +84,8 @@
               </div>
                         <div class="mb-4 mb-sm-5">
                             <label for="description" class="form-label">Description</label>
-                            <textarea asp-for="CreateTransactionDto.Description" class="form-control" rows="4" id="description" required placeholder="Payment Description"></textarea>
-                            <span asp-validation-for="CreateTransactionDto.Description" class="error-message"></span>
+                            <textarea  class="form-control" rows="4" id="description" required placeholder="Payment Description"></textarea>
+                            <span  class="error-message"></span>
                         </div>
               <div class="d-grid"><button  type="submit" class="btn btn-primary">Continue</button></div>
             </form>
