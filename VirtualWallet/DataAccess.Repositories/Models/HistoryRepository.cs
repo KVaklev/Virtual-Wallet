@@ -30,7 +30,7 @@ namespace DataAccess.Repositories.Models
                 .ThenInclude(u=>u.User)
                 .FirstOrDefaultAsync(h => h.Id == id);
 
-            return history ?? throw new EntityNotFoundException(Constants.NoFoundErrorMessage);
+            return history ?? throw new EntityNotFoundException(Constants.NotFoundErrorMessage);
         }
 
         public async Task<History> CreateAsync(History history)
@@ -52,7 +52,7 @@ namespace DataAccess.Repositories.Models
 
             if (totalItems == 0)
             {
-                throw new EntityNotFoundException(Constants.NoFoundErrorMessage);
+                throw new EntityNotFoundException(Constants.NotFoundErrorMessage);
             }
 
             int totalPages = (result.Count() + filterParameters.PageSize - 1) / filterParameters.PageSize;
@@ -76,7 +76,7 @@ namespace DataAccess.Repositories.Models
                 result = result.Where(t => t.AccountId==loggedUser.AccountId);
             }
 
-            return result ?? throw new EntityNotFoundException(Constants.NoFoundErrorMessage);
+            return result ?? throw new EntityNotFoundException(Constants.NotFoundErrorMessage);
         }
 
         private async Task<IQueryable<History>> FilterByUsernameAsync(IQueryable<History> result, string? username)

@@ -1,15 +1,9 @@
 ﻿@model LoginUserModel
 
 @{
-    this.ViewData["Title"] = "Speed Pay - Quick and Trustworthy Money Transfers ";
+    this.ViewData["Title"] = "Speed Pay - Login";
 }
 
-@if (!ViewData.ModelState.IsValid)
-{
-    <div class="alert alert-danger">
-        @Html.ValidationSummary()
-    </div>
-}
 <!-- Content
   ============================================= -->
 <body>
@@ -25,12 +19,12 @@
                             <div class="mb-3">
                                 <label asp-for="Username" class="form-label">Username</label>
                                 <input asp-for="Username" type="text" class="form-control" required placeholder="Enter Your Username">
-                                <span asp-validation-for="Username" class="text-danger"></span>
+                                <span asp-validation-for="Username" class="form-error text-danger"></span>
                             </div>
                             <div class="mb-3">
                                 <label asp-for="Password" class="form-label">Password</label>
                                 <input asp-for="Password" type="password" class="form-control" required placeholder="Enter Password">
-                                <span asp-validation-for="Password" class="text-danger"></span>
+                                <span asp-validation-for="Password" class="form-error text-danger"></span>
                             </div>
                             <div class="row mb-3">
                                 <div class="col-sm">

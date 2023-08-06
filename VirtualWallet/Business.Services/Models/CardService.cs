@@ -9,7 +9,7 @@ using Business.Services.Contracts;
 using Business.Services.Helpers;
 using DataAccess.Models.Models;
 using DataAccess.Repositories.Contracts;
-using DataAccess.Repositories.Models;
+using static Business.Services.Helpers.Constants;
 
 namespace Business.Services.Models
 {
@@ -100,7 +100,8 @@ namespace Business.Services.Models
             if (await CardNumberExistsAsync(card.CardNumber))
             {
                 result.IsSuccessful = false;
-                result.Message = Constants.CardNumberAddErrorMessage;
+                result.Message = CardNumberAddErrorMessage;
+                result.Error = new Error(PropertyName.CardNumber);
                 return result;
             }
 
@@ -125,14 +126,15 @@ namespace Business.Services.Models
             if (await CardNumberExistsAsync(updateCardDto.CardNumber))
             {
                 result.IsSuccessful = false;
-                result.Message = Constants.CardNumberAddErrorMessage;
+                result.Message = CardNumberAddErrorMessage;
+                result.Error = new Error(PropertyName.CardNumber);
                 return result;
             }
 
             if (!await Security.IsAuthorizedAsync(cardToUpdate, loggedUser))
             {
                 result.IsSuccessful = false;
-                result.Message = Constants.ModifyCardErrorMessage;
+                result.Message = ModifyCardErrorMessage;
                 return result;
             }
 
@@ -152,12 +154,12 @@ namespace Business.Services.Models
             if (!await Security.IsAdminAsync(loggedUser))
             {
                 result.IsSuccessful = false;
-                result.Message = Constants.ModifyUserErrorMessage;
+                result.Message = ModifyUserErrorMessage;
                 return result;
             }
 
             result.Data = await this.cardRepository.DeleteAsync(id);
-            result.Message = Constants.SuccessfullDeletedCardMessage;
+            result.Message = SuccessfullDeletedCardMessage;
 
             return result;
         }

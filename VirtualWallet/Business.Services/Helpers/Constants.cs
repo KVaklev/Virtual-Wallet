@@ -11,6 +11,7 @@
         public const string NoUsersAfterFilterErrorMessage = "No users match the specified filter criteria.";
 
         public const string UsernameExistsErrorMessage = "User with this username already exists.";
+        public const string UsernameDoesntExistErrorMessage = "User with this username doesn't exist.";
         public const string EmailExistsErrorMessage = "User with this email already exists.";
         public const string PhoneNumberExistsErrorMessage = "User with this phone number already exists.";
 
@@ -75,6 +76,7 @@
         public const string ConfirmedRegistrationMessage = "Registration confirmed!";
         public const string NotSuccessfullRegistrationMessage = "Your registration was not successfull.";
         public const string SuccessfullConfirmationEmailSentMessage = "Hooray! Your confirmation email has been sent successfully. Check your inbox, follow the link to complete your registration, and then dive right in to create your wallet!";
+        public const string InvalidSendEmailOperation = "An error occurred while sending the email. Please try again later.";
 
         //Constant messages for login
 
@@ -85,6 +87,13 @@
         public static class PropertyName
         {
             public const string Username = "Username";
+            public const string Email = "Email";
+            public const string PhoneNumber = "PhoneNumber";
+            public const string CardNumber = "CardNumber";
+            public const string Credentials = "Credentials";
+            public const string PasswordHashMatch = "PasswordHashMatch";
+            public const string NotConfirmedEmail = "NotConfirmedEmail";
+            public const string UsernameDoesntExist = "UsernameDoesntExist";
         }
     }
 

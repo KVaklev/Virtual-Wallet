@@ -1,8 +1,6 @@
 ﻿using AutoMapper;
 using Business.DTOs;
-using Business.DTOs.Requests;
 using Business.DTOs.Responses;
-using Business.Exceptions;
 using Business.Mappers;
 using Business.Services.Additional;
 using Business.Services.Contracts;
@@ -12,8 +10,8 @@ using DataAccess.Repositories.Contracts;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Security.Principal;
 using System.Text;
+using static Business.Services.Helpers.Constants;
 
 namespace Business.Services.Models
 {
@@ -55,7 +53,7 @@ namespace Business.Services.Models
             else
             {
                 result.IsSuccessful = false;
-                result.Message = Constants.NoAccountsErrorMessage;
+                result.Message = NoAccountsErrorMessage;
             }
 
             return result;
@@ -70,7 +68,7 @@ namespace Business.Services.Models
             if (!await Security.IsUserAuthorized(id, user))
             {
                 result.IsSuccessful = false;
-                result.Message = Constants.ModifyAccountErrorMessage;
+                result.Message = ModifyAccountErrorMessage;
                 return result;
             }
             var accountDto = this.mapper.Map<GetAccountDto>(account);
@@ -88,7 +86,7 @@ namespace Business.Services.Models
             if (!await Security.IsUserAuthorized(id, user))
             {
                 result.IsSuccessful = false;
-                result.Message = Constants.ModifyAccountErrorMessage;
+                result.Message = ModifyAccountErrorMessage;
                 return result;
             }
 
@@ -123,7 +121,7 @@ namespace Business.Services.Models
             if (!await Security.IsAdminAsync(loggedUser))
             {
                 result.IsSuccessful = false;
-                result.Message = Constants.ModifyUserErrorMessage;
+                result.Message = ModifyUserErrorMessage;
                 return result;
             }
 
@@ -146,7 +144,7 @@ namespace Business.Services.Models
             if (!await Security.IsUserAuthorized(id, user))
             {
                 result.IsSuccessful = false;
-                result.Message = Constants.ModifyAccountCardErrorMessage;
+                result.Message = ModifyAccountCardErrorMessage;
                 return result;
             }
 
@@ -154,6 +152,7 @@ namespace Business.Services.Models
             {
                 result.IsSuccessful = true;
                 result.Data = await this.accountRepository.AddCardAsync(id, card);
+                result.Error = new Error(PropertyName.CardNumber);
                 return result;
             }
 
@@ -166,13 +165,14 @@ namespace Business.Services.Models
             if (!await Security.IsUserAuthorized(id, user))
             {
                 result.IsSuccessful = false;
-                result.Message = Constants.ModifyAccountCardErrorMessage;
+                result.Message = ModifyAccountCardErrorMessage;
                 return result;
             }
             if (!await this.cardRepository.CardNumberExistsAsync(card.CardNumber))
             {
                 result.IsSuccessful = true;
-                result.Data = await this.accountRepository.AddCardAsync(id, card);
+                result.Data = await this.accountRepository.RemoveCardAsync(id, card);
+                result.Error = new Error(PropertyName.CardNumber);
                 return result;
             }
 
@@ -203,7 +203,7 @@ namespace Business.Services.Models
            
             if (!result.IsSuccessful)
             {
-                result.Message = Constants.GenerateTokenErrorMessage;
+                result.Message = GenerateTokenErrorMessage;
                 return result;
             }
 
@@ -223,7 +223,7 @@ namespace Business.Services.Models
             var result = new Response<bool>();
 
             result.Data = await this.accountRepository.ConfirmRegistrationAsync(id, token);
-            result.Message = Constants.ConfirmedRegistrationMessage;
+            result.Message = ConfirmedRegistrationMessage;
             return result;
         }
 

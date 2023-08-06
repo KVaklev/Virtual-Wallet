@@ -69,7 +69,7 @@ namespace Business.Services.Models
             if (!await Security.IsAuthorizedAsync(user, loggedUser))
             {
                 result.IsSuccessful = false;
-                result.Message = Constants.ModifyAuthorizedErrorMessage;
+                result.Message = ModifyAuthorizedErrorMessage;
                 return result;
             }
             var userDto = this.mapper.Map<GetUserDto>(user);
@@ -105,6 +105,7 @@ namespace Business.Services.Models
             {
                 result.IsSuccessful = false;
                 result.Message = EmailExistsErrorMessage;
+                result.Error = new Error(PropertyName.Email);
                 return result;
             }
 
@@ -112,6 +113,7 @@ namespace Business.Services.Models
             {
                 result.IsSuccessful = false;
                 result.Message = PhoneNumberExistsErrorMessage;
+                result.Error = new Error(PropertyName.PhoneNumber);
                 return result;
             }
             
@@ -134,7 +136,7 @@ namespace Business.Services.Models
             if (!await Security.IsAuthorizedAsync(userToUpdate, loggedUser))
             {
                 result.IsSuccessful = false;
-                result.Message = Constants.ModifyUserErrorMessage;
+                result.Message = ModifyUserErrorMessage;
                 return result;
             }
 
@@ -143,7 +145,8 @@ namespace Business.Services.Models
                 if (await EmailExistsAsync(updateUserDto.Email))
                 {
                     result.IsSuccessful = false;
-                    result.Message = Constants.EmailExistsErrorMessage;
+                    result.Message = EmailExistsErrorMessage;
+                    result.Error = new Error(PropertyName.Email);
                     return result;
                 }
             }
@@ -153,7 +156,8 @@ namespace Business.Services.Models
                 if (await PhoneNumberExistsAsync(updateUserDto.PhoneNumber))
                 {
                     result.IsSuccessful = false;
-                    result.Message = Constants.PhoneNumberExistsErrorMessage;
+                    result.Message = PhoneNumberExistsErrorMessage;
+                    result.Error = new Error(PropertyName.PhoneNumber);
                     return result;
                 }
             }
@@ -174,7 +178,7 @@ namespace Business.Services.Models
             if (!await Security.IsAdminAsync(loggedUser))
             {
                 result.IsSuccessful = false;
-                result.Message = Constants.ModifyUserErrorMessage;
+                result.Message = ModifyUserErrorMessage;
                 return result;
             } 
             
@@ -193,7 +197,7 @@ namespace Business.Services.Models
             if (!await Security.IsAdminAsync(loggedUser))
             {
                 result.IsSuccessful = false;
-                result.Message = Constants.ModifyUserErrorMessage;
+                result.Message = ModifyUserErrorMessage;
                 return result;
             }
 
@@ -217,7 +221,7 @@ namespace Business.Services.Models
             if (!await Security.IsAdminAsync(loggedUser))
             {
                 result.IsSuccessful = false;
-                result.Message = Constants.ModifyUserErrorMessage;
+                result.Message = ModifyUserErrorMessage;
                 return result;
             }
 
@@ -241,7 +245,7 @@ namespace Business.Services.Models
             if (!await Security.IsAdminAsync(loggedUser))
             {
                 result.IsSuccessful = false;
-                result.Message = Constants.ModifyUserErrorMessage;
+                result.Message = ModifyUserErrorMessage;
                 return result;
             }
 
@@ -260,12 +264,15 @@ namespace Business.Services.Models
 
         public async Task<Response<User>> LoginAsync(string username, string password)
         {
+            var result = new Response<User>();
 
             await Security.CheckForNullEntryAsync(username, password);
-            User loggedUser = await this.userRepository.GetByUsernameAsync(username);
-            var authenticatedUser = await Security.AuthenticateAsync(loggedUser, password);
 
-            return authenticatedUser;
+            User loggedUser = await this.userRepository.GetByUsernameAsync(username);
+
+           var authenticatedUser = await Security.AuthenticateAsync(loggedUser, password);
+           return authenticatedUser;
+
         }
 
         private async Task<bool> EmailExistsAsync(string email)
