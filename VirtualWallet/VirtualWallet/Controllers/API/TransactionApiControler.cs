@@ -6,6 +6,7 @@ using Business.QueryParameters;
 using Business.DTOs.Requests;
 using DataAccess.Models.Models;
 using DataAccess.Repositories.Contracts;
+using Business.Services.Helpers;
 
 namespace VirtualWallet.Controllers.API
 {
@@ -15,29 +16,38 @@ namespace VirtualWallet.Controllers.API
     { 
         private readonly ITransactionService transactionService;
         private readonly IUserService userService;
-        private readonly IUserRepository userRepository;
+        
         
         public TransactionApiControler(
             ITransactionService transactionService,
-            IUserService userService,
-            IUserRepository userRepository
+            IUserService userService
             )
         {
             this.transactionService = transactionService; 
             this.userService = userService;
-            this.userRepository = userRepository;
         }
 
         [HttpPost, Authorize]
         public async Task<IActionResult> CreateAsync([FromBody] CreateTransactionDto transactionDto)
         {
 
-            var loggedUser = await FindLoggedUserAsync();
-            var result = await this.transactionService.CreateOutTransactionAsync(transactionDto, loggedUser);
+            var loggedUserResult = await FindLoggedUserAsync();
+            if (!loggedUserResult.IsSuccessful)
+            {
+                    return StatusCode(StatusCodes.Status404NotFound, loggedUserResult.Message);
+            }
+            var result = await this.transactionService.CreateOutTransactionAsync(transactionDto, loggedUserResult.Data);
 
             if (!result.IsSuccessful)
             {
-                return BadRequest(result.Message);
+                if (loggedUserResult.Message == Constants.NoFoundResulte)
+                {
+                    return StatusCode(StatusCodes.Status404NotFound, loggedUserResult.Message);
+                }
+                else 
+                { 
+                    return BadRequest(result.Message);
+                }
             }
            
             return StatusCode(StatusCodes.Status201Created, result.Data);
@@ -47,99 +57,113 @@ namespace VirtualWallet.Controllers.API
         [HttpDelete("{id}"), Authorize]
         public async Task<IActionResult> DeleteAsync(int id)
         {
-            try
+            var loggedUserResult = await FindLoggedUserAsync();
+            if (!loggedUserResult.IsSuccessful)
             {
-                var loggedUser = await FindLoggedUserAsync();
-                var result = await this.transactionService.DeleteAsync(id, loggedUser);
-                if (!result.IsSuccessful)
+                return StatusCode(StatusCodes.Status404NotFound, loggedUserResult.Message);
+            }
+            var result = await this.transactionService.DeleteAsync(id, loggedUserResult.Data);
+            if (!result.IsSuccessful)
+            {
+                if (loggedUserResult.Message == Constants.NoFoundResulte)
+                {
+                    return StatusCode(StatusCodes.Status404NotFound, loggedUserResult.Message);
+                }
+                else
                 {
                     return BadRequest(result.Message);
                 }
-                return StatusCode(StatusCodes.Status200OK, result.Message);
             }
-            catch (EntityNotFoundException e)
-            {
-                return StatusCode(StatusCodes.Status404NotFound, e.Message);
-            }
+            return StatusCode(StatusCodes.Status200OK, result.Message);
         }
 
         [HttpPut("{id}"), Authorize]
         public async Task<IActionResult> UpdateAsync(int id, [FromBody] CreateTransactionDto transactionDto)
         {
-            try
-            {
-                var loggedUser = await FindLoggedUserAsync();
-                var result = await this.transactionService.UpdateAsync(id, loggedUser, transactionDto);
+                var loggedUserResult = await FindLoggedUserAsync();
+                if (!loggedUserResult.IsSuccessful)
+                {
+                    return StatusCode(StatusCodes.Status404NotFound, loggedUserResult.Message);
+                }
+                var result = await this.transactionService.UpdateAsync(id, loggedUserResult.Data, transactionDto);
                 if (!result.IsSuccessful)
+                {
+                if (loggedUserResult.Message == Constants.NoFoundResulte)
+                {
+                    return StatusCode(StatusCodes.Status404NotFound, loggedUserResult.Message);
+                }
+                else
                 {
                     return BadRequest(result.Message);
                 }
+            }
                 return StatusCode(StatusCodes.Status200OK, result.Data);
-            }
-            catch (EntityNotFoundException e)
-            {
-                return StatusCode(StatusCodes.Status404NotFound, e.Message);
-            }
+            
         }
 
         [HttpGet("{id}"), Authorize]
         public async Task<IActionResult> GetByIdAsync(int id)
         {
-            try
+            var loggedUserResult = await FindLoggedUserAsync();
+            if (!loggedUserResult.IsSuccessful)
             {
-                var loggedUser = await FindLoggedUserAsync();
-                var result = await this.transactionService.GetByIdAsync(id, loggedUser);
+                return StatusCode(StatusCodes.Status404NotFound, loggedUserResult.Message);
+            }
+            var result = await this.transactionService.GetByIdAsync(id, loggedUserResult.Data);
                 if (!result.IsSuccessful)
+                {
+                if (loggedUserResult.Message == Constants.NoFoundResulte)
+                {
+                    return StatusCode(StatusCodes.Status404NotFound, loggedUserResult.Message);
+                }
+                else
                 {
                     return BadRequest(result.Message);
                 }
+            }
                 return StatusCode(StatusCodes.Status200OK, result.Data);
-            }
-            catch (EntityNotFoundException e)
-            {
-                return StatusCode(StatusCodes.Status404NotFound, e.Message);
-            }
         }
 
         [HttpGet, Authorize]
         public async Task<IActionResult> GetTransactionsAsync([FromQuery] TransactionQueryParameters filterParameters)
         {
-            try
+            var loggedUserResult = await FindLoggedUserAsync();
+            if (!loggedUserResult.IsSuccessful)
             {
-                var loggedUser = await FindLoggedUserAsync();
-                var result = await this.transactionService.FilterByAsync(filterParameters, loggedUser);
+                return StatusCode(StatusCodes.Status404NotFound, loggedUserResult.Message);
+            }
+            var result = await this.transactionService.FilterByAsync(filterParameters, loggedUserResult.Data);
                 
                 return StatusCode(StatusCodes.Status200OK, result);
-            }
-            catch (EntityNotFoundException e)
-            {
-                return StatusCode(StatusCodes.Status404NotFound, e.Message);
-            }
         }
 
         [HttpPut("{id}/execute"), Authorize]
         public async Task<IActionResult> ExecuteAsync(int id)
         {
-            try
+            var loggedUserResult = await FindLoggedUserAsync();
+            if (!loggedUserResult.IsSuccessful)
             {
-                var loggedUser = await FindLoggedUserAsync();
-                var result = await this.transactionService.ExecuteAsync(id, loggedUser);
+                return StatusCode(StatusCodes.Status404NotFound, loggedUserResult.Message);
+            }
+            var result = await this.transactionService.ExecuteAsync(id, loggedUserResult.Data);
                 if (!result.IsSuccessful)
+                {
+                if (loggedUserResult.Message == Constants.NoFoundResulte)
+                {
+                    return StatusCode(StatusCodes.Status404NotFound, loggedUserResult.Message);
+                }
+                else
                 {
                     return BadRequest(result.Message);
                 }
+            }
                 return StatusCode(StatusCodes.Status200OK, result);
-            }
-            catch (EntityNotFoundException e)
-            {
-                return StatusCode(StatusCodes.Status404NotFound, e.Message);
-            }
         }
-        private async Task<User> FindLoggedUserAsync()
+        private async Task<Response<User>> FindLoggedUserAsync()
         {
             var loggedUsersUsername = User.Claims.FirstOrDefault(claim => claim.Type == "Username").Value;
-            var loggedUser = await this.userRepository.GetByUsernameAsync(loggedUsersUsername);
-            return loggedUser;
+            var loggedUserResult = await this.userService.GetLoggedUserByUsernameAsync(loggedUsersUsername);
+            return loggedUserResult;
         }
     }
 }  
