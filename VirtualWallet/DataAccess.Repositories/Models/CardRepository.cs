@@ -26,7 +26,7 @@ namespace DataAccess.Repositories.Models
                .ThenInclude(c=>c.User)
                .AsQueryable();
 
-            return cards ?? throw new EntityNotFoundException("There are no cards.");
+            return cards;
         }
 
         public async Task<Card> GetByIdAsync(int id)
@@ -35,9 +35,8 @@ namespace DataAccess.Repositories.Models
                 .Where(c => c.IsDeleted == false)
                 .Include(c => c.Account)
                 .ThenInclude(a => a.User)
-                .FirstOrDefaultAsync(c => c.Id == id)
-                ?? throw new EntityNotFoundException($"Card with ID = {id} doesn't exist.");
-
+                .FirstOrDefaultAsync(c => c.Id == id);
+                
             return card;
         }
 
@@ -48,7 +47,7 @@ namespace DataAccess.Repositories.Models
                 .Where(card => card.AccountId == accountId)
                 .AsQueryable();
 
-            return cards ?? throw new EntityNotFoundException($"Account with ID = {accountId} doesn't have any cards.");
+            return cards;
         }
 
         public async Task<PaginatedList<Card>> FilterByAsync(CardQueryParameters filterParameters)
@@ -61,12 +60,6 @@ namespace DataAccess.Repositories.Models
             result = await FilterByBalanceAsync(result, filterParameters.Balance);
             result = await SortByAsync(result, filterParameters.SortBy);
             result = await SortOrderAsync(result, filterParameters.SortOrder);
-
-            int totalItems = await result.CountAsync();
-            if (totalItems == 0)
-            {
-                throw new EntityNotFoundException("No cards match the specified filter criteria.");
-            }
 
             int totalPages = (result.Count() + filterParameters.PageSize - 1) / filterParameters.PageSize;
             result = await Common<Card>.PaginateAsync(result, filterParameters.PageNumber, filterParameters.PageSize);
@@ -101,20 +94,10 @@ namespace DataAccess.Repositories.Models
             return await context.Cards.AnyAsync(u => u.CardNumber == cardNumber);
         }
 
-        public async Task<Card> IncreaseBalanceAsync(int id, decimal amount)
+        public async Task<bool> SaveChangesAsync()
         {
-            Card cardToDepositTo = await this.GetByIdAsync(id);
             await context.SaveChangesAsync();
-
-            return cardToDepositTo;
-        }
-
-        public async Task<Card> DecreaseBalanceAsync(int id, decimal amount)
-        {
-            Card cardToWithdrawFrom = await this.GetByIdAsync(id);
-            await context.SaveChangesAsync();
-
-            return cardToWithdrawFrom;
+            return true;
         }
 
         private async Task<IQueryable<Card>> FilterByUsernameAsync(IQueryable<Card> result, string username)

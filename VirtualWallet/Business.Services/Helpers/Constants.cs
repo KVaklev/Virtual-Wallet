@@ -30,9 +30,11 @@
         //Constant messages for cards
 
         public const string NoCardsErrorMessage = "No cards are found.";
+        public const string NoCardsByAccountSearchErrorMessage = "Account with this ID does not have any cards.";
         public const string ModifyCardErrorMessage = "Only an admin or owner of the card can access, delete or modify the card.";
         public const string CardNumberAddErrorMessage = "Card with the specified card number has already been registered.";
         public const string SuccessfullDeletedCardMessage = "Card has been successfully deleted.";
+        public const string NoCardFoundErrorMessage = "No card is found.";
 
         //Constant messages for transactions 
 

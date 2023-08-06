@@ -46,13 +46,28 @@ namespace Business.Services.Models
 
             return result;
         }
-        public async Task<PaginatedList<Card>> FilterByAsync(CardQueryParameters filterParameters)
+        public async Task<Response<PaginatedList<GetCreatedCardDto>>> FilterByAsync(CardQueryParameters filterParameters)
         {
-            var result = await this.cardRepository.FilterByAsync(filterParameters);
+            var result = new Response<PaginatedList<GetCreatedCardDto>>();
 
-            List<GetCardDto> cardDtos = result
-                    .Select(card => mapper.Map<GetCardDto>(card))
+            var cards = await this.cardRepository.FilterByAsync(filterParameters);
+
+            if (cards.Count == 0)
+            {
+                result.IsSuccessful = false;
+                result.Message = NoCardsErrorMessage;
+                return result;
+            }
+
+            var cardTotalPages = cards.TotalPages;
+            var cardPageNumber = cards.PageNumber;
+
+            List<GetCreatedCardDto> cardDtos = cards
+                    .Select(card => mapper.Map<GetCreatedCardDto>(card))
                     .ToList();
+
+            result.Data = new PaginatedList<GetCreatedCardDto>(cardDtos, cardTotalPages, cardPageNumber);
+
             return result;
         }
         public async Task<Response<GetCardDto>> GetByIdAsync(int id, User loggedUser)
@@ -60,11 +75,17 @@ namespace Business.Services.Models
             var result = new Response<GetCardDto>();
 
             var card = await this.cardRepository.GetByIdAsync(id);
+
+            if (card == null)
+            {
+                result.IsSuccessful = false;
+                result.Message = NoCardsErrorMessage;
+            }
             
             if (!await Security.IsUserAuthorized(id, loggedUser))
             {
                 result.IsSuccessful = false;
-                result.Message = Constants.ModifyCardErrorMessage;
+                result.Message = ModifyCardErrorMessage;
                 return result;
             }
 
@@ -88,7 +109,7 @@ namespace Business.Services.Models
             else
             {
                 result.IsSuccessful = false;
-                result.Message = Constants.NoCardsErrorMessage;
+                result.Message = NoCardsByAccountSearchErrorMessage;
             }
 
             return result;
@@ -164,20 +185,46 @@ namespace Business.Services.Models
             return result;
         }
 
-        public async Task<Card> IncreaseBalanceAsync(int id, decimal amount, User loggedUser)
+        public async Task<Response<Card>> IncreaseBalanceAsync(int id, decimal amount, User loggedUser)
         {
-            Card cardToDepositTo = await this.cardRepository.GetByIdAsync(id);
-            cardToDepositTo.Balance += amount;
+            var result = new Response<Card>();
 
-            return await this.cardRepository.IncreaseBalanceAsync(id, amount);
+            Card cardToDepositTo = await this.cardRepository.GetByIdAsync(id);
+            
+            if (cardToDepositTo == null)
+            {
+                result.IsSuccessful = false;
+                result.Message = NoCardFoundErrorMessage;   
+                return result;
+
+            }
+
+            cardToDepositTo.Balance += amount;
+            await this.cardRepository.SaveChangesAsync();
+
+            result.Data = cardToDepositTo;
+            return result;
         }
 
-        public async Task<Card> DecreaseBalanceAsync(int id, decimal amount, User loggedUser)
+        public async Task<Response<Card>> DecreaseBalanceAsync(int id, decimal amount, User loggedUser)
         {
-            Card cardToWithdrawFrom = await this.cardRepository.GetByIdAsync(id);
-            cardToWithdrawFrom.Balance -= amount;
+            var result = new Response<Card>();
 
-            return await this.cardRepository.DecreaseBalanceAsync(id, amount);
+            Card cardToWithdrawFrom = await this.cardRepository.GetByIdAsync(id);
+
+            if (cardToWithdrawFrom == null)
+            {
+                result.IsSuccessful = false;
+                result.Message = NoCardFoundErrorMessage;
+                return result;
+
+            }
+
+            cardToWithdrawFrom.Balance -= amount;
+            await this.cardRepository.SaveChangesAsync();
+
+            result.Data = cardToWithdrawFrom;
+            return result;
         }
 
         private async Task<bool> CardNumberExistsAsync(string cardNumber)
