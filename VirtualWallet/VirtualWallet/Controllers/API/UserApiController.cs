@@ -19,38 +19,37 @@ namespace VirtualWallet.Controllers.API
     public class UserApiController : ControllerBase
     {
         private readonly IUserService userService;
-        private readonly IUserRepository userRepository;
+      
 
         public UserApiController(
-            IUserService userService,
-            IUserRepository userRepository)
+            IUserService userService)
         {
             this.userService = userService;
-            this.userRepository = userRepository;
         }
        
         [HttpGet, Authorize]
         public async Task<IActionResult> GetUsersAsync([FromQuery] UserQueryParameters userQueryParameters)
         {
-            try
-            {
+            
                 var result = await userService.FilterByAsync(userQueryParameters);
+                if (!result.IsSuccessful)
+                {
+                      return StatusCode(StatusCodes.Status404NotFound);
+                }
 
                 return StatusCode(StatusCodes.Status200OK, result);
-            }
-            catch (EntityNotFoundException e)
-            {
-                return StatusCode(StatusCodes.Status404NotFound, e.Message);
-            }
         }
 
         [HttpGet("id"),Authorize]
         public async Task<IActionResult> GetByIdAsync(int id)
         {
-            try
-            {
-                User loggedUser = await FindLoggedUserAsync();
-                var result = await this.userService.GetByIdAsync(id, loggedUser);
+                var loggedUserResponse = await FindLoggedUserAsync();
+                if (!loggedUserResponse.IsSuccessful)
+                {
+                    return StatusCode(StatusCodes.Status404NotFound, loggedUserResponse.Message);
+                }
+
+                var result = await this.userService.GetByIdAsync(id, loggedUserResponse.Data);
 
                 if (!result.IsSuccessful)
                 {
@@ -58,11 +57,7 @@ namespace VirtualWallet.Controllers.API
                 }
 
                 return StatusCode(StatusCodes.Status200OK, result.Data);
-            }
-            catch (EntityNotFoundException e)
-            {
-                return StatusCode(StatusCodes.Status404NotFound, e.Message);
-            }
+            
         }
 
         [HttpPost]
@@ -81,8 +76,12 @@ namespace VirtualWallet.Controllers.API
         [HttpPut("{id}"), Authorize]
         public async Task<IActionResult> UpdateUser(int id, [FromBody] UpdateUserDto updateUserDto)
         {
-            User loggedUser = await FindLoggedUserAsync();
-            var result = await userService.UpdateAsync(id, updateUserDto, loggedUser);
+            var loggedUserResponse = await FindLoggedUserAsync();
+            if (!loggedUserResponse.IsSuccessful)
+            {
+                return StatusCode(StatusCodes.Status404NotFound, loggedUserResponse.Message);
+            }
+            var result = await userService.UpdateAsync(id, updateUserDto, loggedUserResponse.Data);
 
             if (!result.IsSuccessful)
             {
@@ -96,10 +95,13 @@ namespace VirtualWallet.Controllers.API
         [HttpDelete("{id}"), Authorize]
         public async Task<IActionResult> DeleteUser(int id)
         {
-            try
-            {
-                User loggedUser = await FindLoggedUserAsync();
-                var result = await userService.DeleteAsync(id, loggedUser);
+            
+                var loggedUserResponse = await FindLoggedUserAsync();
+                if (!loggedUserResponse.IsSuccessful)
+                {
+                    return StatusCode(StatusCodes.Status404NotFound, loggedUserResponse.Message);
+                }
+                var result = await userService.DeleteAsync(id, loggedUserResponse.Data);
 
                 if (!result.IsSuccessful)
                 {
@@ -109,20 +111,17 @@ namespace VirtualWallet.Controllers.API
                 result.Message = Constants.SuccessfullDeletedUserMessage;
 
                 return StatusCode(StatusCodes.Status200OK, result.Message);
-            }
-            catch (EntityNotFoundException e)
-            {
-                return StatusCode(StatusCodes.Status404NotFound, e.Message);
-            }
         }
 
         [HttpPut("{id}/promote"), Authorize]
         public async Task<IActionResult> Promote(int id)
         {
-            try
-            {
-                User loggedUser = await FindLoggedUserAsync();
-                var result = await userService.PromoteAsync(id, loggedUser);
+                var loggedUserResponse = await FindLoggedUserAsync();
+                if (!loggedUserResponse.IsSuccessful)
+                {
+                    return StatusCode(StatusCodes.Status404NotFound, loggedUserResponse.Message);
+                }
+                var result = await userService.PromoteAsync(id, loggedUserResponse.Data);
 
                 if (!result.IsSuccessful)
                 {
@@ -132,20 +131,17 @@ namespace VirtualWallet.Controllers.API
                 result.Message = Constants.SuccessfullPromoteddUserMessage;
 
                 return StatusCode(StatusCodes.Status200OK, result.Message);
-            }
-            catch (EntityNotFoundException e)
-            {
-                return StatusCode(StatusCodes.Status404NotFound, e.Message);
-            }
         }
 
         [HttpPut("{id}/block"), Authorize]
         public async Task<IActionResult> BlockUser(int id)
         {
-            try
-            {
-                User loggedUser = await FindLoggedUserAsync();
-                var result = await userService.BlockUserAsync(id, loggedUser);
+               var loggedUserResponse = await FindLoggedUserAsync();
+                if (!loggedUserResponse.IsSuccessful)
+                {
+                    return StatusCode(StatusCodes.Status404NotFound, loggedUserResponse.Message);
+                }
+                var result = await userService.BlockUserAsync(id, loggedUserResponse.Data);
 
                 if (!result.IsSuccessful)
                 {
@@ -155,20 +151,19 @@ namespace VirtualWallet.Controllers.API
                 result.Message = Constants.SuccessfullBlockedUserMessage;
 
                 return StatusCode(StatusCodes.Status200OK, result.Message);
-            }
-            catch (EntityNotFoundException e)
-            {
-                return StatusCode(StatusCodes.Status404NotFound, e.Message);
-            }
+            
         }
 
         [HttpPut("{id}/unblock"), Authorize]
         public async Task<IActionResult> UnblockUser(int id)
         {
-            try
+           
+            var loggedUserResponse = await FindLoggedUserAsync();
+            if (!loggedUserResponse.IsSuccessful)
             {
-                User loggedUser = await FindLoggedUserAsync();
-                var result = await userService.UnblockUserAsync(id, loggedUser);
+                return StatusCode(StatusCodes.Status404NotFound, loggedUserResponse.Message);
+            }
+            var result = await userService.UnblockUserAsync(id, loggedUserResponse.Data);
 
                 if (!result.IsSuccessful)
                 {
@@ -178,17 +173,12 @@ namespace VirtualWallet.Controllers.API
                 result.Message = Constants.SuccessfullUnblockedUserMessage;
 
                 return StatusCode(StatusCodes.Status200OK, result.Message);
-            }
-            catch (EntityNotFoundException e)
-            {
-                return StatusCode(StatusCodes.Status404NotFound, e.Message);
-            }
         }
-        private async Task<User> FindLoggedUserAsync()
+        private async Task<Response<User>> FindLoggedUserAsync()
         {
             var loggedUsersUsername = User.Claims.FirstOrDefault(claim => claim.Type == "Username").Value;
-            var loggedUser = await this.userRepository.GetByUsernameAsync(loggedUsersUsername);
-            return loggedUser;
+            var loggedUserResult = await this.userService.GetLoggedUserByUsernameAsync(loggedUsersUsername);
+            return loggedUserResult;
         }
     }
 }
