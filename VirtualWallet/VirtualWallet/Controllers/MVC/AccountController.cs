@@ -1,7 +1,7 @@
-﻿using Business.DTOs.Requests;
-using Business.Services.Contracts;
-using Business.Services.Helpers;
-using Business.ViewModels;
+﻿using DataAccess.Models.Models.DTOs.Requests;
+using DataAccess.Models.Models.Services.Contracts;
+using DataAccess.Models.Models.Services.Helpers;
+using DataAccess.Models.Models.ViewModels;
 using DataAccess.Repositories.Contracts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

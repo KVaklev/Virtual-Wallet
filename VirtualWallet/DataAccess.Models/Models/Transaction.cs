@@ -45,5 +45,10 @@ namespace DataAccess.Models.Models
 
         public bool IsDeleted { get; set; }
 
+        [Required(ErrorMessage = Constants.EmptyFieldErrorMessage)]
+        [MinLength(Constants.DescriptionMinLength, ErrorMessage = Constants.MinLengthErrorMessage)]
+        [MaxLength(Constants.DescriptionMaxLength, ErrorMessage = Constants.MaxLengthErrorMessage)]
+        public string Description { get; set; }
+
     }
 }

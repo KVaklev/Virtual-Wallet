@@ -1,8 +1,8 @@
-﻿using Business.Exceptions;
-using Business.QueryParameters;
-using Business.Services.Contracts;
-using Business.Services.Models;
-using Business.ViewModels;
+﻿using DataAccess.Models.Models.Exceptions;
+using DataAccess.Models.Models.QueryParameters;
+using DataAccess.Models.Models.Services.Contracts;
+using DataAccess.Models.Models.Services.Models;
+using DataAccess.Models.Models.ViewModels;
 using DataAccess.Models.Models;
 using DataAccess.Repositories.Contracts;
 using Microsoft.AspNetCore.Authorization;
@@ -30,31 +30,31 @@ namespace VirtualWallet.Controllers.MVC
         [HttpGet]
         public async Task<IActionResult> IndexAsync([FromQuery] HistoryQueryParameters parameters)
         {
-			//try
-			//{
-			//    var loggedUser = await GetLoggedUserAsync();
-			//    var result = await this.historyService.FilterByAsync(parameters, loggedUser);
+            try
+            {
+                var loggedUser = await GetLoggedUserAsync();
+                var result = await this.historyService.FilterByAsync(parameters, loggedUser);
 
-			//    return this.View(result);
-			//}
-			//catch (EntityNotFoundException ex)
-			//{
-			//    return await EntityErrorViewAsync(ex.Message);
-			//}
+                return this.View(result);
+            }
+            catch (EntityNotFoundException ex)
+            {
+                return await EntityErrorViewAsync(ex.Message);
+            }
 
-			return this.View();
+            
 		}
 
         private async Task<User> GetLoggedUserAsync()
         {
-            var username = this.HttpContext.Session.GetString("LoggedUser");
-            var user = await this.userRepository.GetByUsernameAsync(username);
+            //var username = this.HttpContext.Session.GetString("LoggedUser");
+            var user = await this.userRepository.GetByUsernameAsync("ivanGorev");
             return user;
         }
 
         private async Task<IActionResult> EntityErrorViewAsync(string message)
         {
-            this.HttpContext.Response.StatusCode = StatusCodes.Status404NotFound;
+           // this.HttpContext.Response.StatusCode = StatusCodes.Status404NotFound;
             this.ViewData["ErrorMessage"] = message;
 
             return this.View("Error404");

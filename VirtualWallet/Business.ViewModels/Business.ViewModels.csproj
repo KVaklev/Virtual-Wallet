@@ -16,6 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Business.Dto\Business.DTOs.csproj" />
     <ProjectReference Include="..\DataAccess.Models\DataAccess.Models.csproj" />
     <ProjectReference Include="..\DataAccess.Repositories\DataAccess.Repositories.csproj" />
   </ItemGroup>
