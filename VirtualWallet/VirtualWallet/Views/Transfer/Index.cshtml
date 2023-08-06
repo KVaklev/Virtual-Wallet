@@ -1,0 +1,16 @@
+﻿@using Business.DTOs.Responses;
+
+@model IEnumerable<GetTransferDto>
+
+<div>
+    @foreach (var item in Model)
+    {
+        <h1>
+            @item.Username
+        </h1>
+
+        <h1>
+            @item.DateCreated
+        </h1>
+    }
+</div>

@@ -20,6 +20,7 @@ namespace DataAccess.Repositories.Models
             this.context = context;
         }
 
+        
         public IQueryable<Transfer> GetAll(User user)
         {
             IQueryable<Transfer> result = context.Transfers

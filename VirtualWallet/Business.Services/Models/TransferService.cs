@@ -129,7 +129,7 @@ namespace Business.Services.Models
             var currency = await this.currencyRepository.GetByCurrencyCodeAsync(transferDto.CurrencyCode);
 
             var transferType = Enum.Parse<TransferDirection>(transferDto.TransferType, true);
-            
+
             var transfer = await TransfersMapper.MapCreateDtoToTransferAsync(transferDto, user, card, currency, transferType);
 
 
@@ -155,7 +155,7 @@ namespace Business.Services.Models
 
                 }
             }
-           
+
 
             transfer.DateCreated = DateTime.UtcNow;
             transfer.IsConfirmed = false;
