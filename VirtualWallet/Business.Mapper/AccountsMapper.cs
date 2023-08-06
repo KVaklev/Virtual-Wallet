@@ -1,9 +1,6 @@
 ﻿using AutoMapper;
-using Business.DTOs;
 using Business.DTOs.Responses;
 using DataAccess.Models.Models;
-using DataAccess.Repositories.Models;
-using System.Security.Principal;
 
 namespace Business.Mappers
 {

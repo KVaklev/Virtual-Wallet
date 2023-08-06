@@ -15,7 +15,7 @@ namespace Business.DTOs.Requests
         [MaxLength(Constants.CardHolderMaxLength, ErrorMessage = Constants.MaxLengthErrorMessage)]
         public string? CardHolder { get; set; }
 
-        [CardCheckNumber(ErrorMessage = Constants.CardCheckNumberFieldErrorMessage)]
+        [CardNumber(ErrorMessage = Constants.CardCheckNumberFieldErrorMessage)]
         [StringLength(Constants.CheckNumberLength, ErrorMessage = Constants.LengthErrorMessage)]
         public string? CheckNumber { get; set; }
 

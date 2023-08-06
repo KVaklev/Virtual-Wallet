@@ -37,7 +37,7 @@ namespace Business.Mappers
             return history;
         }
 
-            public static async Task<GetHistoryDto> MapHistoryToDtoAsync(History history)
+        public static async Task<GetHistoryDto> MapHistoryToDtoAsync(History history)
         {
             var historyDto = new GetHistoryDto();
             historyDto.EventTime = history.EventTime.ToString();

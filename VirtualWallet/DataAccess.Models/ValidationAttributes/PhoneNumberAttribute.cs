@@ -15,12 +15,12 @@ namespace DataAccess.Models.ValidationAttributes
 
             if (string.IsNullOrEmpty(phoneNumber))
             {
-                return new ValidationResult("The phone number must not be empty.");
+                return new ValidationResult(Constants.PhoneNumberEmptyFieldErrorMessage);
             }
 
             if (!IsDigitsOnly(phoneNumber))
             {
-                return new ValidationResult("The phone number must contain only digits.");
+                return new ValidationResult(Constants.PhoneNumberDigitContainErrorMessage);
             }
 
             return ValidationResult.Success;

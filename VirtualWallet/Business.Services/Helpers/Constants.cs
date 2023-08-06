@@ -41,7 +41,6 @@
         public const string ModifyTransactionNotExecuteErrorMessage = "You cannot update or delete a completed transaction!";
         public const string ModifyTransactionBlockedErrorMessage = "You are not allowed to make transactions while being blocked!";
         
-
         //Constant messages for transfers
 
         public const string ModifyTransferErrorMessage = "You are not authorized to create, delete or modify the transfer.";

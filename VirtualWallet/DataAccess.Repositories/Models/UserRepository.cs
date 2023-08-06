@@ -2,7 +2,6 @@
 using Business.QueryParameters;
 using DataAccess.Models.Enums;
 using DataAccess.Models.Models;
-using DataAccess.Models.ValidationAttributes;
 using DataAccess.Repositories.Contracts;
 using DataAccess.Repositories.Data;
 using DataAccess.Repositories.Helpers;

@@ -199,10 +199,11 @@ namespace Business.Services.Models
                     signingCredentials: signinCredentials
                 );
             
-            result.Data = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
-           
-            if (!result.IsSuccessful)
+            string resultToken = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
+
+            if (resultToken == null)
             {
+                result.IsSuccessful = false;
                 result.Message = GenerateTokenErrorMessage;
                 return result;
             }

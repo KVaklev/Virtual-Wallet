@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace DataAccess.Models.Models
+﻿namespace DataAccess.Models.Models
 {
     public class PaginatedList<T> : List<T>
     {

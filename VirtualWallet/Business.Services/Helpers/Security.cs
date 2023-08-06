@@ -1,5 +1,4 @@
-﻿using Business.DTOs;
-using Business.DTOs.Requests;
+﻿using Business.DTOs.Requests;
 using DataAccess.Models.Enums;
 using DataAccess.Models.Models;
 using System.Security.Cryptography;
@@ -19,38 +18,6 @@ namespace Business.Services.Helpers
             return await Task.FromResult(true);
         }
 
-        public static async Task<bool> IsAuthorizedAsync(User user, User loggedUser)
-        {
-            bool isAuthorized = false;
-
-            if (user.Id == loggedUser.Id || loggedUser.IsAdmin)
-            {
-                isAuthorized = true;
-            }
-            return await Task.FromResult(isAuthorized);
-        }
-
-        public static async Task<bool> IsAuthorizedAsync(Card card, User loggedUser)
-        {
-            bool isAuthorized = false;
-
-            if (card.Account.User.Id == loggedUser.Id || loggedUser.IsAdmin)
-            {
-                isAuthorized = true;
-            }
-            return await Task.FromResult(isAuthorized);
-        }
-
-        public static async Task<bool> IsUserAuthorized(int accountId, User user)
-        {
-            bool isUserAccountOwnerOrAdminId = false;
-
-            if (accountId == user.Id || user.IsAdmin)
-            {
-                isUserAccountOwnerOrAdminId = true;
-            }
-            return await Task.FromResult(isUserAccountOwnerOrAdminId);
-        }
 
         public async static Task<Response<bool>> CheckForNullEntryAsync(string username, string password)
         {
@@ -63,7 +30,7 @@ namespace Business.Services.Helpers
                 result.Error = new Error(PropertyName.Credentials);
             }
 
-            return result;
+            return await Task.FromResult(result);
         }
 
         public static async Task<Response<User>> AuthenticateAsync(User loggedUser, string password)
@@ -106,6 +73,7 @@ namespace Business.Services.Helpers
               return await Task.FromResult(true);
             }
         }
+
         private static async Task<bool> IsEmailConfirmedAsync(User loggedUser)
         {
             if (!loggedUser.IsVerified)
@@ -117,9 +85,6 @@ namespace Business.Services.Helpers
 
         public static async Task<User> ComputePasswordHashAsync<T>(object dto, User user)
         {
-            //Benefit one of using saltkey on hash - if users enter equal password - they are stored different in the db
-            //Benefit of using SHA512 - it is not easily decrypted online over the internet available dictionaries
-
             byte[] passwordHash, passwordKey;
             string password = string.Empty;
 
@@ -142,22 +107,23 @@ namespace Business.Services.Helpers
 
             return await Task.FromResult(user);
         }
+
         public static async Task<bool> HasEnoughBalanceAsync(Account account, decimal amount)
         {
             if (account.Balance < amount)
             {
-                return false;
+                return await Task.FromResult(false);
             }
-            return true;
+            return await Task.FromResult(true);
         }
 
         public static async Task<bool> HasEnoughCardBalanceAsync(Card card, decimal amount)
         {
             if (card.Balance < amount)
             {
-                return false;
+                return await Task.FromResult(false);
             }
-            return true;
+            return await Task.FromResult(true);
         }
 
         public static async Task<bool> IsTransactionSenderAsync(Transaction transaction, int userId)
@@ -168,20 +134,9 @@ namespace Business.Services.Helpers
             {
                 isTransactionSender = false;
             }
-            return isTransactionSender;
+            return await Task.FromResult(isTransactionSender);
         }
 
-        public static async Task<bool> IsUserAuthorizedAsync(Transfer transfer, User user)
-        {
-            bool IsUserAuthorized = true;
-
-            if (transfer.Account.UserId != user.Id)
-            {
-                IsUserAuthorized = false;
-            }
-
-            return IsUserAuthorized;
-        }
 
         public static async Task<bool> CanModifyTransactionAsync(Transaction transaction)
         {
@@ -192,7 +147,7 @@ namespace Business.Services.Helpers
             {
                 canExecuteTransaction = false;
             }
-            return canExecuteTransaction;
+            return await Task.FromResult(canExecuteTransaction);
         }
 
         public static async Task<bool> IsHistoryOwnerAsync(History history, User user)
@@ -203,7 +158,53 @@ namespace Business.Services.Helpers
             {
                 isHistoryOwner = false;
             }
-            return isHistoryOwner;
+            return await Task.FromResult(isHistoryOwner);
+        }
+
+        //ToDo-Check if we can combine and use only one with generic
+        public static async Task<bool> IsUserAuthorizedAsync(Transfer transfer, User user)
+        {
+            bool IsUserAuthorized = true;
+
+            if (transfer.Account.UserId != user.Id)
+            {
+                IsUserAuthorized = false;
+            }
+
+            return await Task.FromResult(IsUserAuthorized);
+        }
+
+        public static async Task<bool> IsAuthorizedAsync(User user, User loggedUser)
+        {
+            bool isAuthorized = false;
+
+            if (user.Id == loggedUser.Id || loggedUser.IsAdmin)
+            {
+                isAuthorized = true;
+            }
+            return await Task.FromResult(isAuthorized);
+        }
+
+        public static async Task<bool> IsAuthorizedAsync(Card card, User loggedUser)
+        {
+            bool isAuthorized = false;
+
+            if (card.Account.User.Id == loggedUser.Id || loggedUser.IsAdmin)
+            {
+                isAuthorized = true;
+            }
+            return await Task.FromResult(isAuthorized);
+        }
+
+        public static async Task<bool> IsUserAuthorized(int accountId, User user)
+        {
+            bool isUserAccountOwnerOrAdminId = false;
+
+            if (accountId == user.Id || user.IsAdmin)
+            {
+                isUserAccountOwnerOrAdminId = true;
+            }
+            return await Task.FromResult(isUserAccountOwnerOrAdminId);
         }
     }
 }

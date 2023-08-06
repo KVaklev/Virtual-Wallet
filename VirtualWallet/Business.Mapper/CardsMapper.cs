@@ -48,7 +48,6 @@ namespace Business.Mappers
             return Task.FromResult(cardToCreate);
         }
 
-
         public async static Task<Card> MapUpdateDtoToCardAsync(Card cardToUpdate, UpdateCardDto updateCardDto, Currency currency)
         {
             cardToUpdate.CardNumber = updateCardDto.CardNumber ?? cardToUpdate.CardNumber;

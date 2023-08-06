@@ -14,14 +14,14 @@ namespace DataAccess.Models.Models
 
         [Required(ErrorMessage = Constants.EmptyFieldErrorMessage)]
         [Range(Constants.IdMin, Constants.IdMax, ErrorMessage = Constants.RangeFieldErrorMessage)]
-        public int AccountSenderId { get; set; } //FK
+        public int AccountSenderId { get; set; } 
 
         [JsonIgnore]
         public Account AccountSender { get; set; }
 
         [Required(ErrorMessage = Constants.EmptyFieldErrorMessage)]
         [Range(Constants.IdMin, Constants.IdMax, ErrorMessage = Constants.RangeFieldErrorMessage)]
-        public int AccountRecepientId { get; set; } //FK
+        public int AccountRecepientId { get; set; } 
 
         [JsonIgnore]
         public Account AccountRecipient { get; set; }
@@ -36,7 +36,7 @@ namespace DataAccess.Models.Models
 
         [Required(ErrorMessage = Constants.EmptyFieldErrorMessage)]
         [Range(Constants.IdMin, Constants.IdMax, ErrorMessage = Constants.RangeFieldErrorMessage)]
-        public int CurrencyId { get; set; } //FK
+        public int CurrencyId { get; set; } 
         
         [JsonIgnore]
         public Currency Currency { get; set; }
