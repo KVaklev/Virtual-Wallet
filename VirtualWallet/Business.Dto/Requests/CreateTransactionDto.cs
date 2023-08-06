@@ -17,5 +17,10 @@ namespace Business.DTOs.Requests
         [Required(ErrorMessage = Constants.EmptyFieldErrorMessage)]
         [StringLength(Constants.CurrencyCodeLength, ErrorMessage = Constants.LengthErrorMessage)]
         public string CurrencyCode { get; set; }
+
+        [Required(ErrorMessage = Constants.EmptyFieldErrorMessage)]
+        [MinLength(Constants.DescriptionMinLength, ErrorMessage = Constants.MinLengthErrorMessage)]
+        [MaxLength(Constants.DescriptionMaxLength, ErrorMessage = Constants.MaxLengthErrorMessage)]
+        public string Description { get; set; }
     }
 }
