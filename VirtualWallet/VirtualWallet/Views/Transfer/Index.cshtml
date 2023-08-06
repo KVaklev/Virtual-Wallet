@@ -2,15 +2,18 @@
 
 @model IEnumerable<GetTransferDto>
 
-<div>
+<div class="transaction-list">
     @foreach (var item in Model)
     {
-        <h1>
-            @item.Username
-        </h1>
-
-        <h1>
-            @item.DateCreated
-        </h1>
+            
+    <div class="transaction-item px-4 py-3" data-bs-toggle="modal" data-bs-target="#transaction-detail">
+        <div class="row align-items-center flex-row">
+            <div class="col-2 col-sm-1 text-center"> <span class="d-block text-4 fw-300">@item.DateCreated.DayOfWeek</span> <span class="d-block text-1 fw-300 text-uppercase">@item.DateCreated.Month</span> </div>
+            <div class="col col-sm-7"> <span class="d-block text-4">@item.TransferType</span> </div>
+           @* <div class="col-auto col-sm-2 d-none d-sm-block text-center text-3"> <span class="text-warning" data-bs-toggle="tooltip" title="" data-bs-original-title="In Progress" aria-label="In Progress"><i class="fas fa-ellipsis-h"></i></span> </div>*@
+            <div class="col-3 col-sm-2 text-end text-4"> <span class="text-nowrap">- @item.Amount</span> <span class="text-2 text-uppercase">(@item.CurrencyCode)</span> </div>
+        </div>
+    </div>
     }
 </div>
+

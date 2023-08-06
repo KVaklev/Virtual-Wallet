@@ -2,7 +2,6 @@
 using Business.Exceptions;
 using Business.QueryParameters;
 using Business.Services.Contracts;
-using Business.ViewModels;
 using DataAccess.Models.Models;
 using DataAccess.Repositories.Contracts;
 using Microsoft.AspNetCore.Authorization;
