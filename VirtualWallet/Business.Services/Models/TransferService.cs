@@ -63,9 +63,21 @@ namespace Business.Services.Models
             this.exchangeRateService = exchangeRateService;
         }
 
-        public IQueryable<Transfer> GetAll(User user)
+        public Response<IQueryable<GetTransferDto>> GetAll(User user)
         {
-            return transferRepository.GetAll(user);
+            var result = new Response<IQueryable<GetTransferDto>>();
+
+            var transfers = this.transferRepository.GetAll(user);
+
+            if (transfers.Count() == 0)
+            {
+                result.IsSuccessful = false;
+                result.Message = Constants.ModifyNoRecordsFound;
+                return result;
+            }
+            result.Data = (IQueryable<GetTransferDto>)transfers.AsQueryable();
+
+            return result;
 
         }
 
@@ -74,6 +86,13 @@ namespace Business.Services.Models
             var result = new Response<GetTransferDto>();
 
             Transfer transferToGet = await transferRepository.GetByIdAsync(id);
+
+            if (transferToGet == null)
+            {
+                result.IsSuccessful = false;
+                result.Message = Constants.ModifyNoRecordsFound;
+                return result;
+            }
 
             if (!await Security.IsUserAuthorizedAsync(transferToGet, user) || user.IsAdmin)
 
@@ -89,27 +108,7 @@ namespace Business.Services.Models
             return result;
         }
 
-        //public async Task<Transfer> CreateAsync(CreateTransferDto transferDto, User user)
-        //{
-        //    var card = this.cardRepository.GetByAccountId((int)user.AccountId).FirstOrDefault(x => x.CardNumber == transferDto.CardNumber);
 
-        //    var transfer = await MapDtoToTransferAsync(transferDto, user, card);
-
-        //    if (user.IsBlocked)
-        //    {
-        //        throw new UnauthorizedOperationException(Constants.ModifyTransferErrorMessage);
-        //    }
-
-
-        //    if (!await this.accountRepository.HasEnoughBalanceAsync(transfer.AccountId, transfer.Amount))
-        //    {
-        //        throw new UnauthorizedOperationException(Constants.ModifyAccountBalancetErrorMessage);
-        //    }
-
-        //    var createdTransfer = await this.transferRepository.CreateAsync(transfer);
-
-        //    return createdTransfer;
-        //}
 
         public async Task<Response<GetTransferDto>> CreateAsync(CreateTransferDto transferDto, User user)
         {
@@ -176,6 +175,13 @@ namespace Business.Services.Models
 
             Transfer transferToDelete = await transferRepository.GetByIdAsync(id);
 
+            if (transferToDelete == null)
+            {
+                result.IsSuccessful = false;
+                result.Message = Constants.ModifyNoRecordsFound;
+                return result;
+            }
+
             if (!await Security.IsUserAuthorizedAsync(transferToDelete, user))
             {
                 result.IsSuccessful = false;
@@ -204,6 +210,13 @@ namespace Business.Services.Models
             var result = new Response<GetTransferDto>();
 
             Transfer transfer = await transferRepository.GetByIdAsync(id);
+
+            if (transfer == null)
+            {
+                result.IsSuccessful = false;
+                result.Message = Constants.ModifyNoRecordsFound;
+                return result;
+            }
 
             if (!await Security.IsUserAuthorizedAsync(transfer, user))
             {
@@ -242,21 +255,29 @@ namespace Business.Services.Models
         }
 
 
-        public async Task<Response<List<GetTransferDto>>> FilterByAsync(TransferQueryParameters transferQueryParameters, User loggedUser)
+        public async Task<Response<PaginatedList<GetTransferDto>>> FilterByAsync(TransferQueryParameters transferQueryParameters, User loggedUser)
         {
+            var result = new Response<PaginatedList<GetTransferDto>>();
+
             var transfers = await this.transferRepository.FilterByAsync(transferQueryParameters, loggedUser);
 
-            var result = new Response<List<GetTransferDto>>();
 
             if (transfers.Count == 0)
             {
-                throw new EntityNotFoundException(Constants.ModifyTransferNoDataErrorMessage);
+
+                result.IsSuccessful = false;
+                result.Message = Constants.ModifyNoRecordsFound;
+                return result;
+
             }
+
+            var transferTotalPages = transfers.TotalPages;
+            var transferPageNumber = transfers.PageNumber;
 
             List<GetTransferDto> transferDtos = transfers.Select(transfer => mapper.Map<GetTransferDto>(transfer)).ToList();
 
 
-            result.Data = transferDtos;
+            result.Data = new PaginatedList<GetTransferDto>(transferDtos, transferTotalPages, transferPageNumber);
 
             return result;
 
@@ -267,6 +288,13 @@ namespace Business.Services.Models
             var result = new Response<bool>();
 
             Transfer transferToExecute = await transferRepository.GetByIdAsync(transferId);
+
+            if (transferToExecute == null)
+            {
+                result.IsSuccessful = false;
+                result.Message = Constants.ModifyNoRecordsFound;
+                return result;
+            }
 
             if (!(await Security.IsUserAuthorizedAsync(transferToExecute, user)))
             {
