@@ -75,6 +75,7 @@
         public const string ConfirmedRegistrationMessage = "Registration confirmed!";
         public const string NotSuccessfullRegistrationMessage = "Your registration was not successfull.";
         public const string SuccessfullConfirmationEmailSentMessage = "Hooray! Your confirmation email has been sent successfully. Check your inbox, follow the link to complete your registration, and then dive right in to create your wallet!";
+        public const string InvalidSendEmailOperation = "An error occurred while sending the email. Please try again later.";
 
         //Constant messages for login
 
@@ -85,6 +86,9 @@
         public static class PropertyName
         {
             public const string Username = "Username";
+            public const string Email = "Email";
+            public const string PhoneNumber = "PhoneNumber";
+            public const string CardNumber = "CardNumber";
         }
     }
 
