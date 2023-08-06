@@ -24,6 +24,7 @@
 
 <!-- Preloader -->
 <div id="preloader">
+    
   <div data-loader="dual-ring"></div>
 </div>
 <!-- Preloader End --> 
@@ -52,7 +53,7 @@
           <nav class="primary-menu navbar navbar-expand-lg">
             <div id="header-nav" class="collapse navbar-collapse">
               <ul class="navbar-nav me-auto">
-                <li><a asp-controller="Home" asp-action="Index">Send</a></li>
+                <li><a asp-controller="Transaction" asp-action="Create">Send</a></li>
                 <li><a asp-controller="Home" asp-action="Index">Receive</a></li>
                 <li class="dropdown active"> <a class="dropdown-toggle" href="#">Account</a>
                   <ul class="dropdown-menu">
@@ -63,10 +64,12 @@
                 </li>
                 <li class="dropdown active"> <a class="dropdown-toggle" href="#">Dashboard</a>
                   <ul class="dropdown-menu">
-                    <li class="dropdown"><a class="dropdown-item" href="#">Transactions</a></li>
+                   <li class="dropdown"><a class="dropdown-item" asp-controller="History" asp-action="Index">History</a></li>
+                   <li class="dropdown"><a class="dropdown-item" asp-controller="Transaction" asp-action="Index">Transactions</a></li>
+                   <li class="dropdown"><a class="dropdown-item" asp-controller="Transfer" asp-action="Index">Transfers</a></li>
                    <li class="dropdown"><a class="dropdown-item dropdown-toggle" href="#">Money Operations</a>
                       <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" >Send</a></li>
+                        <li><a asp-controller="Transaction" asp-action="Create" class="dropdown-item">Send</a></li>
                         <li><a class="dropdown-item" >Receive</a></li>
                         <li><a class="dropdown-item" >Deposit</a></li>
                         <li><a class="dropdown-item" >Withdraw</a></li>
@@ -86,17 +89,6 @@
           <!-- Primary Navigation end --> 
         </div>
         <div class="header-column justify-content-end"> 
-
-
-
-
-
-
-
-
-
-
-
 
           <!-- Login & Signup Link
           ============================== -->
