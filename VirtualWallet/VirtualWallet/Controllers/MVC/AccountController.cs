@@ -38,6 +38,7 @@ namespace VirtualWallet.Controllers.MVC
         [HttpPost]
         public async Task<IActionResult> Login(LoginUserModel loginUserModel)
         {
+           
             if (!this.ModelState.IsValid)
             {
                 return this.View(loginUserModel);
@@ -47,7 +48,8 @@ namespace VirtualWallet.Controllers.MVC
            
                 if (!loggedUser.IsSuccessful)
                 {
-                    return BadRequest(loggedUser.Message);
+                    this.ModelState.AddModelError(loggedUser.Error.InvalidPropertyName, loggedUser.Message);
+                    return this.View(loginUserModel);
                 }
 
             var result = await this.accountService.CreateApiTokenAsync(loggedUser.Data);
@@ -63,8 +65,7 @@ namespace VirtualWallet.Controllers.MVC
                 SameSite = SameSiteMode.Strict
             });
 
-            result.Message = Constants.SuccessfullLoggedInMessage;
-
+            //result.Message = Constants.SuccessfullLoggedInMessage; not needed?
             return RedirectToAction("Index", "Home");
         }
 
@@ -125,7 +126,6 @@ namespace VirtualWallet.Controllers.MVC
             return RedirectToAction("SuccessfulRegistration", "Account");
         }
 
-        [AllowAnonymous]
         public IActionResult SuccessfulRegistration()
         {
 			return this.View();

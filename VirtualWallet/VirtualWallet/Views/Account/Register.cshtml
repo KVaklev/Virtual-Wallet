@@ -1,7 +1,7 @@
 ﻿@model CreateUserModel
 
 @{
-    this.ViewData["Title"] = "Speed Pay - Quick and Trustworthy Money Transfers ";
+    this.ViewData["Title"] = "Speed Pay - Registration";
 }
 
 <!-- Content
@@ -23,22 +23,22 @@
                         <div class="mb-3">
                             <label asp-for="Email" class="form-label">Email Address</label>
                             <input asp-for="Email" type="email" class="form-control" required placeholder="Enter Your Email">
-                            <span asp-validation-for="Email" class="form-error"></span>
+                            <span asp-validation-for="Email" class="form-error text-danger"></span>
                         </div>
                         <div class="mb-3">
                             <label asp-for="Password" class="form-label">Password</label>
                             <input asp-for="Password" type="password" class="form-control" required placeholder="Enter Password">
-                            <span asp-validation-for="Password" class="form-error"></span>
+                            <span asp-validation-for="Password" class="form-error text-danger"></span>
                         </div>
                          <div class="mb-3">
                             <label asp-for="PhoneNumber" class="form-label">Phone number</label>
                             <input asp-for="PhoneNumber" type="number" class="form-control" required placeholder="Enter Phone Number">
-                            <span asp-validation-for="PhoneNumber" class="form-error"></span>
+                            <span asp-validation-for="PhoneNumber" class="form-error text-danger"></span>
                         </div>
                         <div class="mb-3">
                             <label asp-for="CurrencyCode" class="form-label">Currency</label>
                             <input asp-for="CurrencyCode" type="text" class="form-control" required placeholder="Enter Password">
-                            <span asp-validation-for="CurrencyCode" class="form-error"></span>
+                            <span asp-validation-for="CurrencyCode" class="form-error text-danger"></span>
                         </div>
                         <div class="d-grid mt-4 mb-3"><button class="btn btn-primary" type="submit">Sign Up</button></div>
                     </form>

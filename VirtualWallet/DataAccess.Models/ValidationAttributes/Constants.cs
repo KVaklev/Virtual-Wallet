@@ -1,5 +1,4 @@
-﻿using System.Globalization;
-
+﻿
 namespace DataAccess.Models.ValidationAttributes
 {
     public static class Constants
@@ -30,6 +29,10 @@ namespace DataAccess.Models.ValidationAttributes
         public const string EmailFieldErrorMessage = "Please provide a valid email.";
         public const string PhoneNumberFieldErroMessage = "The {0} must contain only digits.";
         public const string ImageFileFieldErrorMessage = "Upload File";
+        public const string UsernameDoesntExistErrorMessage = "User with this username does not exist.";
+        public const string UserWithIdDoesntExistErrorMessage = "User with this ID does not exist.";
+        public const string NoUsersErrorMessage = "No users are found.";
+        public const string NoUsersAfterFilterErrorMessage = "No users match the specified filter criteria.";
 
         //Messages for cards
         public const string CardNumberFieldErroMessage = "The {0} must contain only digits.";
@@ -37,15 +40,19 @@ namespace DataAccess.Models.ValidationAttributes
         public const string EmptyFieldCardTypeErrorMessage = "The field is required. Specify 'Debit' or 'Credit' card ";
         public const string ExpirationDateErrorMessage = "Expiration date must not be in the past.";
 
-        ////Message for tranfer
-        public const string EmptyFieldTransferTypeErrorMessage = 
-            "The field is required. Specify 'Deposit' or 'Withdrawal' tranfer ";
+        //Messages for tranfer
+        public const string EmptyFieldTransferTypeErrorMessage = "The field is required. Specify 'Deposit' or 'Withdrawal' tranfer ";
         public const string TransferIsConfirmedErrorMessage = "Transfer is confirmed! You are not authorized to modify it";
         public const string TransferDirectionInputError = "Transfer direction should be either Deposit or Withdrawal.";
 
+        //Messages for accounts
+        public const string NoAccountsErrorMessage = "No accounts are found.";
+        public const string AccountWithIdDoesntExistErrorMessage = "Account with this ID does not exist.";
+        public const string AccountWithUsernameDoesntExistErrorMessage = "Account with this username does not exist.";
+
 
         //Common
-        public const string NoFoundErrorMessage = "No matches found.";
+        public const string NotFoundErrorMessage = "No matches found.";
         public const string EmptyFieldErrorMessage = "The field is required.";
         public const string RangeFieldErrorMessage = "The {0} field must be in the range from {1} to {2}.";
         public const string MinLengthErrorMessage = "The {0} must be at least {1} characters long.";

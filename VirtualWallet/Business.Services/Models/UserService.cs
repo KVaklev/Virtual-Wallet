@@ -264,9 +264,20 @@ namespace Business.Services.Models
 
         public async Task<Response<User>> LoginAsync(string username, string password)
         {
+            var result = new Response<User>();
 
             await Security.CheckForNullEntryAsync(username, password);
+
             User loggedUser = await this.userRepository.GetByUsernameAsync(username);
+
+            if (loggedUser == null)
+            {
+                result.IsSuccessful = false;
+                result.Message = UsernameDoesntExistErrorMessage;
+                result.Error = new Error(PropertyName.UsernameDoesntExist);
+                return result;
+            }
+
             var authenticatedUser = await Security.AuthenticateAsync(loggedUser, password);
 
             return authenticatedUser;

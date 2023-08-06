@@ -29,7 +29,7 @@ namespace DataAccess.Repositories.Models
                 .FirstOrDefaultAsync();
 
             //todo - filter by loggetusername
-            return transaction ?? throw new EntityNotFoundException(Constants.NoFoundErrorMessage);
+            return transaction ?? throw new EntityNotFoundException(Constants.NotFoundErrorMessage);
         }
 
         public async Task<bool> SaveChangesAsync()
@@ -69,7 +69,7 @@ namespace DataAccess.Repositories.Models
 
             if (totalItems == 0)
             {
-                throw new EntityNotFoundException(Constants.NoFoundErrorMessage);
+                throw new EntityNotFoundException(Constants.NotFoundErrorMessage);
             }
 
             int totalPages = (result.Count() + filterParameters.PageSize - 1) / filterParameters.PageSize;
@@ -89,7 +89,7 @@ namespace DataAccess.Repositories.Models
                     .AsQueryable();
 
             //todo - filter by username
-            return result ?? throw new EntityNotFoundException(Constants.NoFoundErrorMessage);
+            return result ?? throw new EntityNotFoundException(Constants.NotFoundErrorMessage);
         }
 
         private async Task<IQueryable<Transaction>> FilterByRecipientAsync(IQueryable<Transaction> result, string? username)

@@ -11,6 +11,7 @@
         public const string NoUsersAfterFilterErrorMessage = "No users match the specified filter criteria.";
 
         public const string UsernameExistsErrorMessage = "User with this username already exists.";
+        public const string UsernameDoesntExistErrorMessage = "User with this username doesn't exist.";
         public const string EmailExistsErrorMessage = "User with this email already exists.";
         public const string PhoneNumberExistsErrorMessage = "User with this phone number already exists.";
 
@@ -89,6 +90,10 @@
             public const string Email = "Email";
             public const string PhoneNumber = "PhoneNumber";
             public const string CardNumber = "CardNumber";
+            public const string Credentials = "Credentials";
+            public const string PasswordHashMatch = "PasswordHashMatch";
+            public const string NotConfirmedEmail = "NotConfirmedEmail";
+            public const string UsernameDoesntExist = "UsernameDoesntExist";
         }
     }
 

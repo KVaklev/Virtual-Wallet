@@ -1,5 +1,6 @@
 ﻿using Business.Exceptions;
 using DataAccess.Models.Models;
+using DataAccess.Models.ValidationAttributes;
 using DataAccess.Repositories.Contracts;
 using DataAccess.Repositories.Data;
 using Microsoft.EntityFrameworkCore;
@@ -27,7 +28,7 @@ namespace DataAccess.Repositories.Models
                 .Include(a => a.Cards)
                 .Include(a => a.Currency);
 
-            return result ?? throw new EntityNotFoundException($"There are no accounts");
+            return result ?? throw new EntityNotFoundException(Constants.NoAccountsErrorMessage);
         }
         public async Task <Account> GetByIdAsync(int id)
         {
@@ -39,7 +40,7 @@ namespace DataAccess.Repositories.Models
                 .Include(a => a.Currency)
                 .FirstOrDefaultAsync();
 
-            return account ?? throw new EntityNotFoundException($"Account with ID ={id} does not exist.");
+            return account ?? throw new EntityNotFoundException(Constants.AccountWithIdDoesntExistErrorMessage);
         }
 
         public async Task<Account> GetByUsernameAsync(string username)
@@ -52,7 +53,7 @@ namespace DataAccess.Repositories.Models
                 .Where(a => a.User.Username == username)
                 .FirstOrDefaultAsync();
 
-            return account ?? throw new EntityNotFoundException($"Account with username = {username} does not exist.");
+            return account ?? throw new EntityNotFoundException(Constants.AccountWithUsernameDoesntExistErrorMessage);
         }
 
         public async Task<Account> CreateAsync(Account account)

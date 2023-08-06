@@ -2,6 +2,7 @@
 using Business.QueryParameters;
 using DataAccess.Models.Enums;
 using DataAccess.Models.Models;
+using DataAccess.Models.ValidationAttributes;
 using DataAccess.Repositories.Contracts;
 using DataAccess.Repositories.Data;
 using DataAccess.Repositories.Helpers;
@@ -26,7 +27,7 @@ namespace DataAccess.Repositories.Models
                 .ThenInclude(c=>c.Currency)
                 .AsQueryable();
 
-            return users ?? throw new EntityNotFoundException("There are no users.");
+            return users ?? throw new EntityNotFoundException(Constants.NoUsersErrorMessage);
         }
 
         public async Task<PaginatedList<User>> FilterByAsync(UserQueryParameters filterParameters)
@@ -42,7 +43,7 @@ namespace DataAccess.Repositories.Models
             int totalItems = await result.CountAsync();
             if (totalItems == 0)
             {
-                throw new EntityNotFoundException("No users match the specified filter criteria.");
+                throw new EntityNotFoundException(Constants.NoUsersAfterFilterErrorMessage);
             }
 
             int totalPages = (result.Count() + filterParameters.PageSize - 1) / filterParameters.PageSize;
@@ -60,7 +61,7 @@ namespace DataAccess.Repositories.Models
                 .ThenInclude(c => c.Currency)
                 .FirstOrDefaultAsync();
 
-            return user ?? throw new EntityNotFoundException($"User with ID = {id} doesn't exist.");
+            return user ?? throw new EntityNotFoundException(Constants.UserWithIdDoesntExistErrorMessage);
         }
 
         public async Task<User> GetByUsernameAsync(string username)
@@ -71,7 +72,7 @@ namespace DataAccess.Repositories.Models
                 .Where(users => users.Username == username)
                 .FirstOrDefaultAsync();
 
-            return user ?? throw new EntityNotFoundException($"User with username '{username}' doesn't exist.");
+            return user ?? throw new EntityNotFoundException(Constants.UsernameDoesntExistErrorMessage);
         }
 
         public async Task<User> CreateAsync(User user)
@@ -193,18 +194,5 @@ namespace DataAccess.Repositories.Models
                 return await Task.FromResult(result);
             }
         }
-
-        //private async Task UpdateAdminStatusAsync(User user, User userToUpdate)
-        //{
-        //    if (!userToUpdate.IsAdmin)
-        //    {
-        //        await Task.FromResult(userToUpdate.IsAdmin = user.IsAdmin);
-        //    }
-        //    else
-        //    {
-        //        await Task.FromResult(userToUpdate.IsAdmin = true);
-        //    }
-        //}
-
     }
 }
