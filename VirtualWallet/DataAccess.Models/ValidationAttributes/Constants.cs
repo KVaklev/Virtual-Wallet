@@ -25,6 +25,9 @@ namespace DataAccess.Models.ValidationAttributes
         public const int MinAmount = 1;
         public const int MaxAmount = 10000;
 
+        public const int DescriptionMinLength = 5;
+        public const int DescriptionMaxLength = 100;
+
         //Messages for users
         public const string EmailFieldErrorMessage = "Please provide a valid email.";
         public const string PhoneNumberFieldErroMessage = "The {0} must contain only digits.";

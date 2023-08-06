@@ -27,7 +27,7 @@ namespace DataAccess.Repositories.Models
                 .ThenInclude(c=>c.Currency)
                 .AsQueryable();
 
-            return users ?? throw new EntityNotFoundException(Constants.NoUsersErrorMessage);
+            return users;
         }
 
         public async Task<PaginatedList<User>> FilterByAsync(UserQueryParameters filterParameters)
@@ -41,10 +41,7 @@ namespace DataAccess.Repositories.Models
             result = await SortOrderAsync(result, filterParameters.SortOrder);
 
             int totalItems = await result.CountAsync();
-            if (totalItems == 0)
-            {
-                throw new EntityNotFoundException(Constants.NoUsersAfterFilterErrorMessage);
-            }
+            
 
             int totalPages = (result.Count() + filterParameters.PageSize - 1) / filterParameters.PageSize;
             result = await Common<User>.PaginateAsync(result, filterParameters.PageNumber, filterParameters.PageSize);
@@ -62,7 +59,7 @@ namespace DataAccess.Repositories.Models
                 .FirstOrDefaultAsync();
 
             return user;
-            // ?? throw new EntityNotFoundException(Constants.UserWithIdDoesntExistErrorMessage);
+         
         }
 
         public async Task<User> GetByUsernameAsync(string username)

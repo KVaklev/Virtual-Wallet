@@ -33,6 +33,7 @@ namespace Business.Mappers
                 transactionIn.CurrencyId = (int)transactionOut.AccountRecipient.CurrencyId;
                 transactionIn.Direction = DirectionType.In;
                 transactionIn.Date = DateTime.UtcNow;
+            transactionIn.Description = transactionOut.Description;
                 transactionIn.IsExecuted = true;
                 return transactionIn;
             }
@@ -44,6 +45,7 @@ namespace Business.Mappers
             transactionToUpdate.AccountRecepientId = transaction.AccountRecepientId;
             transactionToUpdate.Amount = transaction.Amount;
             transactionToUpdate.CurrencyId = transaction.CurrencyId;
+            transactionToUpdate.Description = transaction.Description;
             transactionToUpdate.Date = DateTime.UtcNow;
             return transactionToUpdate;
         }
@@ -63,6 +65,7 @@ namespace Business.Mappers
             transaction.AccountRecepientId = account.Id;
             transaction.CurrencyId = currency.Id;
             transaction.Direction = DirectionType.Out;
+            transaction.Description = transactionDto.Description;
             transaction.Date = DateTime.UtcNow;
             return transaction;
         }

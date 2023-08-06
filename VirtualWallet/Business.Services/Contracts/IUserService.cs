@@ -10,7 +10,7 @@ namespace Business.Services.Contracts
     public interface IUserService
     {
         Response<IQueryable<GetUserDto>> GetAll();
-        Task<PaginatedList<User>> FilterByAsync(UserQueryParameters queryParameters);
+        Task<Response<PaginatedList<GetCreatedUserDto>>> FilterByAsync(UserQueryParameters filterParameters);
         Task<Response<GetUserDto>> GetByIdAsync(int id, User loggedUser);
         Task<Response<GetUserDto>> GetByUsernameAsync(string username);
         Task<Response<GetCreatedUserDto>> CreateAsync(CreateUserModel createUserDto);
@@ -20,5 +20,6 @@ namespace Business.Services.Contracts
         Task<Response<GetUserDto>> BlockUserAsync(int id, User loggedUser);
         Task<Response<GetUserDto>> UnblockUserAsync(int id, User loggedUser);
         Task<Response<User>> LoginAsync(string username, string password);
+        Task<Response<User>> GetLoggedUserByUsernameAsync(string username);
     }
 }

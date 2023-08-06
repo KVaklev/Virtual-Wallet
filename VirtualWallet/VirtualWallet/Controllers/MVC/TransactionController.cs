@@ -2,10 +2,12 @@
 using Business.Exceptions;
 using Business.QueryParameters;
 using Business.Services.Contracts;
+using Business.ViewModels;
 using DataAccess.Models.Models;
 using DataAccess.Repositories.Contracts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace VirtualWallet.Controllers.MVC
 {
@@ -14,13 +16,16 @@ namespace VirtualWallet.Controllers.MVC
     {
         private readonly ITransactionService transactionService;
         private readonly IUserRepository userRepository;
+        private readonly ICurrencyRepository currencyRepository;
 
         public TransactionController(
             ITransactionService transactionService,
-            IUserRepository userRepository)
+            IUserRepository userRepository,
+            ICurrencyRepository currencyRepository)
         {
             this.transactionService = transactionService;
             this.userRepository = userRepository;
+            this.currencyRepository = currencyRepository;
         }
 
 
@@ -54,13 +59,14 @@ namespace VirtualWallet.Controllers.MVC
             //{
             //    return this.View();
             //}
-            var createTransaction = new CreateTransactionDto();
+            var createTransactionViewModel = new CreateTransactionViewModel();
+            this.InitializeCurrenncies(createTransactionViewModel);
 
-            return this.View(createTransaction);
+            return this.View(createTransactionViewModel);
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateAsync([FromRoute] CreateTransactionDto transactionDto)
+        public async Task<IActionResult> Create(CreateTransactionDto transactionDto)
         {
             try
             {
@@ -201,9 +207,15 @@ namespace VirtualWallet.Controllers.MVC
 
         private async Task<User> GetLoggedUserAsync()
         {
-            var username = this.HttpContext.Session.GetString("LoggedUser");
-            var user = await this.userRepository.GetByUsernameAsync(username);
+            //var username = this.HttpContext.Session.GetString("LoggedUser");
+            var user = await this.userRepository.GetByUsernameAsync("ivanGorev");
             return user;
+        }
+
+        private void InitializeCurrenncies(CreateTransactionViewModel createTransactionViewModel)
+        {
+            var currencies = this.currencyRepository.GetAll();
+            createTransactionViewModel.Curencies = new SelectList(currencies, "CurrencyCode", "Name");
         }
     }
 }

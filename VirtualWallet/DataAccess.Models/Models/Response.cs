@@ -1,5 +1,4 @@
-﻿
-namespace Business.DTOs
+﻿namespace DataAccess.Models.Models
 {
     public class Response<TItem>
     {
@@ -10,7 +9,6 @@ namespace Business.DTOs
         public TItem Data { get; set; }
 
         public Error Error { get; set; }
-
     }
 }
 
