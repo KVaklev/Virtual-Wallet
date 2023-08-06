@@ -81,11 +81,13 @@ namespace VirtualWallet.Controllers.API
         [HttpGet("confirm-email")]
         public async Task<IActionResult> SendConfirmationEmailAsync(string username)
         {
-            var user = await this.userRepository.GetByUsernameAsync(username);
-            var token = this.accountService.GenerateTokenAsync(user.Id);
-            var confirmationLink = Url.Action("confirm-registration", "api", new { userId = user.Id, token = token.Result }, Request.Scheme);
+            Response<User> user = await this.userService.GetLoggedUserByUsernameAsync(username);
+           
+            var token = this.accountService.GenerateTokenAsync(user.Data.Id);
+
+            var confirmationLink = Url.Action("confirm-registration", "api", new { userId = user.Data.Id, token = token.Result }, Request.Scheme);
             
-            var message = await this.emailService.BuildEmailAsync(user, confirmationLink);
+            var message = await this.emailService.BuildEmailAsync(user.Data, confirmationLink);
             
             await emailService.SendEMailAsync(message);
 

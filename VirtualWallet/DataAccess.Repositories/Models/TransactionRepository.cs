@@ -148,7 +148,7 @@ namespace DataAccess.Repositories.Models
                     case SortCriteria.Date:
                         return await Task.FromResult(result.OrderBy(t => t.Date));
                     default:
-                        return await Task.FromResult(result);
+                        return result;
                 }
 
             }
