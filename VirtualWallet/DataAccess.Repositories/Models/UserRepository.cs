@@ -27,7 +27,7 @@ namespace DataAccess.Repositories.Models
                 .ThenInclude(c=>c.Currency)
                 .AsQueryable();
 
-            return users ?? throw new EntityNotFoundException(Constants.NoUsersErrorMessage);
+            return users;
         }
 
         public async Task<PaginatedList<User>> FilterByAsync(UserQueryParameters filterParameters)
@@ -62,7 +62,7 @@ namespace DataAccess.Repositories.Models
                 .FirstOrDefaultAsync();
 
             return user;
-            // ?? throw new EntityNotFoundException(Constants.UserWithIdDoesntExistErrorMessage);
+         
         }
 
         public async Task<User> GetByUsernameAsync(string username)
