@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Business.ViewModels
+namespace Business.DTOs.Requests
 {
     public class LoginUserModel
     {

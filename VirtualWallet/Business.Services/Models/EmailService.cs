@@ -1,5 +1,6 @@
 ﻿using Business.Services.Additional;
 using Business.Services.Contracts;
+using Business.Services.Helpers;
 using DataAccess.Models.Models;
 using MailKit.Net.Smtp;
 using MimeKit;
@@ -39,7 +40,7 @@ namespace Business.Services.Models
             catch (Exception)
             {
 
-                throw new InvalidOperationException("An error occurred while sending the email. Please try again later.");
+                throw new InvalidOperationException(Constants.InvalidSendEmailOperation);
             }
             finally
             {

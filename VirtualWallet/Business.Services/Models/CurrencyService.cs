@@ -33,7 +33,7 @@ namespace Business.Services.Models
                 return result;
             }
             var currency = this.mapper.Map<Currency>(currencyDto);
-            var newCurrency = await this.currencyRepository.CreateAsync(currency);
+            var newCurrency = await this.currencyRepository.CreateAsync(currency); //not used, should we remove this?
             var newCurrencyDto = this.mapper.Map<CreateCurrencyDto>(currency);
             result.Data = newCurrencyDto;
             return result;
@@ -42,7 +42,7 @@ namespace Business.Services.Models
         public async Task<Response<bool>> DeleteAsync(int id, User loggedUser)
         {
             var result = new Response<bool>();
-            if (!loggedUser.IsAdmin)
+            if (!await Security.IsAdminAsync(loggedUser))
             {
                 result.IsSuccessful = false;
                 result.Message = Constants.ModifyUserErrorMessage;
@@ -84,6 +84,7 @@ namespace Business.Services.Models
         public async Task<Response<CreateCurrencyDto>> UpdateAsync(int id, CreateCurrencyDto currencyDto, User loggedUser)
         {
             var result = new Response<CreateCurrencyDto>();
+
             if (!await Security.IsAdminAsync(loggedUser))
             {
                 result.IsSuccessful = false;

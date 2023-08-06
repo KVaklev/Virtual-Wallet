@@ -1,7 +1,7 @@
 ﻿@model CreateUserModel
 
 @{
-    this.ViewData["Title"] = "Speed Pay - Quick and Trustworthy Money Transfers ";
+    this.ViewData["Title"] = "Speed Pay - Registration";
 }
 
 <!-- Content
@@ -14,30 +14,35 @@
                     <h3 class="fw-400 text-center mb-4">Sign Up</h3>
                     <hr class="mx-n3 mx-sm-n5">
                     <p class="lead text-center">Your information is safe with us.</p>
-                    <form id="signupForm" method="post">
+                    <form asp-controller="Account" asp-action="Register" method="post">
                         <div class="mb-3">
-                            <label for="username" class="form-label">Username</label>
-                            <input type="text" class="form-control" id="username" required placeholder="Enter Your Username">
+                            <label asp-for="Username" class="form-label">Username</label>
+                            <input asp-for="Username" type="text" class="form-control" required placeholder="Enter Your Username">
+                            <span asp-validation-for="Username" class="form-error text-danger"></span>
                         </div>
                         <div class="mb-3">
-                            <label for="emailAddress" class="form-label">Email Address</label>
-                            <input type="email" class="form-control" id="emailAddress" required placeholder="Enter Your Email">
+                            <label asp-for="Email" class="form-label">Email Address</label>
+                            <input asp-for="Email" type="email" class="form-control" required placeholder="Enter Your Email">
+                            <span asp-validation-for="Email" class="form-error text-danger"></span>
                         </div>
                         <div class="mb-3">
-                            <label for="loginPassword" class="form-label">Password</label>
-                            <input type="password" class="form-control" id="loginPassword" required placeholder="Enter Password">
+                            <label asp-for="Password" class="form-label">Password</label>
+                            <input asp-for="Password" type="password" class="form-control" required placeholder="Enter Password">
+                            <span asp-validation-for="Password" class="form-error text-danger"></span>
                         </div>
                          <div class="mb-3">
-                            <label for="phoneNumber" class="form-label">Phone number</label>
-                            <input type="number" class="form-control" required placeholder="Enter Phone Number">
+                            <label asp-for="PhoneNumber" class="form-label">Phone number</label>
+                            <input asp-for="PhoneNumber" type="number" class="form-control" required placeholder="Enter Phone Number">
+                            <span asp-validation-for="PhoneNumber" class="form-error text-danger"></span>
                         </div>
                         <div class="mb-3">
-                            <label for="currencyCode" class="form-label">Currency</label>
-                            <input type="text" class="form-control" required placeholder="Enter Password">
+                            <label asp-for="CurrencyCode" class="form-label">Currency</label>
+                            <input asp-for="CurrencyCode" type="text" class="form-control" required placeholder="Enter Password">
+                            <span asp-validation-for="CurrencyCode" class="form-error text-danger"></span>
                         </div>
                         <div class="d-grid mt-4 mb-3"><button class="btn btn-primary" type="submit">Sign Up</button></div>
                     </form>
-                    <p class="text-3 text-muted text-center mb-0">Already have an account? <a class="btn-link" href="login-3.html">Log In</a></p>
+                    <p class="text-3 text-muted text-center mb-0">Already have an account? <a class="btn-link" asp-controller="Account" asp-action="Register">Log In</a></p>
                 </div>
             </div>
         </div>

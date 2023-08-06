@@ -1,7 +1,6 @@
-﻿using DataAccess.Models.Models.DTOs.Requests;
-using DataAccess.Models.Models.Services.Contracts;
-using DataAccess.Models.Models.Services.Helpers;
-using DataAccess.Models.Models.ViewModels;
+﻿using Business.DTOs.Requests;
+using Business.Services.Contracts;
+using Business.Services.Helpers;
 using DataAccess.Repositories.Contracts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -39,6 +38,7 @@ namespace VirtualWallet.Controllers.MVC
         [HttpPost]
         public async Task<IActionResult> Login(LoginUserModel loginUserModel)
         {
+           
             if (!this.ModelState.IsValid)
             {
                 return this.View(loginUserModel);
@@ -48,7 +48,8 @@ namespace VirtualWallet.Controllers.MVC
            
                 if (!loggedUser.IsSuccessful)
                 {
-                    return BadRequest(loggedUser.Message);
+                    this.ModelState.AddModelError(loggedUser.Error.InvalidPropertyName, loggedUser.Message);
+                    return this.View(loginUserModel);
                 }
 
             var result = await this.accountService.CreateApiTokenAsync(loggedUser.Data);
@@ -64,8 +65,7 @@ namespace VirtualWallet.Controllers.MVC
                 SameSite = SameSiteMode.Strict
             });
 
-            result.Message = Constants.SuccessfullLoggedInMessage;
-
+            //result.Message = Constants.SuccessfullLoggedInMessage; not needed?
             return RedirectToAction("Index", "Home");
         }
 
@@ -88,6 +88,7 @@ namespace VirtualWallet.Controllers.MVC
             return this.View(createUserModel);
         }
 
+ 
         [HttpPost]
         public async Task<IActionResult> Register(CreateUserModel createUserModel)
         {
@@ -100,34 +101,36 @@ namespace VirtualWallet.Controllers.MVC
 
             if (!result.IsSuccessful)
             {
-                return BadRequest(result.Message);
+                this.ModelState.AddModelError(result.Error.InvalidPropertyName, result.Message);
+                return View(createUserModel);
             }
 
-            return await this.SendConfirmationEmailAsync(result.Data.Username);
+            return await SendConfirmationEmailAsync(result.Data.Username);
         }
 
         public async Task<IActionResult> SendConfirmationEmailAsync(string username)
         {
             var user = await this.userRepository.GetByUsernameAsync(username);
-            var generatedToken = this.accountService.GenerateTokenAsync(user.Id);
+            var generatedToken = await this.accountService.GenerateTokenAsync(user.Id);
 
-            if (!generatedToken.IsCompletedSuccessfully)
+            if (!generatedToken.IsSuccessful)
             {
                 return RedirectToAction("Register", "Account");
             }
-            var confirmationLink = Url.Action("confirm-registration", "api", new { userId = user.Id, token = generatedToken.Result }, Request.Scheme);
+            var confirmationLink = Url.Action("confirm-registration", "api", new { userId = user.Id, token = generatedToken }, Request.Scheme);
 
             var message = await this.emailService.BuildEmailAsync(user, confirmationLink);
 
             await emailService.SendEMailAsync(message);
-
-            return RedirectToAction("RegistrationSuccessful", "Account");
+                
+            return RedirectToAction("SuccessfulRegistration", "Account");
         }
 
-        public IActionResult RegistrationSuccessful()
+        public IActionResult SuccessfulRegistration()
         {
-			return this.View("RegistrationSuccessful");
+			return this.View();
 		}
+
 
         [HttpGet("confirm-registration")]
         public async Task<IActionResult> ConfirmRegistrationAsync([FromQuery] int userId, [FromQuery] string token)

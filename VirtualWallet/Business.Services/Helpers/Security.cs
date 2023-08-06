@@ -4,6 +4,7 @@ using DataAccess.Models.Enums;
 using DataAccess.Models.Models;
 using System.Security.Cryptography;
 using System.Text;
+using static Business.Services.Helpers.Constants;
 
 namespace Business.Services.Helpers
 {
@@ -58,7 +59,8 @@ namespace Business.Services.Helpers
             if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
             {
                 result.IsSuccessful = false;
-                result.Message = Constants.CredentialsErrorMessage;
+                result.Message = CredentialsErrorMessage;
+                result.Error = new Error(PropertyName.Credentials);
             }
 
             return result;
@@ -71,14 +73,16 @@ namespace Business.Services.Helpers
             if (!await IsPasswordHashMatchedAsync(password, loggedUser.Password, loggedUser.PasswordKey))
             {
                 result.IsSuccessful = false;
-                result.Message = Constants.FailedLoginAtemptErrorMessage;
+                result.Message = FailedLoginAtemptErrorMessage;
+                result.Error = new Error(PropertyName.PasswordHashMatch);
                 return result;
             }
 
             if (!await IsEmailConfirmedAsync(loggedUser))
             {
                 result.IsSuccessful = false;
-                result.Message = Constants.NotConfirmedEmailErrorMessage;
+                result.Message = NotConfirmedEmailErrorMessage;
+                result.Error = new Error(PropertyName.NotConfirmedEmail);
                 return result;
             }
 

@@ -22,7 +22,7 @@ namespace DataAccess.Repositories.Models
                 .OrderBy(n => n.Name)
                 .AsQueryable();
 
-            return currencies ?? throw new EntityNotFoundException(Constants.NoFoundErrorMessage);
+            return currencies ?? throw new EntityNotFoundException(Constants.NotFoundErrorMessage);
         }
 
         public async Task<Currency> GetByIdAsync(int id)
@@ -31,7 +31,7 @@ namespace DataAccess.Repositories.Models
                 .Where(c => c.Id == id)
                 .FirstOrDefaultAsync();
 
-            return currency ?? throw new EntityNotFoundException(Constants.NoFoundErrorMessage);
+            return currency ?? throw new EntityNotFoundException(Constants.NotFoundErrorMessage);
         }
 
         public async Task<Currency> GetByCurrencyCodeAsync(string currencyCode)
@@ -40,7 +40,7 @@ namespace DataAccess.Repositories.Models
                     .Where(c => c.CurrencyCode == currencyCode)
                     .FirstOrDefaultAsync();
  
-            return currency ?? throw new EntityNotFoundException(Constants.NoFoundErrorMessage);
+            return currency ?? throw new EntityNotFoundException(Constants.NotFoundErrorMessage);
         }
 
         public async Task<Currency> CreateAsync(Currency currency)

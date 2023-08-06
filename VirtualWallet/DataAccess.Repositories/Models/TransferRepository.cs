@@ -20,6 +20,7 @@ namespace DataAccess.Repositories.Models
             this.context = context;
         }
 
+        
         public IQueryable<Transfer> GetAll(User user)
         {
             IQueryable<Transfer> result = context.Transfers
@@ -36,7 +37,7 @@ namespace DataAccess.Repositories.Models
             }
 
 
-            return result ?? throw new EntityNotFoundException(Constants.NoFoundErrorMessage);
+            return result ?? throw new EntityNotFoundException(Constants.NotFoundErrorMessage);
         }
 
         public async Task<Transfer> CreateAsync(Transfer transfer)
@@ -79,7 +80,7 @@ namespace DataAccess.Repositories.Models
                 .FirstOrDefaultAsync(t => t.Id == id);
 
 
-            return transfer ?? throw new EntityNotFoundException(Constants.NoFoundErrorMessage);
+            return transfer ?? throw new EntityNotFoundException(Constants.NotFoundErrorMessage);
 
         }
 
@@ -90,7 +91,7 @@ namespace DataAccess.Repositories.Models
                 .ThenInclude(u => u.User)
                 .FirstOrDefaultAsync(t => t.Account.User.Id == userId);
 
-            return transfer ?? throw new EntityNotFoundException(Constants.NoFoundErrorMessage);
+            return transfer ?? throw new EntityNotFoundException(Constants.NotFoundErrorMessage);
         }
 
         //public async Task<Transfer> UpdateAsync(int id, Transfer transfer)
@@ -133,7 +134,7 @@ namespace DataAccess.Repositories.Models
 
             if (finalResult == 0)
             {
-                throw new EntityNotFoundException(Constants.NoFoundErrorMessage);
+                throw new EntityNotFoundException(Constants.NotFoundErrorMessage);
             }
 
             int totalPages = (result.Count() + filterParameters.PageSize - 1) /

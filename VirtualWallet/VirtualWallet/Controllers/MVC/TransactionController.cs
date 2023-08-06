@@ -1,8 +1,7 @@
-﻿using DataAccess.Models.Models.DTOs.Requests;
-using DataAccess.Models.Models.Exceptions;
-using DataAccess.Models.Models.QueryParameters;
-using DataAccess.Models.Models.Services.Contracts;
-using DataAccess.Models.Models.ViewModels;
+﻿using Business.DTOs.Requests;
+using Business.Exceptions;
+using Business.QueryParameters;
+using Business.Services.Contracts;
 using DataAccess.Models.Models;
 using DataAccess.Repositories.Contracts;
 using Microsoft.AspNetCore.Authorization;
