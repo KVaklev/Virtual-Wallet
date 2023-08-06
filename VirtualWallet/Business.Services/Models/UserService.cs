@@ -270,17 +270,9 @@ namespace Business.Services.Models
 
             User loggedUser = await this.userRepository.GetByUsernameAsync(username);
 
-            if (loggedUser == null)
-            {
-                result.IsSuccessful = false;
-                result.Message = UsernameDoesntExistErrorMessage;
-                result.Error = new Error(PropertyName.UsernameDoesntExist);
-                return result;
-            }
+           var authenticatedUser = await Security.AuthenticateAsync(loggedUser, password);
+           return authenticatedUser;
 
-            var authenticatedUser = await Security.AuthenticateAsync(loggedUser, password);
-
-            return authenticatedUser;
         }
 
         private async Task<bool> EmailExistsAsync(string email)

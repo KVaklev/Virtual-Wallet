@@ -61,7 +61,8 @@ namespace DataAccess.Repositories.Models
                 .ThenInclude(c => c.Currency)
                 .FirstOrDefaultAsync();
 
-            return user ?? throw new EntityNotFoundException(Constants.UserWithIdDoesntExistErrorMessage);
+            return user;
+            // ?? throw new EntityNotFoundException(Constants.UserWithIdDoesntExistErrorMessage);
         }
 
         public async Task<User> GetByUsernameAsync(string username)
