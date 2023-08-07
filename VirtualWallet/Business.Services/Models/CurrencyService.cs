@@ -34,7 +34,7 @@ namespace Business.Services.Models
             }
             var currency = this.mapper.Map<Currency>(currencyDto);
             var newCurrency = await this.currencyRepository.CreateAsync(currency); //not used, should we remove this?
-            var newCurrencyDto = this.mapper.Map<CreateCurrencyDto>(currency);
+            var newCurrencyDto = this.mapper.Map<CreateCurrencyDto>(newCurrency);
             result.Data = newCurrencyDto;
             return result;
         }

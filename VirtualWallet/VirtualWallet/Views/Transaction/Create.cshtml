@@ -72,11 +72,15 @@
                   <span class="input-group-text">$</span>
                                 <input asp-for="CreateTransactionDto.Amount" type="number" class="form-control" data-bv-field="youSend" id="youSend" value="" placeholder="">
                   <span class="input-group-text p-0">
-                      <select asp-for="Curencies" asp-items="@Model.Curencies"  id="youSendCurrency" data-style="form-select bg-transparent border-0" data-container="body" data-live-search="true" class="selectpicker form-control bg-transparent" required="">
-                      <optgroup label="Popular Currency">
-                 
-                     
-                      </optgroup>
+                                    <select id="youSendCurrency" data-style="form-select bg-transparent border-0" data-container="body" data-live-search="true" class="selectpicker form-control bg-transparent" required="">
+                                        <optgroup label="Popular Currency">
+                                            @foreach(var currency in @Model.Currencies)
+                                            {
+                                                
+                                            <option data-icon="currency-flag currency-flag-inr me-1" data-subtext="@currency.Name" value="">@currency.CurrencyCode | @currency.Name</option>
+
+                                            }
+                                        </optgroup>
                     </select>
                     </span>
                                 <span asp-validation-for="CreateTransactionDto.Amount" class="error-message"></span>

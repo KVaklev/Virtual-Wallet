@@ -10,7 +10,7 @@ namespace Business.DTOs.Requests
         [MaxLength(Constants.UsernameMaxLength, ErrorMessage = Constants.MaxLengthErrorMessage)]
         public string RecepientUsername { get; set; }
 
-        [Required(ErrorMessage = Constants.EmptyFieldErrorMessage)]
+        
         [Range(Constants.MinAmount, Constants.MaxAmount, ErrorMessage = Constants.RangeFieldErrorMessage)]
         public decimal Amount { get; set; }
 

@@ -6,12 +6,11 @@ namespace DataAccess.Models.Models
 {
     public class History 
     {
-        [Required(ErrorMessage = Constants.EmptyFieldErrorMessage)]
-        [Range(Constants.IdMin, Constants.IdMax, ErrorMessage = Constants.RangeFieldErrorMessage)]
+        
         public int Id { get; set; } 
         public DateTime EventTime { get; set; }
 
-        [Required(ErrorMessage = Constants.EmptyFieldErrorMessage)]
+       
         [Range(Constants.IdMin, Constants.IdMax, ErrorMessage = Constants.RangeFieldErrorMessage)]
         public int AccountId { get; set; }
         public Account Account { get; set; }
