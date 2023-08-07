@@ -20,7 +20,7 @@ namespace DataAccess.Repositories.Models
             this.context = context;
         }
 
-        
+
         public IQueryable<Transfer> GetAll(User user)
         {
             IQueryable<Transfer> result = context.Transfers
@@ -37,7 +37,7 @@ namespace DataAccess.Repositories.Models
             }
 
 
-            return result ?? throw new EntityNotFoundException(Constants.NotFoundErrorMessage);
+            return result;
         }
 
         public async Task<Transfer> CreateAsync(Transfer transfer)
@@ -69,18 +69,17 @@ namespace DataAccess.Repositories.Models
 
         public async Task<Transfer> GetByIdAsync(int id)
         {
-            Transfer transfer = await context.Transfers
+            Transfer? transfer = await context.Transfers
                 .Include(t => t.Account)
                 .ThenInclude(t => t.Currency)
                  .Include(t => t.Account)
                 .ThenInclude(u => u.User)
                 .Include(t => t.Card)
-                .ThenInclude(c=>c.Currency)
+                .ThenInclude(c => c.Currency)
                 .Include(t => t.Currency)
                 .FirstOrDefaultAsync(t => t.Id == id);
 
-
-            return transfer ?? throw new EntityNotFoundException(Constants.NotFoundErrorMessage);
+            return transfer;
 
         }
 
@@ -91,28 +90,9 @@ namespace DataAccess.Repositories.Models
                 .ThenInclude(u => u.User)
                 .FirstOrDefaultAsync(t => t.Account.User.Id == userId);
 
-            return transfer ?? throw new EntityNotFoundException(Constants.NotFoundErrorMessage);
+            return transfer;
+
         }
-
-        //public async Task<Transfer> UpdateAsync(int id, Transfer transfer)
-        //{
-        //    var transferToUpdate = await GetByIdAsync(id);
-
-        //    if (transferToUpdate.IsConfirmed)
-        //    {
-        //        throw new UnauthorizedOperationException(Constants.TransferIsConfirmedErrorMessage);
-        //    }
-
-        //    transferToUpdate.Amount = transfer.Amount;
-        //    transferToUpdate.CardId = transfer.CardId;
-        //    transferToUpdate.CurrencyId = transfer.CurrencyId;
-
-
-        //    await context.SaveChangesAsync();
-        //    return transferToUpdate;
-
-        //}
-
         public async Task<Transfer> UpdateAsync(Transfer transferToUpdate)
         {
             await context.SaveChangesAsync();
@@ -130,15 +110,8 @@ namespace DataAccess.Repositories.Models
             result = await FilterByTransferTypeAsync(result, filterParameters.TransferType);
             result = await SortByAsync(result, filterParameters.SortBy);
 
-            int finalResult = result.Count();
-
-            if (finalResult == 0)
-            {
-                throw new EntityNotFoundException(Constants.NotFoundErrorMessage);
-            }
-
             int totalPages = (result.Count() + filterParameters.PageSize - 1) /
-                filterParameters.PageSize;
+    filterParameters.PageSize;
 
             result = await Common<Transfer>.PaginateAsync(result, filterParameters.PageNumber, filterParameters.PageSize);
 
@@ -182,24 +155,32 @@ namespace DataAccess.Repositories.Models
         {
             if (!string.IsNullOrEmpty(transfer))
             {
-                TransferDirection transferType = ParseTransferTypeParameter(transfer, "transfer");
-                return await Task.FromResult(transfers.Where(t => t.TransferType == transferType));
+                if (TryParseTransferTypeParameter(transfer, out TransferDirection? transferType))
+                {
+                    if (transferType.HasValue)
+                    {
+                        return await Task.FromResult(transfers.Where(t => t.TransferType == transferType.Value));
+                    }
+                    else
+                    {
+                        return await Task.FromResult(transfers);
+                    }
+                }
             }
 
-            else
-            {
-                return await Task.FromResult(transfers);
-            }
+            return await Task.FromResult(transfers);
         }
 
-        private TransferDirection ParseTransferTypeParameter(string value, string parameter)
+        private bool TryParseTransferTypeParameter(string value, out TransferDirection? result)
         {
-            if (Enum.TryParse(value, true, out TransferDirection result))
+            if (Enum.TryParse(value, true, out TransferDirection parsedResult))
             {
-                return result;
+                result = parsedResult;
+                return true;
             }
 
-            throw new EntityNotFoundException(Constants.TransferDirectionInputError);
+            result = null;
+            return false;
         }
 
         public static async Task<IQueryable<Transfer>> SortByAsync(IQueryable<Transfer> transfers, string? sortCriteria)

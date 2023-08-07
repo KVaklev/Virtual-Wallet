@@ -40,9 +40,9 @@ namespace VirtualWallet.Controllers.API
 
             if (!result.IsSuccessful)
             {
-                if (loggedUserResult.Message == Constants.NoFoundResulte)
+                if (result.Message == Constants.NoFoundResulte)
                 {
-                    return StatusCode(StatusCodes.Status404NotFound, loggedUserResult.Message);
+                    return StatusCode(StatusCodes.Status404NotFound, result.Message);
                 }
                 else 
                 { 
@@ -81,11 +81,13 @@ namespace VirtualWallet.Controllers.API
         public async Task<IActionResult> UpdateAsync(int id, [FromBody] CreateTransactionDto transactionDto)
         {
                 var loggedUserResult = await FindLoggedUserAsync();
+
                 if (!loggedUserResult.IsSuccessful)
                 {
                     return StatusCode(StatusCodes.Status404NotFound, loggedUserResult.Message);
                 }
                 var result = await this.transactionService.UpdateAsync(id, loggedUserResult.Data, transactionDto);
+
                 if (!result.IsSuccessful)
                 {
                 if (loggedUserResult.Message == Constants.NoFoundResulte)
