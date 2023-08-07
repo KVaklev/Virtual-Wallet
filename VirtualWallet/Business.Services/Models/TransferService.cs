@@ -327,38 +327,70 @@ namespace Business.Services.Models
         }
 
 
-        private async Task<decimal> GetCorrectAmountAsync(string transferCurrencyCode, string accountCurrencyCode, decimal amount)
+        private async Task<Response<decimal>> GetCorrectAmountAsync(string transferCurrencyCode, string accountCurrencyCode, decimal amount)
         {
+            var result = new Response<decimal>();
+
             if (transferCurrencyCode != accountCurrencyCode)
             {
-               //Todo - Result<desimal>
-                //amount = await this.exchangeRateService.ExchangeAsync(amount, transferCurrencyCode, accountCurrencyCode);
+                var amountResult = await this.exchangeRateService.ExchangeAsync(amount, transferCurrencyCode, accountCurrencyCode);
+
+                if (!amountResult.IsSuccessful)
+                {
+                    result.IsSuccessful = false;
+                    result.Message = amountResult.Message;
+                    return result;
+                }
+
+                result.Data = amountResult.Data;
+
             }
-            return amount;
+            return result;
         }
 
-        private async Task<bool> UpdateAccountsBalanceAsync(Transfer transfer, User user)
+
+        private async Task<Response<bool>> UpdateAccountsBalanceAsync(Transfer transfer, User user)
         {
             var accountAmount = await GetCorrectAmountAsync(transfer.Currency.CurrencyCode, transfer.Account.Currency.CurrencyCode, transfer.Amount);
 
+            var result = new Response<bool>();
+
+            if (!accountAmount.IsSuccessful)
+            {
+
+                result.IsSuccessful = false;
+                result.Message = accountAmount.Message;
+                return result;
+               
+            }
+
             var cardAmount = await GetCorrectAmountAsync(transfer.Currency.CurrencyCode, transfer.Card.Currency.CurrencyCode, transfer.Amount);
+
+            if(!cardAmount.IsSuccessful)
+            {
+                result.IsSuccessful = false;
+                result.Message = cardAmount.Message;
+                return result;
+            }
 
             if (transfer.TransferType == TransferDirection.Deposit)
             {
 
-                await this.accountService.IncreaseBalanceAsync(transfer.AccountId, accountAmount, user);
+                await this.accountService.IncreaseBalanceAsync(transfer.AccountId, accountAmount.Data, user);
 
-                await this.cardService.DecreaseBalanceAsync(transfer.CardId, cardAmount, user);
+                await this.cardService.DecreaseBalanceAsync(transfer.CardId, cardAmount.Data, user);
             }
 
             if (transfer.TransferType == TransferDirection.Withdrawal)
             {
-                await this.accountService.DecreaseBalanceAsync(transfer.AccountId, accountAmount, user);
+                await this.accountService.DecreaseBalanceAsync(transfer.AccountId, accountAmount.Data, user);
 
-                await this.cardService.IncreaseBalanceAsync(transfer.CardId, cardAmount, user);
+                await this.cardService.IncreaseBalanceAsync(transfer.CardId, cardAmount.Data, user);
             }
 
-            return true;
+            result.Data = true;
+
+            return result;
         }
 
 
