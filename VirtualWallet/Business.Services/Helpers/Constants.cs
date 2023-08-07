@@ -9,6 +9,7 @@
 
         public const string NoUsersErrorMessage = "No users are found.";
         public const string NoUsersAfterFilterErrorMessage = "No users match the specified filter criteria.";
+        public const string NoUserFoundErrorMessage = "No user is found.";
 
         public const string UsernameExistsErrorMessage = "User with this username already exists.";
         public const string UsernameDoesntExistErrorMessage = "User with this username doesn't exist.";

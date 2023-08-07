@@ -354,7 +354,22 @@ namespace Business.Services.Models
 
             return result;
         }
+        public async Task<Response<User>> GetLoggedUserByIdAsync(int id)
+        {
+            var result = new Response<User>();
 
+            var user = await this.userRepository.GetByIdAsync(id);
+
+            if (user == null)
+            {
+                result.IsSuccessful = false;
+                result.Message = NoUserFoundErrorMessage;
+                return result;
+            }
+            result.Data = user;
+
+            return result;
+        }
         private async Task<bool> EmailExistsAsync(string email)
         {
             return await this.userRepository.EmailExistsAsync(email);

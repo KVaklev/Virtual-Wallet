@@ -92,7 +92,7 @@ namespace Business.Services.Models
             if (account == null)
             {
                 result.IsSuccessful = false;
-                result.Message = Constants.NoUsersErrorMessage;
+                result.Message = NoUsersErrorMessage;
                 return result;
             }
 
@@ -214,14 +214,14 @@ namespace Business.Services.Models
                     issuer: "VirtualWallet",
                     audience: "Where is that audience",
                     claims: new[] {
-                new Claim("LoggedUserId", loggedUser.Id.ToString()),
-                new Claim("Username", loggedUser.Username),
+                new Claim(ClaimTypes.NameIdentifier, loggedUser.Id.ToString()),
+                new Claim(ClaimTypes.Name, loggedUser.Username),
                 new Claim("IsAdmin", loggedUser.IsAdmin.ToString()),
                 new Claim("UsersAccountId", loggedUser.Account.Id.ToString()),//null check
                 new Claim(JwtRegisteredClaimNames.Email, loggedUser.Email),
                 new Claim(JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString())
         },
-            expires: DateTime.Now.AddMinutes(30),
+            expires: DateTime.Now.AddMinutes(5),
                     signingCredentials: signinCredentials
                 );
             
@@ -234,7 +234,9 @@ namespace Business.Services.Models
                 return result;
             }
 
-            return await Task.FromResult(result);
+            result.Data = resultToken;
+
+            return result;
         }
         public async Task<Response<string>> GenerateTokenAsync(int id)
         {
@@ -244,7 +246,7 @@ namespace Business.Services.Models
             if (user == null)
             {
                 result.IsSuccessful = false;
-                result.Message = Constants.NoUsersErrorMessage;
+                result.Message = NoUsersErrorMessage;
                 return result;
             }
 

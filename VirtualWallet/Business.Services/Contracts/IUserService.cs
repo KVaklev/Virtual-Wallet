@@ -21,5 +21,6 @@ namespace Business.Services.Contracts
         Task<Response<GetUserDto>> UnblockUserAsync(int id, User loggedUser);
         Task<Response<User>> LoginAsync(string username, string password);
         Task<Response<User>> GetLoggedUserByUsernameAsync(string username);
+        Task<Response<User>> GetLoggedUserByIdAsync(int id);
     }
 }
