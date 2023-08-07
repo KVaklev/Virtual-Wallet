@@ -36,7 +36,7 @@ namespace Business.Services.Models
                 return result;
             }
             
-            var historyDto = await HistoryMapper.MapHistoryToDtoAsync(history);
+            var historyDto = HistoryMapper.MapHistoryToDtoAsync(history);
             result.Data = historyDto;
             return result;
         }
