@@ -1,19 +1,13 @@
-﻿using AutoMapper;
-using Business.DTOs;
-using Business.DTOs.Requests;
-using Business.DTOs.Responses;
-using Business.Exceptions;
+﻿using Business.DTOs.Requests;
 using Business.QueryParameters;
 using Business.Services.Contracts;
 using Business.Services.Helpers;
 using DataAccess.Models.Models;
-using DataAccess.Repositories.Contracts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace VirtualWallet.Controllers.API
 {
-
     [ApiController]
     [Route("api/users")]
     public class UserApiController : ControllerBase
@@ -21,8 +15,7 @@ namespace VirtualWallet.Controllers.API
         private readonly IUserService userService;
       
 
-        public UserApiController(
-            IUserService userService)
+        public UserApiController(IUserService userService)
         {
             this.userService = userService;
         }
@@ -30,34 +23,33 @@ namespace VirtualWallet.Controllers.API
         [HttpGet, Authorize]
         public async Task<IActionResult> GetUsersAsync([FromQuery] UserQueryParameters userQueryParameters)
         {
-            
-                var result = await userService.FilterByAsync(userQueryParameters);
-                if (!result.IsSuccessful)
-                {
-                      return StatusCode(StatusCodes.Status404NotFound);
-                }
+            var result = await userService.FilterByAsync(userQueryParameters);
 
-                return StatusCode(StatusCodes.Status200OK, result);
+            if (!result.IsSuccessful)
+            {
+                  return StatusCode(StatusCodes.Status404NotFound);
+            }
+
+            return StatusCode(StatusCodes.Status200OK, result);
         }
 
         [HttpGet("id"),Authorize]
         public async Task<IActionResult> GetByIdAsync(int id)
         {
-                var loggedUserResponse = await FindLoggedUserAsync();
-                if (!loggedUserResponse.IsSuccessful)
-                {
-                    return StatusCode(StatusCodes.Status404NotFound, loggedUserResponse.Message);
-                }
+            var loggedUserResponse = await FindLoggedUserAsync();
+            if (!loggedUserResponse.IsSuccessful)
+            {
+                return StatusCode(StatusCodes.Status404NotFound, loggedUserResponse.Message);
+            }
 
-                var result = await this.userService.GetByIdAsync(id, loggedUserResponse.Data);
+            var result = await this.userService.GetByIdAsync(id, loggedUserResponse.Data);
 
-                if (!result.IsSuccessful)
-                {
-                    return BadRequest(result.Message);
-                }
+            if (!result.IsSuccessful)
+            {
+                return BadRequest(result.Message);
+            }
 
-                return StatusCode(StatusCodes.Status200OK, result.Data);
-            
+            return StatusCode(StatusCodes.Status200OK, result.Data);
         }
 
         [HttpPost]
@@ -89,69 +81,66 @@ namespace VirtualWallet.Controllers.API
             }
 
             return StatusCode(StatusCodes.Status200OK, result.Data);
-           
         }
 
         [HttpDelete("{id}"), Authorize]
         public async Task<IActionResult> DeleteUser(int id)
         {
-            
-                var loggedUserResponse = await FindLoggedUserAsync();
-                if (!loggedUserResponse.IsSuccessful)
-                {
-                    return StatusCode(StatusCodes.Status404NotFound, loggedUserResponse.Message);
-                }
-                var result = await userService.DeleteAsync(id, loggedUserResponse.Data);
+            var loggedUserResponse = await FindLoggedUserAsync();
+            if (!loggedUserResponse.IsSuccessful)
+            {
+                return StatusCode(StatusCodes.Status404NotFound, loggedUserResponse.Message);
+            }
+            var result = await userService.DeleteAsync(id, loggedUserResponse.Data);
 
-                if (!result.IsSuccessful)
-                {
-                    return BadRequest(result.Message);
-                }
+            if (!result.IsSuccessful)
+            {
+                return BadRequest(result.Message);
+            }
 
-                result.Message = Constants.SuccessfullDeletedUserMessage;
+            result.Message = Constants.SuccessfullDeletedUserMessage;
 
-                return StatusCode(StatusCodes.Status200OK, result.Message);
+            return StatusCode(StatusCodes.Status200OK, result.Message);
         }
 
         [HttpPut("{id}/promote"), Authorize]
         public async Task<IActionResult> Promote(int id)
         {
-                var loggedUserResponse = await FindLoggedUserAsync();
-                if (!loggedUserResponse.IsSuccessful)
-                {
-                    return StatusCode(StatusCodes.Status404NotFound, loggedUserResponse.Message);
-                }
-                var result = await userService.PromoteAsync(id, loggedUserResponse.Data);
+            var loggedUserResponse = await FindLoggedUserAsync();
+            if (!loggedUserResponse.IsSuccessful)
+            {
+                return StatusCode(StatusCodes.Status404NotFound, loggedUserResponse.Message);
+            }
+            var result = await userService.PromoteAsync(id, loggedUserResponse.Data);
 
-                if (!result.IsSuccessful)
-                {
-                    return BadRequest(result.Message);
-                }
+            if (!result.IsSuccessful)
+            {
+                return BadRequest(result.Message);
+            }
 
-                result.Message = Constants.SuccessfullPromoteddUserMessage;
+            result.Message = Constants.SuccessfullPromoteddUserMessage;
 
-                return StatusCode(StatusCodes.Status200OK, result.Message);
+            return StatusCode(StatusCodes.Status200OK, result.Message);
         }
 
         [HttpPut("{id}/block"), Authorize]
         public async Task<IActionResult> BlockUser(int id)
         {
-               var loggedUserResponse = await FindLoggedUserAsync();
-                if (!loggedUserResponse.IsSuccessful)
-                {
-                    return StatusCode(StatusCodes.Status404NotFound, loggedUserResponse.Message);
-                }
-                var result = await userService.BlockUserAsync(id, loggedUserResponse.Data);
+            var loggedUserResponse = await FindLoggedUserAsync();
+            if (!loggedUserResponse.IsSuccessful)
+            {
+                return StatusCode(StatusCodes.Status404NotFound, loggedUserResponse.Message);
+            }
+            var result = await userService.BlockUserAsync(id, loggedUserResponse.Data);
 
-                if (!result.IsSuccessful)
-                {
-                    return BadRequest(result.Message);
-                }
+            if (!result.IsSuccessful)
+            {
+                return BadRequest(result.Message);
+            }
 
-                result.Message = Constants.SuccessfullBlockedUserMessage;
+            result.Message = Constants.SuccessfullBlockedUserMessage;
 
-                return StatusCode(StatusCodes.Status200OK, result.Message);
-            
+            return StatusCode(StatusCodes.Status200OK, result.Message);
         }
 
         [HttpPut("{id}/unblock"), Authorize]
@@ -165,14 +154,14 @@ namespace VirtualWallet.Controllers.API
             }
             var result = await userService.UnblockUserAsync(id, loggedUserResponse.Data);
 
-                if (!result.IsSuccessful)
-                {
-                    return BadRequest(result.Message);
-                }
+            if (!result.IsSuccessful)
+            {
+                return BadRequest(result.Message);
+            }
 
-                result.Message = Constants.SuccessfullUnblockedUserMessage;
+            result.Message = Constants.SuccessfullUnblockedUserMessage;
 
-                return StatusCode(StatusCodes.Status200OK, result.Message);
+            return StatusCode(StatusCodes.Status200OK, result.Message);
         }
         private async Task<Response<User>> FindLoggedUserAsync()
         {

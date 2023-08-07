@@ -21,7 +21,7 @@ namespace DataAccess.Repositories.Models
 
         public async Task<Transaction> GetByIdAsync(int id) 
         {
-            Transaction transaction = await context.Transactions.Where(t => t.Id == id)
+            var transaction = await context.Transactions.Where(t => t.Id == id)
                 .Include(s =>s.AccountSender)
                 .Include(r =>r.AccountRecipient)
                 .ThenInclude(c=>c.Currency)
@@ -64,8 +64,6 @@ namespace DataAccess.Repositories.Models
             result = await FilterByToDataAsync(result, filterParameters.ToDate);
             result = await SortByAsync(result, filterParameters.SortBy);
 
-            int totalItems = await result.CountAsync();
-
             int totalPages = (result.Count() + filterParameters.PageSize - 1) / filterParameters.PageSize;
             result = await Common<Transaction>.PaginateAsync(result, filterParameters.PageNumber, filterParameters.PageSize);
 
@@ -74,13 +72,13 @@ namespace DataAccess.Repositories.Models
         
         private IQueryable<Transaction> GetAll(string username)
         {
-            IQueryable<Transaction> result = context.Transactions
-                    .Where(u => u.AccountSender.User.Username == username)
-                    .Include(s => s.AccountSender)
-                    .Include(r => r.AccountRecipient)
-                    .ThenInclude(u =>u.User)
-                    .Include(c => c.Currency)
-                    .AsQueryable();
+            var result = context.Transactions
+                .Where(u => u.AccountSender.User.Username == username)
+                .Include(s => s.AccountSender)
+                .Include(r => r.AccountRecipient)
+                .ThenInclude(u =>u.User)
+                .Include(c => c.Currency)
+                .AsQueryable();
 
             //todo - filter by username
             return result;

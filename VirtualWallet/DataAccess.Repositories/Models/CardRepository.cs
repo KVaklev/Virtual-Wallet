@@ -50,11 +50,10 @@ namespace DataAccess.Repositories.Models
             return cards;
         }
 
-        public async Task<PaginatedList<Card>> FilterByAsync(CardQueryParameters filterParameters)
+        public async Task<PaginatedList<Card>> FilterByAsync(CardQueryParameters filterParameters, User loggeedUser)
         {
             IQueryable<Card> result = this.GetAll();
 
-            result = await FilterByUsernameAsync(result, filterParameters.Username);
             result = await FilterByExpirationDateAsync(result, filterParameters.ExpirationDate);
             result = await FilterByCardTypeAsync(result, filterParameters.CardType);
             result = await FilterByBalanceAsync(result, filterParameters.Balance);
@@ -66,6 +65,7 @@ namespace DataAccess.Repositories.Models
 
             return new PaginatedList<Card>(result.ToList(), totalPages, filterParameters.PageNumber);
         }
+
         public async Task<Card> CreateAsync(int accountId, Card card)
         {
             context.Cards.Add(card);
@@ -100,19 +100,19 @@ namespace DataAccess.Repositories.Models
             return true;
         }
 
-        private async Task<IQueryable<Card>> FilterByUsernameAsync(IQueryable<Card> result, string username)
-        {
-            result = result
-                .Include(c => c.Account)
-                .ThenInclude(a => a.User);
+        //private async Task<IQueryable<Card>> FilterByUsernameAsync(IQueryable<Card> result, string username)
+        //{
+        //    result = result
+        //        .Include(c => c.Account)
+        //        .ThenInclude(a => a.User);
 
-            if (!string.IsNullOrEmpty(username))
-            {
-                return await Task.FromResult(result.Where(card => card.Account.User.Username.Contains(username.ToUpper())));
-            }
+        //    if (!string.IsNullOrEmpty(username))
+        //    {
+        //        return await Task.FromResult(result.Where(card => card.Account.User.Username.Contains(username.ToUpper())));
+        //    }
 
-            return await Task.FromResult(result);
-        }
+        //    return await Task.FromResult(result);
+        //}
         private async Task<IQueryable<Card>> FilterByExpirationDateAsync(IQueryable<Card> result, string expirationDate)
         {
             DateTime? date = !string.IsNullOrEmpty(expirationDate) ? DateTime.Parse(expirationDate) : null;

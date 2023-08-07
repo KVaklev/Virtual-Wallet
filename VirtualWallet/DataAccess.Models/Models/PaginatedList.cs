@@ -25,5 +25,10 @@
                 return PageNumber < TotalPages;
             }
         }
+
+        public static implicit operator PaginatedList<T>(PaginatedList<Card> v)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

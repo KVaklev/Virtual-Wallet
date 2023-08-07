@@ -28,31 +28,56 @@ namespace Business.Services.Models
             this.currencyService = currencyService;
             this.mapper = mapper;
         }
-        public Response<IQueryable<GetCardDto>> GetAll()
+        public async Task<Response<IQueryable<GetCardDto>>> GetAll(User loggedUser)
         {
             var result = new Response<IQueryable<GetCardDto>>();
             var cards = this.cardRepository.GetAll();
 
             if (cards != null && cards.Any())
             {
-                result.IsSuccessful = true;
-                result.Data = (IQueryable<GetCardDto>)cards.AsQueryable();
+                if (await Security.IsAdminAsync(loggedUser))
+                {
+                    result.Data = (IQueryable<GetCardDto>)cards;
+                    return result;
+                }
+                else
+                {
+                    cards = cards
+                        .Where(a => a.Account.User.Username == loggedUser.Username)
+                        .AsQueryable();
+                    result.Data = (IQueryable<GetCardDto>)cards;
+                    return result;
+                }
             }
             else
             {
                 result.IsSuccessful = false;
-                result.Message = Constants.NoCardsErrorMessage;
+                result.Message = NoCardsErrorMessage;
+                return result;
             }
 
-            return result;
         }
-        public async Task<Response<PaginatedList<GetCreatedCardDto>>> FilterByAsync(CardQueryParameters filterParameters)
+        public async Task<Response<PaginatedList<GetCreatedCardDto>>> FilterByAsync(CardQueryParameters filterParameters, User loggedUser)
         {
             var result = new Response<PaginatedList<GetCreatedCardDto>>();
 
-            var cards = await this.cardRepository.FilterByAsync(filterParameters);
+            var cards = await this.cardRepository.FilterByAsync(filterParameters, loggedUser);
 
-            if (cards.Count == 0)
+            if (cards != null && cards.Any())
+            {
+                if (await Security.IsAdminAsync(loggedUser))
+                {
+                    result.Data = cards;
+                }
+                else
+                {
+                    cards = (PaginatedList<Card>)cards
+                        .Where(a => a.Account.User.Username == loggedUser.Username)
+                        .AsQueryable();
+                    result.Data = cards;
+                }
+            }
+            else
             {
                 result.IsSuccessful = false;
                 result.Message = NoCardsErrorMessage;

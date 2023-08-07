@@ -8,8 +8,8 @@ namespace Business.Services.Contracts
 {
     public interface ICardService
     {
-        Response<IQueryable<GetCardDto>> GetAll();
-        Task<Response<PaginatedList<GetCreatedCardDto>>> FilterByAsync(CardQueryParameters queryParameters);
+        Task<Response<IQueryable<GetCardDto>>> GetAll(User loggedUser);
+        Task<Response<PaginatedList<GetCreatedCardDto>>> FilterByAsync(CardQueryParameters queryParameters, User loggedUser);
         Task<Response<GetCardDto>> GetByIdAsync(int id, User loggedUser);
         Response<IQueryable<GetCardDto>> GetByAccountId(int accountId);
         Task<Response<GetCreatedCardDto>> CreateAsync(int accountId, CreateCardDto card);
