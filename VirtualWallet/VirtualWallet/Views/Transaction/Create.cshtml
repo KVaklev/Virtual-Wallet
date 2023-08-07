@@ -70,14 +70,14 @@
                 <label for="youSend" class="form-label">You Send</label>
                 <div class="input-group">
                   <span class="input-group-text">$</span>
-                                <input asp-for="CreateTransactionDto.Amount" type="number" class="form-control" data-bv-field="youSend" id="youSend" value="" placeholder="">
+                  <input asp-for="CreateTransactionDto.Amount" type="number" class="form-control" data-bv-field="youSend" id="youSend" value="" placeholder="">
                   <span class="input-group-text p-0">
-                                    <select id="youSendCurrency" data-style="form-select bg-transparent border-0" data-container="body" data-live-search="true" class="selectpicker form-control bg-transparent" required="">
+                                    <select asp-for="CreateTransactionDto.CurrencyCode" id="youSendCurrency" data-style="form-select bg-transparent border-0" data-container="body" data-live-search="true" class="selectpicker form-control bg-transparent" required="">
                                         <optgroup label="Popular Currency">
                                             @foreach(var currency in @Model.Currencies)
                                             {
                                                 
-                                            <option data-icon="currency-flag currency-flag-inr me-1" data-subtext="@currency.Name" value="">@currency.CurrencyCode | @currency.Name</option>
+                              <option data-icon="currency-flag currency-flag-inr me-1" data-subtext="@currency.Name " value="">@currency.CurrencyCode</option>
 
                                             }
                                         </optgroup>
@@ -88,10 +88,10 @@
               </div>
                         <div class="mb-4 mb-sm-5">
                             <label for="description" class="form-label">Description</label>
-                            <textarea asp-for="CreateTransactionDto.Amount"  class="form-control" rows="4" id="description" required placeholder="Payment Description"></textarea>
+                            <textarea asp-for="CreateTransactionDto.Description" class="form-control" rows="4" id="description" required placeholder="Payment Description"></textarea>
                             <span asp-validation-for="CreateTransactionDto.Description" class=" error-message"></span>
                         </div>
-              <div class="d-grid"><button  type="submit" class="btn btn-primary">Continue</button></div>
+                        <div class="d-grid"><button type="submit" class="btn btn-primary">Continue</button></div>
             </form>
             <!-- Send Money Form end --> 
           </div>

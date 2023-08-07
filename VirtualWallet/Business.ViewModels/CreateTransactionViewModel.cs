@@ -9,6 +9,6 @@ namespace Business.ViewModels
     {
         public CreateTransactionDto CreateTransactionDto { get; set; }
 
-        public IQueryable<CreateCurrencyDto> Currencies { get; set; }
+        public List<CreateCurrencyDto> Currencies { get; set; }
     }
 }

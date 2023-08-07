@@ -9,11 +9,12 @@ using DataAccess.Repositories.Contracts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using System.Security.Claims;
 using System.Security.Cryptography.Xml;
 
 namespace VirtualWallet.Controllers.MVC
 {
-    [AllowAnonymous]
+    [Authorize]
     public class TransactionController : Controller
     {
         private readonly ITransactionService transactionService;
@@ -53,29 +54,27 @@ namespace VirtualWallet.Controllers.MVC
         public async Task<IActionResult> Create()
         {
 
-            //if ((this.HttpContext.Session.GetString("IsBlocked")) == "True")
-            //{
-            //    return BlockedErrorView();
-            //}
-            //else
-            //{
-            //    return this.View();
-            //}
-            var createTransactionViewModel = new CreateTransactionViewModel();
-            createTransactionViewModel.Currencies = this.currencyService.GetAll();
-
+           var createTransactionViewModel = new CreateTransactionViewModel();
+            var result = this.currencyService.GetAll();
+            if (!result.IsSuccessful)
+            {
+                return await EntityErrorViewAsync(result.Message);
+            }
+            createTransactionViewModel.Currencies = result.Data;
+           
             return this.View(createTransactionViewModel);
         }
 
         [HttpPost]
         public async Task<IActionResult> Create(CreateTransactionViewModel transactionDto)
         {
-            try
-            {
-                if (!this.ModelState.IsValid)
-                {
-                    return this.View(transactionDto);
-                }
+            var currencyResult = this.currencyService.GetAll();
+            transactionDto.Currencies = currencyResult.Data;
+            transactionDto.CreateTransactionDto.CurrencyCode = "USD";
+                //if (!this.ModelState.IsValid)
+                //{
+                //    return this.View(transactionDto);
+                //}
                 var loggedUserResult = await GetLoggedUserAsync();
                 if (!loggedUserResult.IsSuccessful)
                 {
@@ -86,12 +85,7 @@ namespace VirtualWallet.Controllers.MVC
                 {
                     return await EntityErrorViewAsync(result.Message);
                 }
-                return this.RedirectToAction("Execute", "Transacion", new { username = result.Data.SenderUsername });
-            }
-            catch (EntityNotFoundException ex)
-            {
-                return await EntityErrorViewAsync(ex.Message);
-            }
+                return this.RedirectToAction("Execute", "Transaction", new { id = result.Data.Id });
         }
 
         [HttpGet]
@@ -209,7 +203,7 @@ namespace VirtualWallet.Controllers.MVC
         }
 
         [HttpPost]
-        public async Task<IActionResult> Execute(int id, GetTransactionDto getTransactionDto)
+        public async Task<IActionResult> Confirm( int id)
         {
             try
             {
@@ -250,11 +244,9 @@ namespace VirtualWallet.Controllers.MVC
 
         private async Task<Response<User>> GetLoggedUserAsync()
         {
-            //var username = this.HttpContext.Session.GetString("LoggedUser");
-            var userResult = await this.userService.GetLoggedUserByUsernameAsync("ivanGorev");
-            return userResult;
+            //var loggedUsersUsername = User.Claims.FirstOrDefault(claim => claim.Type == "Username").Value;
+            var loggedUserResult = await this.userService.GetLoggedUserByUsernameAsync("ivanGorev");
+            return loggedUserResult;
         }
-
-        
     }
 }

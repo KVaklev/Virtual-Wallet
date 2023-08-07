@@ -4,7 +4,7 @@
   <div class="bg-primary">
     <div class="container d-flex justify-content-center">
       <ul class="nav nav-pills alternate nav-lg border-bottom-0">
-        <li class="nav-item"> <a class="nav-link" href="send-money.html">Send</a></li>
+        <li class="nav-item"> <a class="nav-link active" href="send-money.html">Send</a></li>
       </ul>
     </div>
   </div>
@@ -40,8 +40,8 @@
           </div>
         </div>
       </div>
-      <h2 class="fw-400 text-center mt-3">Request Money</h2>
-      <p class="lead text-center mb-4">You are requesting money from <span class="fw-500">demo@gmail.com</span></p>
+      <h2 class="fw-400 text-center mt-3">Send Money</h2>
+      <p class="lead text-center mb-4">You are sending money to <span class="fw-500">@Model.RecipientUsername.</span></p>
       <div class="row">
         <div class="col-md-9 col-lg-7 col-xl-6 mx-auto">
           <div class="bg-white shadow-sm rounded p-3 pt-sm-4 pb-sm-5 px-sm-5 mb-4"> 
@@ -62,19 +62,15 @@
               <p class="col-sm-8 text-3">Australia</p>
             </div>
             <div class="row g-3 align-items-center">
-              <p class="col-sm-4 text-muted text-sm-end mb-0 mb-sm-3">Payment due by:</p>
-              <p class="col-sm-8 text-3">09-13-2021</p>
-            </div>
-            <div class="row g-3 align-items-center">
               <p class="col-sm-4 text-muted text-sm-end fw-500 mb-0 mb-sm-3">Requested Amount:</p>
-              <p class="col-sm-8 text-4 fw-500">1,000.00 USD</p>
+              <p class="col-sm-8 text-4 fw-500">@Model.Amount @Model.CurrencyCode</p>
             </div>
             <div class="row g-3 align-items-baseline">
               <p class="col-sm-4 text-muted text-sm-end mb-0 mb-sm-3">Description:</p>
-              <p class="col-sm-8 text-3">Quidam lisque persius interesset his et, in quot quidam persequeris vim, ad mea essent possim iriure. Lisque persius interesset his et.</p>
+              <p class="col-sm-8 text-3">@Model.Direction</p>
             </div>
             <form id="form-send-money" method="post">
-              <div class="d-grid"><button class="btn btn-primary">Request Money</button></div>
+              <div class="d-grid"><button class="btn btn-primary">Send Money</button></div>
             </form>
             <!-- Request Money Confirm Details end --> 
           </div>
