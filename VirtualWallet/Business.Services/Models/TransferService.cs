@@ -303,7 +303,8 @@ namespace Business.Services.Models
         {
             if (transferCurrencyCode != accountCurrencyCode)
             {
-                amount = await this.exchangeRateService.ExchangeAsync(amount, transferCurrencyCode, accountCurrencyCode);
+               //Todo - Result<desimal>
+                //amount = await this.exchangeRateService.ExchangeAsync(amount, transferCurrencyCode, accountCurrencyCode);
             }
             return amount;
         }

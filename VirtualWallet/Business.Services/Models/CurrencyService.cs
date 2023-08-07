@@ -96,7 +96,7 @@ namespace Business.Services.Models
             if (currencyToUpdate.IsDeleted)
             {
                 result.IsSuccessful = false;
-                result.Message = Constants.ModifyCurrencyNotFoundErrorMessage;
+                result.Message = Constants.CurrencyNotFoundErrorMessage;
                 return result;
             }
 

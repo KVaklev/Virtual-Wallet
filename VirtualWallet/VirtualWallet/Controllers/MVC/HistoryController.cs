@@ -1,9 +1,7 @@
-﻿using Business.Exceptions;
+﻿
 using Business.QueryParameters;
 using Business.Services.Contracts;
-using Business.Services.Models;
 using DataAccess.Models.Models;
-using DataAccess.Repositories.Contracts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,14 +12,15 @@ namespace VirtualWallet.Controllers.MVC
 
     {
         private readonly IHistoryService historyService;
-        private readonly IUserRepository userRepository;
+        private readonly IUserService userService;
+
 
         public HistoryController(
             IHistoryService historyService,
-            IUserRepository userRepository)
+             IUserService userService)
         {
             this.historyService = historyService;
-            this.userRepository = userRepository;
+            this.userService = userService;
 
         }
 
@@ -29,26 +28,26 @@ namespace VirtualWallet.Controllers.MVC
         [HttpGet]
         public async Task<IActionResult> IndexAsync([FromQuery] HistoryQueryParameters parameters)
         {
-            try
+           
+            var loggedUserResponse = await FindLoggedUserAsync();
+            if (!loggedUserResponse.IsSuccessful)
             {
-                var loggedUser = await GetLoggedUserAsync();
-                var result = await this.historyService.FilterByAsync(parameters, loggedUser);
+                return await EntityErrorViewAsync(loggedUserResponse.Message);
+            }
+                var result = await this.historyService.FilterByAsync(parameters, loggedUserResponse.Data);
+            if (!result.IsSuccessful)
+            {
+                return await EntityErrorViewAsync(result.Message);
+            }
 
                 return this.View(result);
-            }
-            catch (EntityNotFoundException ex)
-            {
-                return await EntityErrorViewAsync(ex.Message);
-            }
-
-            
-		}
-
-        private async Task<User> GetLoggedUserAsync()
+        }
+        
+        private async Task<Response<User>> FindLoggedUserAsync()
         {
-            //var username = this.HttpContext.Session.GetString("LoggedUser");
-            var user = await this.userRepository.GetByUsernameAsync("ivanGorev");
-            return user;
+            var loggedUsersUsername = User.Claims.FirstOrDefault(claim => claim.Type == "Username").Value;
+            var loggedUserResult = await this.userService.GetLoggedUserByUsernameAsync(loggedUsersUsername);
+            return loggedUserResult;
         }
 
         private async Task<IActionResult> EntityErrorViewAsync(string message)
