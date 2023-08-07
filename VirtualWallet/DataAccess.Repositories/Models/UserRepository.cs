@@ -70,7 +70,7 @@ namespace DataAccess.Repositories.Models
                 .Where(users => users.Username == username)
                 .FirstOrDefaultAsync();
 
-            return user ?? throw new EntityNotFoundException(Constants.UsernameDoesntExistErrorMessage);
+            return user;
         }
 
         public async Task<User> CreateAsync(User user)

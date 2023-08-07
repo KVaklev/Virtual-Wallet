@@ -28,7 +28,7 @@ namespace DataAccess.Repositories.Models
                 .Include(a => a.Cards)
                 .Include(a => a.Currency);
 
-            return result ?? throw new EntityNotFoundException(Constants.NoAccountsErrorMessage);
+            return result;
         }
         public async Task <Account> GetByIdAsync(int id)
         {
@@ -40,7 +40,7 @@ namespace DataAccess.Repositories.Models
                 .Include(a => a.Currency)
                 .FirstOrDefaultAsync();
 
-            return account ?? throw new EntityNotFoundException(Constants.AccountWithIdDoesntExistErrorMessage);
+            return account;
         }
 
         public async Task<Account> GetByUsernameAsync(string username)
@@ -53,7 +53,7 @@ namespace DataAccess.Repositories.Models
                 .Where(a => a.User.Username == username)
                 .FirstOrDefaultAsync();
 
-            return account ?? throw new EntityNotFoundException(Constants.AccountWithUsernameDoesntExistErrorMessage);
+            return account;
         }
 
         public async Task<Account> CreateAsync(Account account)
@@ -93,27 +93,20 @@ namespace DataAccess.Repositories.Models
             return await Task.FromResult(true);
         }
 
-        public async Task<Account> IncreaseBalanceAsync(int id, decimal amount)
+        public async Task<bool> SaveChangesAsync()
         {
-            Account accountToDepositTo = await this.GetByIdAsync(id);
             await context.SaveChangesAsync();
-
-            return accountToDepositTo;
-        }
-
-        public async Task<Account> DecreaseBalanceAsync(int id, decimal amount)
-        {
-            Account accountToWithdrawFrom = await this.GetByIdAsync(id);
-            await context.SaveChangesAsync();
-
-            return accountToWithdrawFrom;
+            return true;
         }
 
         public async Task<bool> ConfirmRegistrationAsync(int userId, string token)
         {
             var user = await this.userRepository.GetByIdAsync(userId);
+            if (user==null)
+            {
+                return false;
+            }
             user.IsVerified = true;
-
             await this.context.SaveChangesAsync();
             return true;
         }

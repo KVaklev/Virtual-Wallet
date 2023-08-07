@@ -1,5 +1,6 @@
 ﻿using Business.DTOs;
 using Business.Services.Contracts;
+using Business.Services.Helpers;
 using DataAccess.Repositories.Contracts;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -34,6 +35,12 @@ namespace DataAccess.Models.Models
                 ExchangeRate exchangeRateData = JsonConvert.DeserializeObject<ExchangeRate>(jsonResponse);
                 
                 string currencyValue = jsonResponse.Substring(39, 8).ToString();
+                if (currencyValue==null)
+                {
+                    result.IsSuccessful = false;
+                    result.Message = Constants.NoFoundResulte;
+                    return result;
+                }
                 exchangeRateData.CurrencyValue = decimal.Parse(currencyValue, CultureInfo.InvariantCulture); ;
 
               
@@ -45,24 +52,28 @@ namespace DataAccess.Models.Models
             catch (HttpRequestException ex)
             {  
                 result.IsSuccessful = false;
-                result.Message = "No such host is known.";
+                result.Message = Constants.NoHostError;
                 return result;
             }
             catch (JsonException ex)
             {
                 result.IsSuccessful = false;
-                result.Message = "JSON Deserialization Error";
+                result.Message = Constants.JsonDeserializationError;
                 return result;
             }
         }
-        public async Task<decimal> ExchangeAsync(decimal amount, string fromCurrencyCode, string toCurrencyCode)
+        public async Task<Response<decimal>> ExchangeAsync(decimal amount, string fromCurrencyCode, string toCurrencyCode)
         {
+            var result = new Response<decimal>();
             var exchangeRateDataResult = await GetExchangeRateDataAsync(fromCurrencyCode, toCurrencyCode);
-            if (exchangeRateDataResult.IsSuccessful)
+            if (!exchangeRateDataResult.IsSuccessful)
             {
-                amount *= exchangeRateDataResult.Data.CurrencyValue;
+                result.IsSuccessful = false;
+                result.Message = exchangeRateDataResult.Message;
+                return result;
             }
-            return amount;
+             result.Data= amount *= exchangeRateDataResult.Data.CurrencyValue;
+            return result;
         }
     }
 }

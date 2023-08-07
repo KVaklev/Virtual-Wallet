@@ -55,7 +55,7 @@
         //Constant messages for curencies
 
         public const string ModifyCurrencyDeleteMessage = "The currency has been successfully deleted.";
-        public const string ModifyCurrencyNotFoundErrorMessage = "This currency does not exist.";
+        public const string CurrencyNotFoundErrorMessage = "This currency does not exist.";
 
         //Constant messages for Authorized
 
@@ -96,6 +96,11 @@
             public const string NotConfirmedEmail = "NotConfirmedEmail";
             public const string UsernameDoesntExist = "UsernameDoesntExist";
         }
+
+        public const string NoFoundResulte = "No found result.";
+        public const string NoHostError= "No such host is known.";
+        public const string JsonDeserializationError = "JSON Deserialization Error";
+
     }
 
 
