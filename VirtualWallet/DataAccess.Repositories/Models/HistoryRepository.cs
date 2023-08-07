@@ -48,8 +48,6 @@ namespace DataAccess.Repositories.Models
             result = await FilterByFromDataAsync(result, filterParameters.FromDate);
             result = await FilterByToDataAsync(result, filterParameters.ToDate);
 
-            int totalItems = await result.CountAsync();
-
             int totalPages = (result.Count() + filterParameters.PageSize - 1) / filterParameters.PageSize;
             result = await Common<History>.PaginateAsync(result, filterParameters.PageNumber, filterParameters.PageSize);
            
@@ -82,7 +80,6 @@ namespace DataAccess.Repositories.Models
             }
             return await Task.FromResult(result);
         }
-
         private async Task<IQueryable<History>> FilterByFromDataAsync(IQueryable<History> result, string? fromData)
         {
             if (!string.IsNullOrEmpty(fromData))
@@ -93,7 +90,6 @@ namespace DataAccess.Repositories.Models
             }
             return await Task.FromResult(result);
         }
-
         private async Task<IQueryable<History>> FilterByToDataAsync(IQueryable<History> result, string? toData)
         {
             if (!string.IsNullOrEmpty(toData))

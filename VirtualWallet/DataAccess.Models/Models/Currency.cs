@@ -15,15 +15,9 @@ namespace DataAccess.Models.Models
         [Required(ErrorMessage = Constants.EmptyFieldErrorMessage)]
         [StringLength(Constants.CurrencyCodeLength, ErrorMessage = Constants.LengthErrorMessage)]
         public string CurrencyCode { get; set; }
-
         public List<Account> Accounts { get; set; } = new List<Account>();
-
         public List<Card> Cards { get; set; } = new List<Card>();
-
         public List<Transaction> Transactions { get; set; } = new List<Transaction>();
-
-       // public List<Transfer> Transfer { get; set; } = new List<Transfer>();
-
         public bool IsDeleted { get; set; }
     }
 }

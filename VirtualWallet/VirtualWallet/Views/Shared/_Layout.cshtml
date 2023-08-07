@@ -55,6 +55,7 @@
               <ul class="navbar-nav me-auto">
                 <li><a asp-controller="Transaction" asp-action="Create">Send</a></li>
                 <li><a asp-controller="Home" asp-action="Index">Receive</a></li>
+                <li><a asp-controller="User" asp-action="Index">Users</a></li>
                 <li class="dropdown active"> <a class="dropdown-toggle" href="#">Account</a>
                   <ul class="dropdown-menu">
                     <li class="dropdown"><a class="dropdown-item" href="#">My Profile</a></li>
@@ -79,8 +80,8 @@
                 </li>
                 <li class="dropdown active"> <a class="dropdown-toggle" href="#">Help</a>
                   <ul class="dropdown-menu">
-                    <li class="dropdown"><a class="dropdown-item" href="#">About us</a></li>
-                    <li class="dropdown"><a class="dropdown-item" href="#">FAQ</a></li>
+                    <li class="dropdown"><a class="dropdown-item" asp-controller="Help" asp-action="AboutUs" >About us</a></li>
+                    <li class="dropdown"><a class="dropdown-item" asp-controller="Help" asp-action="FAQ">FAQ</a></li>
                   </ul>
                 </li>
               </ul>

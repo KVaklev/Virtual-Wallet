@@ -23,7 +23,7 @@ namespace DataAccess.Models.Models
         public string CardHolder { get; set; }
 
         [Required(ErrorMessage = Constants.EmptyFieldErrorMessage)]
-        [CardCheckNumber(ErrorMessage = Constants.CardCheckNumberFieldErrorMessage)]
+        [CardNumber(ErrorMessage = Constants.CardCheckNumberFieldErrorMessage)]
         [StringLength(Constants.CheckNumberLength, ErrorMessage = Constants.LengthErrorMessage)]
         public string CheckNumber { get; set; }
 

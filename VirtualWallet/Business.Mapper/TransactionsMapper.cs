@@ -24,19 +24,19 @@ namespace Business.Mappers
                 .ReverseMap();
         }
 
-            public static async Task<Transaction> MapCreateDtoToTransactionInAsync(Transaction transactionOut, decimal amount)
-            {
-                var transactionIn = new Transaction();
-                transactionIn.AccountRecepientId = transactionOut.AccountRecepientId;
-                transactionIn.AccountSenderId = transactionOut.AccountSenderId;
-                transactionIn.Amount = amount;
-                transactionIn.CurrencyId = (int)transactionOut.AccountRecipient.CurrencyId;
-                transactionIn.Direction = DirectionType.In;
-                transactionIn.Date = DateTime.UtcNow;
+        public static async Task<Transaction> MapCreateDtoToTransactionInAsync(Transaction transactionOut, decimal amount)
+        {
+            var transactionIn = new Transaction();
+            transactionIn.AccountRecepientId = transactionOut.AccountRecepientId;
+            transactionIn.AccountSenderId = transactionOut.AccountSenderId;
+            transactionIn.Amount = amount;
+            transactionIn.CurrencyId = (int)transactionOut.AccountRecipient.CurrencyId;
+            transactionIn.Direction = DirectionType.In;
+            transactionIn.Date = DateTime.UtcNow;
             transactionIn.Description = transactionOut.Description;
-                transactionIn.IsExecuted = true;
-                return transactionIn;
-            }
+            transactionIn.IsExecuted = true;
+            return transactionIn;
+        }
 
         public static async Task<Transaction> MapUpdateDtoToTransactionAsync(
             Transaction transactionToUpdate, 

@@ -9,8 +9,6 @@ namespace DataAccess.Models.Models
 {
     public class User
     {
-        public static readonly object Claims;
-
         public int Id { get; set; }
 
         [MinLength(Constants.NameMinLength, ErrorMessage = Constants.MinLengthErrorMessage)]
@@ -39,10 +37,8 @@ namespace DataAccess.Models.Models
         [PhoneNumber(ErrorMessage = Constants.PhoneNumberFieldErroMessage)]
         [StringLength(Constants.PhoneNumberLength, ErrorMessage = Constants.LengthErrorMessage)]
         public string PhoneNumber { get; set; }
-
         public bool IsBlocked { get; set; }
         public bool IsAdmin { get; set; }
-
         public string? ProfilePhotoPath { get; set; }
         public string? ProfilePhotoFileName { get; set; }
 
@@ -54,6 +50,5 @@ namespace DataAccess.Models.Models
         public int? AccountId { get; set; }
         public bool IsDeleted { get; set; }
         public bool IsVerified { get; set; }
-
     }
 }

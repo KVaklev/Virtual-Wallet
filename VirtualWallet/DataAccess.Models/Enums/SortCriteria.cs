@@ -14,7 +14,5 @@ namespace DataAccess.Models.Enums
         Email,
         PhoneNumber,
         Desc
-
-
     }
 }

@@ -31,6 +31,8 @@ namespace Business.Mappers
 
             CreateMap<GetUpdatedCardDto, Card>();
             CreateMap<Card, GetUpdatedCardDto>();
+            CreateMap<Card, GetCreatedCardDto>();
+            CreateMap<GetCreatedCardDto, Card>();
         }
 
         public static Task<Card> MapCreateDtoToCardAsync(int accountId, Card cardToCreate, Currency currency, CreateCardDto card)
@@ -47,7 +49,6 @@ namespace Business.Mappers
 
             return Task.FromResult(cardToCreate);
         }
-
 
         public async static Task<Card> MapUpdateDtoToCardAsync(Card cardToUpdate, UpdateCardDto updateCardDto, Currency currency)
         {

@@ -4,16 +4,18 @@ using Microsoft.AspNetCore.Mvc;
 namespace VirtualWallet.Controllers.MVC
 {
     [AllowAnonymous]
-    public class HomeController : Controller
+    public class HelpController : Controller
     {
+        [Route("/AboutUs")]
         [HttpGet]
-        public IActionResult Index()
+        public IActionResult AboutUs()
         {
             return View();
         }
 
+        [Route("/FAQ")]
         [HttpGet]
-        public IActionResult Error()
+        public IActionResult FAQ()
         {
             return View();
         }

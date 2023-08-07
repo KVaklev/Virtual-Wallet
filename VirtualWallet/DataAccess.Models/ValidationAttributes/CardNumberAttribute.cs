@@ -21,7 +21,6 @@ namespace DataAccess.Models.ValidationAttributes
 
             return new ValidationResult(ErrorMessage);
         }
-
         private bool IsDigitsOnly(string value)
         {
             foreach (char c in value)

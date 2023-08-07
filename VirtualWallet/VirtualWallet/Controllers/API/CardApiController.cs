@@ -15,64 +15,63 @@ namespace VirtualWallet.Controllers.API
     [Route("api/cards")]
     public class CardApiController : ControllerBase
     {
-        private readonly IMapper mapper;
         private readonly ICardService cardService;
-        private readonly IUserRepository userRepository;
+        private readonly IUserService userService;
 
         public CardApiController(
-            IMapper mapper,
-            ICardService cardService,
-            IUserRepository userRepository)
+            ICardService cardService, 
+            IUserService userService)
         {
-            this.mapper = mapper;
             this.cardService = cardService;
-            this.userRepository = userRepository;
+            this.userService = userService;
         }
 
         [HttpGet, Authorize]
         public async Task<IActionResult> GetCardsAsync([FromQuery] CardQueryParameters cardQueryParameters)
         {
-            try
+            var loggedUserResponse = await FindLoggedUserAsync();
+            if (!loggedUserResponse.IsSuccessful)
             {
-                List<Card> result = await cardService.FilterByAsync(cardQueryParameters);
+                return StatusCode(StatusCodes.Status404NotFound, loggedUserResponse.Message);
+            }
 
-                return StatusCode(StatusCodes.Status200OK, result);
-            }
-            catch (EntityNotFoundException e)
+            var result = await cardService.FilterByAsync(cardQueryParameters, loggedUserResponse.Data);
+            if (!result.IsSuccessful)
             {
-                return StatusCode(StatusCodes.Status404NotFound, e.Message);
+                return BadRequest(result.Message);
             }
+            
+            return StatusCode(StatusCodes.Status200OK, result);
         }
 
         [HttpGet("id"), Authorize]
         public async Task<IActionResult> GetByIdAsync(int id)
         {
-            try
+            var loggedUserResponse = await FindLoggedUserAsync();
+            if (!loggedUserResponse.IsSuccessful)
             {
-                User loggedUser = await FindLoggedUserAsync();
-                var result = await cardService.GetByIdAsync(id, loggedUser);
-
-                if (!result.IsSuccessful)
-                {
-                    return BadRequest(result.Message);
-                }
-
-                return StatusCode(StatusCodes.Status200OK, result.Data);
+                return StatusCode(StatusCodes.Status404NotFound, loggedUserResponse.Message);
             }
-            catch (EntityNotFoundException e)
+
+            var result = await cardService.GetByIdAsync(id, loggedUserResponse.Data);
+            if (!result.IsSuccessful)
             {
-                return StatusCode(StatusCodes.Status404NotFound, e.Message);
+                return BadRequest(result.Message);
             }
+
+            return StatusCode(StatusCodes.Status200OK, result.Data);         
         }
 
         [HttpPost, Authorize]
         public async Task<IActionResult> CreateCardAsync([FromBody] CreateCardDto createCardDto)
         {
-        
             var loggedUsersAccountId = await FindLoggedUsersAccountAsync();
+            if (!loggedUsersAccountId.IsSuccessful)
+            {
+                return StatusCode(StatusCodes.Status404NotFound, loggedUsersAccountId.Message);
+            }
 
-            var result = await cardService.CreateAsync(loggedUsersAccountId, createCardDto);
-
+            var result = await cardService.CreateAsync(loggedUsersAccountId.Data, createCardDto);
             if (!result.IsSuccessful) 
             {
                 return BadRequest(result.Message);
@@ -84,10 +83,14 @@ namespace VirtualWallet.Controllers.API
         [HttpPut("{id}"), Authorize]
         public async Task<IActionResult> UpdateCard(int id, [FromBody] UpdateCardDto updateCardDto)
         {
-          
-            User loggedUser = await FindLoggedUserAsync();
-            var result = await this.cardService.UpdateAsync(id, loggedUser, updateCardDto);
 
+            var loggedUserResponse = await FindLoggedUserAsync();
+            if (!loggedUserResponse.IsSuccessful)
+            {
+                return StatusCode(StatusCodes.Status404NotFound, loggedUserResponse.Message);
+            }
+
+            var result = await this.cardService.UpdateAsync(id, loggedUserResponse.Data, updateCardDto);
             if (!result.IsSuccessful)
             {
                 return BadRequest(result.Message);
@@ -99,35 +102,35 @@ namespace VirtualWallet.Controllers.API
         [HttpDelete("{id}"), Authorize]
         public async Task<IActionResult> DeleteCardAsync(int id)
         {
-            try
+            var loggedUserResponse = await FindLoggedUserAsync();
+            if (!loggedUserResponse.IsSuccessful)
             {
-                User loggedUser = await FindLoggedUserAsync();
-                var result = await this.cardService.DeleteAsync(id, loggedUser);
-
-                if (!result.IsSuccessful)
-                {
-                    return BadRequest(result.Message);
-                }
-
-                return StatusCode(StatusCodes.Status200OK, result.Message);
+                return StatusCode(StatusCodes.Status404NotFound, loggedUserResponse.Message);
             }
-           
-            catch (EntityNotFoundException e)
+
+            var result = await this.cardService.DeleteAsync(id, loggedUserResponse.Data);
+            if (!result.IsSuccessful)
             {
-                return StatusCode(StatusCodes.Status404NotFound, e.Message);
+                return BadRequest(result.Message);
             }
+
+            return StatusCode(StatusCodes.Status200OK, result.Message);
         }
-        private async Task<User> FindLoggedUserAsync()
+        private async Task<Response<User>> FindLoggedUserAsync()
         {
             var loggedUsersUsername = User.Claims.FirstOrDefault(claim => claim.Type == "Username").Value;
-            var loggedUser = await this.userRepository.GetByUsernameAsync(loggedUsersUsername);
-            return loggedUser;
+            var loggedUserResult = await this.userService.GetLoggedUserByUsernameAsync(loggedUsersUsername);
+            
+            return loggedUserResult;
         }
-        private async Task<int> FindLoggedUsersAccountAsync()
+        private async Task<Response<int>> FindLoggedUsersAccountAsync()
         {
+            var result = new Response<int>();
             var loggedUsersAccountIdAsString = User.Claims.FirstOrDefault(claim => claim.Type == "UsersAccountId").Value;
             var accountId = int.Parse(loggedUsersAccountIdAsString);
-            return accountId;
+            result.Data= accountId;
+
+            return await Task.FromResult(result);
         }
 
     }

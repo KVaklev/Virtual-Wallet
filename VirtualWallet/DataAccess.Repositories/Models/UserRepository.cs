@@ -2,7 +2,6 @@
 using Business.QueryParameters;
 using DataAccess.Models.Enums;
 using DataAccess.Models.Models;
-using DataAccess.Models.ValidationAttributes;
 using DataAccess.Repositories.Contracts;
 using DataAccess.Repositories.Data;
 using DataAccess.Repositories.Helpers;
@@ -40,8 +39,6 @@ namespace DataAccess.Repositories.Models
             result = await SortByAsync(result, filterParameters.SortBy);
             result = await SortOrderAsync(result, filterParameters.SortOrder);
 
-            int totalItems = await result.CountAsync();
-            
 
             int totalPages = (result.Count() + filterParameters.PageSize - 1) / filterParameters.PageSize;
             result = await Common<User>.PaginateAsync(result, filterParameters.PageNumber, filterParameters.PageSize);
@@ -59,7 +56,6 @@ namespace DataAccess.Repositories.Models
                 .FirstOrDefaultAsync();
 
             return user;
-         
         }
 
         public async Task<User> GetByUsernameAsync(string username)
@@ -119,7 +115,6 @@ namespace DataAccess.Repositories.Models
             await context.SaveChangesAsync();
             return userToUnblock;
         }
-
         public async Task<bool> PhoneNumberExistsAsync(string phoneNumber)
         {
             return await context.Users.AnyAsync(u => u.PhoneNumber == phoneNumber);
@@ -159,37 +154,39 @@ namespace DataAccess.Repositories.Models
         private async Task<IQueryable<User>> SortByAsync(IQueryable<User> result, string? sortCriteria)
         {
             if (Enum.TryParse<SortCriteria>(sortCriteria, true, out var sortEnum))
-
-            switch (sortEnum)
             {
-                case SortCriteria.Username:
-                    return await Task.FromResult(result.OrderBy(user => user.Username));
-                case SortCriteria.Email:
-                    return await Task.FromResult(result.OrderBy(user => user.Email));
-                case SortCriteria.PhoneNumber:
-                    return await Task.FromResult(result.OrderBy(user => user.PhoneNumber));
-                default:
-                    return await Task.FromResult(result);
+                switch (sortEnum)
+                {
+                    case SortCriteria.Username:
+                        return await Task.FromResult(result.OrderBy(user => user.Username));
+                    case SortCriteria.Email:
+                        return await Task.FromResult(result.OrderBy(user => user.Email));
+                    case SortCriteria.PhoneNumber:
+                        return await Task.FromResult(result.OrderBy(user => user.PhoneNumber));
+                    default:
+                        return await Task.FromResult(result);
+                }
             }
-
             else
             {
-                return await Task.FromResult(result);
+                return result;
             }
         }
         private async Task<IQueryable<User>> SortOrderAsync(IQueryable<User> result, string? sortOrder)
         {
-            if(Enum.TryParse<SortCriteria>(sortOrder, true, out var sortEnum))
-            switch (sortEnum)
+            if (Enum.TryParse<SortCriteria>(sortOrder, true, out var sortEnum))
             {
-                case SortCriteria.Desc:
-                    return await Task.FromResult(result.Reverse());
-                default:
-                    return await Task.FromResult(result);
+                switch (sortEnum)
+                {
+                    case SortCriteria.Desc:
+                        return await Task.FromResult(result.Reverse());
+                    default:
+                        return await Task.FromResult(result);
+                }
             }
             else
             {
-                return await Task.FromResult(result);
+                return result;
             }
         }
     }

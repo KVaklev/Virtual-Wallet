@@ -54,18 +54,22 @@ namespace Business.Services.Models
         {
             var result = new Response<PaginatedList<GetCreatedUserDto>>();
             var users = await this.userRepository.FilterByAsync(filterParameters);
+
             if (users.Count==0)
             {
                 result.IsSuccessful = false;
                 result.Message= NoUsersErrorMessage;
                 return result;
             }
+
             var userTotalPages=users.TotalPages;
             var userPageNumber=users.PageNumber;
+
             List<GetCreatedUserDto> userDtos = users
                     .Select(user => mapper.Map<GetCreatedUserDto>(user))
                     .ToList();
             result.Data = new PaginatedList<GetCreatedUserDto>(userDtos,userTotalPages,userPageNumber);
+
             return result;
         }
 
@@ -98,12 +102,14 @@ namespace Business.Services.Models
             var result = new Response<GetUserDto>();
 
             var user = await this.userRepository.GetByUsernameAsync(username);
+
             if (user == null)
             {
                 result.IsSuccessful = false;
                 result.Message = NoUsersErrorMessage;
                 return result;
             }
+
             var userDto = this.mapper.Map<GetUserDto>(user);
             result.Data = userDto;
 

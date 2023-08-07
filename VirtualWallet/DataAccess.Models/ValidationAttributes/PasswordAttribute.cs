@@ -18,27 +18,27 @@ namespace DataAccess.Models.ValidationAttributes
 
             if (password.Length < MinLength)
             {
-                return new ValidationResult($"Password must be at least {MinLength} characters long.");
+                return new ValidationResult(Constants.PasswordMinLengthErrorMessage);
             }
 
             if (!password.Any(char.IsLower))
             {
-                return new ValidationResult("Password must contain at least one lowercase letter.");
+                return new ValidationResult(Constants.PasswordLowerCaseErrorMessage);
             }
 
             if (!password.Any(char.IsUpper))
             {
-                return new ValidationResult("Password must contain at least one uppercase letter.");
+                return new ValidationResult(Constants.PasswordUpperCaseErrorMessage);
             }
 
             if (!password.Any(char.IsDigit))
             {
-                return new ValidationResult("Password must contain at least one digit.");
+                return new ValidationResult(Constants.PasswordDigitContainErrorMessage);
             }
 
             if (!password.Any(c => SpecialCharacters.Contains(c)))
             {
-                return new ValidationResult("Password must contain at least one special character.");
+                return new ValidationResult(Constants.PasswordSpecialCharacterContainErrorMessage);
             }
 
             return ValidationResult.Success;

@@ -30,7 +30,6 @@
 
   <ItemGroup>
     <Folder Include="Views\Transaction\" />
-    <Folder Include="Views\User\" />
   </ItemGroup>
 
 </Project>

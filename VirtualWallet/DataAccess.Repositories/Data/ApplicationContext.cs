@@ -29,7 +29,6 @@ namespace DataAccess.Repositories.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            //modelBuilder.ApplyConfiguration(new TransferConfiguration());
             modelBuilder.ApplyConfigurationsFromAssembly(this.GetType().Assembly);
             modelBuilder.SeedData();
         }
