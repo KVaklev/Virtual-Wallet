@@ -22,7 +22,15 @@ namespace DataAccess.Repositories.Models
                 .OrderBy(n => n.Name)
                 .AsQueryable();
 
-            return currencies ?? throw new EntityNotFoundException(Constants.NotFoundErrorMessage);
+            return currencies;
+
+        }
+        public async Task<Currency> CreateAsync(Currency currency)
+        {
+            context.AddAsync(currency);
+            await context.SaveChangesAsync();
+
+            return currency;
         }
 
         public async Task<Currency> GetByIdAsync(int id)
@@ -31,7 +39,7 @@ namespace DataAccess.Repositories.Models
                 .Where(c => c.Id == id)
                 .FirstOrDefaultAsync();
 
-            return currency ?? throw new EntityNotFoundException(Constants.NotFoundErrorMessage);
+            return currency;
         }
 
         public async Task<Currency> GetByCurrencyCodeAsync(string currencyCode)
@@ -39,17 +47,10 @@ namespace DataAccess.Repositories.Models
             var currency = await context.Currencies
                     .Where(c => c.CurrencyCode == currencyCode)
                     .FirstOrDefaultAsync();
- 
-            return currency ?? throw new EntityNotFoundException(Constants.NotFoundErrorMessage);
-        }
-
-        public async Task<Currency> CreateAsync(Currency currency)
-        {
-            context.Add(currency);
-            await context.SaveChangesAsync();
 
             return currency;
         }
+
 
         public async Task<bool> SaveChangesAsync()
         {
@@ -57,7 +58,7 @@ namespace DataAccess.Repositories.Models
             return true;
         }
 
-        public async Task<bool> DeleteAsync(int id) 
+        public async Task<bool> DeleteAsync(int id)
         {
             var currencyToDelete = await this.GetByIdAsync(id);
             currencyToDelete.IsDeleted = true;

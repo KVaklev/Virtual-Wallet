@@ -22,7 +22,7 @@ namespace Business.Services.Models
             this.currencyRepository = currencyRepository;
             this.mapper = mapper;
         }
-       
+
         public async Task<Response<CreateCurrencyDto>> CreateAsync(CreateCurrencyDto currencyDto, User loggedUser)
         {
             var result = new Response<CreateCurrencyDto>();
@@ -42,6 +42,7 @@ namespace Business.Services.Models
         public async Task<Response<bool>> DeleteAsync(int id, User loggedUser)
         {
             var result = new Response<bool>();
+
             if (!await Security.IsAdminAsync(loggedUser))
             {
                 result.IsSuccessful = false;
@@ -49,36 +50,87 @@ namespace Business.Services.Models
                 return result;
 
             }
+            var currencyExists = await this.currencyRepository.GetByIdAsync(id);
+
+            if (currencyExists == null)
+            {
+                result.IsSuccessful = false;
+                result.Message = Constants.CurrencyNotFoundErrorMessage;
+                return result;
+            }
             result.Data = await this.currencyRepository.DeleteAsync(id);
             result.Message = Constants.ModifyCurrencyDeleteMessage;
             return result;
         }
 
-        public IQueryable<CreateCurrencyDto> GetAll()
+        public Response<IQueryable<CreateCurrencyDto>> GetAll()
         {
-           var currencies = this.currencyRepository.GetAll();
-           var currenciesDto = currencies
-                     .Select(currency => mapper.Map<CreateCurrencyDto>(currency))
-                     .AsQueryable();
+            var result = new Response<IQueryable<CreateCurrencyDto>>();
 
-            return currenciesDto;
+            var currencies = this.currencyRepository.GetAll();
+
+            if(currencies.Count() == 0)
+            {
+                result.IsSuccessful = false;
+                result.Message = Constants.ModifyNoRecordsFound;
+                return result;
+            }
+            result.Data = currencies
+                      .Select(currency => mapper.Map<CreateCurrencyDto>(currency))
+                      .AsQueryable();
+
+            return result;
         }
 
-        public Task<Currency> GetByCurrencyCodeAsync(string currencyCode)
+        public async Task<Response<Currency>> GetByCurrencyCodeAsync(string currencyCode)
         {
-            return this.currencyRepository.GetByCurrencyCodeAsync(currencyCode);
+            var result = new Response<Currency>();
+
+            Currency currencyToGet = await currencyRepository.GetByCurrencyCodeAsync(currencyCode);
+
+            if(currencyToGet == null)
+            {
+                result.IsSuccessful = false;
+                result.Message = Constants.ModifyNoRecordsFound;
+                return result;
+            }
+
+            result.Data = currencyToGet;
+            return result;
         }
 
-        public async Task<CreateCurrencyDto> GetByIdAsync(int id)
+        public async Task<Response<CreateCurrencyDto>> GetByIdAsync(int id)
         {
-            var currency= await this.currencyRepository.GetByIdAsync(id);
-            var currencyDto = this.mapper.Map<CreateCurrencyDto>(currency);
-            return currencyDto;
+            var result = new Response<CreateCurrencyDto>(); 
+
+            Currency currencyToGet = await this.currencyRepository.GetByIdAsync(id);
+
+            if(currencyToGet == null)
+            {
+                result.IsSuccessful = false;
+                result.Message = Constants.ModifyNoRecordsFound;
+                return result;
+            }
+            var currencyDto = this.mapper.Map<CreateCurrencyDto>(currencyToGet);
+            result.Data = currencyDto;
+            return result;
         }
 
-        public async Task<Currency> GetCurrencyByIdAsync(int id)
+        public async Task<Response<Currency>> GetCurrencyByIdAsync(int id)
         {
-            return await this.currencyRepository.GetByIdAsync(id);
+            var result = new Response<Currency>();
+
+            Currency currencyToGet = await this.currencyRepository.GetByIdAsync(id);
+
+            if (currencyToGet == null)
+            {
+                result.IsSuccessful = false;
+                result.Message = Constants.ModifyNoRecordsFound;
+                return result;
+            }
+           
+            result.Data = currencyToGet;
+            return result;
         }
 
         public async Task<Response<CreateCurrencyDto>> UpdateAsync(int id, CreateCurrencyDto currencyDto, User loggedUser)
@@ -103,7 +155,7 @@ namespace Business.Services.Models
             var currency = this.mapper.Map<Currency>(currencyDto);
             var updatedCurrency = await CurrenciesMapper.MapUpdateAsync(currencyToUpdate, currency);
             this.currencyRepository.SaveChangesAsync();
-            result.Data= this.mapper.Map<CreateCurrencyDto>(updatedCurrency); 
+            result.Data = this.mapper.Map<CreateCurrencyDto>(updatedCurrency);
             return result;
         }
 

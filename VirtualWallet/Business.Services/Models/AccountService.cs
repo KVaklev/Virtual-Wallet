@@ -121,7 +121,7 @@ namespace Business.Services.Models
                 result.Message = Constants.CurrencyNotFoundErrorMessage;
                 return result;
             }
-            accountToCreate = await AccountsMapper.MapCreateDtoToAccountAsync(accountToCreate, currency, user);
+            accountToCreate = await AccountsMapper.MapCreateDtoToAccountAsync(accountToCreate, currency.Data, user);
             
             user.AccountId = user.Id;
             var createdAccount = await this.accountRepository.CreateAsync(accountToCreate);
