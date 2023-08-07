@@ -67,14 +67,16 @@ namespace Business.Services.Models
             {
                 if (await Security.IsAdminAsync(loggedUser))
                 {
-                    result.Data = cards;
+                    result.Data = (PaginatedList<GetCreatedCardDto>)cards.AsQueryable();
+                    return result;
                 }
+
                 else
                 {
                     cards = (PaginatedList<Card>)cards
                         .Where(a => a.Account.User.Username == loggedUser.Username)
                         .AsQueryable();
-                    result.Data = cards;
+                    result.Data = (PaginatedList<GetCreatedCardDto>)cards.AsQueryable();
                 }
             }
             else

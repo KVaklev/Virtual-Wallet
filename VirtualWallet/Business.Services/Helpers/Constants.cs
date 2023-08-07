@@ -86,6 +86,9 @@
         public const string CredentialsErrorMessage = "Username and/or Password not specified";
         public const string FailedLoginAtemptErrorMessage = "Nice try! Invalid credentials!";
         public const string NotConfirmedEmailErrorMessage = "Your email is not confirmed, please check your inbox folder and follow the link!";
+        public const string NotLoggedInErrorMessage = "Oops, it looks like you've stumbled upon a hidden treasure! " +
+                                                      "The menu you're trying to access is reserved for our lovely authenticated members. " +
+                                                      "Navigate to the upper right corner and unveil the magic. Either Login or Register!";
 
         public static class PropertyName
         {

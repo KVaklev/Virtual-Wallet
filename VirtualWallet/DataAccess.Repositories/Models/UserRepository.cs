@@ -33,6 +33,8 @@ namespace DataAccess.Repositories.Models
         {
             IQueryable<User> result = this.GetAll();
 
+            result = await FilterByFirstNameAsync(result, filterParameters.FirstName);
+            result = await FilterByLastNameAsync(result, filterParameters.LastName);
             result = await FilterByUsernameAsync(result, filterParameters.Username);
             result = await FilterByEmailAsync(result, filterParameters.Email);
             result = await FilterByPhoneNumberAsync(result, filterParameters.PhoneNumber);
@@ -126,6 +128,23 @@ namespace DataAccess.Repositories.Models
         public async Task<bool> UsernameExistsAsync(string username)
         {
             return await context.Users.AnyAsync(u => u.Username == username);
+        }
+
+        private async Task<IQueryable<User>> FilterByFirstNameAsync(IQueryable<User> result, string? firstName)
+        {
+            if (!string.IsNullOrEmpty(firstName))
+            {
+                result = result.Where(user => user.Username != null && user.FirstName == firstName);
+            }
+            return await Task.FromResult(result);
+        }
+        private async Task<IQueryable<User>> FilterByLastNameAsync(IQueryable<User> result, string? lastName)
+        {
+            if (!string.IsNullOrEmpty(lastName))
+            {
+                result = result.Where(user => user.Username != null && user.LastName == lastName);
+            }
+            return await Task.FromResult(result);
         }
         private async Task<IQueryable<User>> FilterByUsernameAsync(IQueryable<User> result, string? username)
         {
