@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace VirtualWallet.Controllers.MVC
 {
     [AllowAnonymous]
+    [Route("Account")]
     public class AccountController : Controller
     {
         private readonly IUserService userService;
@@ -27,7 +28,7 @@ namespace VirtualWallet.Controllers.MVC
             this.emailService = emailService;
         }
 
-        [HttpGet]
+        [HttpGet("login")]
         public IActionResult Login()
         {
             var loginViewModel = new LoginUserModel();
@@ -35,7 +36,7 @@ namespace VirtualWallet.Controllers.MVC
             return this.View(loginViewModel);
         }
 
-        [HttpPost]
+        [HttpPost("login")]
         public async Task<IActionResult> Login(LoginUserModel loginUserModel)
         {
            
@@ -44,32 +45,30 @@ namespace VirtualWallet.Controllers.MVC
                 return this.View(loginUserModel);
             }
 
-            var loggedUser = await this.userService.LoginAsync(loginUserModel.Username, loginUserModel.Password);
-           
+            var loggedUser = await this.userService.LoginAsync(loginUserModel.Username, loginUserModel.Password); 
                 if (!loggedUser.IsSuccessful)
                 {
                     this.ModelState.AddModelError(loggedUser.Error.InvalidPropertyName, loggedUser.Message);
                     return this.View(loginUserModel);
                 }
 
-            var result = await this.accountService.CreateApiTokenAsync(loggedUser.Data);
 
+            var result = await this.accountService.CreateApiTokenAsync(loggedUser.Data);
                 if (!result.IsSuccessful)
                 {
                     return BadRequest(result.Message);
                 }
 
-            Response.Cookies.Append("Cookie_JWT", result.Data.ToString(), new CookieOptions()
+            Response.Cookies.Append("Cookie_JWT", result.Data, new CookieOptions()
             {
                 HttpOnly = false,
                 SameSite = SameSiteMode.Strict
             });
 
-            //result.Message = Constants.SuccessfullLoggedInMessage; not needed?
             return RedirectToAction("Index", "Home");
         }
 
-        [HttpGet]
+        [HttpGet("logout")]
         public IActionResult Logout()
         {
             if (Request.Cookies["Cookie_JWT"] != null)
@@ -80,7 +79,7 @@ namespace VirtualWallet.Controllers.MVC
             return RedirectToAction("Index", "Home");
         }
 
-        [HttpGet]
+        [HttpGet("register")]
         public IActionResult Register()
         {
             var createUserModel = new CreateUserModel();
@@ -89,7 +88,7 @@ namespace VirtualWallet.Controllers.MVC
         }
 
  
-        [HttpPost]
+        [HttpPost("register")]
         public async Task<IActionResult> Register(CreateUserModel createUserModel)
         {
             if (!this.ModelState.IsValid)
@@ -108,6 +107,7 @@ namespace VirtualWallet.Controllers.MVC
             return await SendConfirmationEmailAsync(result.Data.Username);
         }
 
+        [HttpGet("confirm-email")]
         public async Task<IActionResult> SendConfirmationEmailAsync(string username)
         {
             var user = await this.userRepository.GetByUsernameAsync(username);
@@ -117,7 +117,7 @@ namespace VirtualWallet.Controllers.MVC
             {
                 return RedirectToAction("Register", "Account");
             }
-            var confirmationLink = Url.Action("confirm-registration", "api", new { userId = user.Id, token = generatedToken }, Request.Scheme);
+            var confirmationLink = Url.Action("confirm-registration", "Account", new { userId = user.Id, token = generatedToken }, Request.Scheme);
 
             var message = await this.emailService.BuildEmailAsync(user, confirmationLink);
 
@@ -126,12 +126,13 @@ namespace VirtualWallet.Controllers.MVC
             return RedirectToAction("SuccessfulRegistration", "Account");
         }
 
+        [HttpGet("successful-registration")]
         public IActionResult SuccessfulRegistration()
         {
 			return this.View();
 		}
 
-
+        //ToDo - fix messages if not confirmed
         [HttpGet("confirm-registration")]
         public async Task<IActionResult> ConfirmRegistrationAsync([FromQuery] int userId, [FromQuery] string token)
         {

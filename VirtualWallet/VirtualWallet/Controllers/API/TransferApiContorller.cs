@@ -19,18 +19,17 @@ namespace VirtualWallet.Controllers.API
     {
         private readonly ITransferService transferService;
         private readonly IUserService userService;
-        private readonly IUserRepository userRepository;
+
 
         public TransferApiContorller(
             ITransferService transferService,
-            IUserService userService,
-            IUserRepository userRepository
+            IUserService userService
             )
         {
 
             this.transferService = transferService;
             this.userService = userService;
-            this.userRepository = userRepository;
+
         }
 
         [HttpPost, Authorize]
@@ -52,13 +51,10 @@ namespace VirtualWallet.Controllers.API
                 {
                     return StatusCode(StatusCodes.Status404NotFound, result.Message);
                 }
-                else
-                {
-                    return BadRequest(result.Message);
-                }
+                return BadRequest(result.Message);
             }
 
-            return StatusCode(StatusCodes.Status201Created, result.Message);
+            return StatusCode(StatusCodes.Status201Created, result.Data);
 
         }
 
@@ -74,7 +70,7 @@ namespace VirtualWallet.Controllers.API
 
             var result = await this.transferService.FilterByAsync(filterParameters, loggedUser.Data);
 
-            return StatusCode(StatusCodes.Status200OK, result.Message);
+            return StatusCode(StatusCodes.Status200OK, result.Data);
 
         }
 
@@ -103,7 +99,7 @@ namespace VirtualWallet.Controllers.API
                     return BadRequest(result.Message);
                 }
             }
-            return StatusCode(StatusCodes.Status200OK, result.Message);
+            return StatusCode(StatusCodes.Status200OK, result.Data);
         }
 
 
@@ -128,7 +124,7 @@ namespace VirtualWallet.Controllers.API
                 return BadRequest(result.Message);
             }
 
-            return StatusCode(StatusCodes.Status200OK, result.Message);
+            return StatusCode(StatusCodes.Status200OK, result.Data);
 
         }
 
@@ -153,7 +149,7 @@ namespace VirtualWallet.Controllers.API
                 }
                 return BadRequest(result.Message);
             }
-            return StatusCode(StatusCodes.Status200OK, result.Message);
+            return StatusCode(StatusCodes.Status200OK, result.Data);
 
         }
 
@@ -178,7 +174,7 @@ namespace VirtualWallet.Controllers.API
                 return BadRequest(result.Message);
             }
 
-            return StatusCode(StatusCodes.Status200OK, result.Message);
+            return StatusCode(StatusCodes.Status200OK, result.Data);
         }
         private async Task<Response<User>> FindLoggedUserAsync()
         {
