@@ -9,6 +9,19 @@
     if (User.Claims.Any()) { isLogged = true; };
 }
 
+<script>
+    function toggleUserResults() {
+        var userResults = document.getElementById("userResults");
+        userResults.style.display = userResults.style.display === "none" ? "block" : "none";
+    }
+</script>
+
+<style>
+    #userResults {
+        display: none;
+    }
+</style>
+
 @{
 
  var parameters = new Dictionary<string, string>
@@ -136,7 +149,7 @@
                                             <input type="text" name="Username" placeholder="Username" class="form-control" style="height: 40px; max-width: 350px;" />
                                         </div>
                                         <div class="col-md-5">
-                                            <input type="submit" value="Search" class="btn-sm btn-primary btn-block" />
+                                            <input type="submit" value="Search" class="btn-sm btn-primary btn-block" onclick="toggleUserResults()" />
                                         </div>
                                     </div>
                                     <input type="text" name="Email" placeholder="Email" class="form-control mb-2" style="height: 40px; max-width: 350px;" />
@@ -145,28 +158,36 @@
                                   </div>
                             </div>
                        <div class="row">
-                           <div class="col-lg-12">
-                               @for (int i = 0; i < @Model.Users.Data.Count; i++)
-                                      {
-                                         var currentUser = @Model.Users.Data[i];
+                            <div class="col-lg-12">
+                                @{
+                                    bool isSearchClicked = !string.IsNullOrEmpty(Context.Request.Query["Username"]) ||
+                                    !string.IsNullOrEmpty(Context.Request.Query["Email"]) ||
+                                    !string.IsNullOrEmpty(Context.Request.Query["PhoneNumber"]);
+                                }
+                                @if (isSearchClicked)
+                                {
+                                    @for (int i = 0; i < @Model.Users.Data.Count; i++)
+                                    {
+                                        var currentUser = @Model.Users.Data[i];
                                         <div class="col-lg-12 mt-4">
-                                              <div class="transaction-list">
-                                                  <div class="transaction-item px-6 py-6" data-bs-toggle="modal" data-bs-target="#transaction-detail">
-                                                      <div class="row d-flex align-items-center flex-row">
-                                                           <div class="col-2 col-sm-3"><img src="~/images/profile-thumb-sm.jpg" class="rounded-circle" src="~/images/profile-thumb-sm.jpg" alt=""></div>
-                                                              <div class="col-12 col-sm-8 col-md-6">
-                                                                  <div class="d-flex flex-column">
-                                                                      <span class="text-3">@currentUser.FirstName @currentUser.LastName / <b>@currentUser.Username</b></span>
-                                                                      <span class="text-3">@currentUser.Email</span>
-                                                                      <span class="text-3">@currentUser.PhoneNumber</span>
-                                                                  </div>
-                                                              </div>
-                                                      </div>
-                                                  </div>
-                                              </div>
-                                          </div>
-                                      }
-                                     
+                                            <div class="transaction-list">
+                                                <div class="transaction-item px-6 py-6" data-bs-toggle="modal" data-bs-target="#transaction-detail">
+                                                    <div class="row d-flex align-items-center flex-row">
+                                                        <div class="col-2 col-sm-3"><img src="~/images/profile-thumb-sm.jpg" class="rounded-circle" src="~/images/profile-thumb-sm.jpg" alt=""></div>
+                                                        <div class="col-12 col-sm-8 col-md-6">
+                                                            <div class="d-flex flex-column">
+                                                                <span class="text-3">@currentUser.FirstName @currentUser.LastName / <b>@currentUser.Username</b></span>
+                                                                <span class="text-3">@currentUser.Email</span>
+                                                                <span class="text-3">@currentUser.PhoneNumber</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                }
+
                            </div>
                        </div>
                     </div>
