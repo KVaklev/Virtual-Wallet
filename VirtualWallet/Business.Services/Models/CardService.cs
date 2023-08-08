@@ -155,7 +155,7 @@ namespace Business.Services.Models
 
             var cardToCreate = new Card();
             var currency = await currencyService.GetByCurrencyCodeAsync(card.CurrencyCode);
-            cardToCreate = await CardsMapper.MapCreateDtoToCardAsync(accountId, cardToCreate, currency, card);
+            cardToCreate = await CardsMapper.MapCreateDtoToCardAsync(accountId, cardToCreate, currency.Data, card);
             var createdCard = await this.cardRepository.CreateAsync(accountId, cardToCreate);
             
             var cardDto = this.mapper.Map<GetCreatedCardDto>(createdCard);
@@ -187,7 +187,7 @@ namespace Business.Services.Models
             }
 
             var currency = await currencyService.GetCurrencyByIdAsync((int)cardToUpdate.CurrencyId);
-            cardToUpdate = await CardsMapper.MapUpdateDtoToCardAsync(cardToUpdate, updateCardDto, currency);
+            cardToUpdate = await CardsMapper.MapUpdateDtoToCardAsync(cardToUpdate, updateCardDto, currency.Data);
             cardToUpdate = await this.cardRepository.UpdateAsync(id, cardToUpdate);
 
             var cardDto = mapper.Map<GetUpdatedCardDto>(cardToUpdate);
