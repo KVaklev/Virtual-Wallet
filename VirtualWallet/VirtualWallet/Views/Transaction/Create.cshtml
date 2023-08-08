@@ -72,9 +72,15 @@
                   <span class="input-group-text">$</span>
                                 <input asp-for="CreateTransactionDto.Amount" type="number" class="form-control" data-bv-field="youSend" id="youSend" value="" placeholder="">
                   <span class="input-group-text p-0">
-                      <select asp-for="Curencies" asp-items="@Model.Curencies"  id="youSendCurrency" data-style="form-select bg-transparent border-0" data-container="body" data-live-search="true" class="selectpicker form-control bg-transparent" required="">
+                                    <select asp-for="CreateTransactionDto.CurrencyCode" id="youSendCurrency" data-style="form-select bg-transparent border-0" data-container="body" data-live-search="true" class="selectpicker form-control bg-transparent" required="">
                       <optgroup label="Popular Currency">
-                 
+                                            @{
+                                                foreach(var currency in Model.Currencies)
+                                                {
+                                                    
+                                                <option data-icon="currency-flag currency-flag-brl me-1" data-subtext="@Model.Currencies" value="">@Model.Currencies</option>
+                                                }
+                 }
                      
                       </optgroup>
                     </select>

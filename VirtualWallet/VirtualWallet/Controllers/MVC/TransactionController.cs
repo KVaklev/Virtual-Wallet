@@ -1,4 +1,5 @@
 ﻿using Business.DTOs.Requests;
+using Business.DTOs.Responses;
 using Business.Exceptions;
 using Business.QueryParameters;
 using Business.Services.Contracts;
@@ -8,6 +9,7 @@ using DataAccess.Repositories.Contracts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using System.Security.Claims;
 
 namespace VirtualWallet.Controllers.MVC
 {
@@ -66,7 +68,7 @@ namespace VirtualWallet.Controllers.MVC
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(CreateTransactionDto transactionDto)
+        public async Task<IActionResult> Create(CreateTransactionViewModel transactionDto)
         {
             var currencyResult = this.currencyService.GetAll();
             transactionDto.Currencies = currencyResult.Data;
@@ -85,7 +87,7 @@ namespace VirtualWallet.Controllers.MVC
             {
                 return await EntityErrorViewAsync(result.Message);
             }
-            return this.RedirectToAction("Execute", "Transaction", new { id = result.Data.Id });
+            return this.RedirectToAction("Execute", "Transaction", new { id = result.Data.Id});
         }
 
         [HttpGet]

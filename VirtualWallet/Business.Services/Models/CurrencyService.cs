@@ -63,9 +63,9 @@ namespace Business.Services.Models
             return result;
         }
 
-        public Response<IQueryable<CreateCurrencyDto>> GetAll()
+        public Response<List<CreateCurrencyDto>> GetAll()
         {
-            var result = new Response<IQueryable<CreateCurrencyDto>>();
+            var result = new Response<List<CreateCurrencyDto>>();
 
             var currencies = this.currencyRepository.GetAll();
 
@@ -77,7 +77,7 @@ namespace Business.Services.Models
             }
             result.Data = currencies
                       .Select(currency => mapper.Map<CreateCurrencyDto>(currency))
-                      .AsQueryable();
+                      .ToList();
 
             return result;
         }
