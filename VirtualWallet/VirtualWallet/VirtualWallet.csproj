@@ -28,4 +28,9 @@
     <ProjectReference Include="..\Business.ViewModels\Business.ViewModels.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Views\Transaction\" />
+    <Folder Include="wwwroot\UploadedImages\" />
+  </ItemGroup>
+
 </Project>
