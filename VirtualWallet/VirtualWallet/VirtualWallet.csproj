@@ -30,6 +30,7 @@
 
   <ItemGroup>
     <Folder Include="Views\Transaction\" />
+    <Folder Include="wwwroot\UploadedImages\" />
   </ItemGroup>
 
 </Project>

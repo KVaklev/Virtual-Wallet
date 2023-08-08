@@ -1,4 +1,8 @@
-﻿namespace DataAccess.Models.Models
+﻿using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
+
+namespace DataAccess.Models.Models
 {
     public class PaginatedList<T> : List<T>
     {
@@ -26,9 +30,9 @@
             }
         }
 
-        public static implicit operator PaginatedList<T>(PaginatedList<Card> v)
-        {
-            throw new NotImplementedException();
-        }
+        //public async Task<PaginatedList<T>> CreateAsync(IQueryable<T> result, int page, int pageSize)
+        //{
+        //    var totalCount = await result.CountAsync();
+        //}
     }
 }
