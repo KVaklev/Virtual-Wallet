@@ -1,4 +1,8 @@
-﻿namespace DataAccess.Models.Models
+﻿using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
+
+namespace DataAccess.Models.Models
 {
     public class PaginatedList<T> : List<T>
     {
@@ -25,5 +29,10 @@
                 return PageNumber < TotalPages;
             }
         }
+
+        //public async Task<PaginatedList<T>> CreateAsync(IQueryable<T> result, int page, int pageSize)
+        //{
+        //    var totalCount = await result.CountAsync();
+        //}
     }
 }

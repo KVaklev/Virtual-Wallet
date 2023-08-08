@@ -10,7 +10,7 @@ using System.Security.Claims;
 namespace VirtualWallet.Controllers.MVC
 {
     [Authorize]
-	[Route("User")]
+	[Route("users")]
 	public class UserController : Controller
     {
         private readonly IUserService userService;
