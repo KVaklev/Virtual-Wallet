@@ -130,7 +130,7 @@ namespace Business.Services.Helpers
         {
             bool isTransactionSender = true;
 
-            if (transaction.AccountSender.User.Id != userId)
+            if (transaction.AccountSenderId != userId)
             {
                 isTransactionSender = false;
             }
