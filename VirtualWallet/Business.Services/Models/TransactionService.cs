@@ -24,6 +24,7 @@ namespace Business.Services.Models
         private readonly IMapper mapper;
         private readonly IExchangeRateService exchangeRateService;
         private readonly IAccountService accountService;
+        private readonly IHistoryRepository historyRepository;
 
         public TransactionService(
             ITransactionRepository transactionRepository,
@@ -32,7 +33,8 @@ namespace Business.Services.Models
             ICurrencyRepository currencyRepository,
             IMapper mapper,
             IExchangeRateService exchangeRateService,
-            IAccountService accountService
+            IAccountService accountService,
+            IHistoryRepository historyRepository
             )
         {
             this.transactionRepository = transactionRepository;
@@ -42,6 +44,7 @@ namespace Business.Services.Models
             this.mapper = mapper;
             this.exchangeRateService = exchangeRateService;
             this.accountService = accountService;
+            this.historyRepository= historyRepository; ;
         }
         public async Task<Response<GetTransactionDto>> GetByIdAsync(int id, User loggedUser)
         {
@@ -81,11 +84,16 @@ namespace Business.Services.Models
             List<GetTransactionDto> transactionDtos = transactions
                     .Select(transaction => mapper.Map<GetTransactionDto>(transaction))
                     .ToList();
-            result.Data = new PaginatedList<GetTransactionDto>(transactionDtos,transactions.TotalPages,transactions.PageNumber);
+            result.Data = new PaginatedList<GetTransactionDto>(
+                transactionDtos,
+                transactions.TotalPages,
+                transactions.PageNumber);
             return result;
         }
 
-        public async Task<Response<GetTransactionDto>> CreateOutTransactionAsync(CreateTransactionDto transactionDto, User loggedUser)
+        public async Task<Response<GetTransactionDto>> CreateOutTransactionAsync(
+            CreateTransactionDto transactionDto, 
+            User loggedUser)
         {
             var result = new Response<GetTransactionDto>();
             if (loggedUser.IsBlocked)
@@ -168,8 +176,16 @@ namespace Business.Services.Models
                 return result;
             }
 
-            var newTransaction = await TransactionsMapper.MapDtoТоTransactionAsync(transactionDto, loggedUser, account, currency);
-            var updatedTransacion = await TransactionsMapper.MapUpdateDtoToTransactionAsync(transactionToUpdate, newTransaction);
+            var newTransaction = await TransactionsMapper.MapDtoТоTransactionAsync(
+                transactionDto, 
+                loggedUser, 
+                account, 
+                currency);
+
+            var updatedTransacion = await TransactionsMapper.MapUpdateDtoToTransactionAsync(
+                transactionToUpdate, 
+                newTransaction);
+
             await this.transactionRepository.SaveChangesAsync();
             result.Data = this.mapper.Map<GetTransactionDto>(updatedTransacion);
             return result;
@@ -301,7 +317,9 @@ namespace Business.Services.Models
         {
 
             int historyCount = await this.context.History.CountAsync();
-            await HistoryMapper.MapCreateWithTransactionAsync(transaction);
+            History history = await HistoryMapper.MapCreateWithTransactionAsync(transaction);
+            await this.historyRepository.CreateAsync(history);
+
             int newHistoryCount = await this.context.History.CountAsync();
 
             if (newHistoryCount == historyCount + 1)
