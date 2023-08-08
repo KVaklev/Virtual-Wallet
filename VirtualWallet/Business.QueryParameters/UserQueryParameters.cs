@@ -13,7 +13,7 @@ namespace Business.QueryParameters
         public string? SortOrder { get; set; }
         public bool? Admin { get; set; }
         public bool? Blocked { get; set; }
-        public int PageSize { get; set; } = 5;
+        public int PageSize { get; set; } = 4;
         public int PageNumber { get; set; } = 1;
 
     }
