@@ -4,6 +4,7 @@ using Business.Services.Contracts;
 using DataAccess.Models.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace VirtualWallet.Controllers.MVC
 {
@@ -28,8 +29,9 @@ namespace VirtualWallet.Controllers.MVC
         [HttpGet]
         public async Task<IActionResult> IndexAsync([FromQuery] HistoryQueryParameters parameters)
         {
-           
-            var loggedUserResponse = await FindLoggedUserAsync();
+
+            var loggedUserResponse = await GetLoggedUserAsync();
+        
             if (!loggedUserResponse.IsSuccessful)
             {
                 return await EntityErrorViewAsync(loggedUserResponse.Message);
@@ -42,17 +44,18 @@ namespace VirtualWallet.Controllers.MVC
 
                 return this.View(result);
         }
-        
-        private async Task<Response<User>> FindLoggedUserAsync()
+
+        private async Task<Response<User>> GetLoggedUserAsync()
         {
-            var loggedUsersUsername = User.Claims.FirstOrDefault(claim => claim.Type == "Username").Value;
-            var loggedUserResult = await this.userService.GetLoggedUserByUsernameAsync(loggedUsersUsername);
+            var loggedUsersUsername = User.FindFirst(ClaimTypes.Name);
+            var loggedUserResult = await this.userService.GetLoggedUserByUsernameAsync(loggedUsersUsername.Value);
+
             return loggedUserResult;
         }
 
         private async Task<IActionResult> EntityErrorViewAsync(string message)
         {
-           // this.HttpContext.Response.StatusCode = StatusCodes.Status404NotFound;
+           this.HttpContext.Response.StatusCode = StatusCodes.Status404NotFound;
             this.ViewData["ErrorMessage"] = message;
 
             return this.View("Error404");

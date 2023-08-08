@@ -1,5 +1,4 @@
-﻿@model Business.DTOs.Responses.GetTransactionDto
-<!-- Secondary menu
+﻿<!-- Secondary menu
   ============================================= -->
   <div class="bg-primary">
     <div class="container d-flex justify-content-center">
@@ -42,6 +41,7 @@
       </div>
       <h2 class="fw-400 text-center mt-3">Send Money</h2>
       <p class="lead text-center mb-4">You are sending money to <span class="fw-500">@Model.RecipientUsername.</span></p>
+      <p class="lead text-center mb-4">You are sending money to <span class="fw-500">@Model.Recipient.Username.</span></p>
       <div class="row">
         <div class="col-md-9 col-lg-7 col-xl-6 mx-auto">
           <div class="bg-white shadow-sm rounded p-3 pt-sm-4 pb-sm-5 px-sm-5 mb-4"> 
@@ -51,23 +51,25 @@
             <hr class="mx-n3 mx-sm-n5 mb-4">
             <div class="row g-3 align-items-center">
               <p class="col-sm-4 text-muted text-sm-end mb-0 mb-sm-3">Name:</p>
-              <p class="col-sm-8 text-3">Smith Rhodes</p>
+              <p class="col-sm-8 text-3">@Model.Recipient.FirstName @Model.Recipient.LastName</p>
             </div>
             <div class="row g-3 align-items-center">
               <p class="col-sm-4 text-muted text-sm-end mb-0 mb-sm-3">Email:</p>
-              <p class="col-sm-8 text-3">demo@gmail.com</p>
+              <p class="col-sm-8 text-3">@Model.Recipient.Email</p>
             </div>
+            
             <div class="row g-3 align-items-center">
-              <p class="col-sm-4 text-muted text-sm-end mb-0 mb-sm-3">Country:</p>
-              <p class="col-sm-8 text-3">Australia</p>
+                        <p class="col-sm-4 text-muted text-sm-end fw-500 mb-0 mb-sm-3">You Send:</p>
+              <p class="col-sm-8 text-4 fw-500">@Model.GetTransactionDto.Amount @Model.GetTransactionDto.CurrencyCode</p>
             </div>
-            <div class="row g-3 align-items-center">
-              <p class="col-sm-4 text-muted text-sm-end fw-500 mb-0 mb-sm-3">Requested Amount:</p>
-              <p class="col-sm-8 text-4 fw-500">@Model.Amount @Model.CurrencyCode</p>
-            </div>
+                    <div class="row g-3 align-items-center">
+                        <p class="col-sm-4 text-muted text-sm-end mb-0 mb-sm-3">Recipient Gets:</p>
+                        <p class="col-sm-8 text-4 fw-500">
+                            @Model.RecipientGetsAmount @Model.Recipient.Account.Currency.CurrencyCode</p>
+                    </div>
             <div class="row g-3 align-items-baseline">
               <p class="col-sm-4 text-muted text-sm-end mb-0 mb-sm-3">Description:</p>
-              <p class="col-sm-8 text-3">@Model.Direction</p>
+              <p class="col-sm-8 text-3">@Model.GetTransactionDto.Direction</p>
             </div>
             <form id="form-send-money" method="post">
               <div class="d-grid"><button class="btn btn-primary">Send Money</button></div>

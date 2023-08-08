@@ -52,7 +52,7 @@ namespace Business.Services.Models
                 result.Message = Constants.NoFoundResulte;
                 return result;
             }
-            if (!await Security.IsTransactionSenderAsync(transaction, loggedUser.Id) || !loggedUser.IsAdmin)
+            if (!await Security.IsTransactionSenderAsync(transaction, loggedUser.Id))
             {
                 result.IsSuccessful = false;
                 result.Message = Constants.ModifyAuthorizedErrorMessage;
