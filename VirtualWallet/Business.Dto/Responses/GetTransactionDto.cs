@@ -4,6 +4,7 @@ namespace Business.DTOs.Responses
 {
     public class GetTransactionDto
     {
+        public int Id { get; set; }
         public string SenderUsername { get; set; }
         public string RecipientUsername { get; set; }
         public DateTime Date { get; set; }

@@ -26,16 +26,16 @@ namespace DataAccess.Models.Models
         public async Task<Response<ExchangeRate>> GetExchangeRateDataAsync(string fromCurrencyCode, string toCurrencyCode)
         {
             var result = new Response<ExchangeRate>();
-            
+
             try
             {
                 string endOfUrl = fromCurrencyCode.ToLower() + "/" + toCurrencyCode.ToLower() + ".json";
                 HttpResponseMessage response = await httpClient.GetAsync(endOfUrl);//eur/usd.json
                 string jsonResponse = await response.Content.ReadAsStringAsync();
                 ExchangeRate exchangeRateData = JsonConvert.DeserializeObject<ExchangeRate>(jsonResponse);
-                
+
                 string currencyValue = jsonResponse.Substring(39, 8).ToString();
-                if (currencyValue==null)
+                if (currencyValue == null)
                 {
                     result.IsSuccessful = false;
                     result.Message = Constants.NoFoundResulte;
@@ -43,36 +43,49 @@ namespace DataAccess.Models.Models
                 }
                 exchangeRateData.CurrencyValue = decimal.Parse(currencyValue, CultureInfo.InvariantCulture); ;
 
-              
+
                 result.IsSuccessful = true;
                 result.Data = exchangeRateData;
                 return result;
             }
             //todo
-            catch (HttpRequestException ex)
-            {  
+            catch (HttpRequestException)
+            {
                 result.IsSuccessful = false;
                 result.Message = Constants.NoHostError;
                 return result;
             }
-            catch (JsonException ex)
+            catch (JsonException)
             {
                 result.IsSuccessful = false;
                 result.Message = Constants.JsonDeserializationError;
+                return result;
+            }
+            catch (ArgumentOutOfRangeException)
+            {
+                result.IsSuccessful = false;
+                result.Message = Constants.ArgumentOutOfRangeError;
                 return result;
             }
         }
         public async Task<Response<decimal>> ExchangeAsync(decimal amount, string fromCurrencyCode, string toCurrencyCode)
         {
             var result = new Response<decimal>();
-            var exchangeRateDataResult = await GetExchangeRateDataAsync(fromCurrencyCode, toCurrencyCode);
-            if (!exchangeRateDataResult.IsSuccessful)
+            if (fromCurrencyCode == toCurrencyCode)
             {
-                result.IsSuccessful = false;
-                result.Message = exchangeRateDataResult.Message;
-                return result;
+                result.Data = amount;
             }
-             result.Data= amount *= exchangeRateDataResult.Data.CurrencyValue;
+            else
+            {
+                var exchangeRateDataResult = await GetExchangeRateDataAsync(fromCurrencyCode, toCurrencyCode);
+                if (!exchangeRateDataResult.IsSuccessful)
+                {
+                    result.IsSuccessful = false;
+                    result.Message = exchangeRateDataResult.Message;
+                    return result;
+                }
+                result.Data = amount *= exchangeRateDataResult.Data.CurrencyValue;
+            }
             return result;
         }
     }

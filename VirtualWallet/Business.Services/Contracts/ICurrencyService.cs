@@ -7,7 +7,7 @@ namespace Business.Services.Contracts
 {
     public interface ICurrencyService
     {
-        Response<IQueryable<CreateCurrencyDto>> GetAll();
+        Response<List<CreateCurrencyDto>> GetAll();
         Task<Response<CreateCurrencyDto>> GetByIdAsync(int id);
         Task<Response<Currency>> GetCurrencyByIdAsync(int id);
         Task<Response<Currency>> GetByCurrencyCodeAsync(string id);

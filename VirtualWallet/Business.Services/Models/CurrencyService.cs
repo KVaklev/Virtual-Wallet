@@ -34,7 +34,7 @@ namespace Business.Services.Models
             }
             var currency = this.mapper.Map<Currency>(currencyDto);
             var newCurrency = await this.currencyRepository.CreateAsync(currency); //not used, should we remove this?
-            var newCurrencyDto = this.mapper.Map<CreateCurrencyDto>(currency);
+            var newCurrencyDto = this.mapper.Map<CreateCurrencyDto>(newCurrency);
             result.Data = newCurrencyDto;
             return result;
         }
@@ -63,9 +63,9 @@ namespace Business.Services.Models
             return result;
         }
 
-        public Response<IQueryable<CreateCurrencyDto>> GetAll()
+        public Response<List<CreateCurrencyDto>> GetAll()
         {
-            var result = new Response<IQueryable<CreateCurrencyDto>>();
+            var result = new Response<List<CreateCurrencyDto>>();
 
             var currencies = this.currencyRepository.GetAll();
 
@@ -77,7 +77,7 @@ namespace Business.Services.Models
             }
             result.Data = currencies
                       .Select(currency => mapper.Map<CreateCurrencyDto>(currency))
-                      .AsQueryable();
+                      .ToList();
 
             return result;
         }

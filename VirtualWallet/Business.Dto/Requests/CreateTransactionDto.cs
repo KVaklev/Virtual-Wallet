@@ -5,12 +5,14 @@ namespace Business.DTOs.Requests
 {
     public class CreateTransactionDto
     {
+
+
         [Required(ErrorMessage = Constants.EmptyFieldErrorMessage)]
         [MinLength(Constants.UsernameMinLength, ErrorMessage = Constants.MinLengthErrorMessage)]
         [MaxLength(Constants.UsernameMaxLength, ErrorMessage = Constants.MaxLengthErrorMessage)]
         public string RecepientUsername { get; set; }
 
-        [Required(ErrorMessage = Constants.EmptyFieldErrorMessage)]
+        
         [Range(Constants.MinAmount, Constants.MaxAmount, ErrorMessage = Constants.RangeFieldErrorMessage)]
         public decimal Amount { get; set; }
 

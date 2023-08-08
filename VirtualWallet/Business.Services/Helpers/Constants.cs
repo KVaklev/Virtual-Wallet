@@ -105,6 +105,7 @@
         public const string NoFoundResulte = "No found result.";
         public const string NoHostError= "No such host is known.";
         public const string JsonDeserializationError = "JSON Deserialization Error";
+        public const string ArgumentOutOfRangeError = "Index and length must refer to a location within the string.";
 
     }
 
