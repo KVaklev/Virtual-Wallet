@@ -36,7 +36,7 @@
                     <aside class="col-lg-3">
                     <div class="bg-white shadow-sm rounded text-center p-3 mb-4">
                         <div class="profile-thumb mt-3 mb-4">
-                                <img class="rounded-circle" src="@Url.Content("~/UploadedImages/" + @username.Value + ".png")" alt="">
+                                <img class="rounded-circle" src="~/images/profile-thumb-sm.jpg" alt="">
                                 <p class="text-black opacity-12 mb-4">
                                     Hello, <b>@username.Value</b>! <br>
                                  @DateTime.Now.DayOfWeek, @DateTime.Now.Date.ToShortDateString()<p>
@@ -54,7 +54,7 @@
                                         <input type="text" name="Username" placeholder="Username" class="form-control me-1" style="max-width: 150px; height: 40px;" />
                                         <input type="text" name="Email" placeholder="Email" class="form-control me-1" style="max-width: 150px; height: 40px;" />
                                         <input type="text" name="PhoneNumber" placeholder="Phone number" class="form-control me-1" style="max-width: 150px; height: 40px;" />
-                                        <input type="submit" value="Search" class="btn btn-primary ms-auto" />
+                                        <input type="submit" value="Search" class="btn btn-primary btn-sm ms-auto" />
                                     </div>
                                     <div class="d-flex">
                                         <span class="form-check-inline me-4">
@@ -64,39 +64,49 @@
                                             <input type="checkbox" name="Blocked" value="true" class="form-check-input" /> Blocked
                                         </span>
                                     </div>
+                                    <br>
                                 </form>
+                            </div>
+                        </div>
+
+                    <div class="row">
+                        <div class="col-lg-12">
+
+                                @for (int i = 0; i < @Model.Users.Data.Count; i++)
+                                {
+                                    var currentUser = @Model.Users.Data[i];
+                                    <div class="col-lg-12">
+                                        <div class="transaction-list">
+                                            <div class="transaction-item px-2 py-2" data-bs-toggle="modal" data-bs-target="#transaction-detail">
+                                                <div class="row d-flex align-items-center flex-row bg-white">
+                                                    <div class="col-2 col-sm-1">
+                                                        <img src="~/images/profile-thumb-sm.jpg" class="rounded-circle" alt="">
+                                                    </div>
+                                                    <div class="col-4 col-sm-4">
+                                                        <!-- Adjusted column width -->
+                                                        <span class="d-block text-2 mt-2">@currentUser.FirstName @currentUser.LastName / <b>@currentUser.Username</b></span>
+                                                        <span class="d-block text-2">@currentUser.Email</span>
+                                                        <span class="d-block text-2">@currentUser.PhoneNumber</span>
+                                                        <span>@((currentUser.IsAdmin) ? "Admin" : "Regular User")</span>
+                                                    </div>
+                                                    <div class="col-4 col-sm-4">
+                                                        <!-- Adjusted column width -->
+                                                        <div class="d-flex justify-content-end">
+                                                            <a asp-controller="Users" asp-action="Details" asp-route-id="@currentUser.Id" class="btn btn-primary btn-sm me-3">Details</a>
+                                                            <a asp-controller="Users" asp-action="Edit" asp-route-id="@currentUser.Id" class="btn btn-warning btn-sm me-3">Edit</a>
+                                                            <a asp-controller="Users" asp-action="Delete" asp-route-id="@currentUser.Id" class="btn btn-danger btn-sm">Delete</a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-
-            @for (int i = 0; i < @Model.Users.Data.Count; i++)
-            {
-                var currentUser = @Model.Users.Data[i];
-                    <div class="transaction-list">
-                        <div class="transaction-item px-2 py-2" data-bs-toggle="modal" data-bs-target="#transaction-detail">
-                            <div class="row d-flex align-items-center flex-row">
-                                <div class="col-2 col-sm-1">
-                                    <img src="~/images/profile-thumb-sm.jpg" class="rounded-circle" src="~/images/profile-thumb-sm.jpg" alt="">
-                                </div>
-                                <div class="col-2 col-sm-2">
-                                    <span class="d-block text-2">@currentUser.FirstName @currentUser.LastName <b>@currentUser.Username</b></span>
-                                    <span class="d-block text-2">@currentUser.Email</span>
-                                    <span class="d-block text-2">@currentUser.PhoneNumber</span>
-                                    <span>@((currentUser.IsAdmin) ? "Admin" : "Regular User")</span>
-                                </div>
-                                <div class="col-2 col-sm-1">
-                                    <div class="d-flex flex-row align-items-center">
-                                        <a asp-controller="Users" asp-action="Details" asp-route-id="@currentUser.Id" class="btn btn-primary btn-sm me-1">Details</a>
-                                        <a asp-controller="Users" asp-action="Edit" asp-route-id="@currentUser.Id" class="btn btn-warning btn-sm me-1">Edit</a>
-                                        <a asp-controller="Users" asp-action="Delete" asp-route-id="@currentUser.Id" class="btn btn-danger btn-sm">Delete</a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-            }
         }
         else
         {
@@ -162,22 +172,24 @@
         string prevButtonState = this.Model.Users.Data.HasNextPage ? "" : "disabled";
         string nextButtonState = this.Model.Users.Data.HasNextPage ? "" : "disabled";
     }
-
+    <div class="d-flex justify-content-center margin: 5px">
     <a asp-controller="Users" asp-action="Index" asp-all-route-data="@parameters" asp-route-PageNumber="@(this.Model.Users.Data.PageNumber-1)" class="btn btn-link @prevButtonState">Prev</a>
-
+        <div class="d-flex align-items-center">
     @{
         int currentPageNumber = this.Model.Users.Data.PageNumber;
         for (int i = 1; i <= this.Model.Users.Data.TotalPages; i++)
         {
             if (i == currentPageNumber)
             {
-                <span>@i</span>
+                <span class="btn m-1">@i</span>
             }
             else
             {
-                <span><a asp-controller="Users" asp-all-route-data="@parameters" asp-action="Index" asp-route-PageNumber="@i">@i</a></span>
+                <span><a asp-controller="Users" asp-all-route-data="@parameters" asp-action="Index" asp-route-PageNumber="@i" class=" btn btn-link m-1">@i</a></span>
             }
         }
     }
+    </div>
     <a asp-controller="Users" asp-action="Index" asp-all-route-data="@parameters" asp-route-PageNumber="@(this.Model.Users.Data.PageNumber+1)" class="btn btn-link @nextButtonState">Next</a>
+    </div>
 </body>
