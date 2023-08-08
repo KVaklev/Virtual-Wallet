@@ -2,7 +2,6 @@
 
 @{
     this.ViewData["Title"] = "Speed Pay - About us";
-
     var username = User.FindFirst(ClaimTypes.Name);
     var loggedUserId = User.FindFirst(ClaimTypes.NameIdentifier);
     var isAdmin = User.FindFirst("IsAdmin");
@@ -26,21 +25,21 @@
 }
 <body>
 
-    <h2>Users</h2>
+    <h5 class="fw-400 d-flex align-items-center nav-link"></h5>
 
-    <h5>Find user by:</h5>
     <form asp-controller="Users" asp-action="Index" method="get">
         <input type="text" name="Firstname" placeholder="First name" />
         <input type="text" name="Lastname" placeholder="Last name" />
+        <input type="text" name="Username" placeholder="Username" />
         <input type="text" name="Email" placeholder="Email" />
         <input type="number" name="PhoneNumber" placeholder="Pnone number" />
-        <input type="text" name="Username" placeholder="Username" />
-        <span style="margin-right: 20px;"></span>
-        <input type="checkbox" name="Admin" value="true" /> Admin
-        <span style="margin-right: 20px;"></span>
 
-        @if (isLogged)
+
+        @if (isAdmin.Value == "True")
         {
+            <span>
+                <input type="checkbox" name="Admin" value="true" /> Admin
+            </span>
             <span>
                 <input type="checkbox" name="Blocked" value="true" /> Blocked
             </span>
@@ -51,45 +50,52 @@
         <br />
     </form>
 
-    <div class="table-responsive">
-        <table class="table table-bordered table-condensed table-hover">
-            <thead class="table-dark">
-                <tr>
-                    <th>First name</th>
-                    <th>Last name</th>
-                    <th class="text-center">Email</th>
-                    <th class="text-center">Username</th>
-                    <th class="text-center">Phone number</th>
-                    <th class="text-center">Role</th>
-                    <th class="text-center">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                @for (int i = 0; i < @Model.Users.Data.Count; i++)
-                {
-                        var currentUser = @Model.Users.Data[i];
-                        <tr>
-                            <td>@currentUser.FirstName</td>
-                            <td>@currentUser.LastName</td>
-                            <td>@currentUser.Email</td>
-                            <td>@currentUser.Username</td>
-                            <td>@currentUser.PhoneNumber</td>
-                        <td class="text-center">@(currentUser.IsAdmin ? "Admin" : "Regular User")</td>
-                        <td class="text-center">
-                            <a asp-controller="Users" asp-action="Details" asp-route-id="@currentUser.Id" class="btn btn-primary">Details</a>
-                            @if (isLogged)
-                            {
-                                <span>|</span>
-                                <a asp-controller="Users" asp-action="Edit" asp-route-id="@currentUser.Id" class="btn btn-warning">Edit</a>
-                                <span>|</span>
-                                <a asp-controller="Users" asp-action="Delete" asp-route-id="@currentUser.Id" class="btn btn-danger">Delete</a>
-                            }
-                        </td>
-                    </tr>
+        @for (int i = 0; i < @Model.Users.Data.Count; i++)
+        {
+            var currentUser = @Model.Users.Data[i];
+
+                if (isAdmin.Value == "True")
+                      {
+            <div class="transaction-list">
+                <div class="transaction-item px-2 py-2" data-bs-toggle="modal" data-bs-target="#transaction-detail">
+                    <div class="row d-flex align-items-center flex-row">
+                        <div class="col-2 col-sm-1">
+                            <img src="@Url.Content("~/UploadedImages/" + username + ".png")" class="rounded-circle" src="~/images/profile-thumb-sm.jpg" alt="">
+                        </div>
+                        <div class="col-2 col-sm-2">
+                            <span class="d-block text-2">@currentUser.FirstName @currentUser.LastName</span>
+                            <span class="d-block text-2">@currentUser.Username</span>
+                            <span class="d-block text-2">@currentUser.Email</span>
+                            <span class="d-block text-2">@currentUser.PhoneNumber</span>
+                            <span>@((currentUser.IsAdmin) ? "Admin" : "Regular User")</span>
+                        </div>
+                        <div class="col-2 col-sm-1">
+                            <div class="d-flex flex-row align-items-center">
+                                <a asp-controller="Users" asp-action="Details" asp-route-id="@currentUser.Id" class="btn btn-primary btn-sm me-1">Details</a>
+                                <a asp-controller="Users" asp-action="Edit" asp-route-id="@currentUser.Id" class="btn btn-warning btn-sm me-1">Edit</a>
+                                <a asp-controller="Users" asp-action="Delete" asp-route-id="@currentUser.Id" class="btn btn-danger btn-sm">Delete</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+                      }
+                else
+                      {
+                          <div class="transaction-list">
+                              <div class="transaction-item px-2 py-2" data-bs-toggle="modal" data-bs-target="#transaction-detail">
+                                  <div class="row d-flex align-items-center flex-row">
+                                      <div class="col-2 col-sm-1"><img src="@Url.Content("~/UploadedImages/" + username + ".png")" class="rounded-circle" src="~/images/profile-thumb-sm.jpg" alt=""></div>
+                                      <div class="col-2 col-sm-2"><span class="d-block text-2">@currentUser.FirstName @currentUser.LastName</span></div>
+                                      <div class="col-2 col-sm-2"><span class="d-block text-2">@currentUser.Username</span></div>
+                                      <div class="col-2 col-sm-2"><span class="d-block text-2">@currentUser.Email</span></div>
+                                      <div class="col-2 col-sm-1"><span class="d-block text-2">@currentUser.PhoneNumber</span></div>
+                                  </div>
+                              </div>
+                          </div>
                 }
-            </tbody>
-        </table>
-    </div>
+        }
+
     @{
         string prevButtonState = this.Model.Users.Data.HasNextPage ? "" : "disabled";
         string nextButtonState = this.Model.Users.Data.HasNextPage ? "" : "disabled";
@@ -99,7 +105,6 @@
 
     @{
         int currentPageNumber = this.Model.Users.Data.PageNumber;
-
         for (int i = 1; i <= this.Model.Users.Data.TotalPages; i++)
         {
             if (i == currentPageNumber)
@@ -110,10 +115,7 @@
             {
                 <span><a asp-controller="Users" asp-all-route-data="@parameters" asp-action="Index" asp-route-PageNumber="@i">@i</a></span>
             }
-
         }
     }
     <a asp-controller="Users" asp-action="Index" asp-all-route-data="@parameters" asp-route-PageNumber="@(this.Model.Users.Data.PageNumber+1)" class="btn btn-link @nextButtonState">Next</a>
-
-
 </body>
