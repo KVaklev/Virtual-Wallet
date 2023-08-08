@@ -1,8 +1,11 @@
-﻿@model Business.ViewModels.CreateTransactionViewModel
+﻿@using DataAccess.Models.Models;
+@model Business.ViewModels.CreateTransactionViewModel
 
 
 @{
     this.ViewData["Title"] = "Speed Pay - Quick and Trustworthy Money Transfers ";
+    var currencies = JsonSerializer.Deserialize<List<Currency>>(TempData.Peek("Currencies").ToString());
+    ;
 }
 
 <head>
@@ -63,8 +66,8 @@
                     <form asp-controller="Transaction" asp-action="Create" id="form-send-money" method="post">
               <div class="mb-3">
                 <label for="emailID" class="form-label">Recipient</label>
-                <input asp-for="CreateTransactionDto.RecepientUsername"  type="text" value="" class="form-control" data-bv-field="emailid" id="emailID" required placeholder="Enter Username">
-                            <span asp-validation-for="CreateTransactionDto.RecepientUsername" class="error-message"></span>
+                <input asp-for="CreateTransactionDto.RecipientUsername"  type="text" value="" class="form-control" data-bv-field="emailid" id="emailID" required placeholder="Enter Username">
+                            <span asp-validation-for="CreateTransactionDto.RecipientUsername" class="error-message"></span>
                         </div>
               <div class="mb-3">
                 <label for="youSend" class="form-label">You Send</label>
@@ -73,11 +76,11 @@
                   <input asp-for="CreateTransactionDto.Amount" type="number" class="form-control" data-bv-field="youSend" id="youSend" value="" placeholder="">
                   <span class="input-group-text p-0">
                                     <select asp-for="CreateTransactionDto.CurrencyCode" id="youSendCurrency" data-style="form-select bg-transparent border-0" data-container="body" data-live-search="true" class="selectpicker form-control bg-transparent" required="">
-                                        <optgroup label="Popular Currency">
-                                            @foreach(var currency in @Model.Currencies)
+                                        <optgroup  label="Popular Currency">
+                                            @foreach (var currency in currencies)
                                             {
-                                                
-                              <option data-icon="currency-flag currency-flag-inr me-1" data-subtext="@currency.Name " value="">@currency.CurrencyCode</option>
+
+                                                <option data-icon="currency-flag currency-flag-inr me-1" data-subtext="@currency.Name " value="@currency.CurrencyCode">@currency.CurrencyCode</option>
 
                                             }
                                         </optgroup>

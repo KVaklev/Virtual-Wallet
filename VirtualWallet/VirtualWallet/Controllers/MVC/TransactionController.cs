@@ -1,6 +1,8 @@
-﻿using Business.DTOs.Requests;
+﻿using AutoMapper;
+using Business.DTOs.Requests;
 using Business.DTOs.Responses;
 using Business.Exceptions;
+using Business.Mappers;
 using Business.QueryParameters;
 using Business.Services.Contracts;
 using Business.ViewModels;
@@ -11,6 +13,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Security.Claims;
 using System.Security.Cryptography.Xml;
+using System.Text.Json;
 
 namespace VirtualWallet.Controllers.MVC
 {
@@ -21,17 +24,20 @@ namespace VirtualWallet.Controllers.MVC
         private readonly IUserService userService;
         private readonly ICurrencyService currencyService;
         private readonly IExchangeRateService exchangeRateService;
+        private readonly IMapper mapper;
 
         public TransactionController(
             ITransactionService transactionService,
             IUserService userService,
             ICurrencyService currencyService,
-            IExchangeRateService exchangeRateService)
+            IExchangeRateService exchangeRateService,
+            IMapper mapper)
         {
             this.transactionService = transactionService;
             this.userService = userService;
             this.currencyService = currencyService;
             this.exchangeRateService = exchangeRateService;
+            this.mapper = mapper;
         }
 
 
@@ -63,22 +69,19 @@ namespace VirtualWallet.Controllers.MVC
             {
                 return await EntityErrorViewAsync(result.Message);
             }
-            createTransactionViewModel.Currencies = result.Data;
-           
+            
+            TempData["Currencies"] = JsonSerializer.Serialize(result.Data);
             return this.View(createTransactionViewModel);
         }
 
         [HttpPost]
         public async Task<IActionResult> Create(CreateTransactionViewModel transactionDto)
         {
-            var currencyResult = this.currencyService.GetAll();
-            transactionDto.Currencies = currencyResult.Data;
-            transactionDto.CreateTransactionDto.CurrencyCode = "USD";
-                //if (!this.ModelState.IsValid)
-                //{
-                //    return this.View(transactionDto);
-                //}
-                var loggedUserResult = await GetLoggedUserAsync();
+            if (!this.ModelState.IsValid)
+            {
+                return this.View(transactionDto);
+            }
+            var loggedUserResult = await GetLoggedUserAsync();
                 if (!loggedUserResult.IsSuccessful)
                 {
                     return await EntityErrorViewAsync(loggedUserResult.Message);
@@ -92,33 +95,38 @@ namespace VirtualWallet.Controllers.MVC
         }
 
         [HttpGet]
-        public async Task<IActionResult> Edit([FromRoute] int id)
+        public async Task<IActionResult> Update([FromRoute] int id)
         {
-            try
+
+            var loggedUserResult = await GetLoggedUserAsync();
+            if (!loggedUserResult.IsSuccessful)
             {
-                var loggedUserResult = await GetLoggedUserAsync();
-                if (!loggedUserResult.IsSuccessful)
-                {
-                    return await EntityErrorViewAsync(loggedUserResult.Message);
-                }
-                var result = await this.transactionService.GetByIdAsync(id, loggedUserResult.Data);
-                if (!result.IsSuccessful)
-                {
-                    return await EntityErrorViewAsync(result.Message);
-                }
-                return this.View(result.Data);
+                return await EntityErrorViewAsync(loggedUserResult.Message);
             }
-            catch (EntityNotFoundException ex)
+            var transactionResult = await this.transactionService.GetByIdAsync(id, loggedUserResult.Data);
+            if (!transactionResult.IsSuccessful)
             {
-                return await EntityErrorViewAsync(ex.Message);
+                return await EntityErrorViewAsync(transactionResult.Message);
             }
+
+            var createTransactionViewModel = new CreateTransactionViewModel();
+            createTransactionViewModel.CreateTransactionDto = await TransactionsMapper.MapGetDtoToCreateDto(transactionResult.Data);
+
+            var currencyResult = this.currencyService.GetAll();
+            if (!currencyResult.IsSuccessful)
+            {
+                return await EntityErrorViewAsync(currencyResult.Message);
+            }
+            TempData["Currencies"] = JsonSerializer.Serialize(currencyResult.Data);
+            return this.View(createTransactionViewModel);
+           
+            
         }
 
         [HttpPost]
-        public async Task<IActionResult> EditAsync([FromRoute] int id, CreateTransactionDto transactionDto)
+        public async Task<IActionResult> Update([FromRoute] int id, CreateTransactionDto transactionDto)
         {
-            try
-            {
+            
                 if (!this.ModelState.IsValid)
                 {
                     return View(transactionDto);
@@ -134,11 +142,7 @@ namespace VirtualWallet.Controllers.MVC
                     return await EntityErrorViewAsync(result.Message);
                 }
                 return this.RedirectToAction("Index", "Transaction", new { Username = loggedUserResult.Data.Username });
-            }
-            catch (EntityNotFoundException ex)
-            {
-                return await EntityErrorViewAsync(ex.Message);
-            }
+            
         }
 
         [HttpGet]

@@ -95,7 +95,7 @@ namespace Business.Services.Models
                 return result;
             }
             
-            var account = await accountRepository.GetByUsernameAsync(transactionDto.RecepientUsername);
+            var account = await accountRepository.GetByUsernameAsync(transactionDto.RecipientUsername);
             if (account == null) 
             {
                 result.IsSuccessful = false;
@@ -153,7 +153,7 @@ namespace Business.Services.Models
                 result.Message = Constants.ModifyAccountBalancetErrorMessage;
                 return result;
             }
-            var account = await accountRepository.GetByUsernameAsync(transactionDto.RecepientUsername);
+            var account = await accountRepository.GetByUsernameAsync(transactionDto.RecipientUsername);
             if (account == null)
             {
                 result.IsSuccessful = false;
@@ -255,21 +255,20 @@ namespace Business.Services.Models
         private async Task<Response<Transaction>> CreateInTransactionAsync(Transaction transaction)
         {
             var result = new Response<Transaction>();
-            var exchangeAmountResult = new Response<decimal>();
-            if (transaction.Currency.CurrencyCode != transaction.AccountRecipient.Currency.CurrencyCode)
-            {
-              exchangeAmountResult = await this.exchangeRateService
+
+            var exchangeAmountResult = await this.exchangeRateService
                     .ExchangeAsync(
                   transaction.Amount, 
                   transaction.Currency.CurrencyCode, 
                   transaction.AccountRecipient.Currency.CurrencyCode);
+
                 if (!exchangeAmountResult.IsSuccessful)
                 {
                     result.IsSuccessful = false;
                     result.Message = exchangeAmountResult.Message;
                     return result;
                 } 
-            }
+            
             var transactionIn = await TransactionsMapper.MapCreateDtoToTransactionInAsync(transaction, exchangeAmountResult.Data);
             await this.transactionRepository.CreateTransactionAsync(transactionIn);
             result.Data = transactionIn;

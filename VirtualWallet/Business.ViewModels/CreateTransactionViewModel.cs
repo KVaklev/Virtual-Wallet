@@ -10,6 +10,5 @@ namespace Business.ViewModels
     {
         public CreateTransactionDto CreateTransactionDto { get; set; }
 
-        public List<CreateCurrencyDto> Currencies { get; set; }
     }
 }
