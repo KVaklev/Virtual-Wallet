@@ -100,7 +100,7 @@
                                                         <span class="d-block text-2 mt-2">@currentUser.FirstName @currentUser.LastName / <b>@currentUser.Username</b></span>
                                                         <span class="d-block text-2">@currentUser.Email</span>
                                                         <span class="d-block text-2">@currentUser.PhoneNumber</span>
-                                                        <span>@((currentUser.IsAdmin) ? "Admin" : "Regular User")</span>
+                                                       @* <span>@((currentUser.IsAdmin) ? "Admin" : "Regular User")</span>*@
                                                     </div>
                                                     <div class="col-4 col-sm-4">
                                          
@@ -117,16 +117,20 @@
                                                         <h3 class="text-5 fw-400 d-flex align-items-center mb-4">Account Settings<a href="#edit-account-settings" data-bs-toggle="modal" class="ms-auto text-2 text-uppercase btn-link"><span class="me-1"><i class="fas fa-edit"></i></span>Change status</a></h3>
                                                         <hr class="mx-n4 mb-4">
                                                         <div class="row gx-3 align-items-center">
-                                                            <p class="col-sm-3 text-muted text-sm-end mb-0 mb-sm-3">Language:</p>
-                                                            <p class="col-sm-9 text-3">English (United States)</p>
-                                                        </div>
-                                                        <div class="row gx-3 align-items-center">
-                                                            <p class="col-sm-3 text-muted text-sm-end mb-0 mb-sm-3">Time Zone:</p>
-                                                            <p class="col-sm-9 text-3">(GMT-06:00) Central America</p>
+                                                            <p class="col-sm-3 text-muted text-sm-end mb-0 mb-sm-3">User status:</p>
+                                                            <p class="col-sm-9 text-3"><b>@((currentUser.IsAdmin) ? "Admin" : "Regular User")</b></p>
                                                         </div>
                                                         <div class="row gx-3 align-items-center">
                                                             <p class="col-sm-3 text-muted text-sm-end mb-0 mb-sm-3">Account Status:</p>
-                                                            <p class="col-sm-9 text-3"><span class="bg-success text-white rounded-pill d-inline-block px-2 mb-0"><i class="fas fa-check-circle"></i> Active</span></p>
+                                                            @if (currentUser.IsBlocked)
+                                                            {
+                                                            <p class="col-sm-9 text-3"><span class="bg-danger text-white rounded-pill d-inline-block px-2 mb-0"><i class="fas fa-check-circle"></i>Blocked</span></p>
+                                                                
+                                                            }
+                                                            else
+                                                            {
+                                                                <p class="col-sm-9 text-3"><span class="bg-success text-white rounded-pill d-inline-block px-2 mb-0"><i class="fas fa-check-circle"></i>Active</span></p>
+                                                            }
                                                         </div>
                                                     </div>
                                                     <!-- Edit Details Modal
@@ -142,36 +146,17 @@
                                                                     <form id="accountSettings" method="post">
                                                                         <div class="row g-3">
                                                                             <div class="col-12">
-                                                                                <label for="language" class="form-label">Language</label>
+                                                                                <label for="language" class="form-label">User status</label>
                                                                                 <select class="form-select" id="language" name="language_id">
-                                                                                    <option value="1">English (United States)</option>
-                                                                                    <option value="2">Spanish </option>
-                                                                                    <option value="3">Chinese</option>
-                                                                                    <option value="4">Russian</option>
-                                                                                </select>
-                                                                            </div>
-                                                                            <div class="col-12">
-                                                                                <label for="input-timezone" class="form-label">Time Zone</label>
-                                                                                <select class="form-select" id="input-timezone" name="timezone_id">
-                                                                                    <option value="-12">(GMT-12:00) International Date Line West</option>
-                                                                                    <option value="-11">(GMT-11:00) Midway Island, Samoa</option>
-                                                                                    <option value="-7">(GMT-07:00) Chihuahua, La Paz, Mazatlan</option>
-                                                                                    <option value="-7">(GMT-07:00) Mountain Time (US & Canada)</option>
-                                                                                    <option selected="selected" value="-6">(GMT-06:00) Central America</option>
-                                                                                    <option value="-6">(GMT-06:00) Central Time (US & Canada)</option>
-                                                                                    <option value="-6">(GMT-06:00) Guadalajara, Mexico City, Monterrey</option>
-                                                                                    <option value="-6">(GMT-06:00) Saskatchewan</option>
-                                                                                    <option value="-5">(GMT-05:00) Bogota, Lima, Quito, Rio Branco</option>
-                                                                                    <option value="-5">(GMT-05:00) Eastern Time (US & Canada)</option>
-                                                                                    <option value="-5">(GMT-05:00) Indiana (East)</option>
-                                      
+                                                                                    <option value="1">Admin</option>
+                                                                                    <option value="2">Regular user </option>
                                                                                 </select>
                                                                             </div>
                                                                             <div class="col-12">
                                                                                 <label for="accountStatus" class="form-label">Account Status</label>
                                                                                 <select class="form-select" id="accountStatus" name="language_id">
-                                                                                    <option value="1">Active</option>
-                                                                                    <option value="2">In Active</option>
+                                                                                    <option value="1">Blocked</option>
+                                                                                    <option value="2">Active</option>
                                                                                 </select>
                                                                             </div>
                                                                             <div class="col-12 d-grid mt-4">

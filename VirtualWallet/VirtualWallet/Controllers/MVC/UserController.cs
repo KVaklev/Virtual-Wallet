@@ -10,7 +10,7 @@ using System.Security.Claims;
 namespace VirtualWallet.Controllers.MVC
 {
     [Authorize]
-	[Route("users")]
+	//[Route("users")]
 	public class UserController : Controller
     {
         private readonly IUserService userService;
@@ -41,8 +41,8 @@ namespace VirtualWallet.Controllers.MVC
         }
 
 
-        [HttpGet, Authorize]
-        public async Task<IActionResult> ChangeStatus(int id)
+        [HttpGet]
+        public async Task<IActionResult> ChangeStatus()
         {
             var loggedUserResponse = await GetLoggedUserAsync();
             if (!loggedUserResponse.IsSuccessful)
@@ -56,7 +56,7 @@ namespace VirtualWallet.Controllers.MVC
         }
 
         [HttpPost, ActionName("ChangeStatus")]
-        [HttpPost, Authorize]
+        [HttpPost]
         public async Task<IActionResult> ChangeStatusConfirmed(int id, UserChangeStatusViewModel userChangeStatusViewModel)
         {
             var loggedUserResponse = await GetLoggedUserAsync();
@@ -65,7 +65,7 @@ namespace VirtualWallet.Controllers.MVC
                 return StatusCode(StatusCodes.Status404NotFound, loggedUserResponse.Message);
             }
 
-            await userService.ChangeStatusAsync(id, loggedUserResponse.Data);
+            await userService.ChangeStatusAsync(id, loggedUserResponse.Data, userChangeStatusViewModel);
 
             return this.RedirectToAction("Index", "Users");
         }
