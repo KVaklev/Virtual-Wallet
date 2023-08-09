@@ -1,13 +1,8 @@
-﻿using AutoMapper;
-using Business.DTOs;
-using Business.DTOs.Requests;
-using Business.DTOs.Responses;
-using Business.Exceptions;
+﻿using Business.DTOs.Requests;
 using Business.QueryParameters;
 using Business.Services.Contracts;
 using Business.Services.Helpers;
 using DataAccess.Models.Models;
-using DataAccess.Repositories.Contracts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -181,7 +176,6 @@ namespace VirtualWallet.Controllers.API
         {
             var loggedUsersUsername = User.FindFirst(ClaimTypes.Name);
             var loggedUserResult = await this.userService.GetLoggedUserByUsernameAsync(loggedUsersUsername.Value);
-
             return loggedUserResult;
         }
     }

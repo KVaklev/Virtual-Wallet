@@ -1,15 +1,9 @@
-﻿using Business.DTOs;
+﻿
 using Business.Services.Contracts;
 using Business.Services.Helpers;
-using DataAccess.Repositories.Contracts;
-using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
-using System;
 using System.Globalization;
-using System.Net.Http;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
-using static System.Net.Mime.MediaTypeNames;
-using static System.Net.WebRequestMethods;
+
 
 namespace DataAccess.Models.Models
 {
@@ -43,12 +37,9 @@ namespace DataAccess.Models.Models
                 }
                 exchangeRateData.CurrencyValue = decimal.Parse(currencyValue, CultureInfo.InvariantCulture); ;
 
-
-                result.IsSuccessful = true;
                 result.Data = exchangeRateData;
                 return result;
             }
-            //todo
             catch (HttpRequestException)
             {
                 result.IsSuccessful = false;

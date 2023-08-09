@@ -5,6 +5,7 @@ using Business.Services.Helpers;
 using DataAccess.Models.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace VirtualWallet.Controllers.API
 {
@@ -13,7 +14,6 @@ namespace VirtualWallet.Controllers.API
     public class UserApiController : ControllerBase
     {
         private readonly IUserService userService;
-      
 
         public UserApiController(IUserService userService)
         {
@@ -24,7 +24,6 @@ namespace VirtualWallet.Controllers.API
         public async Task<IActionResult> GetUsersAsync([FromQuery] UserQueryParameters userQueryParameters)
         {
             var result = await userService.FilterByAsync(userQueryParameters);
-
             if (!result.IsSuccessful)
             {
                   return StatusCode(StatusCodes.Status404NotFound);
@@ -56,7 +55,6 @@ namespace VirtualWallet.Controllers.API
         public async Task<IActionResult> CreateUserAsync([FromBody] CreateUserModel createUserDto)
         {
             var result = await userService.CreateAsync(createUserDto);
-
             if (!result.IsSuccessful)
             {
                 return BadRequest(result.Message);
@@ -165,8 +163,8 @@ namespace VirtualWallet.Controllers.API
         }
         private async Task<Response<User>> FindLoggedUserAsync()
         {
-            var loggedUsersUsername = User.Claims.FirstOrDefault(claim => claim.Type == "Username").Value;
-            var loggedUserResult = await this.userService.GetLoggedUserByUsernameAsync(loggedUsersUsername);
+            var loggedUsersUsername = User.FindFirst(ClaimTypes.Name);
+            var loggedUserResult = await this.userService.GetLoggedUserByUsernameAsync(loggedUsersUsername.Value);
             return loggedUserResult;
         }
     }

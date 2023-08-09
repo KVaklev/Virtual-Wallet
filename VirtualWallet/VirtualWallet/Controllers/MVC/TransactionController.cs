@@ -81,7 +81,7 @@ namespace VirtualWallet.Controllers.MVC
             {
                 return this.View(transactionDto);
             }
-            var loggedUserResult = await GetLoggedUserAsync();
+            var loggedUserResult = await FindLoggedUserAsync();
                 if (!loggedUserResult.IsSuccessful)
                 {
                     return await EntityErrorViewAsync(loggedUserResult.Message);
@@ -98,7 +98,7 @@ namespace VirtualWallet.Controllers.MVC
         public async Task<IActionResult> Update([FromRoute] int id)
         {
 
-            var loggedUserResult = await GetLoggedUserAsync();
+            var loggedUserResult = await FindLoggedUserAsync();
             if (!loggedUserResult.IsSuccessful)
             {
                 return await EntityErrorViewAsync(loggedUserResult.Message);
@@ -131,7 +131,7 @@ namespace VirtualWallet.Controllers.MVC
                 {
                     return View(transactionDto);
                 }
-                var loggedUserResult = await GetLoggedUserAsync();
+                var loggedUserResult = await FindLoggedUserAsync();
                 if (!loggedUserResult.IsSuccessful)
                 {
                     return await EntityErrorViewAsync(loggedUserResult.Message);
@@ -148,9 +148,8 @@ namespace VirtualWallet.Controllers.MVC
         [HttpGet]
         public async Task<IActionResult> DeleteAsync([FromRoute] int id)
         {
-            try
-            {
-                var loggedUserResult = await GetLoggedUserAsync();
+            
+                var loggedUserResult = await FindLoggedUserAsync();
                 if (!loggedUserResult.IsSuccessful)
                 {
                     return await EntityErrorViewAsync(loggedUserResult.Message);
@@ -161,19 +160,13 @@ namespace VirtualWallet.Controllers.MVC
                     return await EntityErrorViewAsync(result.Message);
                 }
                 return this.View(result.Data);
-            }
-            catch (EntityNotFoundException ex)
-            {
-                return await EntityErrorViewAsync(ex.Message);
-            }
         }
 
         [HttpPost, ActionName("Delete")]
         public async Task<IActionResult> DeleteConfirmed([FromRoute] int id)
         {
-            try
-            {
-                var loggedUserResult = await GetLoggedUserAsync();
+            
+                var loggedUserResult = await FindLoggedUserAsync();
                 if (!loggedUserResult.IsSuccessful)
                 {
                     return await EntityErrorViewAsync(loggedUserResult.Message);
@@ -185,17 +178,13 @@ namespace VirtualWallet.Controllers.MVC
                 }
 
                 return this.RedirectToAction("Index", "Transaction", new { Username = loggedUserResult.Data.Username });
-            }
-            catch (EntityNotFoundException ex)
-            {
-                return await EntityErrorViewAsync(ex.Message);
-            }
+           
         }
 
         [HttpGet]
         public async Task<IActionResult> Execute([FromRoute] int id)
         {
-            var loggedUserResult = await GetLoggedUserAsync();
+            var loggedUserResult = await FindLoggedUserAsync();
             if (!loggedUserResult.IsSuccessful)
             {
                 return await EntityErrorViewAsync(loggedUserResult.Message);
@@ -221,7 +210,7 @@ namespace VirtualWallet.Controllers.MVC
             [FromRoute] int id,
             ExecuteTransactionViewModel executeTransactionViewModel)
         {
-            var loggedUserResult = await GetLoggedUserAsync();
+            var loggedUserResult = await FindLoggedUserAsync();
             if (!loggedUserResult.IsSuccessful)
             {
                 return await EntityErrorViewAsync(loggedUserResult.Message);
@@ -252,7 +241,7 @@ namespace VirtualWallet.Controllers.MVC
         [HttpGet]
         public async Task<IActionResult> Confirm([FromRoute] int id)
         {
-            var loggedUserResult = await GetLoggedUserAsync();
+            var loggedUserResult = await FindLoggedUserAsync();
             if (!loggedUserResult.IsSuccessful)
             {
                 return await EntityErrorViewAsync(loggedUserResult.Message);
@@ -283,7 +272,7 @@ namespace VirtualWallet.Controllers.MVC
         }
 
 
-        private async Task<Response<User>> GetLoggedUserAsync()
+        private async Task<Response<User>> FindLoggedUserAsync()
         {
             var loggedUsersUsername = User.FindFirst(ClaimTypes.Name);
             var loggedUserResult = await this.userService.GetLoggedUserByUsernameAsync(loggedUsersUsername.Value);

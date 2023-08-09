@@ -1,6 +1,4 @@
-﻿
-
-using Business.QueryParameters;
+﻿using Business.QueryParameters;
 using Business.Services.Contracts;
 using Business.Services.Helpers;
 using DataAccess.Models.Models;
@@ -11,14 +9,13 @@ using Microsoft.EntityFrameworkCore;
 using Business.DTOs.Requests;
 using Business.DTOs.Responses;
 using Business.Mappers;
-
+using DataAccess.Models.Enums;
 
 namespace Business.Services.Models
 {
     public class TransactionService : ITransactionService
     {
         private readonly ITransactionRepository transactionRepository;
-        private readonly ApplicationContext context;
         private readonly IAccountRepository accountRepository;
         private readonly ICurrencyRepository currencyRepository;
         private readonly IMapper mapper;
@@ -28,7 +25,6 @@ namespace Business.Services.Models
 
         public TransactionService(
             ITransactionRepository transactionRepository,
-            ApplicationContext context,
             IAccountRepository accountRepository,
             ICurrencyRepository currencyRepository,
             IMapper mapper,
@@ -38,7 +34,6 @@ namespace Business.Services.Models
             )
         {
             this.transactionRepository = transactionRepository;
-            this.context = context;
             this.accountRepository = accountRepository;
             this.currencyRepository = currencyRepository;
             this.mapper = mapper;
@@ -73,8 +68,18 @@ namespace Business.Services.Models
             User loggedUser)
         {
             var result = new Response<PaginatedList<GetTransactionDto>>();
-            var transactions = await this.transactionRepository.FilterByAsync(filterParameters, loggedUser.Username);
-            if (transactions.Count==0)
+            IQueryable<Transaction> transactions = this.transactionRepository.GetAll(loggedUser.Username);
+
+            transactions = await FilterByRecipientAsync(transactions, filterParameters.ResipientUsername);
+            transactions = await FilterByDirectionAsync(transactions, filterParameters.Direction);
+            transactions = await FilterByFromDataAsync(transactions, filterParameters.FromDate);
+            transactions = await FilterByToDataAsync(transactions, filterParameters.ToDate);
+            transactions = await SortByAsync(transactions, filterParameters.SortBy);
+
+            int totalPages = (transactions.Count() + filterParameters.PageSize - 1) / filterParameters.PageSize;
+            transactions = await Common<Transaction>.PaginateAsync(transactions, filterParameters.PageNumber, filterParameters.PageSize);
+
+            if (!transactions.Any())
             {
                 result.IsSuccessful = false;
                 result.Message = Constants.NoFoundResulte;
@@ -83,11 +88,9 @@ namespace Business.Services.Models
 
             List<GetTransactionDto> transactionDtos = transactions
                     .Select(transaction => mapper.Map<GetTransactionDto>(transaction))
-                    .ToList();
-            result.Data = new PaginatedList<GetTransactionDto>(
-                transactionDtos,
-                transactions.TotalPages,
-                transactions.PageNumber);
+                    .ToList(); 
+
+            result.Data = new PaginatedList<GetTransactionDto>(transactionDtos, totalPages, filterParameters.PageNumber);
             return result;
         }
 
@@ -119,7 +122,7 @@ namespace Business.Services.Models
             }
             var transaction = await TransactionsMapper.MapDtoТоTransactionAsync(transactionDto, loggedUser, account, currency);
             
-            if (!await Security.HasEnoughBalanceAsync(transaction.AccountSender, transaction.Amount))
+            if (!await Common.HasEnoughBalanceAsync(transaction.AccountSender, transaction.Amount))
             {
                 result.IsSuccessful = false;
                 result.Message = Constants.ModifyAccountBalancetErrorMessage;
@@ -155,7 +158,7 @@ namespace Business.Services.Models
                 result.Message = Constants.ModifyTransactionNotExecuteErrorMessage;
                 return result;
             }
-            if (!await Security.HasEnoughBalanceAsync(loggedUser.Account, loggedUser.Account.Balance))
+            if (!await Common.HasEnoughBalanceAsync(loggedUser.Account, loggedUser.Account.Balance))
             {
                 result.IsSuccessful = false;
                 result.Message = Constants.ModifyAccountBalancetErrorMessage;
@@ -190,6 +193,7 @@ namespace Business.Services.Models
             result.Data = this.mapper.Map<GetTransactionDto>(updatedTransacion);
             return result;
         }
+
         public async Task<Response<bool>> DeleteAsync(int id, User loggedUser)
         {
             var result = new Response<bool>();
@@ -290,7 +294,6 @@ namespace Business.Services.Models
             result.Data = transactionIn;
             return result;
         }
-
         private async Task<Response<bool>> UpdateAccountsBalancesAsync(Transaction transactionOut, Transaction transactionIn)
         {
             var result = new Response<bool>();
@@ -312,15 +315,14 @@ namespace Business.Services.Models
 
             return result;
         }
-
         private async Task<bool> AddTransactionToHistoryAsync(Transaction transaction)
         {
 
-            int historyCount = await this.context.History.CountAsync();
+            int historyCount = await this.historyRepository.GetHistoryCountAsync();
             History history = await HistoryMapper.MapCreateWithTransactionAsync(transaction);
             await this.historyRepository.CreateAsync(history);
 
-            int newHistoryCount = await this.context.History.CountAsync();
+            int newHistoryCount = await this.historyRepository.GetHistoryCountAsync();
 
             if (newHistoryCount == historyCount + 1)
             {
@@ -331,7 +333,58 @@ namespace Business.Services.Models
                 return false;
             }
         }
+        private async Task<IQueryable<Transaction>> FilterByRecipientAsync(IQueryable<Transaction> result, string? username)
+        {
+            if (!string.IsNullOrEmpty(username))
+            {
+                return result.Where(t => t.AccountRecipient.User.Username == username);
+            }
+            return await Task.FromResult(result);
+        }
+        private async Task<IQueryable<Transaction>> FilterByFromDataAsync(IQueryable<Transaction> result, string? fromData)
+        {
+            if (!string.IsNullOrEmpty(fromData))
+            {
+                DateTime date = DateTime.Parse(fromData);
+                return result.Where(t => t.Date >= date);
+            }
+            return result;
+        }
+        private async Task<IQueryable<Transaction>> FilterByToDataAsync(IQueryable<Transaction> result, string? toData)
+        {
+            if (!string.IsNullOrEmpty(toData))
+            {
+                DateTime date = DateTime.Parse(toData);
 
+                return result.Where(t => t.Date <= date);
+            }
+            return result;
+        }
+        private async Task<IQueryable<Transaction>> FilterByDirectionAsync(IQueryable<Transaction> result, string? direction)
+        {
+            if (!string.IsNullOrEmpty(direction))
+            {
+                if (Enum.TryParse<DirectionType>(direction, true, out var directionEnum))
+                {
+                    DirectionType directionType = directionEnum;
+                    return await Task.FromResult(result.Where(t => t.Direction == directionType));
+                }
+            }
+            return result;
+        }
+        private async Task<IQueryable<Transaction>> SortByAsync(IQueryable<Transaction> result, string sortCriteria)
+        {
+            if (Enum.TryParse<SortCriteria>(sortCriteria, true, out var sortEnum))
+            {
+                switch (sortEnum)
+                {
+                    case SortCriteria.Amount:
+                        return await Task.FromResult(result.OrderBy(t => t.Amount));
+                    case SortCriteria.Date:
+                        return await Task.FromResult(result.OrderBy(t => t.Date));
+                }
+            }
+            return result;
+        }
     }
-
 }

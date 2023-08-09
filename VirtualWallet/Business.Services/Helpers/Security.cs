@@ -1,6 +1,9 @@
 ﻿using Business.DTOs.Requests;
 using DataAccess.Models.Enums;
 using DataAccess.Models.Models;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using static Business.Services.Helpers.Constants;
@@ -9,6 +12,41 @@ namespace Business.Services.Helpers
 {
     public static class Security
     {
+        public static async Task<Response<string>> CreateApiTokenAsync(User loggedUser)
+        {
+            var result = new Response<string>();
+
+            var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("This is my secret testing key"));
+            var signinCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256);
+            var jwtSecurityToken = new JwtSecurityToken(
+                    issuer: "VirtualWallet",
+                    audience: "Where is that audience",
+                    claims: new[] {
+                new Claim(ClaimTypes.NameIdentifier, loggedUser.Id.ToString()),
+                new Claim(ClaimTypes.Name, loggedUser.Username),
+                new Claim("IsAdmin", loggedUser.IsAdmin.ToString()),
+                new Claim("UsersAccountId", loggedUser.Account.Id.ToString()),
+                new Claim(JwtRegisteredClaimNames.Email, loggedUser.Email),
+                new Claim(JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString())
+        },
+            expires: DateTime.Now.AddMinutes(15),
+                    signingCredentials: signinCredentials
+                );
+
+            string resultToken = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
+
+            if (resultToken == null)
+            {
+                result.IsSuccessful = false;
+                result.Message = GenerateTokenErrorMessage;
+                return result;
+            }
+
+            result.Data = resultToken;
+
+            return await Task.FromResult(result);
+        }
+
         public static async Task<bool> IsAdminAsync(User loggedUser)
         {
             if (!loggedUser.IsAdmin)
@@ -16,21 +54,6 @@ namespace Business.Services.Helpers
                 return await Task.FromResult(false);
             }
             return await Task.FromResult(true);
-        }
-
-
-        public async static Task<Response<bool>> CheckForNullEntryAsync(string username, string password)
-        {
-            var result = new Response<bool>();
-
-            if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
-            {
-                result.IsSuccessful = false;
-                result.Message = CredentialsErrorMessage;
-                result.Error = new Error(PropertyName.Credentials);
-            }
-
-            return await Task.FromResult(result);
         }
 
         public static async Task<Response<User>> AuthenticateAsync(User loggedUser, string password)
@@ -108,36 +131,6 @@ namespace Business.Services.Helpers
             return await Task.FromResult(user);
         }
 
-        public static async Task<bool> HasEnoughBalanceAsync(Account account, decimal amount)
-        {
-            if (account.Balance < amount)
-            {
-                return await Task.FromResult(false);
-            }
-            return await Task.FromResult(true);
-        }
-
-        public static async Task<bool> HasEnoughCardBalanceAsync(Card card, decimal amount)
-        {
-            if (card.Balance < amount)
-            {
-                return await Task.FromResult(false);
-            }
-            return await Task.FromResult(true);
-        }
-
-        public static async Task<bool> IsTransactionSenderAsync(Transaction transaction, int userId)
-        {
-            bool isTransactionSender = true;
-
-            if (transaction.AccountSenderId != userId)
-            {
-                isTransactionSender = false;
-            }
-            return await Task.FromResult(isTransactionSender);
-        }
-
-
         public static async Task<bool> CanModifyTransactionAsync(Transaction transaction)
         {
             var canExecuteTransaction = true;
@@ -159,6 +152,17 @@ namespace Business.Services.Helpers
                 isHistoryOwner = false;
             }
             return await Task.FromResult(isHistoryOwner);
+        }
+
+        public static async Task<bool> IsTransactionSenderAsync(Transaction transaction, int userId)
+        {
+            bool isTransactionSender = true;
+
+            if (transaction.AccountSenderId != userId)
+            {
+                isTransactionSender = false;
+            }
+            return await Task.FromResult(isTransactionSender);
         }
 
         //ToDo-Check if we can combine and use only one with generic

@@ -13,7 +13,6 @@ namespace Business.Services.Contracts
         Task<Response<bool>> AddCardAsync(int id, Card card, User user);
         Task<Response<bool>> RemoveCardAsync(int id,  Card card, User user);
         Task<Response<bool>> DeleteAsync(int id, User loggedUser);
-        Task<Response<string>> CreateApiTokenAsync(User loggedUser);
         Task<Response<Account>> IncreaseBalanceAsync(int id, decimal amount, User loggedUser);
         Task<Response<Account>> DecreaseBalanceAsync(int id, decimal amount, User loggedUser);
         Task<Response<string>> GenerateTokenAsync(int id);
