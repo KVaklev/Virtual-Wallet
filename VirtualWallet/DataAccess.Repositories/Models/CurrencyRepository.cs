@@ -51,7 +51,6 @@ namespace DataAccess.Repositories.Models
             return currency;
         }
 
-
         public async Task<bool> SaveChangesAsync()
         {
             await context.SaveChangesAsync();

@@ -90,6 +90,13 @@
                                                       "The menu you're trying to access is reserved for our lovely authenticated members. " +
                                                       "Navigate to the upper right corner and unveil the magic. Either Login or Register!";
 
+        //Other Constant messages 
+
+        public const string NoFoundResulte = "No result is found.";
+        public const string NoHostError= "No such host is known.";
+        public const string JsonDeserializationError = "JSON Deserialization Error";
+        public const string ArgumentOutOfRangeError = "Index and length must refer to a location within the string.";
+
         public static class PropertyName
         {
             public const string Username = "Username";
@@ -101,13 +108,5 @@
             public const string NotConfirmedEmail = "NotConfirmedEmail";
             public const string UsernameDoesntExist = "UsernameDoesntExist";
         }
-
-        public const string NoFoundResulte = "No found result.";
-        public const string NoHostError= "No such host is known.";
-        public const string JsonDeserializationError = "JSON Deserialization Error";
-        public const string ArgumentOutOfRangeError = "Index and length must refer to a location within the string.";
-
     }
-
-
 }

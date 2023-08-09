@@ -1,7 +1,4 @@
-﻿using DataAccess.Models.ValidationAttributes;
-using System.ComponentModel.DataAnnotations;
-
-namespace Business.DTOs.Responses
+﻿namespace Business.DTOs.Responses
 {
     public class GetUserDto
     {

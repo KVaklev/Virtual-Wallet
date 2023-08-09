@@ -20,6 +20,8 @@ namespace Business.Mappers
             CreateMap<User, CreateUserModel>();
             CreateMap<User, UpdateUserDto>();
             CreateMap<UpdateUserDto, User>();
+            CreateMap<User, GetUserDto>();
+            CreateMap<GetUserDto, User>();
 
         }
 

@@ -5,8 +5,8 @@ namespace DataAccess.Repositories.Contracts
 {
     public interface IHistoryRepository
     {
+        IQueryable<History> GetAll(User loggedUser);
         Task<History> GetByIdAsync(int id);
-        Task<PaginatedList<History>> FilterByAsync(HistoryQueryParameters filterParameters, User loggedUser);
         Task<History> CreateAsync(History history);
     }
 }

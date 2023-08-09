@@ -1,12 +1,11 @@
 ﻿using Business.Services.Contracts;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
-using Business.Exceptions;
 using Business.QueryParameters;
 using Business.DTOs.Requests;
 using DataAccess.Models.Models;
-using DataAccess.Repositories.Contracts;
 using Business.Services.Helpers;
+using System.Security.Claims;
 
 namespace VirtualWallet.Controllers.API
 {
@@ -163,8 +162,8 @@ namespace VirtualWallet.Controllers.API
         }
         private async Task<Response<User>> FindLoggedUserAsync()
         {
-            var loggedUsersUsername = User.Claims.FirstOrDefault(claim => claim.Type == "Username").Value;
-            var loggedUserResult = await this.userService.GetLoggedUserByUsernameAsync(loggedUsersUsername);
+            var loggedUsersUsername = User.FindFirst(ClaimTypes.Name);
+            var loggedUserResult = await this.userService.GetLoggedUserByUsernameAsync(loggedUsersUsername.Value);
             return loggedUserResult;
         }
     }

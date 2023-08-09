@@ -42,7 +42,7 @@ namespace VirtualWallet.Controllers.API
                 return BadRequest(result.Message);
             }
             
-            return StatusCode(StatusCodes.Status200OK, result);
+            return StatusCode(StatusCodes.Status200OK, result.Data);
         }
 
         [HttpGet("id"), Authorize]
@@ -117,11 +117,11 @@ namespace VirtualWallet.Controllers.API
 
             return StatusCode(StatusCodes.Status200OK, result.Message);
         }
+
         private async Task<Response<User>> FindLoggedUserAsync()
         {
             var loggedUsersUsername = User.FindFirst(ClaimTypes.Name);
             var loggedUserResult = await this.userService.GetLoggedUserByUsernameAsync(loggedUsersUsername.Value);
-            
             return loggedUserResult;
         }
         private async Task<Response<int>> FindLoggedUsersAccountAsync()
@@ -133,6 +133,5 @@ namespace VirtualWallet.Controllers.API
 
             return await Task.FromResult(result);
         }
-
     }
 }

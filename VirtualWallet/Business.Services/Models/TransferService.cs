@@ -134,7 +134,7 @@ namespace Business.Services.Models
 
             if (transfer.TransferType == TransferDirection.Deposit)
             {
-                if (!await Security.HasEnoughCardBalanceAsync(transfer.Card, transfer.Amount))
+                if (!await Common.HasEnoughCardBalanceAsync(transfer.Card, transfer.Amount))
                 {
                     result.IsSuccessful = false;
                     result.Message = Constants.ModifyAccountBalancetErrorMessage;
@@ -145,7 +145,7 @@ namespace Business.Services.Models
             }
             else
             {
-                if (!await Security.HasEnoughBalanceAsync(transfer.Account, transfer.Amount))
+                if (!await Common.HasEnoughBalanceAsync(transfer.Account, transfer.Amount))
                 {
                     result.IsSuccessful = false;
                     result.Message = Constants.ModifyAccountBalancetErrorMessage;
@@ -225,7 +225,7 @@ namespace Business.Services.Models
                 return result;
             }
 
-            if (!await Security.HasEnoughBalanceAsync(transfer.Account, transfer.Account.Balance))
+            if (!await Common.HasEnoughBalanceAsync(transfer.Account, transfer.Account.Balance))
             {
                 result.IsSuccessful = false;
                 result.Message = Constants.ModifyAccountBalancetErrorMessage;

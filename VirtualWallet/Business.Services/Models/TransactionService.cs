@@ -111,7 +111,7 @@ namespace Business.Services.Models
             }
             var transaction = await TransactionsMapper.MapDtoТоTransactionAsync(transactionDto, loggedUser, account, currency);
             
-            if (!await Security.HasEnoughBalanceAsync(transaction.AccountSender, transaction.Amount))
+            if (!await Common.HasEnoughBalanceAsync(transaction.AccountSender, transaction.Amount))
             {
                 result.IsSuccessful = false;
                 result.Message = Constants.ModifyAccountBalancetErrorMessage;
@@ -147,7 +147,7 @@ namespace Business.Services.Models
                 result.Message = Constants.ModifyTransactionNotExecuteErrorMessage;
                 return result;
             }
-            if (!await Security.HasEnoughBalanceAsync(loggedUser.Account, loggedUser.Account.Balance))
+            if (!await Common.HasEnoughBalanceAsync(loggedUser.Account, loggedUser.Account.Balance))
             {
                 result.IsSuccessful = false;
                 result.Message = Constants.ModifyAccountBalancetErrorMessage;
