@@ -1,13 +1,17 @@
-﻿using Business.DTOs.Requests;
+﻿using AutoMapper;
+using Business.DTOs.Requests;
 using Business.DTOs.Responses;
 using Business.Exceptions;
 using Business.QueryParameters;
 using Business.Services.Contracts;
+using Business.ViewModels;
 using DataAccess.Models.Models;
 using DataAccess.Repositories.Contracts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using Org.BouncyCastle.Security;
+using System.Security.Claims;
 
 namespace VirtualWallet.Controllers.MVC
 {
@@ -15,12 +19,21 @@ namespace VirtualWallet.Controllers.MVC
     public class TransferController : Controller
     {
         private readonly ITransferService transferService;
-        private readonly IUserRepository userRepository;
+        private readonly IUserService userService;
+        private readonly ICurrencyService currencyService;
+        private readonly IExchangeRateService exchangeRateService;
+        private readonly IMapper mapper;
 
-        public TransferController(ITransferService transferService, IUserRepository userRepository)
+        public TransferController(ITransferService transferService, IUserService userService,
+            ICurrencyService currencyService,
+            IExchangeRateService exchangeRateService,
+            IMapper mapper)
         {
             this.transferService = transferService;
-            this.userRepository = userRepository;
+            this.userService = userService;
+            this.currencyService = currencyService;
+            this.exchangeRateService = exchangeRateService;
+            this.mapper = mapper;
         }
 
         [HttpGet]
@@ -31,7 +44,7 @@ namespace VirtualWallet.Controllers.MVC
             {
                 var loggedUser = await GetLoggedUserAsync();
                 //var model = transferService.GetAll(loggedUser).Select(m => new GetTransferDto { Username = m.Account.User.Username, DateCreated = m.DateCreated }).ToList();
-                var result = await transferService.FilterByAsync(parameters, loggedUser);
+                var result = await transferService.FilterByAsync(parameters, loggedUser.Data);
                 return View(result.Data);
 
             }
@@ -48,7 +61,7 @@ namespace VirtualWallet.Controllers.MVC
             try
             {
                 var loggedUser = await GetLoggedUserAsync();
-                var transfer = await this.transferService.GetByIdAsync(id, loggedUser);
+                var transfer = await this.transferService.GetByIdAsync(id, loggedUser.Data);
                 return View(transfer);
             }
             catch (EntityNotFoundException ex)
@@ -58,48 +71,46 @@ namespace VirtualWallet.Controllers.MVC
         }
 
         [HttpGet]
-        public async Task<IActionResult> Create([FromQuery] TransferQueryParameters parameters)
+        public async Task<IActionResult> Create()
         {
-            //if (!this.HttpContext.Session.Keys.Contains("LoggedUser)"))
-            //{
-            //    return RedirectToAction("Login", "Auth");
-            //}
+            var createTransferViewModel = new CreateTransferViewModel();
 
-            if ((this.HttpContext.Session.GetString("IsBlocked")) == "True")
+            var result = this.currencyService.GetAll();
+
+            if (!result.IsSuccessful)
             {
-                return await BlockedUserErrorViewAsync();
+                return await EntityNotFoundErrorViewAsync(result.Message);
             }
-            else
-            {
-                return View();
-            }
+
+            //TempData["Currencies"] = JsonSerializer.Serialize(result.Data);
+
+            return View(createTransferViewModel);
+
         }
 
         [HttpPost]
 
-        public async Task<IActionResult> Create(CreateTransferDto transferDto)
+        public async Task<IActionResult> Create(CreateTransferViewModel transferDto)
         {
-            try
+            if (!this.ModelState.IsValid)
             {
-                if (!this.ModelState.IsValid)
-                {
-                    return this.View(transferDto);
-                }
-
-                var loggedUser = await GetLoggedUserAsync();
-
-                var result = await this.transferService.CreateAsync(transferDto, loggedUser);
-
-                if (!result.IsSuccessful)
-                {
-                    return await EntityNotFoundErrorViewAsync(result.Message);
-                }
-                return this.RedirectToAction("Index", "Transfer", new { username = result.Data.Username });
+                return this.View(transferDto);
             }
-            catch (EntityNotFoundException ex)
+            var loggedUser = await GetLoggedUserAsync();
+
+            if (!loggedUser.IsSuccessful)
             {
-                return await EntityNotFoundErrorViewAsync(ex.Message);
+                return await EntityNotFoundErrorViewAsync(loggedUser.Message);
             }
+
+            var result = await this.transferService.CreateAsync(transferDto.CreateTransferDto, loggedUser.Data);
+            if (!result.IsSuccessful)
+            {
+                return await EntityNotFoundErrorViewAsync(result.Message);
+            }
+
+            return this.RedirectToAction("Execute", "Transfer", new { id = result.Data.Id });
+
         }
 
         [HttpGet]
@@ -109,7 +120,7 @@ namespace VirtualWallet.Controllers.MVC
             try
             {
                 var loggedUser = await GetLoggedUserAsync();
-                var result = await this.transferService.GetByIdAsync(id, loggedUser);
+                var result = await this.transferService.GetByIdAsync(id, loggedUser.Data);
 
                 if (!result.IsSuccessful)
                 {
@@ -135,14 +146,14 @@ namespace VirtualWallet.Controllers.MVC
                 }
 
                 var loggedUser = await GetLoggedUserAsync();
-                var result = await this.transferService.UpdateAsync(id, transferDto, loggedUser);
+                var result = await this.transferService.UpdateAsync(id, transferDto, loggedUser.Data);
 
                 if (!result.IsSuccessful)
                 {
                     return await EntityNotFoundErrorViewAsync(result.Message);
                 }
 
-                return this.RedirectToAction("Index", "Transfer", new { Username = loggedUser.Username });
+                return this.RedirectToAction("Index", "Transfer", new { Username = loggedUser.Data.Username });
             }
 
 
@@ -159,7 +170,7 @@ namespace VirtualWallet.Controllers.MVC
             try
             {
                 var loggedUser = await GetLoggedUserAsync();
-                var result = await this.transferService.GetByIdAsync(id, loggedUser);
+                var result = await this.transferService.GetByIdAsync(id, loggedUser.Data);
                 if (!result.IsSuccessful)
                 {
                     return await EntityNotFoundErrorViewAsync(result.Message);
@@ -180,14 +191,14 @@ namespace VirtualWallet.Controllers.MVC
             try
             {
                 var loggedUser = await GetLoggedUserAsync();
-                var result = await this.transferService.DeleteAsync(id, loggedUser);
+                var result = await this.transferService.DeleteAsync(id, loggedUser.Data);
 
                 if (!result.IsSuccessful)
                 {
                     return await EntityNotFoundErrorViewAsync(result.Message);
                 }
 
-                return RedirectToAction("Index", "Transaction", new { Username = loggedUser.Username });
+                return RedirectToAction("Index", "Transaction", new { Username = loggedUser.Data.Username });
 
             }
             catch (EntityNotFoundException ex)
@@ -202,13 +213,13 @@ namespace VirtualWallet.Controllers.MVC
             try
             {
                 var loggedUser = await GetLoggedUserAsync();
-                var result = await this.transferService.ExecuteAsync(id, loggedUser);
+                var result = await this.transferService.ExecuteAsync(id, loggedUser.Data);
                 if (!result.IsSuccessful)
                 {
                     return await EntityNotFoundErrorViewAsync(result.Message);
                 }
 
-                return RedirectToAction("Index", "Transfer", new { Username = loggedUser.Username });
+                return RedirectToAction("Index", "Transfer", new { Username = loggedUser.Data.Username });
             }
             catch (EntityNotFoundException ex)
             {
@@ -217,11 +228,12 @@ namespace VirtualWallet.Controllers.MVC
         }
 
 
-        private async Task<User> GetLoggedUserAsync()
+        private async Task<Response<User>> GetLoggedUserAsync()
         {
-            //var userName = this.HttpContext.Session.GetString("LoggedUser");
-            var user = await this.userRepository.GetByUsernameAsync("kristian");
-            return user;
+            var loggedUsersUsername = User.FindFirst(ClaimTypes.Name);
+            var loggedUserResult = await this.userService.GetLoggedUserByUsernameAsync(loggedUsersUsername.Value);
+
+            return loggedUserResult;
 
         }
 
