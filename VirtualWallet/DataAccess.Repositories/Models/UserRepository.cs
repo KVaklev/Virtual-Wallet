@@ -38,6 +38,8 @@ namespace DataAccess.Repositories.Models
             result = await FilterByUsernameAsync(result, filterParameters.Username);
             result = await FilterByEmailAsync(result, filterParameters.Email);
             result = await FilterByPhoneNumberAsync(result, filterParameters.PhoneNumber);
+            result = await FilterByAdminStatusAsync(result, filterParameters.Admin);
+            result = await FilterByBlockedStatusAsync(result, filterParameters.Blocked);
             result = await SortByAsync(result, filterParameters.SortBy);
             result = await SortOrderAsync(result, filterParameters.SortOrder);
 
@@ -47,6 +49,7 @@ namespace DataAccess.Repositories.Models
 
             return new PaginatedList<User>(result.ToList(), totalPages, filterParameters.PageNumber);
         }
+
 
         public async Task<User> GetByIdAsync(int id)
         {
@@ -167,6 +170,22 @@ namespace DataAccess.Repositories.Models
             if (!string.IsNullOrEmpty(phoneNumber))
             {
                 result = result.Where(user => user.PhoneNumber != null && user.PhoneNumber == phoneNumber);
+            }
+            return await Task.FromResult(result);
+        }
+        private async Task<IQueryable<User>> FilterByAdminStatusAsync(IQueryable<User> result, bool? isAdmin)
+        {
+            if (isAdmin.HasValue)
+            {
+                result = result.Where(user => user.IsAdmin!= null && user.IsAdmin == isAdmin);
+            }
+            return await Task.FromResult(result);
+        }
+        private async Task<IQueryable<User>> FilterByBlockedStatusAsync(IQueryable<User> result, bool? isBlocked)
+        {
+            if (isBlocked.HasValue)
+            {
+                result = result.Where(user => user.IsBlocked != null && user.IsBlocked == isBlocked);
             }
             return await Task.FromResult(result);
         }

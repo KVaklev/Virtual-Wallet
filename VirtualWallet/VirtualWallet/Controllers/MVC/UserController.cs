@@ -1,11 +1,9 @@
-﻿using Business.DTOs.Responses;
-using Business.QueryParameters;
+﻿using Business.QueryParameters;
 using Business.Services.Contracts;
 using Business.ViewModels;
-using DataAccess.Models.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
+
 
 namespace VirtualWallet.Controllers.MVC
 {

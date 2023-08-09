@@ -8,18 +8,17 @@ namespace DataAccess.Models.Models
     public class Transaction
 
     {
-        [Required(ErrorMessage = Constants.EmptyFieldErrorMessage)]
-        [Range(Constants.IdMin, Constants.IdMax, ErrorMessage = Constants.RangeFieldErrorMessage)]
+        
         public int Id { get; set; }
 
-        [Required(ErrorMessage = Constants.EmptyFieldErrorMessage)]
+       
         [Range(Constants.IdMin, Constants.IdMax, ErrorMessage = Constants.RangeFieldErrorMessage)]
         public int AccountSenderId { get; set; } 
 
         [JsonIgnore]
         public Account AccountSender { get; set; }
 
-        [Required(ErrorMessage = Constants.EmptyFieldErrorMessage)]
+        
         [Range(Constants.IdMin, Constants.IdMax, ErrorMessage = Constants.RangeFieldErrorMessage)]
         public int AccountRecepientId { get; set; } 
 
@@ -28,13 +27,13 @@ namespace DataAccess.Models.Models
 
         public DirectionType Direction { get; set; }
 
-        [Required(ErrorMessage = Constants.EmptyFieldErrorMessage)]
+        
         [Range(Constants.MinAmount, Constants.MaxAmount, ErrorMessage = Constants.RangeFieldErrorMessage)]
         public decimal Amount { get; set; }
 
         public DateTime Date { get; set; }
 
-        [Required(ErrorMessage = Constants.EmptyFieldErrorMessage)]
+        
         [Range(Constants.IdMin, Constants.IdMax, ErrorMessage = Constants.RangeFieldErrorMessage)]
         public int CurrencyId { get; set; } 
         

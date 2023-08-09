@@ -1,5 +1,6 @@
 ﻿
 using Business.DTOs.Requests;
+using DataAccess.Models.Models;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 
@@ -9,6 +10,5 @@ namespace Business.ViewModels
     {
         public CreateTransactionDto CreateTransactionDto { get; set; }
 
-        public SelectList Curencies { get; set; }
     }
 }

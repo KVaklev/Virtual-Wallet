@@ -1,5 +1,8 @@
-﻿using Business.DTOs.Requests;
+﻿using AutoMapper;
+using Business.DTOs.Requests;
+using Business.DTOs.Responses;
 using Business.Exceptions;
+using Business.Mappers;
 using Business.QueryParameters;
 using Business.Services.Contracts;
 using Business.ViewModels;
@@ -8,118 +11,122 @@ using DataAccess.Repositories.Contracts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using System.Security.Claims;
+using System.Security.Cryptography.Xml;
+using System.Text.Json;
 
 namespace VirtualWallet.Controllers.MVC
 {
-    [AllowAnonymous]
+    [Authorize]
     public class TransactionController : Controller
     {
         private readonly ITransactionService transactionService;
         private readonly IUserService userService;
-        private readonly ICurrencyRepository currencyRepository;
+        private readonly ICurrencyService currencyService;
+        private readonly IExchangeRateService exchangeRateService;
+        private readonly IMapper mapper;
 
         public TransactionController(
             ITransactionService transactionService,
-            IUserRepository userRepository,
-            ICurrencyRepository currencyRepository)
+            IUserService userService,
+            ICurrencyService currencyService,
+            IExchangeRateService exchangeRateService,
+            IMapper mapper)
         {
             this.transactionService = transactionService;
             this.userService = userService;
-            this.currencyRepository = currencyRepository;
+            this.currencyService = currencyService;
+            this.exchangeRateService = exchangeRateService;
+            this.mapper = mapper;
         }
 
 
         [HttpGet]
         public async Task<IActionResult> Index([FromQuery] TransactionQueryParameters parameters)
         {
-			//try
-			//{
-			//    var loggedUser = await GetLoggedUserAsync();
-			//    var result = await this.transactionService.FilterByAsync(parameters, loggedUser);
+            //try
+            //{
+            //    var loggedUser = await GetLoggedUserAsync();
+            //    var result = await this.transactionService.FilterByAsync(parameters, loggedUser);
 
-			//    return View(result);
-			//}
-			//catch (EntityNotFoundException ex)
-			//{
-			//    return await EntityErrorViewAsync(ex.Message);
-			//}
+            //    return View(result);
+            //}
+            //catch (EntityNotFoundException ex)
+            //{
+            //    return await EntityErrorViewAsync(ex.Message);
+            //}
 
-			return View();
-		}
+            return View();
+        }
 
         [HttpGet]
-        public async Task<IActionResult> Create([FromQuery] TransactionQueryParameters parameters)
+        public async Task<IActionResult> Create()
         {
 
-            //if ((this.HttpContext.Session.GetString("IsBlocked")) == "True")
-            //{
-            //    return BlockedErrorView();
-            //}
-            //else
-            //{
-            //    return this.View();
-            //}
-            var createTransactionViewModel = new CreateTransactionViewModel();
-            this.InitializeCurrenncies(createTransactionViewModel);
-
+           var createTransactionViewModel = new CreateTransactionViewModel();
+            var result = this.currencyService.GetAll();
+            if (!result.IsSuccessful)
+            {
+                return await EntityErrorViewAsync(result.Message);
+            }
+            
+            TempData["Currencies"] = JsonSerializer.Serialize(result.Data);
             return this.View(createTransactionViewModel);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(CreateTransactionDto transactionDto)
+        public async Task<IActionResult> Create(CreateTransactionViewModel transactionDto)
         {
-            try
+            if (!this.ModelState.IsValid)
             {
-                if (!this.ModelState.IsValid)
-                {
-                    return this.View(transactionDto);
-                }
-                var loggedUserResult = await GetLoggedUserAsync();
+                return this.View(transactionDto);
+            }
+            var loggedUserResult = await GetLoggedUserAsync();
                 if (!loggedUserResult.IsSuccessful)
                 {
                     return await EntityErrorViewAsync(loggedUserResult.Message);
                 }
-                var result = await this.transactionService.CreateOutTransactionAsync(transactionDto, loggedUserResult.Data);
+                var result = await this.transactionService.CreateOutTransactionAsync(transactionDto.CreateTransactionDto, loggedUserResult.Data);
                 if (!result.IsSuccessful)
                 {
                     return await EntityErrorViewAsync(result.Message);
                 }
-                return this.RedirectToAction("Index", "Transacion", new { username = result.Data.SenderUsername });
-            }
-            catch (EntityNotFoundException ex)
-            {
-                return await EntityErrorViewAsync(ex.Message);
-            }
+                return this.RedirectToAction("Execute", "Transaction", new { id = result.Data.Id });
         }
 
         [HttpGet]
-        public async Task<IActionResult> Edit([FromRoute] int id)
+        public async Task<IActionResult> Update([FromRoute] int id)
         {
-            try
+
+            var loggedUserResult = await GetLoggedUserAsync();
+            if (!loggedUserResult.IsSuccessful)
             {
-                var loggedUserResult = await GetLoggedUserAsync();
-                if (!loggedUserResult.IsSuccessful)
-                {
-                    return await EntityErrorViewAsync(loggedUserResult.Message);
-                }
-                var result = await this.transactionService.GetByIdAsync(id, loggedUserResult.Data);
-                if (!result.IsSuccessful)
-                {
-                    return await EntityErrorViewAsync(result.Message);
-                }
-                return this.View(result.Data);
+                return await EntityErrorViewAsync(loggedUserResult.Message);
             }
-            catch (EntityNotFoundException ex)
+            var transactionResult = await this.transactionService.GetByIdAsync(id, loggedUserResult.Data);
+            if (!transactionResult.IsSuccessful)
             {
-                return await EntityErrorViewAsync(ex.Message);
+                return await EntityErrorViewAsync(transactionResult.Message);
             }
+
+            var createTransactionViewModel = new CreateTransactionViewModel();
+            createTransactionViewModel.CreateTransactionDto = await TransactionsMapper.MapGetDtoToCreateDto(transactionResult.Data);
+
+            var currencyResult = this.currencyService.GetAll();
+            if (!currencyResult.IsSuccessful)
+            {
+                return await EntityErrorViewAsync(currencyResult.Message);
+            }
+            TempData["Currencies"] = JsonSerializer.Serialize(currencyResult.Data);
+            return this.View(createTransactionViewModel);
+           
+            
         }
 
         [HttpPost]
-        public async Task<IActionResult> EditAsync([FromRoute] int id, CreateTransactionDto transactionDto)
+        public async Task<IActionResult> Update([FromRoute] int id, CreateTransactionDto transactionDto)
         {
-            try
-            {
+            
                 if (!this.ModelState.IsValid)
                 {
                     return View(transactionDto);
@@ -135,11 +142,7 @@ namespace VirtualWallet.Controllers.MVC
                     return await EntityErrorViewAsync(result.Message);
                 }
                 return this.RedirectToAction("Index", "Transaction", new { Username = loggedUserResult.Data.Username });
-            }
-            catch (EntityNotFoundException ex)
-            {
-                return await EntityErrorViewAsync(ex.Message);
-            }
+            
         }
 
         [HttpGet]
@@ -192,26 +195,77 @@ namespace VirtualWallet.Controllers.MVC
         [HttpGet]
         public async Task<IActionResult> Execute([FromRoute] int id)
         {
-            try
+            var loggedUserResult = await GetLoggedUserAsync();
+            if (!loggedUserResult.IsSuccessful)
             {
-                var loggedUserResult = await GetLoggedUserAsync();
-                if (!loggedUserResult.IsSuccessful)
-                {
-                    return await EntityErrorViewAsync(loggedUserResult.Message);
-                }
-                var result = await this.transactionService.ExecuteAsync(id, loggedUserResult.Data);
-                if (!result.IsSuccessful)
-                {
-                    return await EntityErrorViewAsync(result.Message);
-                }
+                return await EntityErrorViewAsync(loggedUserResult.Message);
+            }
+            var transactionResult = await this.transactionService.GetByIdAsync(id, loggedUserResult.Data);
+            if (!transactionResult.IsSuccessful)
+            {
+                return await EntityErrorViewAsync(transactionResult.Message);
+            }
+            var result = await InitializedExecuteTransactionViewModelAsync(transactionResult.Data);
+            if (!result.IsSuccessful)
+            {
+                return await EntityErrorViewAsync(transactionResult.Message);
+            }
+            ExecuteTransactionViewModel executeTransactionViewModel = result.Data;
 
-                return this.RedirectToAction("Index", "Transaction", new { Username = loggedUserResult.Data.Username });
-            }
-            catch (EntityNotFoundException ex)
-            {
-                return await EntityErrorViewAsync(ex.Message);
-            }
+            return this.View(executeTransactionViewModel);
+
         }
+
+        [HttpPost]
+        public async Task<IActionResult> Execute(
+            [FromRoute] int id,
+            ExecuteTransactionViewModel executeTransactionViewModel)
+        {
+            var loggedUserResult = await GetLoggedUserAsync();
+            if (!loggedUserResult.IsSuccessful)
+            {
+                return await EntityErrorViewAsync(loggedUserResult.Message);
+            }
+            var transactionResult = await this.transactionService.GetByIdAsync(id, loggedUserResult.Data);
+            if (!transactionResult.IsSuccessful)
+            {
+                return await EntityErrorViewAsync(loggedUserResult.Message);
+            }
+            executeTransactionViewModel.GetTransactionDto = transactionResult.Data;
+
+            var userResult = await this.userService.GetLoggedUserByUsernameAsync(transactionResult.Data.RecipientUsername);
+            if (!userResult.IsSuccessful)
+            {
+                return await EntityErrorViewAsync(userResult.Message);
+            }
+            executeTransactionViewModel.Recipient = userResult.Data;
+
+            var result = await this.transactionService.ExecuteAsync(id, loggedUserResult.Data);
+            if (!result.IsSuccessful)
+            {
+                return await EntityErrorViewAsync(result.Message);
+            }
+
+            return RedirectToAction("Confirm", "Transaction", new { id = transactionResult.Data.Id });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Confirm([FromRoute] int id)
+        {
+            var loggedUserResult = await GetLoggedUserAsync();
+            if (!loggedUserResult.IsSuccessful)
+            {
+                return await EntityErrorViewAsync(loggedUserResult.Message);
+            }
+            var transactionResult = await this.transactionService.GetByIdAsync(id, loggedUserResult.Data);
+            if (!transactionResult.IsSuccessful)
+            {
+                return await EntityErrorViewAsync(loggedUserResult.Message);
+            }
+
+            return this.View(transactionResult.Data);
+        }
+    
 
         private async Task<IActionResult> EntityErrorViewAsync(string message)
         {
@@ -231,15 +285,38 @@ namespace VirtualWallet.Controllers.MVC
 
         private async Task<Response<User>> GetLoggedUserAsync()
         {
-            //var username = this.HttpContext.Session.GetString("LoggedUser");
-            var userResult = await this.userService.GetLoggedUserByUsernameAsync("ivanGorev");
-            return userResult;
+            var loggedUsersUsername = User.FindFirst(ClaimTypes.Name);
+            var loggedUserResult = await this.userService.GetLoggedUserByUsernameAsync(loggedUsersUsername.Value);
+
+            return loggedUserResult;
         }
 
-        private void InitializeCurrenncies(CreateTransactionViewModel createTransactionViewModel)
+        private async Task<Response<ExecuteTransactionViewModel>> InitializedExecuteTransactionViewModelAsync(
+            GetTransactionDto transaction)
         {
-            var currencies = this.currencyRepository.GetAll();
-            createTransactionViewModel.Curencies = new SelectList(currencies, "CurrencyCode", "Name");
+            var result = new Response<ExecuteTransactionViewModel>();
+            ExecuteTransactionViewModel executeTransactionViewModel = new ExecuteTransactionViewModel();
+            executeTransactionViewModel.GetTransactionDto = transaction;
+            var userResult = await this.userService.GetLoggedUserByUsernameAsync(transaction.RecipientUsername);
+            if (!userResult.IsSuccessful)
+            {
+                result.IsSuccessful = false;
+                result.Message = userResult.Message;
+                return result;
+            }
+            executeTransactionViewModel.Recipient = userResult.Data;
+            var exchngeAmount = await this.exchangeRateService.ExchangeAsync(executeTransactionViewModel.GetTransactionDto.Amount,
+                executeTransactionViewModel.GetTransactionDto.CurrencyCode,
+                userResult.Data.Account.Currency.CurrencyCode);
+            if (!exchngeAmount.IsSuccessful)
+            {
+                result.IsSuccessful = false;
+                result.Message = exchngeAmount.Message;
+                return result;
+            }
+            executeTransactionViewModel.RecipientGetsAmount = exchngeAmount.Data;
+            result.Data = executeTransactionViewModel;
+            return result;
         }
     }
 }
