@@ -407,6 +407,8 @@ namespace Business.Services.Models
 
             var history = await HistoryMapper.MapCreateWithTransferAsync(transfer);
 
+            await this.historyRepository.CreateAsync(history);
+
             int historyCountNewHistoryAdded = await this.context.History.CountAsync();
 
             if (historyCount + 1 == historyCountNewHistoryAdded)
