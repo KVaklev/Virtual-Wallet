@@ -11,24 +11,14 @@ using DataAccess.Models.Enums;
 using DataAccess.Models.Models;
 using DataAccess.Repositories.Contracts;
 using DataAccess.Repositories.Data;
-using DataAccess.Repositories.Models;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http.Headers;
-using System.Security.Cryptography.Xml;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace Business.Services.Models
 {
     public class TransferService : ITransferService
     {
         private readonly ITransferRepository transferRepository;
-        private readonly IHistoryRepository historyRepository;
-        private readonly IAccountRepository accountRepository;
-        private readonly IUserRepository userRepository;
         private readonly ICardRepository cardRepository;
         private readonly ApplicationContext context;
         private readonly IMapper mapper;
@@ -38,10 +28,7 @@ namespace Business.Services.Models
         private readonly IExchangeRateService exchangeRateService;
 
         public TransferService(
-            ITransferRepository transferRepository,
-            IHistoryRepository historyRepository,
-            IAccountRepository accountRepository,
-            IUserRepository userRepository,
+            ITransferRepository transferRepository,            
             ICardRepository cardRepository,
             ApplicationContext context,
             IMapper mapper,
@@ -51,9 +38,6 @@ namespace Business.Services.Models
             IExchangeRateService exchangeRateService)
         {
             this.transferRepository = transferRepository;
-            this.historyRepository = historyRepository;
-            this.accountRepository = accountRepository;
-            this.userRepository = userRepository;
             this.context = context;
             this.mapper = mapper;
             this.currencyRepository = currencyRepository;
@@ -63,22 +47,33 @@ namespace Business.Services.Models
             this.exchangeRateService = exchangeRateService;
         }
 
-        public Response<IQueryable<GetTransferDto>> GetAll(User user)
+        public async Task<Response<PaginatedList<GetTransferDto>>> FilterByAsync(TransferQueryParameters filterParameters, User loggedUser)
         {
-            var result = new Response<IQueryable<GetTransferDto>>();
+            var result = new Response<PaginatedList<GetTransferDto>>();
+            var transfersResult = this.GetAll(loggedUser);
+            IQueryable<Transfer> transfers = transfersResult.Data;
 
-            var transfers = this.transferRepository.GetAll(user);
+            transfers = await FilterByUsernameAsync(transfers, filterParameters.Username);
+            transfers = await FilterByFromDateAsync(transfers, filterParameters.FromDate);
+            transfers = await FilterByToDateAsync(transfers, filterParameters.ToDate);
+            transfers = await FilterByTransferTypeAsync(transfers, filterParameters.TransferType);
+            transfers = await SortByAsync(transfers, filterParameters.SortBy);
 
-            if (transfers.Count() == 0)
+            int totalPages = (transfers.Count() + filterParameters.PageSize - 1) / filterParameters.PageSize;
+            transfers = await Common<Transfer>.PaginateAsync(transfers, filterParameters.PageNumber, filterParameters.PageSize);
+
+            if (!transfers.Any())
             {
                 result.IsSuccessful = false;
                 result.Message = Constants.ModifyNoRecordsFound;
                 return result;
             }
-            result.Data = (IQueryable<GetTransferDto>)transfers.AsQueryable();
 
+            List<GetTransferDto> transferDtos = transfers
+                .Select(transfer => mapper.Map<GetTransferDto>(transfer)).ToList();
+
+            result.Data = new PaginatedList<GetTransferDto>(transferDtos, totalPages, filterParameters.PageNumber);
             return result;
-
         }
 
         public async Task<Response<GetTransferDto>> GetByIdAsync(int id, User user)
@@ -95,7 +90,6 @@ namespace Business.Services.Models
             }
 
             if (!await Security.IsUserAuthorizedAsync(transferToGet, user) || user.IsAdmin)
-
             {
                 result.IsSuccessful = false;
                 result.Message = Constants.ModifyTransferGetByIdErrorMessage;
@@ -108,13 +102,9 @@ namespace Business.Services.Models
             return result;
         }
 
-
-
         public async Task<Response<GetTransferDto>> CreateAsync(CreateTransferDto transferDto, User user)
         {
-
             var result = new Response<GetTransferDto>();
-
 
             if (user.IsBlocked)
             {
@@ -124,13 +114,9 @@ namespace Business.Services.Models
             }
 
             var card = this.cardRepository.GetByAccountId((int)user.AccountId).FirstOrDefault(x => x.CardNumber == transferDto.CardNumber);
-
             var currency = await this.currencyRepository.GetByCurrencyCodeAsync(transferDto.CurrencyCode);
-
             var transferType = Enum.Parse<TransferDirection>(transferDto.TransferType, true);
-
             var transfer = await TransfersMapper.MapCreateDtoToTransferAsync(transferDto, user, card, currency, transferType);
-
 
             if (transfer.TransferType == TransferDirection.Deposit)
             {
@@ -140,7 +126,6 @@ namespace Business.Services.Models
                     result.Message = Constants.ModifyAccountBalancetErrorMessage;
 
                     return result;
-
                 }
             }
             else
@@ -151,10 +136,8 @@ namespace Business.Services.Models
                     result.Message = Constants.ModifyAccountBalancetErrorMessage;
 
                     return result;
-
                 }
             }
-
 
             transfer.DateCreated = DateTime.UtcNow;
             transfer.IsConfirmed = false;
@@ -167,7 +150,6 @@ namespace Business.Services.Models
 
             return result;
         }
-
 
         public async Task<Response<bool>> DeleteAsync(int id, User user)
         {
@@ -190,7 +172,6 @@ namespace Business.Services.Models
 
             }
 
-
             if (transferToDelete.IsCancelled || transferToDelete.IsConfirmed)
             {
                 result.IsSuccessful = false;
@@ -198,17 +179,14 @@ namespace Business.Services.Models
                 return result;
 
             }
-
             result.Message = Constants.ModifyTransferErrorMessage;
             result.Data = await this.transferRepository.DeleteAsync(id);
             return result;
         }
 
-
         public async Task<Response<GetTransferDto>> UpdateAsync(int id, UpdateTransferDto transferDto, User user)
         {
             var result = new Response<GetTransferDto>();
-
             Transfer transfer = await transferRepository.GetByIdAsync(id);
 
             if (transfer == null)
@@ -240,48 +218,16 @@ namespace Business.Services.Models
             }
 
             var card = this.cardRepository.GetByAccountId((int)user.AccountId).FirstOrDefault(x => x.CardNumber == transferDto.CardNumber);
-
             var currency = await this.currencyRepository.GetByCurrencyCodeAsync(transferDto.CurrencyCode);
-
             await TransfersMapper.MapUpdateDtoToTransferAsync(transferDto, user, card, currency);
-
             await this.transferRepository.SaveChangesAsync();
 
             result.Data = this.mapper.Map<GetTransferDto>(transfer);
-
             result.IsSuccessful = true;
 
             return result;
         }
 
-
-        public async Task<Response<PaginatedList<GetTransferDto>>> FilterByAsync(TransferQueryParameters transferQueryParameters, User loggedUser)
-        {
-            var result = new Response<PaginatedList<GetTransferDto>>();
-
-            var transfers = await this.transferRepository.FilterByAsync(transferQueryParameters, loggedUser);
-
-
-            if (transfers.Count == 0)
-            {
-
-                result.IsSuccessful = false;
-                result.Message = Constants.ModifyNoRecordsFound;
-                return result;
-
-            }
-
-            var transferTotalPages = transfers.TotalPages;
-            var transferPageNumber = transfers.PageNumber;
-
-            List<GetTransferDto> transferDtos = transfers.Select(transfer => mapper.Map<GetTransferDto>(transfer)).ToList();
-
-
-            result.Data = new PaginatedList<GetTransferDto>(transferDtos, transferTotalPages, transferPageNumber);
-
-            return result;
-
-        }
 
         public async Task<Response<bool>> ExecuteAsync(int transferId, User user)
         {
@@ -296,7 +242,7 @@ namespace Business.Services.Models
                 return result;
             }
 
-            if (!(await Security.IsUserAuthorizedAsync(transferToExecute, user)))
+            if (!await Security.IsUserAuthorizedAsync(transferToExecute, user))
             {
                 result.IsSuccessful = false;
                 result.Message = Constants.ModifyTransferErrorMessage;
@@ -326,7 +272,29 @@ namespace Business.Services.Models
 
         }
 
+        private Response<IQueryable<Transfer>> GetAll(User loggedUser)
+        {
+            var result = new Response<IQueryable<Transfer>>();
+            var transfers = this.transferRepository.GetAll(loggedUser);
 
+            if (transfers.Any())
+            {
+                if (!loggedUser.IsAdmin)
+                {
+                    transfers = transfers
+                         .Where(a => a.Account.User.Username == loggedUser.Username)
+                         .AsQueryable();
+                }
+                result.Data = transfers;
+                return result;
+            }
+            else
+            {
+                result.IsSuccessful = false;
+                result.Message = Constants.ModifyNoRecordsFound;
+                return result;
+            }
+        }
         private async Task<Response<decimal>> GetCorrectAmountAsync(string transferCurrencyCode, string accountCurrencyCode, decimal amount)
         {
             var result = new Response<decimal>();
@@ -347,8 +315,6 @@ namespace Business.Services.Models
             }
             return result;
         }
-
-
         private async Task<Response<bool>> UpdateAccountsBalanceAsync(Transfer transfer, User user)
         {
             var accountAmount = await GetCorrectAmountAsync(transfer.Currency.CurrencyCode, transfer.Account.Currency.CurrencyCode, transfer.Amount);
@@ -392,15 +358,12 @@ namespace Business.Services.Models
 
             return result;
         }
-
-
-
         private async Task<bool> AddTransferToHistoryAsync(Transfer transfer)
         {
             var historyCount = await this.context.History.CountAsync();
 
-            var history = await HistoryMapper.MapCreateWithTransferAsync(transfer);
-            int historyCountNewHistoryAdded = await this.context.History.CountAsync();
+            var history = await HistoryMapper.MapCreateWithTransferAsync(transfer);//not used?
+            int historyCountNewHistoryAdded = await this.context.History.CountAsync(); //edit - not call the context
 
             if (historyCount + 1 == historyCountNewHistoryAdded)
             {
@@ -412,9 +375,88 @@ namespace Business.Services.Models
             }
         }
 
+        private async Task<IQueryable<Transfer>> FilterByUsernameAsync(IQueryable<Transfer> transfers, string? username)
+        {
+            if (!string.IsNullOrEmpty(username))
+            {
+                transfers = transfers.Where(t => t.Account.User.Username == username);
+            }
 
+            return await Task.FromResult(transfers);
+        }
+        private async Task<IQueryable<Transfer>> FilterByFromDateAsync(IQueryable<Transfer> transfers, string? fromDate)
+        {
+            if (!string.IsNullOrEmpty(fromDate))
+            {
+                DateTime date = DateTime.Parse(fromDate);
 
+                transfers = transfers.Where(a => a.DateCreated >= date);
+            }
 
+            return await Task.FromResult(transfers);
+        }
+        private async Task<IQueryable<Transfer>> FilterByToDateAsync(IQueryable<Transfer> transfers, string? toDate)
+        {
+            if (!string.IsNullOrEmpty(toDate))
+            {
+                DateTime date = DateTime.Parse(toDate);
+
+                transfers = transfers.Where(a => a.DateCreated <= date);
+            }
+
+            return await Task.FromResult(transfers);
+        }
+        private async Task<IQueryable<Transfer>> FilterByTransferTypeAsync(IQueryable<Transfer> transfers, string? transfer)
+        {
+            if (!string.IsNullOrEmpty(transfer))
+            {
+                if (TryParseTransferTypeParameter(transfer, out TransferDirection? transferType))
+                {
+                    if (transferType.HasValue)
+                    {
+                        return await Task.FromResult(transfers.Where(t => t.TransferType == transferType.Value));
+                    }
+                    else
+                    {
+                        return await Task.FromResult(transfers);
+                    }
+                }
+            }
+
+            return await Task.FromResult(transfers);
+        }
+        private bool TryParseTransferTypeParameter(string value, out TransferDirection? result)
+        {
+            if (Enum.TryParse(value, true, out TransferDirection parsedResult))
+            {
+                result = parsedResult;
+                return true;
+            }
+
+            result = null;
+            return false;
+        }
+        private static async Task<IQueryable<Transfer>> SortByAsync(IQueryable<Transfer> transfers, string? sortCriteria)
+        {
+            if (Enum.TryParse<SortCriteria>(sortCriteria, true, out var sortEnum))
+            {
+                switch (sortEnum)
+                {
+                    case SortCriteria.Amount:
+                        return await Task.FromResult(transfers.OrderBy(t => t.Amount));
+                    case SortCriteria.Date:
+                        return await Task.FromResult(transfers.OrderBy(t => t.DateCreated));
+
+                    default:
+                        return await Task.FromResult(transfers);
+                }
+            }
+            else
+            {
+                return await Task.FromResult(transfers);
+
+            }
+        }
     }
 
 

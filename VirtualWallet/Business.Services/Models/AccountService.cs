@@ -38,9 +38,9 @@ namespace Business.Services.Models
         public Response<IQueryable<GetAccountDto>> GetAll()
         {
             var result = new Response<IQueryable<GetAccountDto>>();
-            var accounts = accountRepository.GetAll();
+            var accounts = this.accountRepository.GetAll();
 
-            if (accounts != null && accounts.Any())
+            if (accounts.Any())
             {
                 result.IsSuccessful = true;
                 result.Data = (IQueryable<GetAccountDto>)accounts.AsQueryable();

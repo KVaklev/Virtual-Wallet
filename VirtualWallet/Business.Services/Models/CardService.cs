@@ -27,26 +27,21 @@ namespace Business.Services.Models
             this.currencyService = currencyService;
             this.mapper = mapper;
         }
-        public async Task<Response<IQueryable<GetCardDto>>> GetAll(User loggedUser)
+        private Response<IQueryable<Card>> GetAll(User loggedUser)
         {
-            var result = new Response<IQueryable<GetCardDto>>();
+            var result = new Response<IQueryable<Card>>();
             var cards = this.cardRepository.GetAll();
 
             if (cards.Any())
             {
-                if (await Security.IsAdminAsync(loggedUser))
-                {
-                    result.Data = (IQueryable<GetCardDto>)cards;
-                    return result;
-                }
-                else
+                if (!loggedUser.IsAdmin)
                 {
                     cards = cards
                         .Where(a => a.Account.User.Username == loggedUser.Username)
                         .AsQueryable();
-                    result.Data = (IQueryable<GetCardDto>)cards;
-                    return result;
                 }
+                result.Data = cards;
+                return result;
             }
             else
             {
@@ -54,12 +49,12 @@ namespace Business.Services.Models
                 result.Message = NoCardsErrorMessage;
                 return result;
             }
-
         }
         public async Task<Response<PaginatedList<GetCreatedCardDto>>> FilterByAsync(CardQueryParameters filterParameters, User loggedUser)
         {
             var result = new Response<PaginatedList<GetCreatedCardDto>>();
-            IQueryable<Card> cards = this.cardRepository.GetAll();
+            var cardsResult = this.GetAll(loggedUser);
+            IQueryable<Card> cards = cardsResult.Data;
 
             cards = await FilterByExpirationDateAsync(cards, filterParameters.ExpirationDate);
             cards = await FilterByCardTypeAsync(cards, filterParameters.CardType);
@@ -76,22 +71,13 @@ namespace Business.Services.Models
                 result.Message = NoCardsErrorMessage;
                 return result;
             }
-            else
-            {
-                if (!await Security.IsAdminAsync(loggedUser))
-                {
-                    cards = cards
-                        .Where(a => a.Account.User.Username == loggedUser.Username)
-                        .AsQueryable(); 
-                }
 
-                List<GetCreatedCardDto> cardDtos = cards
-                   .Select(card => mapper.Map<GetCreatedCardDto>(card))
-                   .ToList();
+            List<GetCreatedCardDto> cardDtos = cards
+               .Select(card => mapper.Map<GetCreatedCardDto>(card))
+               .ToList();
 
-                result.Data = new PaginatedList<GetCreatedCardDto>(cardDtos, totalPages, filterParameters.PageNumber);
-                return result;
-            }
+            result.Data = new PaginatedList<GetCreatedCardDto>(cardDtos, totalPages, filterParameters.PageNumber);
+            return result;
         }
 
         public async Task<Response<GetCardDto>> GetByIdAsync(int id, User loggedUser)
@@ -294,29 +280,33 @@ namespace Business.Services.Models
         }
         private async Task<IQueryable<Card>> SortByAsync(IQueryable<Card> result, string sortCriteria)
         {
-            switch (sortCriteria)
+            if (Enum.TryParse<SortCriteria>(sortCriteria, true, out var sortEnum))
             {
-                case "username":
+                switch (sortEnum)
+            {
+                case SortCriteria.Username:
                     return await Task.FromResult(result.OrderBy(card => card.Account.User.Username));
-                case "expirationDate":
+                case SortCriteria.ExpirationDate:
                     return await Task.FromResult(result.OrderBy(card => card.ExpirationDate));
-                case "cardType":
+                case SortCriteria.CardType:
                     return await Task.FromResult(result.OrderBy(card => card.CardType));
-                case "balance":
+                case SortCriteria.Balance:
                     return await Task.FromResult(result.OrderBy(card => card.Account.Balance));
-                default:
-                    return await Task.FromResult(result);
+                }
             }
+            return result;
         }
         private async Task<IQueryable<Card>> SortOrderAsync(IQueryable<Card> result, string sortOrder)
         {
-            switch (sortOrder)
+            if (Enum.TryParse<SortCriteria>(sortOrder, true, out var sortEnum))
             {
-                case "desc":
-                    return await Task.FromResult(result.Reverse());
-                default:
-                    return await Task.FromResult(result);
+                switch (sortEnum)
+                {
+                    case SortCriteria.Desc:
+                        return await Task.FromResult(result.Reverse());
+                }
             }
+            return await Task.FromResult(result);
         }
     }
 }

@@ -29,29 +29,11 @@ namespace Business.Services.Models
             this.mapper = mapper;
         }
 
-        public Response<IQueryable<GetUserDto>> GetAll()
-        {
-            var result = new Response<IQueryable<GetUserDto>>();
-            var users = this.userRepository.GetAll();
-
-            if (users != null && users.Any())
-            {
-                result.IsSuccessful = true;
-                result.Data = (IQueryable<GetUserDto>)users.AsQueryable();
-            }
-            else
-            {
-                result.IsSuccessful = false;
-                result.Message = NoUsersErrorMessage;
-            }
-
-            return result;
-        }
-
         public async Task<Response<PaginatedList<GetCreatedUserDto>>> FilterByAsync(UserQueryParameters filterParameters)
         {
             var result = new Response<PaginatedList<GetCreatedUserDto>>();
-            IQueryable<User> users = this.userRepository.GetAll();
+            var usersResult = this.GetAll();
+            IQueryable<User> users = usersResult.Data;
 
             users = await FilterByFirstNameAsync(users, filterParameters.FirstName);
             users = await FilterByLastNameAsync(users, filterParameters.LastName);
@@ -62,6 +44,7 @@ namespace Business.Services.Models
             users = await FilterByBlockedStatusAsync(users, filterParameters.Blocked);
             users = await SortByAsync(users, filterParameters.SortBy);
             users = await SortOrderAsync(users, filterParameters.SortOrder);
+
             int totalPages = (users.Count() + filterParameters.PageSize - 1) / filterParameters.PageSize;
             users = await Common<User>.PaginateAsync(users, filterParameters.PageNumber, filterParameters.PageSize);
 
@@ -362,6 +345,7 @@ namespace Business.Services.Models
 
             return result;
         }
+
         public async Task<Response<User>> GetLoggedUserByIdAsync(int id)
         {
             var result = new Response<User>();
@@ -375,6 +359,25 @@ namespace Business.Services.Models
                 return result;
             }
             result.Data = user;
+
+            return result;
+        }
+
+        private Response<IQueryable<User>> GetAll()
+        {
+            var result = new Response<IQueryable<User>>();
+            var users = this.userRepository.GetAll();
+
+            if (users.Any())
+            {
+                result.IsSuccessful = true;
+                result.Data = users;
+            }
+            else
+            {
+                result.IsSuccessful = false;
+                result.Message = NoUsersErrorMessage;
+            }
 
             return result;
         }
