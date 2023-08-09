@@ -146,7 +146,7 @@ namespace VirtualWallet.Controllers.MVC
         }
 
         [HttpGet]
-        public async Task<IActionResult> DeleteAsync([FromRoute] int id)
+        public async Task<IActionResult> Delete([FromRoute] int id)
         {
             
                 var loggedUserResult = await FindLoggedUserAsync();
@@ -154,16 +154,24 @@ namespace VirtualWallet.Controllers.MVC
                 {
                     return await EntityErrorViewAsync(loggedUserResult.Message);
                 }
-                var result = await this.transactionService.GetByIdAsync(id, loggedUserResult.Data);
+                var transactionResult = await this.transactionService.GetByIdAsync(id, loggedUserResult.Data);
+                if (!transactionResult.IsSuccessful)
+                {
+                    return await EntityErrorViewAsync(transactionResult.Message);
+                }
+                var result = await InitializedExecuteTransactionViewModelAsync(transactionResult.Data);
                 if (!result.IsSuccessful)
                 {
-                    return await EntityErrorViewAsync(result.Message);
+                    return await EntityErrorViewAsync(transactionResult.Message);
                 }
-                return this.View(result.Data);
+            ExecuteTransactionViewModel executeTransactionViewModel=result.Data;
+            return this.View(executeTransactionViewModel);
         }
 
-        [HttpPost, ActionName("Delete")]
-        public async Task<IActionResult> DeleteConfirmed([FromRoute] int id)
+        [HttpPost]
+        public async Task<IActionResult>Delete(
+            [FromRoute] int id, 
+            ExecuteTransactionViewModel executeTransactionViewModel)
         {
             
                 var loggedUserResult = await FindLoggedUserAsync();
@@ -177,7 +185,7 @@ namespace VirtualWallet.Controllers.MVC
                     return await EntityErrorViewAsync(result.Message);
                 }
 
-                return this.RedirectToAction("Index", "Transaction", new { Username = loggedUserResult.Data.Username });
+                return this.RedirectToAction("SuccessfulDelete", "Transaction");
            
         }
 
@@ -254,7 +262,13 @@ namespace VirtualWallet.Controllers.MVC
 
             return this.View(transactionResult.Data);
         }
-    
+
+        [HttpGet]
+        public async Task<IActionResult> SuccessfulDelete()
+        {
+            return this.View();
+        }
+
 
         private async Task<IActionResult> EntityErrorViewAsync(string message)
         {
@@ -294,9 +308,12 @@ namespace VirtualWallet.Controllers.MVC
                 return result;
             }
             executeTransactionViewModel.Recipient = userResult.Data;
-            var exchngeAmount = await this.exchangeRateService.ExchangeAsync(executeTransactionViewModel.GetTransactionDto.Amount,
+
+            var exchngeAmount = await this.exchangeRateService.ExchangeAsync(
+                executeTransactionViewModel.GetTransactionDto.Amount,
                 executeTransactionViewModel.GetTransactionDto.CurrencyCode,
                 userResult.Data.Account.Currency.CurrencyCode);
+
             if (!exchngeAmount.IsSuccessful)
             {
                 result.IsSuccessful = false;
