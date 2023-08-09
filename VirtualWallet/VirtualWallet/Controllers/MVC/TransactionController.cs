@@ -81,7 +81,7 @@ namespace VirtualWallet.Controllers.MVC
             {
                 return this.View(transactionDto);
             }
-            var loggedUserResult = await GetLoggedUserAsync();
+            var loggedUserResult = await FindLoggedUserAsync();
                 if (!loggedUserResult.IsSuccessful)
                 {
                     return await EntityErrorViewAsync(loggedUserResult.Message);
@@ -98,7 +98,7 @@ namespace VirtualWallet.Controllers.MVC
         public async Task<IActionResult> Update([FromRoute] int id)
         {
 
-            var loggedUserResult = await GetLoggedUserAsync();
+            var loggedUserResult = await FindLoggedUserAsync();
             if (!loggedUserResult.IsSuccessful)
             {
                 return await EntityErrorViewAsync(loggedUserResult.Message);

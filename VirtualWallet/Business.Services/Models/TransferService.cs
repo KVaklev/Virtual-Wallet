@@ -26,11 +26,13 @@ namespace Business.Services.Models
         private readonly IAccountService accountService;
         private readonly ICardService cardService;
         private readonly IExchangeRateService exchangeRateService;
+        private readonly IHistoryRepository historyRepository;
 
         public TransferService(
             ITransferRepository transferRepository,            
             ICardRepository cardRepository,
             ApplicationContext context,
+            IHistoryRepository historyRepository,
             IMapper mapper,
             ICurrencyRepository currencyRepository,
             IAccountService accountService,
@@ -45,6 +47,7 @@ namespace Business.Services.Models
             this.accountService = accountService;
             this.cardService = cardService;
             this.exchangeRateService = exchangeRateService;
+            this.historyRepository = historyRepository;
         }
 
         public async Task<Response<PaginatedList<GetTransferDto>>> FilterByAsync(TransferQueryParameters filterParameters, User loggedUser)
