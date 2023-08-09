@@ -225,7 +225,7 @@ namespace Business.Services.Models
             return result;
         }
 
-        public async Task <Response<Account>> IncreaseBalanceAsync(int id, decimal amount, User loggedUser)
+        public async Task <Response<Account>> IncreaseBalanceAsync(int id, decimal amount, User loggedUser)//Todo - why have loogedUser
         {
             var result = new Response<Account>();
             Account accountToDepositTo = await this.accountRepository.GetByIdAsync(id);

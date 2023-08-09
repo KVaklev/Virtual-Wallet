@@ -219,11 +219,15 @@ namespace Business.Services.Models
 
             var card = this.cardRepository.GetByAccountId((int)user.AccountId).FirstOrDefault(x => x.CardNumber == transferDto.CardNumber);
             var currency = await this.currencyRepository.GetByCurrencyCodeAsync(transferDto.CurrencyCode);
-            await TransfersMapper.MapUpdateDtoToTransferAsync(transferDto, user, card, currency);
-            await this.transferRepository.SaveChangesAsync();
 
-            result.Data = this.mapper.Map<GetTransferDto>(transfer);
-            result.IsSuccessful = true;
+
+            var newTransfer = await TransfersMapper.MapUpdateDtoToTransferAsync(transfer, transferDto, card, currency);
+
+            newTransfer.DateCreated = DateTime.UtcNow;
+
+            result.Data = this.mapper.Map<GetTransferDto>(newTransfer);
+
+            await this.transferRepository.SaveChangesAsync();
 
             return result;
         }
@@ -299,6 +303,8 @@ namespace Business.Services.Models
         {
             var result = new Response<decimal>();
 
+            result.Data = amount;
+
             if (transferCurrencyCode != accountCurrencyCode)
             {
                 var amountResult = await this.exchangeRateService.ExchangeAsync(amount, transferCurrencyCode, accountCurrencyCode);
@@ -313,6 +319,9 @@ namespace Business.Services.Models
                 result.Data = amountResult.Data;
 
             }
+
+
+
             return result;
         }
         private async Task<Response<bool>> UpdateAccountsBalanceAsync(Transfer transfer, User user)
@@ -327,12 +336,12 @@ namespace Business.Services.Models
                 result.IsSuccessful = false;
                 result.Message = accountAmount.Message;
                 return result;
-               
+
             }
 
             var cardAmount = await GetCorrectAmountAsync(transfer.Currency.CurrencyCode, transfer.Card.Currency.CurrencyCode, transfer.Amount);
 
-            if(!cardAmount.IsSuccessful)
+            if (!cardAmount.IsSuccessful)
             {
                 result.IsSuccessful = false;
                 result.Message = cardAmount.Message;
@@ -362,8 +371,11 @@ namespace Business.Services.Models
         {
             var historyCount = await this.context.History.CountAsync();
 
-            var history = await HistoryMapper.MapCreateWithTransferAsync(transfer);//not used?
-            int historyCountNewHistoryAdded = await this.context.History.CountAsync(); //edit - not call the context
+            var history = await HistoryMapper.MapCreateWithTransferAsync(transfer);
+
+            await this.historyRepository.CreateAsync(history);
+
+            int historyCountNewHistoryAdded = await this.context.History.CountAsync();
 
             if (historyCount + 1 == historyCountNewHistoryAdded)
             {

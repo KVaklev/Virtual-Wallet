@@ -26,9 +26,9 @@ namespace Business.Mappers
         }
 
         public static async Task<Transfer> MapCreateDtoToTransferAsync(
-            CreateTransferDto transferDto, 
-            User user, Card card, 
-            Currency currency, 
+            CreateTransferDto transferDto,
+            User user, Card card,
+            Currency currency,
             TransferDirection transferDirection)
         {
             var transfer = new Transfer();
@@ -45,12 +45,12 @@ namespace Business.Mappers
         }
 
         public static async Task<Transfer> MapUpdateDtoToTransferAsync(
-            UpdateTransferDto transferDto, 
-            User user, 
-            Card card, 
+            Transfer transfer,
+            UpdateTransferDto transferDto,
+            Card card,
             Currency currency)
         {
-            var transfer = new Transfer();
+
             transfer.Amount = transferDto.Amount;
             transfer.Currency = currency;
             transfer.Card = card;
