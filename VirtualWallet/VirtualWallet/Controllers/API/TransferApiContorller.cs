@@ -10,6 +10,7 @@ using DataAccess.Models.Models;
 using DataAccess.Repositories.Contracts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace VirtualWallet.Controllers.API
 {
@@ -178,9 +179,10 @@ namespace VirtualWallet.Controllers.API
         }
         private async Task<Response<User>> FindLoggedUserAsync()
         {
-            var loggedUsersUsername = User.Claims.FirstOrDefault(claim => claim.Type == "Username").Value;
-            var loggedUser = await this.userService.GetLoggedUserByUsernameAsync(loggedUsersUsername);
-            return loggedUser;
+            var loggedUsersUsername = User.FindFirst(ClaimTypes.Name);
+            var loggedUserResult = await this.userService.GetLoggedUserByUsernameAsync(loggedUsersUsername.Value);
+
+            return loggedUserResult;
         }
     }
 }
