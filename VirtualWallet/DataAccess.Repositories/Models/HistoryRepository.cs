@@ -51,8 +51,9 @@ namespace DataAccess.Repositories.Models
 
             if (!loggedUser.IsAdmin)
             { 
-                result = result.Where(t => t.AccountId==loggedUser.AccountId);
+                result = result.Where(t => t.AccountId==loggedUser.AccountId);//TODO
             }
+            return result;
         }
 
         public async Task<int> GetHistoryCountAsync()
@@ -89,7 +90,6 @@ namespace DataAccess.Repositories.Models
             }
             return await Task.FromResult(result);
         }        
-            return await Task.FromResult(result);
-        }        
+        
     }
 }

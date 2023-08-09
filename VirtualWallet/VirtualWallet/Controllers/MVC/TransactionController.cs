@@ -149,7 +149,7 @@ namespace VirtualWallet.Controllers.MVC
         public async Task<IActionResult> DeleteAsync([FromRoute] int id)
         {
             
-                var loggedUserResult = await GetLoggedUserAsync();
+                var loggedUserResult = await FindLoggedUserAsync();
                 if (!loggedUserResult.IsSuccessful)
                 {
                     return await EntityErrorViewAsync(loggedUserResult.Message);
@@ -166,7 +166,7 @@ namespace VirtualWallet.Controllers.MVC
         public async Task<IActionResult> DeleteConfirmed([FromRoute] int id)
         {
             
-                var loggedUserResult = await GetLoggedUserAsync();
+                var loggedUserResult = await FindLoggedUserAsync();
                 if (!loggedUserResult.IsSuccessful)
                 {
                     return await EntityErrorViewAsync(loggedUserResult.Message);
