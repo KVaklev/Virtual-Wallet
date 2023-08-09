@@ -15,6 +15,7 @@ namespace DataAccess.Repositories.Contracts
         Task<User> PromoteAsync(int id);
         Task<User> BlockUserAsync(int id);
         Task<User> UnblockUserAsync(int id);
+        Task<bool> SaveChangesAsync();
         Task<bool> UsernameExistsAsync(string username);
         Task<bool> EmailExistsAsync(string email);
         Task<bool> PhoneNumberExistsAsync(string phoneNumber);

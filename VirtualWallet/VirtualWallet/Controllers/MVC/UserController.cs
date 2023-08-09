@@ -1,9 +1,11 @@
-﻿using Business.QueryParameters;
+﻿using Business.DTOs.Requests;
+using Business.QueryParameters;
 using Business.Services.Contracts;
 using Business.ViewModels;
+using DataAccess.Models.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-
+using System.Security.Claims;
 
 namespace VirtualWallet.Controllers.MVC
 {
@@ -38,5 +40,43 @@ namespace VirtualWallet.Controllers.MVC
             return this.View(newViewModel);
         }
 
+
+        [HttpGet, Authorize]
+        public async Task<IActionResult> ChangeStatus(int id)
+        {
+            var loggedUserResponse = await GetLoggedUserAsync();
+            if (!loggedUserResponse.IsSuccessful)
+            {
+                return StatusCode(StatusCodes.Status404NotFound, loggedUserResponse.Message);
+            }
+
+            var newViewModel = new UserChangeStatusViewModel();
+
+            return this.View(newViewModel);
+        }
+
+        [HttpPost, ActionName("ChangeStatus")]
+        [HttpPost, Authorize]
+        public async Task<IActionResult> ChangeStatusConfirmed(int id, UserChangeStatusViewModel userChangeStatusViewModel)
+        {
+            var loggedUserResponse = await GetLoggedUserAsync();
+            if (!loggedUserResponse.IsSuccessful)
+            {
+                return StatusCode(StatusCodes.Status404NotFound, loggedUserResponse.Message);
+            }
+
+            await userService.ChangeStatusAsync(id, loggedUserResponse.Data);
+
+            return this.RedirectToAction("Index", "Users");
+        }
+
+
+        private async Task<Response<User>> GetLoggedUserAsync()
+        {
+            var loggedUsersUsername = User.FindFirst(ClaimTypes.Name);
+            var loggedUserResult = await this.userService.GetLoggedUserByUsernameAsync(loggedUsersUsername.Value);
+
+            return loggedUserResult;
+        }
     }
 }

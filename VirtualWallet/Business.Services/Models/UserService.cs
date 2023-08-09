@@ -9,6 +9,8 @@ using Business.DTOs.Requests;
 using Business.DTOs.Responses;
 using static Business.Services.Helpers.Constants;
 using DataAccess.Models.Enums;
+using Business.ViewModels;
+using System.Reflection.Metadata.Ecma335;
 
 namespace Business.Services.Models
 {
@@ -160,7 +162,7 @@ namespace Business.Services.Models
             if (!await Security.IsAuthorizedAsync(userToUpdate, loggedUser))
             {
                 result.IsSuccessful = false;
-                result.Message = ModifyUserErrorMessage;
+                result.Message = UpdateStatusUserErrorMessage;
                 return result;
             }
 
@@ -218,6 +220,60 @@ namespace Business.Services.Models
     
             result.Data = await this.userRepository.DeleteAsync(id);
             
+            return result;
+        }
+
+        public async Task<Response<bool>> ChangeStatusAsync(int id, User loggedUser, UserChangeStatusViewModel userChangeStatusViewModel)
+        {
+            var result = new Response<bool>();
+
+            if (!await Security.IsAdminAsync(loggedUser))
+            {
+                result.IsSuccessful = false;
+                result.Message = ModifyUserErrorMessage;
+                return result;
+            }
+
+            if (userChangeStatusViewModel.IsBlocked!=null)
+            {
+                if (userChangeStatusViewModel.IsBlocked==true)
+                {
+                    var isBlockedResult = await this.BlockUserAsync(id, loggedUser);
+                    if (!isBlockedResult.IsSuccessful)
+                    {
+                        result.Message = isBlockedResult.Message;
+                        result.IsSuccessful = false;
+                        return result;
+                    }
+                }
+                else
+                {
+                    var isUnblockedResult = await this.UnblockUserAsync(id, loggedUser);
+                    if (!isUnblockedResult.IsSuccessful)
+                    {
+                        result.Message = isUnblockedResult.Message;
+                        result.IsSuccessful = false;
+                        return result;
+                    }
+                }
+                
+            }
+
+            if (userChangeStatusViewModel.IsAdmin != null)
+            {
+                if (userChangeStatusViewModel.IsAdmin == true)
+                {
+                    var isAdminResult = await this.PromoteAsync(id, loggedUser);
+                    if (!isAdminResult.IsSuccessful)
+                    {
+                        result.Message = isAdminResult.Message;
+                        result.IsSuccessful = false;
+                        return result;
+                    }
+                }               
+            }
+
+            await this.userRepository.SaveChangesAsync();
             return result;
         }
 

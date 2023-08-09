@@ -98,6 +98,14 @@ namespace DataAccess.Repositories.Models
             await context.SaveChangesAsync();
             return userToUnblock;
         }
+
+        public async Task<bool> SaveChangesAsync()
+        {
+            await context.SaveChangesAsync();
+
+            return true;
+        }
+
         public async Task<bool> PhoneNumberExistsAsync(string phoneNumber)
         {
             return await context.Users.AnyAsync(u => u.PhoneNumber == phoneNumber);
