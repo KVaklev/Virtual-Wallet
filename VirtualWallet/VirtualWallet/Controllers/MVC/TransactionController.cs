@@ -148,8 +148,7 @@ namespace VirtualWallet.Controllers.MVC
         [HttpGet]
         public async Task<IActionResult> DeleteAsync([FromRoute] int id)
         {
-            try
-            {
+            
                 var loggedUserResult = await GetLoggedUserAsync();
                 if (!loggedUserResult.IsSuccessful)
                 {
@@ -161,18 +160,12 @@ namespace VirtualWallet.Controllers.MVC
                     return await EntityErrorViewAsync(result.Message);
                 }
                 return this.View(result.Data);
-            }
-            catch (EntityNotFoundException ex)
-            {
-                return await EntityErrorViewAsync(ex.Message);
-            }
         }
 
         [HttpPost, ActionName("Delete")]
         public async Task<IActionResult> DeleteConfirmed([FromRoute] int id)
         {
-            try
-            {
+            
                 var loggedUserResult = await GetLoggedUserAsync();
                 if (!loggedUserResult.IsSuccessful)
                 {
@@ -185,11 +178,7 @@ namespace VirtualWallet.Controllers.MVC
                 }
 
                 return this.RedirectToAction("Index", "Transaction", new { Username = loggedUserResult.Data.Username });
-            }
-            catch (EntityNotFoundException ex)
-            {
-                return await EntityErrorViewAsync(ex.Message);
-            }
+           
         }
 
         [HttpGet]

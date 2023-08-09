@@ -1,12 +1,9 @@
 ﻿using DataAccess.Models.Models;
 using DataAccess.Repositories.Data;
 using Microsoft.EntityFrameworkCore;
-using Business.Exceptions;
 using Business.QueryParameters;
-using DataAccess.Models.Enums;
 using DataAccess.Repositories.Helpers;
 using DataAccess.Repositories.Contracts;
-using DataAccess.Models.ValidationAttributes;
 
 namespace DataAccess.Repositories.Models
 {
@@ -70,6 +67,12 @@ namespace DataAccess.Repositories.Models
             }
 
             return result;
+        }
+
+        public async Task<int> GetHistoryCountAsync()
+        {
+             var count = context.History.Count();
+             return count;
         }
 
         private async Task<IQueryable<History>> FilterByUsernameAsync(IQueryable<History> result, string? username)

@@ -1,12 +1,9 @@
-﻿using Business.Exceptions;
-using Business.QueryParameters;
+﻿using Business.QueryParameters;
 using DataAccess.Models.Enums;
 using DataAccess.Models.Models;
-using DataAccess.Models.ValidationAttributes;
 using DataAccess.Repositories.Contracts;
 using DataAccess.Repositories.Data;
 using DataAccess.Repositories.Helpers;
-using Microsoft.AspNetCore.Server.IIS.Core;
 using Microsoft.EntityFrameworkCore;
 
 namespace DataAccess.Repositories.Models

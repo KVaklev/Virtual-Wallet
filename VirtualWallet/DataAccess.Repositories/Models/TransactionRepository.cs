@@ -59,6 +59,9 @@ namespace DataAccess.Repositories.Models
             return transaction;
         }
 
+        
+
+
         public async Task<PaginatedList<Transaction>> FilterByAsync(TransactionQueryParameters filterParameters, string username)
         {
             IQueryable<Transaction> result = this.GetAll(username);

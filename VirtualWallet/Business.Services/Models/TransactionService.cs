@@ -18,7 +18,6 @@ namespace Business.Services.Models
     public class TransactionService : ITransactionService
     {
         private readonly ITransactionRepository transactionRepository;
-        private readonly ApplicationContext context;
         private readonly IAccountRepository accountRepository;
         private readonly ICurrencyRepository currencyRepository;
         private readonly IMapper mapper;
@@ -28,7 +27,6 @@ namespace Business.Services.Models
 
         public TransactionService(
             ITransactionRepository transactionRepository,
-            ApplicationContext context,
             IAccountRepository accountRepository,
             ICurrencyRepository currencyRepository,
             IMapper mapper,
@@ -38,7 +36,6 @@ namespace Business.Services.Models
             )
         {
             this.transactionRepository = transactionRepository;
-            this.context = context;
             this.accountRepository = accountRepository;
             this.currencyRepository = currencyRepository;
             this.mapper = mapper;
@@ -316,11 +313,11 @@ namespace Business.Services.Models
         private async Task<bool> AddTransactionToHistoryAsync(Transaction transaction)
         {
 
-            int historyCount = await this.context.History.CountAsync();
+            int historyCount = await this.historyRepository.GetHistoryCountAsync();
             History history = await HistoryMapper.MapCreateWithTransactionAsync(transaction);
             await this.historyRepository.CreateAsync(history);
 
-            int newHistoryCount = await this.context.History.CountAsync();
+            int newHistoryCount = await this.historyRepository.GetHistoryCountAsync();
 
             if (newHistoryCount == historyCount + 1)
             {
@@ -331,7 +328,5 @@ namespace Business.Services.Models
                 return false;
             }
         }
-
     }
-
 }
