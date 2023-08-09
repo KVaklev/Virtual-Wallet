@@ -1,7 +1,5 @@
-﻿
-using Business.Exceptions;
+﻿using Business.Exceptions;
 using Business.Services.Contracts;
-using DataAccess.Models.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace VirtualWallet.Controllers.MVC

@@ -1,7 +1,9 @@
 ﻿using DataAccess.Models.Models;
 using DataAccess.Repositories.Data;
 using Microsoft.EntityFrameworkCore;
+using Business.Exceptions;
 using Business.QueryParameters;
+using DataAccess.Models.Enums;
 using DataAccess.Repositories.Helpers;
 using DataAccess.Repositories.Contracts;
 
@@ -37,21 +39,7 @@ namespace DataAccess.Repositories.Models
             return history;
         }
 
-        public async Task<PaginatedList<History>> FilterByAsync(HistoryQueryParameters filterParameters, User loggedUser)
-        {
-            IQueryable<History> result = this.GetAll(loggedUser);
-
-            result = await FilterByUsernameAsync(result, filterParameters.Username);
-            result = await FilterByFromDataAsync(result, filterParameters.FromDate);
-            result = await FilterByToDataAsync(result, filterParameters.ToDate);
-
-            int totalPages = (result.Count() + filterParameters.PageSize - 1) / filterParameters.PageSize;
-            result = await Common<History>.PaginateAsync(result, filterParameters.PageNumber, filterParameters.PageSize);
-           
-            return new PaginatedList<History>(result.ToList(), totalPages, filterParameters.PageNumber);
-        }
-
-        private IQueryable<History> GetAll(User loggedUser)
+        public IQueryable<History> GetAll(User loggedUser)
         {
             IQueryable<History> result = context.History
                 .Include(tr => tr.Transaction)
@@ -65,8 +53,6 @@ namespace DataAccess.Repositories.Models
             { 
                 result = result.Where(t => t.AccountId==loggedUser.AccountId);
             }
-
-            return result;
         }
 
         public async Task<int> GetHistoryCountAsync()
@@ -101,6 +87,8 @@ namespace DataAccess.Repositories.Models
 
                 return result.Where(history => history.EventTime <= date);
             }
+            return await Task.FromResult(result);
+        }        
             return await Task.FromResult(result);
         }        
     }

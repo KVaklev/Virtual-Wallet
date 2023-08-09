@@ -1,9 +1,7 @@
 ﻿using Business.DTOs.Requests;
-using Business.Exceptions;
 using Business.Services.Contracts;
 using Business.Services.Helpers;
 using DataAccess.Models.Models;
-using DataAccess.Repositories.Contracts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,19 +15,16 @@ namespace VirtualWallet.Controllers.API
         private readonly IUserService userService;
         private readonly IEmailService emailService;
         private readonly IAccountService accountService;
-        private readonly IUserRepository userRepository;
 
         public AccountApiController( 
             IUserService userService,
             IEmailService emailService,
-            IAccountService accountService,
-            IUserRepository userRepository
+            IAccountService accountService
             )
         {
             this.userService = userService;
             this.emailService = emailService;
             this.accountService = accountService;
-            this.userRepository = userRepository;
         }
 
         [HttpPost("login")]
@@ -37,14 +32,12 @@ namespace VirtualWallet.Controllers.API
         {
 
             var loggedUser = await this.userService.LoginAsync(username, password);
-
             if (!loggedUser.IsSuccessful)
             {
                 return BadRequest(loggedUser.Message);
             }
 
-            var result = await this.accountService.CreateApiTokenAsync(loggedUser.Data);
-
+            var result = await Security.CreateApiTokenAsync(loggedUser.Data);
             if (!result.IsSuccessful)
             {
                 return BadRequest(result.Message);
@@ -68,14 +61,12 @@ namespace VirtualWallet.Controllers.API
         {
    
            var result = await this.userService.CreateAsync(createUserDto);
-
-            if (!result.IsSuccessful)
-            {
-                return BadRequest(result.Message);
-            }
+           if (!result.IsSuccessful)
+           {
+               return BadRequest(result.Message);
+           }
 
            return await this.SendConfirmationEmailAsync(result.Data.Username);
-            
         }
 
         [HttpGet("confirm-email")]
@@ -84,9 +75,7 @@ namespace VirtualWallet.Controllers.API
             Response<User> user = await this.userService.GetLoggedUserByUsernameAsync(username);
            
             var token = this.accountService.GenerateTokenAsync(user.Data.Id);
-
             var confirmationLink = Url.Action("confirm-registration", "api", new { userId = user.Data.Id, token = token.Result }, Request.Scheme);
-            
             var message = await this.emailService.BuildEmailAsync(user.Data, confirmationLink);
             
             await emailService.SendEMailAsync(message);
@@ -99,13 +88,13 @@ namespace VirtualWallet.Controllers.API
         public async Task<IActionResult> ConfirmRegistrationAsync([FromQuery] int userId, [FromQuery] string token)
         {
            var result = await this.accountService.ConfirmRegistrationAsync(userId, token);
+           if (!result.IsSuccessful)
+           {
+               return BadRequest(Constants.NotSuccessfullRegistrationMessage);
 
-            if (!result.IsSuccessful)
-            {
-                return BadRequest(Constants.NotSuccessfullRegistrationMessage);
+           }
 
-            }
-            return Ok(result.Message);
+           return Ok(result.Message);
         }
     }
 }

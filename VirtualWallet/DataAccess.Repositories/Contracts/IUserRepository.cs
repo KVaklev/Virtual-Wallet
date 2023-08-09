@@ -7,7 +7,6 @@ namespace DataAccess.Repositories.Contracts
     public interface IUserRepository
     {
         IQueryable<User> GetAll();
-        Task<PaginatedList<User>> FilterByAsync(UserQueryParameters queryParameters);
         Task<User> GetByIdAsync(int id);
         Task<User> GetByUsernameAsync(string username);
         Task<User> CreateAsync(User user);

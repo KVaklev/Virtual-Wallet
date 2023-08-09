@@ -1,5 +1,4 @@
-﻿using Business.Exceptions;
-using Business.Services.Contracts;
+﻿using Business.Services.Contracts;
 using DataAccess.Models.Models;
 using DataAccess.Repositories.Contracts;
 using Business.Services.Helpers;
@@ -8,9 +7,8 @@ using AutoMapper;
 using Business.Mappers;
 using Business.DTOs.Requests;
 using Business.DTOs.Responses;
-using Business.DTOs;
 using static Business.Services.Helpers.Constants;
-
+using DataAccess.Models.Enums;
 
 namespace Business.Services.Models
 {
@@ -31,48 +29,40 @@ namespace Business.Services.Models
             this.mapper = mapper;
         }
 
-        public Response<IQueryable<GetUserDto>> GetAll()
-        {
-            var result = new Response<IQueryable<GetUserDto>>();
-            var users = this.userRepository.GetAll();
-
-            if (users != null && users.Any())
-            {
-                result.IsSuccessful = true;
-                result.Data = (IQueryable<GetUserDto>)users.AsQueryable();
-            }
-            else
-            {
-                result.IsSuccessful = false;
-                result.Message = NoUsersErrorMessage;
-            }
-
-            return result;
-        }
-
         public async Task<Response<PaginatedList<GetCreatedUserDto>>> FilterByAsync(UserQueryParameters filterParameters)
         {
             var result = new Response<PaginatedList<GetCreatedUserDto>>();
-            var users = await this.userRepository.FilterByAsync(filterParameters);
+            var usersResult = this.GetAll();
+            IQueryable<User> users = usersResult.Data;
 
-            if (users.Count==0)
+            users = await FilterByFirstNameAsync(users, filterParameters.FirstName);
+            users = await FilterByLastNameAsync(users, filterParameters.LastName);
+            users = await FilterByUsernameAsync(users, filterParameters.Username);
+            users = await FilterByEmailAsync(users, filterParameters.Email);
+            users = await FilterByPhoneNumberAsync(users, filterParameters.PhoneNumber);
+            users = await FilterByAdminStatusAsync(users, filterParameters.Admin);
+            users = await FilterByBlockedStatusAsync(users, filterParameters.Blocked);
+            users = await SortByAsync(users, filterParameters.SortBy);
+            users = await SortOrderAsync(users, filterParameters.SortOrder);
+
+            int totalPages = (users.Count() + filterParameters.PageSize - 1) / filterParameters.PageSize;
+            users = await Common<User>.PaginateAsync(users, filterParameters.PageNumber, filterParameters.PageSize);
+
+            if (!users.Any())
             {
                 result.IsSuccessful = false;
                 result.Message= NoUsersErrorMessage;
                 return result;
             }
 
-            var userTotalPages=users.TotalPages;
-            var userPageNumber=users.PageNumber;
-
             List<GetCreatedUserDto> userDtos = users
                     .Select(user => mapper.Map<GetCreatedUserDto>(user))
                     .ToList();
-            result.Data = new PaginatedList<GetCreatedUserDto>(userDtos,userTotalPages,userPageNumber);
+            result.Data = new PaginatedList<GetCreatedUserDto>(userDtos,totalPages,filterParameters.PageNumber);
 
             return result;
         }
-
+  
         public async Task<Response<GetUserDto>> GetByIdAsync(int id, User loggedUser)
         {
             var result = new Response<GetUserDto>();
@@ -91,6 +81,7 @@ namespace Business.Services.Models
                 result.Message = ModifyAuthorizedErrorMessage;
                 return result;
             }
+
             var userDto = this.mapper.Map<GetUserDto>(user);
             result.Data = userDto;
 
@@ -324,7 +315,7 @@ namespace Business.Services.Models
         {
             var result = new Response<User>();
 
-            await Security.CheckForNullEntryAsync(username, password);
+            await Common.CheckForNullEntryAsync(username, password);
 
             User loggedUser = await this.userRepository.GetByUsernameAsync(username);
             if (loggedUser == null)
@@ -354,6 +345,7 @@ namespace Business.Services.Models
 
             return result;
         }
+
         public async Task<Response<User>> GetLoggedUserByIdAsync(int id)
         {
             var result = new Response<User>();
@@ -370,6 +362,25 @@ namespace Business.Services.Models
 
             return result;
         }
+
+        private Response<IQueryable<User>> GetAll()
+        {
+            var result = new Response<IQueryable<User>>();
+            var users = this.userRepository.GetAll();
+
+            if (users.Any())
+            {
+                result.IsSuccessful = true;
+                result.Data = users;
+            }
+            else
+            {
+                result.IsSuccessful = false;
+                result.Message = NoUsersErrorMessage;
+            }
+
+            return result;
+        }
         private async Task<bool> EmailExistsAsync(string email)
         {
             return await this.userRepository.EmailExistsAsync(email);
@@ -382,6 +393,89 @@ namespace Business.Services.Models
         {
             return await this.userRepository.PhoneNumberExistsAsync(phoneNumber);
         }
-
+        private async Task<IQueryable<User>> FilterByFirstNameAsync(IQueryable<User> result, string? firstName)
+        {
+            if (!string.IsNullOrEmpty(firstName))
+            {
+                result = result.Where(user => user.Username != null && user.FirstName == firstName);
+            }
+            return await Task.FromResult(result);
+        }
+        private async Task<IQueryable<User>> FilterByLastNameAsync(IQueryable<User> result, string? lastName)
+        {
+            if (!string.IsNullOrEmpty(lastName))
+            {
+                result = result.Where(user => user.Username != null && user.LastName == lastName);
+            }
+            return await Task.FromResult(result);
+        }
+        private async Task<IQueryable<User>> FilterByUsernameAsync(IQueryable<User> result, string? username)
+        {
+            if (!string.IsNullOrEmpty(username))
+            {
+                result = result.Where(user => user.Username != null && user.Username == username);
+            }
+            return await Task.FromResult(result);
+        }
+        private async Task<IQueryable<User>> FilterByEmailAsync(IQueryable<User> result, string? email)
+        {
+            if (!string.IsNullOrEmpty(email))
+            {
+                result = result.Where(user => user.Email != null && user.Email == email);
+            }
+            return await Task.FromResult(result);
+        }
+        private async Task<IQueryable<User>> FilterByPhoneNumberAsync(IQueryable<User> result, string? phoneNumber)
+        {
+            if (!string.IsNullOrEmpty(phoneNumber))
+            {
+                result = result.Where(user => user.PhoneNumber != null && user.PhoneNumber == phoneNumber);
+            }
+            return await Task.FromResult(result);
+        }
+        private async Task<IQueryable<User>> FilterByAdminStatusAsync(IQueryable<User> result, bool? isAdmin)
+        {
+            if (isAdmin.HasValue)
+            {
+                result = result.Where(user => user.IsAdmin != null && user.IsAdmin == isAdmin);
+            }
+            return await Task.FromResult(result);
+        }
+        private async Task<IQueryable<User>> FilterByBlockedStatusAsync(IQueryable<User> result, bool? isBlocked)
+        {
+            if (isBlocked.HasValue)
+            {
+                result = result.Where(user => user.IsBlocked != null && user.IsBlocked == isBlocked);
+            }
+            return await Task.FromResult(result);
+        }
+        private async Task<IQueryable<User>> SortByAsync(IQueryable<User> result, string? sortCriteria)
+        {
+            if (Enum.TryParse<SortCriteria>(sortCriteria, true, out var sortEnum))
+            {
+                switch (sortEnum)
+                {
+                    case SortCriteria.Username:
+                        return await Task.FromResult(result.OrderBy(user => user.Username));
+                    case SortCriteria.Email:
+                        return await Task.FromResult(result.OrderBy(user => user.Email));
+                    case SortCriteria.PhoneNumber:
+                        return await Task.FromResult(result.OrderBy(user => user.PhoneNumber));
+                }
+            }
+            return result;
+        }
+        private async Task<IQueryable<User>> SortOrderAsync(IQueryable<User> result, string? sortOrder)
+        {
+            if (Enum.TryParse<SortCriteria>(sortOrder, true, out var sortEnum))
+            {
+                switch (sortEnum)
+                {
+                    case SortCriteria.Desc:
+                        return await Task.FromResult(result.Reverse());
+                }
+            }
+         return await Task.FromResult(result);
+        }
     }
 }
