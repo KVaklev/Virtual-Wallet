@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Business.DTOs;
 using Business.DTOs.Responses;
 using Business.Mappers;
 using Business.Services.Additional;
@@ -7,11 +6,6 @@ using Business.Services.Contracts;
 using Business.Services.Helpers;
 using DataAccess.Models.Models;
 using DataAccess.Repositories.Contracts;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Security.Principal;
-using System.Text;
 using static Business.Services.Helpers.Constants;
 
 namespace Business.Services.Models
@@ -44,9 +38,9 @@ namespace Business.Services.Models
         public Response<IQueryable<GetAccountDto>> GetAll()
         {
             var result = new Response<IQueryable<GetAccountDto>>();
-            var accounts = accountRepository.GetAll();
+            var accounts = this.accountRepository.GetAll();
 
-            if (accounts != null && accounts.Any())
+            if (accounts.Any())
             {
                 result.IsSuccessful = true;
                 result.Data = (IQueryable<GetAccountDto>)accounts.AsQueryable();
@@ -204,40 +198,7 @@ namespace Business.Services.Models
 
             return result;
         }
-        public async Task<Response<string>> CreateApiTokenAsync(User loggedUser)
-        {
-            var result = new Response<string>();
-
-            var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("This is my secret testing key"));
-            var signinCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256);
-            var jwtSecurityToken = new JwtSecurityToken(
-                    issuer: "VirtualWallet",
-                    audience: "Where is that audience",
-                    claims: new[] {
-                new Claim(ClaimTypes.NameIdentifier, loggedUser.Id.ToString()),
-                new Claim(ClaimTypes.Name, loggedUser.Username),
-                new Claim("IsAdmin", loggedUser.IsAdmin.ToString()),
-                new Claim("UsersAccountId", loggedUser.Account.Id.ToString()),//null check
-                new Claim(JwtRegisteredClaimNames.Email, loggedUser.Email),
-                new Claim(JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString())
-        },
-            expires: DateTime.Now.AddMinutes(5),
-                    signingCredentials: signinCredentials
-                );
-            
-            string resultToken = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
-
-            if (resultToken == null)
-            {
-                result.IsSuccessful = false;
-                result.Message = GenerateTokenErrorMessage;
-                return result;
-            }
-
-            result.Data = resultToken;
-
-            return result;
-        }
+       
         public async Task<Response<string>> GenerateTokenAsync(int id)
         {
             var result = new Response<string>();
@@ -254,6 +215,7 @@ namespace Business.Services.Models
            
             return result;
         }
+
         public async Task<Response<bool>> ConfirmRegistrationAsync(int id, string token)
         {
             var result = new Response<bool>();

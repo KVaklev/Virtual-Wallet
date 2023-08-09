@@ -38,26 +38,24 @@ namespace VirtualWallet.Controllers.MVC
 
         [HttpPost("login")]
         public async Task<IActionResult> Login(LoginUserModel loginUserModel)
-        {
-           
+        {   
             if (!this.ModelState.IsValid)
             {
                 return this.View(loginUserModel);
             }
 
             var loggedUser = await this.userService.LoginAsync(loginUserModel.Username, loginUserModel.Password); 
-                if (!loggedUser.IsSuccessful)
-                {
-                    this.ModelState.AddModelError(loggedUser.Error.InvalidPropertyName, loggedUser.Message);
-                    return this.View(loginUserModel);
-                }
+            if (!loggedUser.IsSuccessful)
+            {
+                this.ModelState.AddModelError(loggedUser.Error.InvalidPropertyName, loggedUser.Message);
+                return this.View(loginUserModel);
+            }
 
-
-            var result = await this.accountService.CreateApiTokenAsync(loggedUser.Data);
-                if (!result.IsSuccessful)
-                {
-                    return BadRequest(result.Message);
-                }
+            var result = await Security.CreateApiTokenAsync(loggedUser.Data);
+            if (!result.IsSuccessful)
+            {
+                return BadRequest(result.Message);
+            }
 
             Response.Cookies.Append("Cookie_JWT", result.Data, new CookieOptions()
             {
@@ -97,7 +95,6 @@ namespace VirtualWallet.Controllers.MVC
             }
 
             var result = await this.userService.CreateAsync(createUserModel);
-
             if (!result.IsSuccessful)
             {
                 this.ModelState.AddModelError(result.Error.InvalidPropertyName, result.Message);
@@ -117,8 +114,8 @@ namespace VirtualWallet.Controllers.MVC
             {
                 return RedirectToAction("Register", "Account");
             }
-            var confirmationLink = Url.Action("confirm-registration", "Account", new { userId = user.Id, token = generatedToken }, Request.Scheme);
 
+            var confirmationLink = Url.Action("confirm-registration", "Account", new { userId = user.Id, token = generatedToken }, Request.Scheme);
             var message = await this.emailService.BuildEmailAsync(user, confirmationLink);
 
             await emailService.SendEMailAsync(message);
@@ -142,13 +139,12 @@ namespace VirtualWallet.Controllers.MVC
 			}
 
 			var result = await this.accountService.ConfirmRegistrationAsync(userId, token);
-
             if (!result.IsSuccessful)
             {
 				return RedirectToAction("Index", "Home");
 
 			}
-            return RedirectToAction("Login", "Account");
+          return RedirectToAction("Login", "Account");
         }
     }
 }

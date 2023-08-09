@@ -29,25 +29,6 @@ namespace DataAccess.Repositories.Models
             return users;
         }
 
-        public async Task<PaginatedList<User>> FilterByAsync(UserQueryParameters filterParameters)
-        {
-            IQueryable<User> result = this.GetAll();
-
-            result = await FilterByFirstNameAsync(result, filterParameters.FirstName);
-            result = await FilterByLastNameAsync(result, filterParameters.LastName);
-            result = await FilterByUsernameAsync(result, filterParameters.Username);
-            result = await FilterByEmailAsync(result, filterParameters.Email);
-            result = await FilterByPhoneNumberAsync(result, filterParameters.PhoneNumber);
-            result = await SortByAsync(result, filterParameters.SortBy);
-            result = await SortOrderAsync(result, filterParameters.SortOrder);
-
-
-            int totalPages = (result.Count() + filterParameters.PageSize - 1) / filterParameters.PageSize;
-            result = await Common<User>.PaginateAsync(result, filterParameters.PageNumber, filterParameters.PageSize);
-
-            return new PaginatedList<User>(result.ToList(), totalPages, filterParameters.PageNumber);
-        }
-
         public async Task<User> GetByIdAsync(int id)
         {
             User? user = await context.Users
@@ -128,85 +109,6 @@ namespace DataAccess.Repositories.Models
         public async Task<bool> UsernameExistsAsync(string username)
         {
             return await context.Users.AnyAsync(u => u.Username == username);
-        }
-
-        private async Task<IQueryable<User>> FilterByFirstNameAsync(IQueryable<User> result, string? firstName)
-        {
-            if (!string.IsNullOrEmpty(firstName))
-            {
-                result = result.Where(user => user.Username != null && user.FirstName == firstName);
-            }
-            return await Task.FromResult(result);
-        }
-        private async Task<IQueryable<User>> FilterByLastNameAsync(IQueryable<User> result, string? lastName)
-        {
-            if (!string.IsNullOrEmpty(lastName))
-            {
-                result = result.Where(user => user.Username != null && user.LastName == lastName);
-            }
-            return await Task.FromResult(result);
-        }
-        private async Task<IQueryable<User>> FilterByUsernameAsync(IQueryable<User> result, string? username)
-        {
-            if (!string.IsNullOrEmpty(username))
-            {
-                result = result.Where(user => user.Username != null && user.Username == username);
-            }
-            return await Task.FromResult(result);
-        }
-        private async Task<IQueryable<User>> FilterByEmailAsync(IQueryable<User> result, string? email)
-        {
-            if (!string.IsNullOrEmpty(email))
-            {
-                result = result.Where(user => user.Email != null && user.Email == email);
-            }
-            return await Task.FromResult(result);
-        }
-        private async Task<IQueryable<User>> FilterByPhoneNumberAsync(IQueryable<User> result, string? phoneNumber)
-        {
-            if (!string.IsNullOrEmpty(phoneNumber))
-            {
-                result = result.Where(user => user.PhoneNumber != null && user.PhoneNumber == phoneNumber);
-            }
-            return await Task.FromResult(result);
-        }
-        private async Task<IQueryable<User>> SortByAsync(IQueryable<User> result, string? sortCriteria)
-        {
-            if (Enum.TryParse<SortCriteria>(sortCriteria, true, out var sortEnum))
-            {
-                switch (sortEnum)
-                {
-                    case SortCriteria.Username:
-                        return await Task.FromResult(result.OrderBy(user => user.Username));
-                    case SortCriteria.Email:
-                        return await Task.FromResult(result.OrderBy(user => user.Email));
-                    case SortCriteria.PhoneNumber:
-                        return await Task.FromResult(result.OrderBy(user => user.PhoneNumber));
-                    default:
-                        return await Task.FromResult(result);
-                }
-            }
-            else
-            {
-                return result;
-            }
-        }
-        private async Task<IQueryable<User>> SortOrderAsync(IQueryable<User> result, string? sortOrder)
-        {
-            if (Enum.TryParse<SortCriteria>(sortOrder, true, out var sortEnum))
-            {
-                switch (sortEnum)
-                {
-                    case SortCriteria.Desc:
-                        return await Task.FromResult(result.Reverse());
-                    default:
-                        return await Task.FromResult(result);
-                }
-            }
-            else
-            {
-                return result;
-            }
         }
     }
 }
