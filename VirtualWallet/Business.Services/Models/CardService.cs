@@ -41,6 +41,7 @@ namespace Business.Services.Models
                         .AsQueryable();
                 }
                 result.Data = cards;
+                
                 return result;
             }
             else

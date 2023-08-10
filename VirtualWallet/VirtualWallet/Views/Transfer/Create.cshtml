@@ -1,11 +1,19 @@
-﻿@using DataAccess.Models.Models;
-@model Business.ViewModels.CreateTransactionViewModel
+﻿@using Business.QueryParameters;
+@using Business.Services.Contracts;
+@using DataAccess.Models.Enums;
+@using DataAccess.Models.Models;
 
+@model Business.ViewModels.CreateTransferDepositViewModel;
+
+
+@inject ICardService cardService
 
 @{
     this.ViewData["Title"] = "Speed Pay - Quick and Trustworthy Money Transfers ";
+
     var currencies = JsonSerializer.Deserialize<List<Currency>>(TempData.Peek("Currencies").ToString());
-       
+    //var cards = JsonSerializer.Deserialize<PaginatedList<Card>>(TempData.Peek("Cards").ToString());
+    //var cards = new SelectList(cardService.GetAll(@Model.User));
 }
 
 <head>
@@ -13,18 +21,17 @@
 </head>
 
 <!-- Secondary menu
-============================================= -->
+ ============================================= -->
+
 <div class="bg-primary">
     <div class="container d-flex justify-content-center">
         <ul class="nav nav-pills alternate nav-lg border-bottom-0">
-            <li class="nav-item"> <a class="nav-link active" href="send-money.html">Send</a></li>
+            <li class="nav-item"> <a class="nav-link active">Transfer</a></li>
 
         </ul>
     </div>
 </div>
-<!-- Secondary menu end -->
-<!-- Content
-============================================= -->
+
 <div id="content" class="py-4">
     <div class="container">
 
@@ -56,49 +63,68 @@
                 </div>
             </div>
         </div>
-        <h2 class="fw-400 text-center mt-3">Send Money</h2>
-        <p class="lead text-center mb-4">Send your money on anytime, anywhere in the world.</p>
+        <h2 class="fw-400 text-center mt-3">Deposit Money</h2>
+
         <div class="row">
             <div class="col-md-9 col-lg-7 col-xl-6 mx-auto">
                 <div class="bg-white shadow-sm rounded p-3 pt-sm-4 pb-sm-5 px-sm-5 mb-4">
-                    <h3 class="text-5 fw-400 mb-3 mb-sm-4">Personal Details</h3>
-                    <hr class="mx-n3 mx-sm-n5 mb-4">
-                    <!-- Send Money Form
-                    ============================ -->
-                    <form asp-controller="Transaction" asp-action="Create" id="form-send-money" method="post">
+
+                    <!-- Deposit Money Form
+                    ============================================= -->
+                    <form asp-controller="Transfer" asp-action="Create" id="form-send-money" method="post">
+
                         <div class="mb-3">
-                            <label for="emailID" class="form-label">Recipient</label>
-                            <input asp-for="CreateTransactionDto.RecipientUsername" type="text" value="" class="form-control" data-bv-field="emailid" id="emailID" required placeholder="Enter Username">
-                            <span asp-validation-for="CreateTransactionDto.RecipientUsername" class="error-message"></span>
+                            <label for="transferDirection" class="form-label">Select Transfer Direction</label>
+                            <select asp-for="CreateTransferDto.TransferType" id="transferDirection" class="form-select" required="">
+                                @*<option value="">Select Transfer Direction</option>*@
+                                @foreach (var transferDirectionValue in Enum.GetValues(typeof(TransferDirection)))
+                                {
+                                    var transferDirectionName = Enum.GetName(typeof(TransferDirection), transferDirectionValue);
+                                    <option value="@transferDirectionValue">@transferDirectionName</option>
+                                }
+                            </select>
                         </div>
+
+
+
                         <div class="mb-3">
-                            <label for="youSend" class="form-label">You Send</label>
+                            <label for="youSend">Amount</label>
                             <div class="input-group">
                                 <span class="input-group-text">$</span>
-                                <input asp-for="CreateTransactionDto.Amount" type="number" class="form-control" data-bv-field="youSend" id="youSend" value="" placeholder="">
+                                <input asp-for="CreateTransferDto.Amount" type="number" class="form-control" data-bv-field="youSend" id="youSend" value="" placeholder="">
                                 <span class="input-group-text p-0">
-                                    <select asp-for="CreateTransactionDto.CurrencyCode" id="youSendCurrency" data-style="form-select bg-transparent border-0" data-container="body" data-live-search="true" class="selectpicker form-control bg-transparent" required="">
+                                    <select asp-for="CreateTransferDto.CurrencyCode" id="youSendCurrency" data-style="form-select bg-transparent border-0" data-container="body" data-live-search="true" class="selectpicker form-control bg-transparent" required="">
                                         <optgroup label="Popular Currency">
                                             @foreach (var currency in currencies)
                                             {
-
                                                 <option data-icon="currency-flag currency-flag-inr me-1" data-subtext="@currency.Name " value="@currency.CurrencyCode">@currency.CurrencyCode</option>
-
                                             }
                                         </optgroup>
                                     </select>
                                 </span>
-                                <span asp-validation-for="CreateTransactionDto.Amount" class="error-message"></span>
+
                             </div>
                         </div>
-                        <div class="mb-4 mb-sm-5">
-                            <label for="description" class="form-label">Description</label>
-                            <textarea asp-for="CreateTransactionDto.Description" class="form-control" rows="4" id="description" required placeholder="Payment Description"></textarea>
-                            <span asp-validation-for="CreateTransactionDto.Description" class=" error-message"></span>
+                        <div class="mb-3">
+                            <label for="paymentMethod" class="form-label">Select Card</label>
+                            <select asp-for="CreateTransferDto.CardNumber" id="cardType" class="form-select" required="">
+                                <option value="">My Cards</option>
+                                <optgroup>
+                                    @foreach (var card in Model.Cards)
+                                    {
+                                        <option data-subtext="@card.CardType" value="@card.CardNumber"> @card.CardType - @card.CardNumber</option>
+                                    }
+                                </optgroup>
+
+                            </select>
                         </div>
+
+
+                        <hr>
+                        <p class="text-4 fw-500">You'll deposit <span class="float-end">1,000.00 USD</span></p>
                         <div class="d-grid"><button type="submit" class="btn btn-primary">Continue</button></div>
                     </form>
-                    <!-- Send Money Form end -->
+                    <!-- Deposit Money Form end -->
                 </div>
             </div>
         </div>
@@ -106,5 +132,3 @@
 </div>
 <!-- Content end -->
 <link rel="stylesheet" type="text/css" href="~/vendor/currency-flags/css/currency-flags.min.css" />
-
-

@@ -53,6 +53,9 @@
           <nav class="primary-menu navbar navbar-expand-lg">
             <div id="header-nav" class="collapse navbar-collapse">
               <ul class="navbar-nav me-auto">
+                <li><a asp-controller="Transfer" asp-action="Create">Deposit</a></li>
+                <li><a asp-controller="Transfer" asp-action="Create">Withdraw</a></li>
+
                 <li><a asp-controller="Transaction" asp-action="Create">Send</a></li>
                 <li><a asp-controller="Home" asp-action="Index">Receive</a></li>
                 <li><a asp-controller="Home" asp-action="Index">Fees</a></li>
@@ -79,7 +82,7 @@
                               <ul class="dropdown-menu">
                                   <li><a asp-controller="Transaction" asp-action="Create" class="dropdown-item">Send</a></li>
                                   <li><a class="dropdown-item">Receive</a></li>
-                                  <li><a class="dropdown-item">Deposit</a></li>
+                                   <li><a asp-controller="Transfer" asp-action="Create" class="dropdown-item">Deposit</a></li>
                                   <li><a class="dropdown-item">Withdraw</a></li>
                               </ul>
                           </li>
