@@ -1,13 +1,8 @@
-﻿using Business.DTOs.Requests;
-using Business.Exceptions;
-using Business.Mappers;
-using Business.QueryParameters;
+﻿using Business.QueryParameters;
 using Business.Services.Contracts;
-using Business.ViewModels;
 using Business.ViewModels.UserViewModels;
 using DataAccess.Models.Models;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 

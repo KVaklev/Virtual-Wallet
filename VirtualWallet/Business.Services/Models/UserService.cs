@@ -190,8 +190,6 @@ namespace Business.Services.Models
 
             userToUpdate = await UsersMapper.MapUpdateDtoToUserAsync(userToUpdate, updateUserDto);
             userToUpdate = await Security.ComputePasswordHashAsync<UpdateUserDto>(updateUserDto, userToUpdate);
-
-            //userToUpdate = await this.ChangeStatus(userToUpdate, updateUserDto);
             userToUpdate = await this.userRepository.UpdateAsync(userToUpdate);
 
             result.Data = mapper.Map<GetUpdatedUserDto>(userToUpdate);

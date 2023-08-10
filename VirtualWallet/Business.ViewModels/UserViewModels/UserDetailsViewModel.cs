@@ -1,5 +1,4 @@
 ﻿using Business.DTOs.Responses;
-using DataAccess.Models.Models;
 
 namespace Business.ViewModels.UserViewModels
 {
