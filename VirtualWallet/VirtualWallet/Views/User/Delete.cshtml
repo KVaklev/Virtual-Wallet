@@ -1,1 +1,45 @@
-﻿
+﻿@model UserDetailsViewModel
+
+@{
+    this.ViewData["Title"] = "Speed Pay - Delete user";
+   
+}
+<body>
+    <div class="container mt-4" style="margin-left: 10px;">
+        <div class="row justify-content-start">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="mb-0 text-center"> <span class="btn-outline-success">Are you absolutely sure that you want to delete the selected user?</span></h4>
+                    </div>
+                    <div class="card-body">
+                        <table class="table">
+                            <tbody>
+                                <tr>
+                                    <th scope="row" style="text-align: center; display: flex; align-items: center; justify-content: center;">
+                                        <i class="fas fa-arrow-alt-circle-right text-primary" style="font-size: 25px; margin-right: 10px;"></i>
+                                        <span style="font-size: 20px;">  @this.Model.User.Username</span>
+                                    </th>
+                                </tr>
+                                <tr><td>@this.Model.User.FirstName @this.Model.User.LastName</td></tr>
+                                <tr>
+                                   
+                            </tbody>
+                        </table>
+                    
+                    </div> 
+                    <div class="card-footer" style="display: flex;">
+                        <form asp-controller="User" asp-action="Delete" asp-route-id="@this.Model.User.Id">
+                            <input type="submit" value="Delete" class="btn-sm btn-primary me-3" method="post">
+                        </form>
+                        <div style="margin-left: 10px;"></div>
+
+                            <a asp-controller="User" asp-action="Index" class="btn-sm btn-primary" method="get">Go Back</a>
+                            <div style="margin-left: 10px;"></div>
+                  
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </body>

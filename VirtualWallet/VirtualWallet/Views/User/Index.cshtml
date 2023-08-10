@@ -1,7 +1,7 @@
 ﻿@model UserSearchModel
 
 @{
-    this.ViewData["Title"] = "Speed Pay - About us";
+    this.ViewData["Title"] = "Speed Pay - Users";
     var username = User.FindFirst(ClaimTypes.Name);
     var loggedUserId = User.FindFirst(ClaimTypes.NameIdentifier);
     var isAdmin = User.FindFirst("IsAdmin");
@@ -34,7 +34,7 @@
 
     <h5 class="fw-400 d-flex align-items-center nav-link"></h5>
 
-    <form asp-controller="Users" asp-action="Index" method="get">
+    <form asp-controller="User" asp-action="Index" method="get">
 
          @if (isAdmin.Value == "True")
         {
@@ -43,7 +43,7 @@
                     <aside class="col-lg-3">
                     <div class="bg-white shadow-sm rounded text-center p-3 mb-4">
                         <div class="profile-thumb mt-3 mb-4">
-                                <img class="rounded-circle" src="~/images/profile-thumb-sm.jpg" alt="">
+                                <img class= "center rounded-circle" src="~/images/profile-thumb-sm.jpg" alt="" style="width: 110px; height: 110px;">
                                 <p class="text-black opacity-12 mb-4">
                                     Hello, <b>@username.Value</b>! <br>
                                  @DateTime.Now.DayOfWeek, @DateTime.Now.Date.ToShortDateString()<p>
@@ -56,11 +56,11 @@
                             <div class="col-lg-12">
                                 <form class="bg-white shadow-sm rounded p-3 mb-4 col-sm-5 col-md-4">
                                     <div class="d-flex flex-wrap mb-3">
-                                        <input type="text" name="Firstname" placeholder="First name" class="form-control me-1" style="max-width: 150px; height: 40px;" />
-                                        <input type="text" name="Lastname" placeholder="Last name" class="form-control me-1" style="max-width: 150px; height: 40px;" />
-                                        <input type="text" name="Username" placeholder="Username" class="form-control me-1" style="max-width: 150px; height: 40px;" />
-                                        <input type="text" name="Email" placeholder="Email" class="form-control me-1" style="max-width: 150px; height: 40px;" />
-                                        <input type="text" name="PhoneNumber" placeholder="Phone number" class="form-control me-1" style="max-width: 150px; height: 40px;" />
+                                        <input type="text" name="Firstname" placeholder="First name" class="form-control me-1" style="max-width: 145px; height: 40px;" />
+                                        <input type="text" name="Lastname" placeholder="Last name" class="form-control me-1" style="max-width: 145px; height: 40px;" />
+                                        <input type="text" name="Username" placeholder="Username" class="form-control me-1" style="max-width: 145px; height: 40px;" />
+                                        <input type="text" name="Email" placeholder="Email" class="form-control me-1" style="max-width: 145px; height: 40px;" />
+                                        <input type="text" name="PhoneNumber" placeholder="Phone number" class="form-control me-1" style="max-width: 145px; height: 40px;" />
                                         <input type="submit" value="Search" class="btn btn-primary btn-sm ms-auto" />
                                     </div>
                                     <div class="d-flex">
@@ -216,7 +216,7 @@
         string nextButtonState = this.Model.Users.Data.HasNextPage ? "" : "disabled";
     }
     <div class="d-flex justify-content-center margin: 5px">
-    <a asp-controller="Users" asp-action="Index" asp-all-route-data="@parameters" asp-route-PageNumber="@(this.Model.Users.Data.PageNumber-1)" class="btn btn-link @prevButtonState">Prev</a>
+    <a asp-controller="User" asp-action="Index" asp-all-route-data="@parameters" asp-route-PageNumber="@(this.Model.Users.Data.PageNumber-1)" class="btn btn-link @prevButtonState">Prev</a>
         <div class="d-flex align-items-center">
     @{
         int currentPageNumber = this.Model.Users.Data.PageNumber;
@@ -228,11 +228,11 @@
             }
             else
             {
-                <span><a asp-controller="Users" asp-all-route-data="@parameters" asp-action="Index" asp-route-PageNumber="@i" class=" btn btn-link m-1">@i</a></span>
+                <span><a asp-controller="User" asp-all-route-data="@parameters" asp-action="Index" asp-route-PageNumber="@i" class=" btn btn-link m-1">@i</a></span>
             }
         }
     }
     </div>
-    <a asp-controller="Users" asp-action="Index" asp-all-route-data="@parameters" asp-route-PageNumber="@(this.Model.Users.Data.PageNumber+1)" class="btn btn-link @nextButtonState">Next</a>
+    <a asp-controller="User" asp-action="Index" asp-all-route-data="@parameters" asp-route-PageNumber="@(this.Model.Users.Data.PageNumber+1)" class="btn btn-link @nextButtonState">Next</a>
     </div>
 </body>
