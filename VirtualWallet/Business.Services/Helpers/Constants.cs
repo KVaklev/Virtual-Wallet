@@ -5,6 +5,7 @@
         //Constant messages for user
 
         public const string ModifyUserErrorMessage = "Only an admin is authorized to perform the specified action.";
+        public const string UpdateStatusUserErrorMessage = "Only an admin or owner of the account is authorized to perform the specified action.";
         public const string ModifyUsernameErrorMessage = "Username change is not allowed.";
 
         public const string NoUsersErrorMessage = "No users are found.";
@@ -39,7 +40,7 @@
 
         //Constant messages for transactions 
 
-        public const string ModifyTransactionExecuteMessage = "The transaction has been successfully executed.";
+        public const string ModifyTransactionConfirmMessage = "The transaction has been successfully executed.";
         public const string ModifyTransactionDeleteMessage = "The transacion has been successfully deleted.";
         public const string ModifyTransactionNotExecuteErrorMessage = "You cannot update or delete a completed transaction!";
         public const string ModifyTransactionBlockedErrorMessage = "You are not allowed to make transactions while being blocked!";

@@ -61,35 +61,5 @@ namespace DataAccess.Repositories.Models
              var count = context.History.Count();
              return count;
         }
-
-        private async Task<IQueryable<History>> FilterByUsernameAsync(IQueryable<History> result, string? username)
-        {
-            if (!string.IsNullOrEmpty(username))
-            {
-                return result.Where(history => history.Account.User.Username == username);
-            }
-            return await Task.FromResult(result);
-        }
-        private async Task<IQueryable<History>> FilterByFromDataAsync(IQueryable<History> result, string? fromData)
-        {
-            if (!string.IsNullOrEmpty(fromData))
-            {
-                DateTime date = DateTime.Parse(fromData);
-
-                return result.Where(history => history.EventTime >= date);
-            }
-            return await Task.FromResult(result);
-        }
-        private async Task<IQueryable<History>> FilterByToDataAsync(IQueryable<History> result, string? toData)
-        {
-            if (!string.IsNullOrEmpty(toData))
-            {
-                DateTime date = DateTime.Parse(toData);
-
-                return result.Where(history => history.EventTime <= date);
-            }
-            return await Task.FromResult(result);
-        }        
-        
     }
 }

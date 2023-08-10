@@ -15,6 +15,6 @@ namespace Business.Services.Contracts
         Task<Response<GetTransactionDto>> CreateOutTransactionAsync(CreateTransactionDto transactionDto, User loggedUser);
         Task<Response<GetTransactionDto>> UpdateAsync(int id, User loggedUser, CreateTransactionDto transactionDto);
         Task<Response<bool>> DeleteAsync(int id, User loggedUser);
-        Task<Response<bool>> ExecuteAsync(int transactionId, User loggedUser);
+        Task<Response<bool>> ConfirmAsync(int transactionId, User loggedUser);
     }
 }

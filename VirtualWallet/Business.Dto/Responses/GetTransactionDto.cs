@@ -12,7 +12,7 @@ namespace Business.DTOs.Responses
         public decimal Amount { get; set; }
         public string Direction { get; set; }
         public string Description { get; set; }
-        public bool IsExecuted { get; set; }
+        public bool IsConfirmed { get; set; }
         public bool IsDeleted { get; set; }
     }
 }

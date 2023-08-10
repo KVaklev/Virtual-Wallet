@@ -40,7 +40,7 @@ namespace DataAccess.Models.Models
         [JsonIgnore]
         public Currency Currency { get; set; }
 
-        public bool IsExecuted { get; set; }
+        public bool IsConfirmed { get; set; }
 
         public bool IsDeleted { get; set; }
 

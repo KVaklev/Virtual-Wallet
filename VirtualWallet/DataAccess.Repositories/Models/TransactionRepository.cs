@@ -64,7 +64,6 @@ namespace DataAccess.Repositories.Models
                 .Include(c => c.Currency)
                 .AsQueryable();
 
-            //todo - filter by username
             return result;
         } 
     }

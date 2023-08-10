@@ -28,7 +28,9 @@ namespace Business.Mappers
                 
         }
 
-        public static async Task<Transaction> MapCreateDtoToTransactionInAsync(Transaction transactionOut, decimal amount)
+        public static async Task<Transaction> MapCreateDtoToTransactionInAsync(
+            Transaction transactionOut, 
+            decimal amount)
         {
             var transactionIn = new Transaction();
             transactionIn.AccountRecepientId = transactionOut.AccountRecepientId;
@@ -38,7 +40,7 @@ namespace Business.Mappers
             transactionIn.Direction = DirectionType.In;
             transactionIn.Date = DateTime.UtcNow;
             transactionIn.Description = transactionOut.Description;
-            transactionIn.IsExecuted = true;
+            transactionIn.IsConfirmed = true;
             return transactionIn;
         }
 

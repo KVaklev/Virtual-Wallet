@@ -11,10 +11,14 @@ namespace Business.Services.Models
     public class HistoryService : IHistoryService
     {
         private readonly IHistoryRepository historyRepository;
+        private readonly ITransactionRepository transactionRepository;
         
-        public HistoryService(IHistoryRepository historyRepository)
+        public HistoryService(
+            IHistoryRepository historyRepository,
+            ITransactionRepository transactionRepository)
         {
             this.historyRepository = historyRepository;
+            this.transactionRepository = transactionRepository;
         }
 
         public async Task<Response<GetHistoryDto>> GetByIdAsync(int id, User loggedUser)
@@ -33,8 +37,9 @@ namespace Business.Services.Models
                 result.Message = Constants.ModifyAuthorizedErrorMessage;
                 return result;
             }
-            
+
             var historyDto = HistoryMapper.MapHistoryToDtoAsync(history);
+       
             result.Data = historyDto;
             return result;
         }

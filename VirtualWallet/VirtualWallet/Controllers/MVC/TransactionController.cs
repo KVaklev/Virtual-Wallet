@@ -44,19 +44,23 @@ namespace VirtualWallet.Controllers.MVC
         [HttpGet]
         public async Task<IActionResult> Index([FromQuery] TransactionQueryParameters parameters)
         {
-            //try
-            //{
-            //    var loggedUser = await GetLoggedUserAsync();
-            //    var result = await this.transactionService.FilterByAsync(parameters, loggedUser);
+            
+                var loggedUser = await FindLoggedUserAsync();
+                if (!loggedUser.IsSuccessful)
+                {
+                    return await EntityErrorViewAsync(loggedUser.Message);
+                }
 
-            //    return View(result);
-            //}
-            //catch (EntityNotFoundException ex)
-            //{
-            //    return await EntityErrorViewAsync(ex.Message);
-            //}
 
-            return View();
+                var result = await this.transactionService.FilterByAsync(parameters, loggedUser.Data);
+            if (!result.IsSuccessful)
+            {
+                return await EntityErrorViewAsync(result.Message);
+            }
+            var indexTransactionViewModel = new IndexTransactionViewModel();
+            indexTransactionViewModel.TransactionDtos = result.Data;
+            return View(indexTransactionViewModel);
+ 
         }
 
         [HttpGet]
@@ -82,16 +86,16 @@ namespace VirtualWallet.Controllers.MVC
                 return this.View(transactionDto);
             }
             var loggedUserResult = await FindLoggedUserAsync();
-            if (!loggedUserResult.IsSuccessful)
-            {
-                return await EntityErrorViewAsync(loggedUserResult.Message);
-            }
-            var result = await this.transactionService.CreateOutTransactionAsync(transactionDto.CreateTransactionDto, loggedUserResult.Data);
-            if (!result.IsSuccessful)
-            {
-                return await EntityErrorViewAsync(result.Message);
-            }
-            return this.RedirectToAction("Execute", "Transaction", new { id = result.Data.Id });
+                if (!loggedUserResult.IsSuccessful)
+                {
+                    return await EntityErrorViewAsync(loggedUserResult.Message);
+                }
+                var result = await this.transactionService.CreateOutTransactionAsync(transactionDto.CreateTransactionDto, loggedUserResult.Data);
+                if (!result.IsSuccessful)
+                {
+                    return await EntityErrorViewAsync(result.Message);
+                }
+                return this.RedirectToAction("Confirm", "Transaction", new { id = result.Data.Id });
         }
 
         [HttpGet]
@@ -149,31 +153,30 @@ namespace VirtualWallet.Controllers.MVC
         [HttpGet]
         public async Task<IActionResult> Delete([FromRoute] int id)
         {
-
-            var loggedUserResult = await FindLoggedUserAsync();
-
-            if (!loggedUserResult.IsSuccessful)
-            {
-                return await EntityErrorViewAsync(loggedUserResult.Message);
-            }
-            var transactionResult = await this.transactionService.GetByIdAsync(id, loggedUserResult.Data);
-            if (!transactionResult.IsSuccessful)
-            {
-                return await EntityErrorViewAsync(transactionResult.Message);
-            }
-            var result = await InitializedExecuteTransactionViewModelAsync(transactionResult.Data);
-            if (!result.IsSuccessful)
-            {
-                return await EntityErrorViewAsync(transactionResult.Message);
-            }
-            ExecuteTransactionViewModel executeTransactionViewModel = result.Data;
-            return this.View(executeTransactionViewModel);
+            
+                var loggedUserResult = await FindLoggedUserAsync();
+                if (!loggedUserResult.IsSuccessful)
+                {
+                    return await EntityErrorViewAsync(loggedUserResult.Message);
+                }
+                var transactionResult = await this.transactionService.GetByIdAsync(id, loggedUserResult.Data);
+                if (!transactionResult.IsSuccessful)
+                {
+                    return await EntityErrorViewAsync(transactionResult.Message);
+                }
+                var result = await InitializedExecuteTransactionViewModelAsync(transactionResult.Data);
+                if (!result.IsSuccessful)
+                {
+                    return await EntityErrorViewAsync(transactionResult.Message);
+                }
+            ConfirmTransactionViewModel confirmTransactionViewModel=result.Data;
+            return this.View(confirmTransactionViewModel);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Delete(
-            [FromRoute] int id,
-            ExecuteTransactionViewModel executeTransactionViewModel)
+        public async Task<IActionResult>Delete(
+            [FromRoute] int id, 
+            ConfirmTransactionViewModel executeTransactionViewModel)
         {
 
             var loggedUserResult = await FindLoggedUserAsync();
@@ -197,7 +200,7 @@ namespace VirtualWallet.Controllers.MVC
         }
 
         [HttpGet]
-        public async Task<IActionResult> Execute([FromRoute] int id)
+        public async Task<IActionResult> Confirm([FromRoute] int id)
         {
             var loggedUserResult = await FindLoggedUserAsync();
             if (!loggedUserResult.IsSuccessful)
@@ -214,16 +217,16 @@ namespace VirtualWallet.Controllers.MVC
             {
                 return await EntityErrorViewAsync(transactionResult.Message);
             }
-            ExecuteTransactionViewModel executeTransactionViewModel = result.Data;
+            ConfirmTransactionViewModel confirmTransactionViewModel = result.Data;
 
-            return this.View(executeTransactionViewModel);
+            return this.View(confirmTransactionViewModel);
 
         }
 
         [HttpPost]
-        public async Task<IActionResult> Execute(
+        public async Task<IActionResult> Confirm(
             [FromRoute] int id,
-            ExecuteTransactionViewModel executeTransactionViewModel)
+            ConfirmTransactionViewModel executeTransactionViewModel)
         {
             var loggedUserResult = await FindLoggedUserAsync();
             if (!loggedUserResult.IsSuccessful)
@@ -244,17 +247,17 @@ namespace VirtualWallet.Controllers.MVC
             }
             executeTransactionViewModel.Recipient = userResult.Data;
 
-            var result = await this.transactionService.ExecuteAsync(id, loggedUserResult.Data);
+            var result = await this.transactionService.ConfirmAsync(id, loggedUserResult.Data);
             if (!result.IsSuccessful)
             {
                 return await EntityErrorViewAsync(result.Message);
             }
 
-            return RedirectToAction("Confirm", "Transaction", new { id = transactionResult.Data.Id });
+            return RedirectToAction("SuccessfulConfirm", "Transaction", new { id = transactionResult.Data.Id });
         }
 
         [HttpGet]
-        public async Task<IActionResult> Confirm([FromRoute] int id)
+        public async Task<IActionResult> SuccessfulConfirm([FromRoute] int id)
         {
             var loggedUserResult = await FindLoggedUserAsync();
             if (!loggedUserResult.IsSuccessful)
@@ -297,13 +300,11 @@ namespace VirtualWallet.Controllers.MVC
             return loggedUserResult;
         }
 
-        private async Task<Response<ExecuteTransactionViewModel>> InitializedExecuteTransactionViewModelAsync(
+        private async Task<Response<ConfirmTransactionViewModel>> InitializedExecuteTransactionViewModelAsync(
             GetTransactionDto transaction)
         {
-            var result = new Response<ExecuteTransactionViewModel>();
-
-            ExecuteTransactionViewModel executeTransactionViewModel = new ExecuteTransactionViewModel();
-
+            var result = new Response<ConfirmTransactionViewModel>();
+            ConfirmTransactionViewModel executeTransactionViewModel = new ConfirmTransactionViewModel();
             executeTransactionViewModel.GetTransactionDto = transaction;
 
             var userResult = await this.userService.GetLoggedUserByUsernameAsync(transaction.RecipientUsername);

@@ -25,6 +25,7 @@ namespace Business.Services.Helpers
                 new Claim(ClaimTypes.NameIdentifier, loggedUser.Id.ToString()),
                 new Claim(ClaimTypes.Name, loggedUser.Username),
                 new Claim("IsAdmin", loggedUser.IsAdmin.ToString()),
+                new Claim("IsBlocked", loggedUser.IsBlocked.ToString()),
                 new Claim("UsersAccountId", loggedUser.Account.Id.ToString()),
                 new Claim(JwtRegisteredClaimNames.Email, loggedUser.Email),
                 new Claim(JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString())
@@ -134,7 +135,7 @@ namespace Business.Services.Helpers
         public static async Task<bool> CanModifyTransactionAsync(Transaction transaction)
         {
             var canExecuteTransaction = true;
-            if (transaction.IsExecuted
+            if (transaction.IsConfirmed
                     || transaction.Direction == DirectionType.In
                     || transaction.IsDeleted)
             {

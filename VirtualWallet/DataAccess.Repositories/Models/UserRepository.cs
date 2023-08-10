@@ -1,10 +1,6 @@
-﻿using Business.Exceptions;
-using Business.QueryParameters;
-using DataAccess.Models.Enums;
-using DataAccess.Models.Models;
+﻿using DataAccess.Models.Models;
 using DataAccess.Repositories.Contracts;
 using DataAccess.Repositories.Data;
-using DataAccess.Repositories.Helpers;
 using Microsoft.EntityFrameworkCore;
 
 namespace DataAccess.Repositories.Models
@@ -98,6 +94,14 @@ namespace DataAccess.Repositories.Models
             await context.SaveChangesAsync();
             return userToUnblock;
         }
+
+        public async Task<bool> SaveChangesAsync()
+        {
+            await context.SaveChangesAsync();
+
+            return true;
+        }
+
         public async Task<bool> PhoneNumberExistsAsync(string phoneNumber)
         {
             return await context.Users.AnyAsync(u => u.PhoneNumber == phoneNumber);

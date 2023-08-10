@@ -106,16 +106,20 @@ namespace Business.Services.Models
             return result;
         }
 
-        public Response<IQueryable<GetCardDto>> GetByAccountId(int accountId)
+        public Response<List<GetCardDto>> GetByAccountId(int accountId)
         {
-            var result = new Response<IQueryable<GetCardDto>>();
+            var result = new Response<List<GetCardDto>>();
 
             var cards = this.cardRepository.GetByAccountId(accountId);
+
+            var cardDto = cards
+                .Select(cards => this.mapper.Map<GetCardDto> (cards))
+                .ToList();
 
             if (cards != null && cards.Any())
             {
                 result.IsSuccessful = true;
-                result.Data = (IQueryable<GetCardDto>)cards.AsQueryable();
+                result.Data = cardDto;
             }
             else
             {
