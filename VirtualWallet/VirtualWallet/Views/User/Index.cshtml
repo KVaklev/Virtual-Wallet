@@ -1,6 +1,5 @@
 ﻿@model UserSearchModel
 
-
 @{
     this.ViewData["Title"] = "Speed Pay - About us";
     var username = User.FindFirst(ClaimTypes.Name);
@@ -10,7 +9,6 @@
     var isLogged = false;
     if (User.Claims.Any()) { isLogged = true; };
 }
-
 
 <style>
     #userResults {
@@ -99,9 +97,9 @@
                                                     <div class="col-4 col-sm-4">
                                          
                                                         <div class="d-flex justify-content-end">
-                                                            <a asp-controller="Users" asp-action="Details" asp-route-id="@currentUser.Id" class="btn btn-primary btn-sm me-3">Details</a>
-                                                            <a asp-controller="Users" asp-action="Edit" asp-route-id="@currentUser.Id" class="btn btn-warning btn-sm me-3">Edit</a>
-                                                            <a asp-controller="Users" asp-action="Delete" asp-route-id="@currentUser.Id" class="btn btn-danger btn-sm">Delete</a>
+                                                            <a asp-controller="User" asp-action="Details" asp-route-id="@currentUser.Id" class="btn btn-primary btn-sm me-3">Details</a>
+                                                            <a asp-controller="User" asp-action="Edit" asp-route-id="@currentUser.Id" class="btn btn-warning btn-sm me-3">Edit</a>
+                                                            <a asp-controller="User" asp-action="Delete" asp-route-id="@currentUser.Id" class="btn btn-danger btn-sm">Delete</a>
                                                         </div>
                                                     </div>
 
@@ -109,7 +107,7 @@
                                                     ============================================= -->
                                                     <div class="bg-white shadow-sm rounded p-4 mb-4">
                                                         <h3 class="text-5 fw-400 d-flex align-items-center mb-4">Account Settings
-                                                            
+
                                                         </h3>
                                                         <hr class="mx-n4 mb-4">
                                                         <div class="row gx-3 align-items-center">
@@ -129,9 +127,6 @@
                                                             }
                                                         </div>
                                                     </div>
-                                                   
-                                                   
-
                                                 </div>
                                             </div>
                                         </div>
@@ -147,7 +142,6 @@
         {
             <div class="container">
                 <div class="row">
-
                  <aside class="col-lg-3">
                     <div class="bg-white shadow-sm rounded text-center p-3 mb-4">
                                     <div class="row g-4 mb-5">
@@ -161,7 +155,6 @@
                     <p class="text-muted opacity-8 mb-4">Supercharge your connections! Enter emails, send invites for registration. Successful sign-ups earn you both rewards. Limited invites, unlimited possibilities. Discover more in our FAQ section!</p>
                     <div class="d-grid"><a asp-controller="Help" asp-action="FAQ" class="btn btn-primary btn-sm">Go to FAQ</a></div></div>
                </aside>
-
                     <div class="col-lg-9">
                             <div class="row">
                                   <div class="col-lg-12">

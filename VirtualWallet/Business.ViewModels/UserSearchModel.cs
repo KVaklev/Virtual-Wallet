@@ -10,6 +10,5 @@ namespace Business.ViewModels
 
         public Response<PaginatedList<GetCreatedUserDto>> Users { get; set; }
 
-        public UserChangeStatusViewModel UserChangeStatusViewModel { get; set; }
     }
 }

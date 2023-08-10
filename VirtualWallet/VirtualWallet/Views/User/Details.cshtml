@@ -1,5 +1,97 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
-}
+﻿@model UserDetailsViewModel
+
+
+<title> @this.Model.User.Username</title>
+
+<body>
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-md-6 offset-md-3">
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="mb-0 text-center"><i class="fas fa-crown text-primary"></i> <span class="btn-outline-success">@this.Model.User.Username</span></h4>
+                    </div>
+                    <div class="card-body">
+                        <table class="table">
+                            <tbody>
+                                <tr>
+                                    <th scope="row">
+                                        <i class="fas fa-robot text-primary"></i> Firstname
+                                        </th>
+                                    <td>@this.Model.User.FirstName</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">
+                                        <i class="fas fa-robot text-primary"></i> Lastname
+                                    <td>@this.Model.User.LastName</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">
+                                        <i class="fas fa-envelope text-primary"></i>  Email
+                                    </th>
+                                    <td>@this.Model.User.Email</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">
+                                        <i class="fas fa-phone text-primary"></i>  Phone number
+                                    </th>
+                                    <td>@this.Model.User.PhoneNumber</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">
+                                        <i class="fas fa-map-marker-alt text-primary"></i>  Address
+                                    </th>
+                                    <td>@this.Model.User.Country @this.Model.User.Address</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">
+                                        <i class="fas fa-calendar-day text-primary"></i> Date of Birth
+                                    </th>
+                                    <td>@this.Model.User.DateOfBirth</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">
+                                        <i class="fas fa-money-bill text-primary"></i> Wallet Balance
+                                        </th>
+                                    <td>@this.Model.User.AccountBalance</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">
+                                        <i class="fas fa-list text-primary"></i> Cards registered
+                                        </th>
+                                    <td>@this.Model.Cards</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">
+                                        <i class="fas fa-check text-primary"></i> Registration
+                                        </th>
+                                    
+                                        @if (this.Model.User.ConfirmedRegistration)
+                                        {
+                                        <td class="text-success">Confirmed</td>
+                                        }
+                                        else
+                                        {
+                                        <td class="text-danger">Account is not verified. Needs email confirmation</td>
+                                        }
+                                </tr>
+                            </tbody>
+                        </table>
+                        @if (this.Model.User.IsAdmin)
+                        {
+                            <span class="badge badge-warning">Admin</span>
+                        }
+                        @if (this.Model.User.IsBlocked)
+                        {
+                            <span class="badge badge-danger">Blocked user</span>
+                        }
+                    </div>
+                    <div class="card-footer">
+                        <a href="/User/Index" class="btn btn-primary">Go Back</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
