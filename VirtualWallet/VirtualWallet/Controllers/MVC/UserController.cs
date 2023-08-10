@@ -2,6 +2,7 @@
 using Business.QueryParameters;
 using Business.Services.Contracts;
 using Business.ViewModels;
+using Business.ViewModels.UserViewModels;
 using DataAccess.Models.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors.Infrastructure;
