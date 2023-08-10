@@ -188,6 +188,11 @@ namespace VirtualWallet.Controllers.MVC
                 return this.RedirectToAction("SuccessfulDelete", "Transaction");
            
         }
+        [HttpGet]
+        public async Task<IActionResult> SuccessfulDelete()
+        {
+            return this.View();
+        }
 
         [HttpGet]
         public async Task<IActionResult> Execute([FromRoute] int id)
@@ -263,11 +268,7 @@ namespace VirtualWallet.Controllers.MVC
             return this.View(transactionResult.Data);
         }
 
-        [HttpGet]
-        public async Task<IActionResult> SuccessfulDelete()
-        {
-            return this.View();
-        }
+        
 
 
         private async Task<IActionResult> EntityErrorViewAsync(string message)
@@ -275,7 +276,7 @@ namespace VirtualWallet.Controllers.MVC
             this.HttpContext.Response.StatusCode = StatusCodes.Status404NotFound;
             this.ViewData["ErrorMessage"] = message;
 
-            return this.View("Error404");
+            return this.View("Error");
         }
 
         private IActionResult BlockedErrorView()
@@ -300,6 +301,7 @@ namespace VirtualWallet.Controllers.MVC
             var result = new Response<ExecuteTransactionViewModel>();
             ExecuteTransactionViewModel executeTransactionViewModel = new ExecuteTransactionViewModel();
             executeTransactionViewModel.GetTransactionDto = transaction;
+
             var userResult = await this.userService.GetLoggedUserByUsernameAsync(transaction.RecipientUsername);
             if (!userResult.IsSuccessful)
             {
@@ -310,10 +312,9 @@ namespace VirtualWallet.Controllers.MVC
             executeTransactionViewModel.Recipient = userResult.Data;
 
             var exchngeAmount = await this.exchangeRateService.ExchangeAsync(
-                executeTransactionViewModel.GetTransactionDto.Amount,
-                executeTransactionViewModel.GetTransactionDto.CurrencyCode,
+                transaction.Amount,
+                transaction.CurrencyCode,
                 userResult.Data.Account.Currency.CurrencyCode);
-
             if (!exchngeAmount.IsSuccessful)
             {
                 result.IsSuccessful = false;
@@ -321,6 +322,7 @@ namespace VirtualWallet.Controllers.MVC
                 return result;
             }
             executeTransactionViewModel.RecipientGetsAmount = exchngeAmount.Data;
+
             result.Data = executeTransactionViewModel;
             return result;
         }
