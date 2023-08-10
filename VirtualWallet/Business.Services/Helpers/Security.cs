@@ -134,7 +134,7 @@ namespace Business.Services.Helpers
         public static async Task<bool> CanModifyTransactionAsync(Transaction transaction)
         {
             var canExecuteTransaction = true;
-            if (transaction.IsExecuted
+            if (transaction.IsConfirmed
                     || transaction.Direction == DirectionType.In
                     || transaction.IsDeleted)
             {

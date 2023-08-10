@@ -39,7 +39,7 @@
 
         //Constant messages for transactions 
 
-        public const string ModifyTransactionExecuteMessage = "The transaction has been successfully executed.";
+        public const string ModifyTransactionConfirmMessage = "The transaction has been successfully executed.";
         public const string ModifyTransactionDeleteMessage = "The transacion has been successfully deleted.";
         public const string ModifyTransactionNotExecuteErrorMessage = "You cannot update or delete a completed transaction!";
         public const string ModifyTransactionBlockedErrorMessage = "You are not allowed to make transactions while being blocked!";

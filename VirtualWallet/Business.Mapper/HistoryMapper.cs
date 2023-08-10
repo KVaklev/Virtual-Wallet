@@ -13,6 +13,7 @@ namespace Business.Mappers
 
             history.EventTime = DateTime.Now;
             history.TransferId = transfer.Id;
+            history.Transfer = transfer;
             history.NameOperation = NameOperation.Transfer;
             history.AccountId = transfer.AccountId;
             return history;
@@ -24,6 +25,7 @@ namespace Business.Mappers
 
             history.EventTime = DateTime.Now;
             history.TransactionId = transaction.Id;
+            history.Transaction = transaction;
             history.NameOperation = NameOperation.Transaction;
 
             if (transaction.Direction == DirectionType.Out)
@@ -45,8 +47,8 @@ namespace Business.Mappers
 
             if (history.TransactionId != null)
             {
-                historyDto.From = history.Transaction.AccountSender.User.Username;
-                historyDto.To = history.Transaction.AccountRecipient.User.Username;
+                historyDto.From = history.Account.User.Username;
+               // historyDto.To = transaction.AccountRecipient.User.Username;
                 historyDto.Amount = history.Transaction.Amount;
                 historyDto.CurrencyCode = history.Transaction.Currency.CurrencyCode;
                 historyDto.Direction = history.Transaction.Direction.ToString();
@@ -60,11 +62,11 @@ namespace Business.Mappers
                 if (history.Transfer.TransferType == TransferDirection.Deposit)
                 {
                     historyDto.From = history.Transfer.Card.CardNumber;
-                    historyDto.To = history.Transfer.Account.User.Username;
+                    historyDto.To = history.Account.User.Username;
                 }
                 else
                 {
-                    historyDto.From = history.Transfer.Account.User.Username;
+                    historyDto.From = history.Account.User.Username;
                     historyDto.To = history.Transfer.Card.CardNumber;
                 }
             }
