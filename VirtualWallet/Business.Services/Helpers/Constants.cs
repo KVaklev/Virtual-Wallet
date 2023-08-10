@@ -5,6 +5,7 @@
         //Constant messages for user
 
         public const string ModifyUserErrorMessage = "Only an admin is authorized to perform the specified action.";
+        public const string UpdateStatusUserErrorMessage = "Only an admin or owner of the account is authorized to perform the specified action.";
         public const string ModifyUsernameErrorMessage = "Username change is not allowed.";
 
         public const string NoUsersErrorMessage = "No users are found.";

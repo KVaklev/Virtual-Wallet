@@ -5,16 +5,10 @@
     var username = User.FindFirst(ClaimTypes.Name);
     var loggedUserId = User.FindFirst(ClaimTypes.NameIdentifier);
     var isAdmin = User.FindFirst("IsAdmin");
+    var isBlocked = User.FindFirst("IsBlocked");
     var isLogged = false;
     if (User.Claims.Any()) { isLogged = true; };
 }
-
-<script>
-    function toggleUserResults() {
-        var userResults = document.getElementById("userResults");
-        userResults.style.display = userResults.style.display === "none" ? "block" : "none";
-    }
-</script>
 
 <style>
     #userResults {
@@ -94,20 +88,43 @@
                                                 <div class="row d-flex align-items-center flex-row bg-white">
                                                     <div class="col-2 col-sm-1">
                                                         <img src="~/images/profile-thumb-sm.jpg" class="rounded-circle" alt="">
-                                                    </div>
+                                                    </div> 
                                                     <div class="col-4 col-sm-4">
-      
                                                         <span class="d-block text-2 mt-2">@currentUser.FirstName @currentUser.LastName / <b>@currentUser.Username</b></span>
                                                         <span class="d-block text-2">@currentUser.Email</span>
                                                         <span class="d-block text-2">@currentUser.PhoneNumber</span>
-                                                        <span>@((currentUser.IsAdmin) ? "Admin" : "Regular User")</span>
                                                     </div>
                                                     <div class="col-4 col-sm-4">
                                          
                                                         <div class="d-flex justify-content-end">
-                                                            <a asp-controller="Users" asp-action="Details" asp-route-id="@currentUser.Id" class="btn btn-primary btn-sm me-3">Details</a>
-                                                            <a asp-controller="Users" asp-action="Edit" asp-route-id="@currentUser.Id" class="btn btn-warning btn-sm me-3">Edit</a>
-                                                            <a asp-controller="Users" asp-action="Delete" asp-route-id="@currentUser.Id" class="btn btn-danger btn-sm">Delete</a>
+                                                            <a asp-controller="User" asp-action="Details" asp-route-id="@currentUser.Id" class="btn btn-primary btn-sm me-3">Details</a>
+                                                            <a asp-controller="User" asp-action="Edit" asp-route-id="@currentUser.Id" class="btn btn-warning btn-sm me-3">Edit</a>
+                                                            <a asp-controller="User" asp-action="Delete" asp-route-id="@currentUser.Id" class="btn btn-danger btn-sm">Delete</a>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Account Settings
+                                                    ============================================= -->
+                                                    <div class="bg-white shadow-sm rounded p-4 mb-4">
+                                                        <h3 class="text-5 fw-400 d-flex align-items-center mb-4">Account Settings
+
+                                                        </h3>
+                                                        <hr class="mx-n4 mb-4">
+                                                        <div class="row gx-3 align-items-center">
+                                                            <p class="col-sm-3 text-muted text-sm-end mb-0 mb-sm-3">User status:</p>
+                                                            <p class="col-sm-9 text-3"><b>@((currentUser.IsAdmin) ? "Admin" : "Regular User")</b></p>
+                                                        </div>
+                                                        <div class="row gx-3 align-items-center">
+                                                            <p class="col-sm-3 text-muted text-sm-end mb-0 mb-sm-3">Account Status:</p>
+                                                            @if (currentUser.IsBlocked)
+                                                            {
+                                                            <p class="col-sm-9 text-3"><span class="bg-danger text-white rounded-pill d-inline-block px-2 mb-0"><i class="fas fa-check-circle"></i>Blocked</span></p>
+                                                                
+                                                            }
+                                                            else
+                                                            {
+                                                                <p class="col-sm-9 text-3"><span class="bg-success text-white rounded-pill d-inline-block px-2 mb-0"><i class="fas fa-check-circle"></i>Active</span></p>
+                                                            }
                                                         </div>
                                                     </div>
                                                 </div>
@@ -125,7 +142,6 @@
         {
             <div class="container">
                 <div class="row">
-
                  <aside class="col-lg-3">
                     <div class="bg-white shadow-sm rounded text-center p-3 mb-4">
                                     <div class="row g-4 mb-5">
@@ -139,7 +155,6 @@
                     <p class="text-muted opacity-8 mb-4">Supercharge your connections! Enter emails, send invites for registration. Successful sign-ups earn you both rewards. Limited invites, unlimited possibilities. Discover more in our FAQ section!</p>
                     <div class="d-grid"><a asp-controller="Help" asp-action="FAQ" class="btn btn-primary btn-sm">Go to FAQ</a></div></div>
                </aside>
-
                     <div class="col-lg-9">
                             <div class="row">
                                   <div class="col-lg-12">

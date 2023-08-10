@@ -363,3 +363,5 @@ MigrationBackup/
 FodyWeavers.xsd
 /ForumManagementSystem/DataAccess.Repositories/Migrations/20230620114647_init.Designer.cs
 /VirtualWallet/DataAccess.Repositories/Migrations
+/VirtualWallet/Business.ViewModels/CreateTransferViewModel.cs
+/VirtualWallet/Business.ViewModels/CreateTransferViewModel.cs

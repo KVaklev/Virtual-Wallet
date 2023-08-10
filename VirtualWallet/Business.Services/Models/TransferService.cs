@@ -372,13 +372,15 @@ namespace Business.Services.Models
         }
         private async Task<bool> AddTransferToHistoryAsync(Transfer transfer)
         {
-            var historyCount = await this.context.History.CountAsync();
+            //var historyCount = await this.context.History.CountAsync();
+
+            var historyCount = await this.historyRepository.GetHistoryCountAsync();
 
             var history = await HistoryMapper.MapCreateWithTransferAsync(transfer);
 
             await this.historyRepository.CreateAsync(history);
 
-            int historyCountNewHistoryAdded = await this.context.History.CountAsync();
+            int historyCountNewHistoryAdded = await this.historyRepository.GetHistoryCountAsync();
 
             if (historyCount + 1 == historyCountNewHistoryAdded)
             {

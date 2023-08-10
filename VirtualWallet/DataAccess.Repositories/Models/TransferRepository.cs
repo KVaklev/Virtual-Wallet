@@ -1,9 +1,6 @@
-﻿using Business.QueryParameters;
-using DataAccess.Models.Enums;
-using DataAccess.Models.Models;
+﻿using DataAccess.Models.Models;
 using DataAccess.Repositories.Contracts;
 using DataAccess.Repositories.Data;
-using DataAccess.Repositories.Helpers;
 using Microsoft.EntityFrameworkCore;
 
 namespace DataAccess.Repositories.Models
@@ -86,110 +83,5 @@ namespace DataAccess.Repositories.Models
             await context.SaveChangesAsync();
             return transferToUpdate;
         }
-
-    //    public async Task<PaginatedList<Transfer>> FilterByAsync(TransferQueryParameters filterParameters, User user)
-    //    {
-
-    //        IQueryable<Transfer> result = GetAll(user);
-
-    //        result = await FilterByUsernameAsync(result, filterParameters.Username);
-    //        result = await FilterByFromDateAsync(result, filterParameters.FromDate);
-    //        result = await FilterByToDateAsync(result, filterParameters.ToDate);
-    //        result = await FilterByTransferTypeAsync(result, filterParameters.TransferType);
-    //        result = await SortByAsync(result, filterParameters.SortBy);
-
-    //        int totalPages = (result.Count() + filterParameters.PageSize - 1) /
-    //filterParameters.PageSize;
-
-    //        result = await Common<Transfer>.PaginateAsync(result, filterParameters.PageNumber, filterParameters.PageSize);
-
-    //        return new PaginatedList<Transfer>(result.ToList(), totalPages, filterParameters.PageNumber);
-
-
-    //    }
-
-        //private async Task<IQueryable<Transfer>> FilterByUsernameAsync(IQueryable<Transfer> transfers, string? username)
-        //{
-        //    if (!string.IsNullOrEmpty(username))
-        //    {
-        //        transfers = transfers.Where(t => t.Account.User.Username == username);
-        //    }
-
-        //    return await Task.FromResult(transfers);
-        //}
-        //private async Task<IQueryable<Transfer>> FilterByFromDateAsync(IQueryable<Transfer> transfers, string? fromDate)
-        //{
-        //    if (!string.IsNullOrEmpty(fromDate))
-        //    {
-        //        DateTime date = DateTime.Parse(fromDate);
-
-        //        transfers = transfers.Where(a => a.DateCreated >= date);
-        //    }
-
-        //    return await Task.FromResult(transfers);
-        //}
-        //private async Task<IQueryable<Transfer>> FilterByToDateAsync(IQueryable<Transfer> transfers, string? toDate)
-        //{
-        //    if (!string.IsNullOrEmpty(toDate))
-        //    {
-        //        DateTime date = DateTime.Parse(toDate);
-
-        //        transfers = transfers.Where(a => a.DateCreated <= date);
-        //    }
-
-        //    return await Task.FromResult(transfers);
-        //}
-        //private async Task<IQueryable<Transfer>> FilterByTransferTypeAsync(IQueryable<Transfer> transfers, string? transfer)
-        //{
-        //    if (!string.IsNullOrEmpty(transfer))
-        //    {
-        //        if (TryParseTransferTypeParameter(transfer, out TransferDirection? transferType))
-        //        {
-        //            if (transferType.HasValue)
-        //            {
-        //                return await Task.FromResult(transfers.Where(t => t.TransferType == transferType.Value));
-        //            }
-        //            else
-        //            {
-        //                return await Task.FromResult(transfers);
-        //            }
-        //        }
-        //    }
-
-        //    return await Task.FromResult(transfers);
-        //}
-        //private bool TryParseTransferTypeParameter(string value, out TransferDirection? result)
-        //{
-        //    if (Enum.TryParse(value, true, out TransferDirection parsedResult))
-        //    {
-        //        result = parsedResult;
-        //        return true;
-        //    }
-
-        //    result = null;
-        //    return false;
-        //}
-        //private static async Task<IQueryable<Transfer>> SortByAsync(IQueryable<Transfer> transfers, string? sortCriteria)
-        //{
-        //    if (Enum.TryParse<SortCriteria>(sortCriteria, true, out var sortEnum))
-        //    {
-        //        switch (sortEnum)
-        //        {
-        //            case SortCriteria.Amount:
-        //                return await Task.FromResult(transfers.OrderBy(t => t.Amount));
-        //            case SortCriteria.Date:
-        //                return await Task.FromResult(transfers.OrderBy(t => t.DateCreated));
-
-        //            default:
-        //                return await Task.FromResult(transfers);
-        //        }
-        //    }
-        //    else
-        //    {
-        //        return await Task.FromResult(transfers);
-
-        //    }
-        //}
-
     }
 }

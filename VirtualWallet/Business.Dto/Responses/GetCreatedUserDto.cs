@@ -13,6 +13,7 @@ namespace Business.DTOs.Responses
         public decimal Balance { get; set; }
         public string CurrencyCode { get; set; }
         public bool IsAdmin { get; set; }
+        public bool IsBlocked { get; set; }
 
     }
 }

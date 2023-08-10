@@ -9,7 +9,7 @@ using DataAccess.Models.Models;
 using DataAccess.Repositories.Contracts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
+using System.Text.Json;
 using Org.BouncyCastle.Security;
 using System.Security.Claims;
 
@@ -21,19 +21,24 @@ namespace VirtualWallet.Controllers.MVC
         private readonly ITransferService transferService;
         private readonly IUserService userService;
         private readonly ICurrencyService currencyService;
+        private readonly ICardService cardService;
         private readonly IExchangeRateService exchangeRateService;
         private readonly IMapper mapper;
 
         public TransferController(ITransferService transferService, IUserService userService,
             ICurrencyService currencyService,
             IExchangeRateService exchangeRateService,
-            IMapper mapper)
+            ICardService cardService,
+        IMapper mapper)
         {
             this.transferService = transferService;
             this.userService = userService;
             this.currencyService = currencyService;
             this.exchangeRateService = exchangeRateService;
+            this.cardService = cardService;
             this.mapper = mapper;
+
+
         }
 
         [HttpGet]
@@ -42,7 +47,7 @@ namespace VirtualWallet.Controllers.MVC
         {
             try
             {
-                var loggedUser = await GetLoggedUserAsync();
+                var loggedUser = await FindLoggedUserAsync();
                 //var model = transferService.GetAll(loggedUser).Select(m => new GetTransferDto { Username = m.Account.User.Username, DateCreated = m.DateCreated }).ToList();
                 var result = await transferService.FilterByAsync(parameters, loggedUser.Data);
                 return View(result.Data);
@@ -60,7 +65,7 @@ namespace VirtualWallet.Controllers.MVC
         {
             try
             {
-                var loggedUser = await GetLoggedUserAsync();
+                var loggedUser = await FindLoggedUserAsync();
                 var transfer = await this.transferService.GetByIdAsync(id, loggedUser.Data);
                 return View(transfer);
             }
@@ -73,30 +78,43 @@ namespace VirtualWallet.Controllers.MVC
         [HttpGet]
         public async Task<IActionResult> Create()
         {
-            var createTransferViewModel = new CreateTransferViewModel();
+            var query = new CardQueryParameters();
 
-            var result = this.currencyService.GetAll();
+            var loggedUser = await FindLoggedUserAsync();
 
-            if (!result.IsSuccessful)
+            if (!loggedUser.IsSuccessful)
             {
-                return await EntityNotFoundErrorViewAsync(result.Message);
+                return StatusCode(StatusCodes.Status404NotFound, loggedUser.Message);
+            }
+            var createTransferDepositViewModel = new CreateTransferDepositViewModel();
+                       
+            var currencies = this.currencyService.GetAll();
+
+            var cards = await this.cardService.FilterByAsync(query, loggedUser.Data);
+
+            if (!currencies.IsSuccessful)
+            {
+                return await EntityNotFoundErrorViewAsync(currencies.Message);
             }
 
-            //TempData["Currencies"] = JsonSerializer.Serialize(result.Data);
+            createTransferDepositViewModel.Cards = cards.Data;
 
-            return View(createTransferViewModel);
+            TempData["Currencies"] = JsonSerializer.Serialize(currencies.Data);
+            TempData["Cards"] = JsonSerializer.Serialize(cards.Data);
+
+            return View(createTransferDepositViewModel);
 
         }
 
         [HttpPost]
 
-        public async Task<IActionResult> Create(CreateTransferViewModel transferDto)
+        public async Task<IActionResult> Create(CreateTransferDepositViewModel transferDto)
         {
-            if (!this.ModelState.IsValid)
-            {
-                return this.View(transferDto);
-            }
-            var loggedUser = await GetLoggedUserAsync();
+            //if (!this.ModelState.IsValid)
+            //{
+            //    return this.View(transferDto);
+            //}
+            var loggedUser = await FindLoggedUserAsync();
 
             if (!loggedUser.IsSuccessful)
             {
@@ -119,7 +137,7 @@ namespace VirtualWallet.Controllers.MVC
         {
             try
             {
-                var loggedUser = await GetLoggedUserAsync();
+                var loggedUser = await FindLoggedUserAsync();
                 var result = await this.transferService.GetByIdAsync(id, loggedUser.Data);
 
                 if (!result.IsSuccessful)
@@ -145,7 +163,7 @@ namespace VirtualWallet.Controllers.MVC
                     return View(transferDto);
                 }
 
-                var loggedUser = await GetLoggedUserAsync();
+                var loggedUser = await FindLoggedUserAsync();
                 var result = await this.transferService.UpdateAsync(id, transferDto, loggedUser.Data);
 
                 if (!result.IsSuccessful)
@@ -169,7 +187,7 @@ namespace VirtualWallet.Controllers.MVC
         {
             try
             {
-                var loggedUser = await GetLoggedUserAsync();
+                var loggedUser = await FindLoggedUserAsync();
                 var result = await this.transferService.GetByIdAsync(id, loggedUser.Data);
                 if (!result.IsSuccessful)
                 {
@@ -190,7 +208,7 @@ namespace VirtualWallet.Controllers.MVC
         {
             try
             {
-                var loggedUser = await GetLoggedUserAsync();
+                var loggedUser = await FindLoggedUserAsync();
                 var result = await this.transferService.DeleteAsync(id, loggedUser.Data);
 
                 if (!result.IsSuccessful)
@@ -212,7 +230,7 @@ namespace VirtualWallet.Controllers.MVC
         {
             try
             {
-                var loggedUser = await GetLoggedUserAsync();
+                var loggedUser = await FindLoggedUserAsync();
                 var result = await this.transferService.ExecuteAsync(id, loggedUser.Data);
                 if (!result.IsSuccessful)
                 {
@@ -228,7 +246,7 @@ namespace VirtualWallet.Controllers.MVC
         }
 
 
-        private async Task<Response<User>> GetLoggedUserAsync()
+        private async Task<Response<User>> FindLoggedUserAsync()
         {
             var loggedUsersUsername = User.FindFirst(ClaimTypes.Name);
             var loggedUserResult = await this.userService.GetLoggedUserByUsernameAsync(loggedUsersUsername.Value);

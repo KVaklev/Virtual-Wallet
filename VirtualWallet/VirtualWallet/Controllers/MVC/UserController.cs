@@ -1,27 +1,29 @@
 ﻿using Business.QueryParameters;
 using Business.Services.Contracts;
 using Business.ViewModels;
+using DataAccess.Models.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-
+using System.Security.Claims;
 
 namespace VirtualWallet.Controllers.MVC
 {
     [Authorize]
-	[Route("users")]
-	public class UserController : Controller
+    public class UserController : Controller
     {
         private readonly IUserService userService;
-        public UserController(IUserService userService)
+        private readonly ICardService cardService;
+        public UserController(IUserService userService, ICardService cardService)
         {
             this.userService = userService;
+            this.cardService = cardService;
         }
 
         [HttpGet]
-		public async Task<IActionResult> Index(UserQueryParameters userQueryParameters)
+        public async Task<IActionResult> Index(UserQueryParameters userQueryParameters)
         {
 
-           var result = await this.userService.FilterByAsync(userQueryParameters);
+            var result = await this.userService.FilterByAsync(userQueryParameters);
 
             if (!result.IsSuccessful)
             {
@@ -32,11 +34,40 @@ namespace VirtualWallet.Controllers.MVC
             var newViewModel = new UserSearchModel
             {
                 Users = result,
-                UserQueryParameters = userQueryParameters
+                UserQueryParameters = userQueryParameters,
             };
 
             return this.View(newViewModel);
         }
 
-    }
+        [HttpGet]
+        public async Task<IActionResult> Details([FromRoute] int id)
+        {
+            var result = new Response<UserDetailsViewModel>();
+            var loggedUserResult = await FindLoggedUserAsync();
+			if (!loggedUserResult.IsSuccessful)
+			{
+				result.IsSuccessful = false;
+				result.Message = loggedUserResult.Message;
+                return (IActionResult)result.Data;
+			}
+
+            var user = await this.userService.GetByIdAsync(id, loggedUserResult.Data);
+            var cardsResult = this.cardService.GetByAccountId(id);
+            var userDetailsViewModel = new UserDetailsViewModel
+            {
+                User = user.Data,
+                Cards = (!cardsResult.IsSuccessful) ? 0 : cardsResult.Data.Count()
+            };
+
+            return this.View(userDetailsViewModel);
+        }
+
+        private async Task<Response<User>> FindLoggedUserAsync()
+		{
+			var loggedUsersUsername = User.FindFirst(ClaimTypes.Name);
+			var loggedUserResult = await this.userService.GetLoggedUserByUsernameAsync(loggedUsersUsername.Value);
+			return loggedUserResult;
+		}
+	}
 }

@@ -30,6 +30,11 @@ namespace DataAccess.Models.Models
             }
         }
 
+        public static implicit operator PaginatedList<T>(int v)
+        {
+            throw new NotImplementedException();
+        }
+
         //public async Task<PaginatedList<T>> CreateAsync(IQueryable<T> result, int page, int pageSize)
         //{
         //    var totalCount = await result.CountAsync();

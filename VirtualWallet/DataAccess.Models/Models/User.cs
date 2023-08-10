@@ -50,5 +50,8 @@ namespace DataAccess.Models.Models
         public int? AccountId { get; set; }
         public bool IsDeleted { get; set; }
         public bool IsVerified { get; set; }
+        public DateTime? DateOfBirth { get; set; }
+        public string? Address { get; set; }
+        public string? Country { get; set; }
     }
 }
