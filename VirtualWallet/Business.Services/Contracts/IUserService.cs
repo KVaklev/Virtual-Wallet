@@ -10,6 +10,7 @@ namespace Business.Services.Contracts
 {
     public interface IUserService
     {
+        Response<IQueryable<User>> GetAll();
         Task<Response<PaginatedList<GetCreatedUserDto>>> FilterByAsync(UserQueryParameters filterParameters);
         Task<Response<GetUserDto>> GetByIdAsync(int id, User loggedUser);
         Task<Response<GetUserDto>> GetByUsernameAsync(string username);

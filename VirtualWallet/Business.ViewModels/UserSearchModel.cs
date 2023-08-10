@@ -9,5 +9,7 @@ namespace Business.ViewModels
         public UserQueryParameters UserQueryParameters { get; set; }
 
         public Response<PaginatedList<GetCreatedUserDto>> Users { get; set; }
+
+        public UserChangeStatusViewModel UserChangeStatusViewModel { get; set; }
     }
 }

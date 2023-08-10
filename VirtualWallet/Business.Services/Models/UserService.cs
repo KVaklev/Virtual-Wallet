@@ -10,7 +10,6 @@ using Business.DTOs.Responses;
 using static Business.Services.Helpers.Constants;
 using DataAccess.Models.Enums;
 using Business.ViewModels;
-using System.Reflection.Metadata.Ecma335;
 
 namespace Business.Services.Models
 {
@@ -419,7 +418,7 @@ namespace Business.Services.Models
             return result;
         }
 
-        private Response<IQueryable<User>> GetAll()
+        public Response<IQueryable<User>> GetAll()
         {
             var result = new Response<IQueryable<User>>();
             var users = this.userRepository.GetAll();
