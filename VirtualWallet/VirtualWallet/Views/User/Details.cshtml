@@ -7,12 +7,33 @@
 <title> @this.Model.User.Username</title>
 
 <body>
+
     <div class="container mt-4">
         <div class="row">
-            <div class="col-md-6 offset-md-3">
+            <aside class="col-lg-3">
+                <div class="bg-white shadow-sm rounded text-center p-3 mb-4">
+                    <div class="profile-thumb mt-3 mb-4">
+                        <img class="center rounded-circle" src="~/images/profile-thumb-sm.jpg" alt="" style="width: 110px; height: 110px;">
+                        <p class="text-black opacity-12 mb-4">
+                            <b>@this.Model.User.Username</b> <br>
+                                    @DateTime.Now.DayOfWeek, @DateTime.Now.Date.ToShortDateString()
+                        <p>
+                    </div>
+                </div>
+            </aside>
+            <div class="col-md-6">
                 <div class="card">
                     <div class="card-header">
-                        <h4 class="mb-0 text-center"><i class="fas fa-crown text-primary"></i> <span class="btn-outline-success">@this.Model.User.Username</span></h4>
+                        <h4 class="mb-0 text-center">
+                            @if (this.Model.User.Admin)
+                            {
+                                <i class="fas fa-crown text-primary"></i> <span class="btn-outline-success">Admin</span>
+                            }
+                            else
+                            {
+                                <i class="text-primary"></i> <span class="btn-outline-success">Regular user</span>
+                            }
+                        </h4>
                     </div>
                     <div class="card-body">
                         <table class="table">
@@ -80,11 +101,11 @@
                                 </tr>
                             </tbody>
                         </table>
-                        @if (this.Model.User.IsAdmin)
+                        @if (this.Model.User.Admin)
                         {
                             <span class="badge badge-warning">Admin</span>
                         }
-                        @if (this.Model.User.IsBlocked)
+                        @if (this.Model.User.Blocked)
                         {
                             <span class="badge badge-danger">Blocked user</span>
                         }

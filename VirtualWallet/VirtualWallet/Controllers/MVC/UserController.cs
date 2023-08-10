@@ -1,4 +1,5 @@
 ﻿using Business.Exceptions;
+using Business.Mappers;
 using Business.QueryParameters;
 using Business.Services.Contracts;
 using Business.ViewModels;
@@ -64,6 +65,49 @@ namespace VirtualWallet.Controllers.MVC
             };
 
             return this.View(userDetailsViewModel);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Edit([FromRoute] int id)
+        {
+            var result = new Response<UserDetailsViewModel>();
+            var loggedUserResult = await FindLoggedUserAsync();
+            if (!loggedUserResult.IsSuccessful)
+            {
+                result.IsSuccessful = false;
+                result.Message = loggedUserResult.Message;
+                return (IActionResult)result.Data;
+            }
+
+            var user = await this.userService.GetByIdAsync(id, loggedUserResult.Data);
+
+            var cardsResult = this.cardService.GetByAccountId(id);
+            var userDetailsViewModel = new UserDetailsViewModel
+            {
+                User = user.Data,
+                Cards = (!cardsResult.IsSuccessful) ? 0 : cardsResult.Data.Count()
+            };
+
+            return this.View(userDetailsViewModel);
+
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Edit([FromRoute] int id, UserDetailsViewModel userDetailsViewModel)
+        {
+            var result = new Response<UserDetailsViewModel>();
+            var loggedUserResult = await FindLoggedUserAsync();
+            if (!loggedUserResult.IsSuccessful)
+            {
+                result.IsSuccessful = false;
+                result.Message = loggedUserResult.Message;
+                return (IActionResult)result.Data;
+            }
+
+            //var updateUserDto = 
+            //var user = await this.userService.UpdateAsync(id, updateUserDto, loggedUserResult.Data);
+            return this.View(userDetailsViewModel);
+
         }
 
         [HttpGet]

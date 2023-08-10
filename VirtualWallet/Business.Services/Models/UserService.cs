@@ -189,11 +189,20 @@ namespace Business.Services.Models
 
             userToUpdate = await UsersMapper.MapUpdateDtoToUserAsync(userToUpdate, updateUserDto);
             userToUpdate = await Security.ComputePasswordHashAsync<UpdateUserDto>(updateUserDto, userToUpdate);
+
+            userToUpdate = await this.ChangeStatus(userToUpdate, updateUserDto);
             userToUpdate = await this.userRepository.UpdateAsync(userToUpdate);
 
             result.Data = mapper.Map<GetUpdatedUserDto>(userToUpdate);
 
             return result;
+        }
+
+        private async Task<User> ChangeStatus(User userToUpdate, UpdateUserDto updateUserDto)
+        {
+            userToUpdate.IsAdmin = updateUserDto.IsAdmin ?? userToUpdate.IsAdmin;
+            userToUpdate.IsBlocked = updateUserDto.IsBlocked ?? userToUpdate.IsBlocked;
+            return await Task.FromResult(userToUpdate);
         }
 
         public async Task<Response<bool>> DeleteAsync(int id, User loggedUser)

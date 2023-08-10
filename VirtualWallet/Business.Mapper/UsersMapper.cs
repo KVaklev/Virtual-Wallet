@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Business.DTOs.Requests;
 using Business.DTOs.Responses;
+using Business.ViewModels.UserViewModels;
 using DataAccess.Models.Models;
 
 namespace Business.Mappers
@@ -22,9 +23,18 @@ namespace Business.Mappers
             CreateMap<UpdateUserDto, User>();
             CreateMap<User, GetUserDto>();
             CreateMap<GetUserDto, User>();
+            
 
         }
 
+        //public static async Task<UpdateUserDto> MapUserDetailsViewModelToUpdateUserDtoAsync(UserDetailsViewModel userDetailsViewModel, UpdateUserDto updateUserDto)
+        //{
+        //    updateUserDto.FirstName = userDetailsViewModel.User.FirstName;
+        //    updateUserDto.LastName = userDetailsViewModel.User.LastName;
+        //    updateUserDto.Email = userDetailsViewModel.User.Email;
+        //    updateUserDto.PhoneNumber = userDetailsViewModel.User.PhoneNumber;
+        //    updateUserDto
+        //}
         public static async Task<User> MapCreateDtoToUserAsync(CreateUserModel createUserDto)
         {
             User newUser = new User();
