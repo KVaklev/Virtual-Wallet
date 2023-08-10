@@ -3,7 +3,7 @@
 @using DataAccess.Models.Enums;
 @using DataAccess.Models.Models;
 
-@model Business.ViewModels.CreateTransferDepositViewModel;
+@model Business.ViewModels.CreateTransferViewModel;
 
 
 @inject ICardService cardService
@@ -11,7 +11,7 @@
 @{
     this.ViewData["Title"] = "Speed Pay - Quick and Trustworthy Money Transfers ";
 
-    var currencies = JsonSerializer.Deserialize<List<Currency>>(TempData.Peek("Currencies").ToString());
+    //var currencies = JsonSerializer.Deserialize<List<Currency>>(TempData.Peek("Currencies").ToString());
     //var cards = JsonSerializer.Deserialize<PaginatedList<Card>>(TempData.Peek("Cards").ToString());
     //var cards = new SelectList(cardService.GetAll(@Model.User));
 }
@@ -85,41 +85,26 @@
                             </select>
                         </div>
 
-
+                        <div class="mb-3">
+                            <label for="paymentMethod" class="form-label">Select Card</label>
+                            <select asp-for="CreateTransferDto.CardNumber" id="cardType" class="form-select" required="">
+                                <option value="">My Cards</option>
+                                @foreach (var card in Model.Cards)
+                                {
+                                    <option value="@card.CurrencyCode"> @card.CardType - @card.CardNumber - @card.CurrencyCode </option>
+                                }
+                            </select>
+                        </div>
 
                         <div class="mb-3">
                             <label for="youSend">Amount</label>
                             <div class="input-group">
                                 <span class="input-group-text">$</span>
                                 <input asp-for="CreateTransferDto.Amount" type="number" class="form-control" data-bv-field="youSend" id="youSend" value="" placeholder="">
-                                <span class="input-group-text p-0">
-                                    <select asp-for="CreateTransferDto.CurrencyCode" id="youSendCurrency" data-style="form-select bg-transparent border-0" data-container="body" data-live-search="true" class="selectpicker form-control bg-transparent" required="">
-                                        <optgroup label="Popular Currency">
-                                            @foreach (var currency in currencies)
-                                            {
-                                                <option data-icon="currency-flag currency-flag-inr me-1" data-subtext="@currency.Name " value="@currency.CurrencyCode">@currency.CurrencyCode</option>
-                                            }
-                                        </optgroup>
-                                    </select>
-                                </span>
+                                <span id="amountCurrency" class="input-group-text">USD</span>
 
                             </div>
                         </div>
-                        <div class="mb-3">
-                            <label for="paymentMethod" class="form-label">Select Card</label>
-                            <select asp-for="CreateTransferDto.CardNumber" id="cardType" class="form-select" required="">
-                                <option value="">My Cards</option>
-                                <optgroup>
-                                    @foreach (var card in Model.Cards)
-                                    {
-                                        <option data-subtext="@card.CardType" value="@card.CardNumber"> @card.CardType - @card.CardNumber</option>
-                                    }
-                                </optgroup>
-
-                            </select>
-                        </div>
-
-
                         <hr>
                         <p class="text-4 fw-500">You'll deposit <span class="float-end">1,000.00 USD</span></p>
                         <div class="d-grid"><button type="submit" class="btn btn-primary">Continue</button></div>
@@ -132,3 +117,17 @@
 </div>
 <!-- Content end -->
 <link rel="stylesheet" type="text/css" href="~/vendor/currency-flags/css/currency-flags.min.css" />
+
+
+
+<script>
+    document.getElementById('cardType').addEventListener('change', function (event) {
+        var newValue = '';
+        for (const child of document.getElementById('cardType').children) {
+            if (child.selected) {
+                newValue = child.value;
+            }
+        }
+        document.getElementById("amountCurrency").textContent = newValue;
+    });
+</script>

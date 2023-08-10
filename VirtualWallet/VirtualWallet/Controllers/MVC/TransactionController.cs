@@ -63,13 +63,13 @@ namespace VirtualWallet.Controllers.MVC
         public async Task<IActionResult> Create()
         {
 
-           var createTransactionViewModel = new CreateTransactionViewModel();
+            var createTransactionViewModel = new CreateTransactionViewModel();
             var result = this.currencyService.GetAll();
             if (!result.IsSuccessful)
             {
                 return await EntityErrorViewAsync(result.Message);
             }
-            
+
             TempData["Currencies"] = JsonSerializer.Serialize(result.Data);
             return this.View(createTransactionViewModel);
         }
@@ -82,23 +82,76 @@ namespace VirtualWallet.Controllers.MVC
                 return this.View(transactionDto);
             }
             var loggedUserResult = await FindLoggedUserAsync();
-                if (!loggedUserResult.IsSuccessful)
-                {
-                    return await EntityErrorViewAsync(loggedUserResult.Message);
-                }
-                var result = await this.transactionService.CreateOutTransactionAsync(transactionDto.CreateTransactionDto, loggedUserResult.Data);
-                if (!result.IsSuccessful)
-                {
-                    return await EntityErrorViewAsync(result.Message);
-                }
-                return this.RedirectToAction("Execute", "Transaction", new { id = result.Data.Id });
+            if (!loggedUserResult.IsSuccessful)
+            {
+                return await EntityErrorViewAsync(loggedUserResult.Message);
+            }
+            var result = await this.transactionService.CreateOutTransactionAsync(transactionDto.CreateTransactionDto, loggedUserResult.Data);
+            if (!result.IsSuccessful)
+            {
+                return await EntityErrorViewAsync(result.Message);
+            }
+            return this.RedirectToAction("Execute", "Transaction", new { id = result.Data.Id });
         }
 
         [HttpGet]
         public async Task<IActionResult> Update([FromRoute] int id)
         {
+            var loggedUserResult = await FindLoggedUserAsync();
+            if (!loggedUserResult.IsSuccessful)
+            {
+                return await EntityErrorViewAsync(loggedUserResult.Message);
+            }
+            var transactionResult = await this.transactionService.GetByIdAsync(id, loggedUserResult.Data);
+
+            if (!transactionResult.IsSuccessful)
+            {
+                return await EntityErrorViewAsync(transactionResult.Message);
+            }
+
+            var createTransactionViewModel = new CreateTransactionViewModel();
+
+            createTransactionViewModel.CreateTransactionDto = await TransactionsMapper.MapGetDtoToCreateDto(transactionResult.Data);
+
+            var currencyResult = this.currencyService.GetAll();
+            if (!currencyResult.IsSuccessful)
+            {
+                return await EntityErrorViewAsync(currencyResult.Message);
+            }
+            TempData["Currencies"] = JsonSerializer.Serialize(currencyResult.Data);
+
+            return this.View(createTransactionViewModel);
+
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Update([FromRoute] int id, CreateTransactionDto transactionDto)
+        {
+
+            if (!this.ModelState.IsValid)
+            {
+                return View(transactionDto);
+            }
+            var loggedUserResult = await FindLoggedUserAsync();
+            if (!loggedUserResult.IsSuccessful)
+            {
+                return await EntityErrorViewAsync(loggedUserResult.Message);
+            }
+            var result = await this.transactionService.UpdateAsync(id, loggedUserResult.Data, transactionDto);
+            if (!result.IsSuccessful)
+            {
+                return await EntityErrorViewAsync(result.Message);
+            }
+            return this.RedirectToAction("Index", "Transaction", new { Username = loggedUserResult.Data.Username });
+
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Delete([FromRoute] int id)
+        {
 
             var loggedUserResult = await FindLoggedUserAsync();
+
             if (!loggedUserResult.IsSuccessful)
             {
                 return await EntityErrorViewAsync(loggedUserResult.Message);
@@ -108,85 +161,34 @@ namespace VirtualWallet.Controllers.MVC
             {
                 return await EntityErrorViewAsync(transactionResult.Message);
             }
-
-            var createTransactionViewModel = new CreateTransactionViewModel();
-            createTransactionViewModel.CreateTransactionDto = await TransactionsMapper.MapGetDtoToCreateDto(transactionResult.Data);
-
-            var currencyResult = this.currencyService.GetAll();
-            if (!currencyResult.IsSuccessful)
+            var result = await InitializedExecuteTransactionViewModelAsync(transactionResult.Data);
+            if (!result.IsSuccessful)
             {
-                return await EntityErrorViewAsync(currencyResult.Message);
+                return await EntityErrorViewAsync(transactionResult.Message);
             }
-            TempData["Currencies"] = JsonSerializer.Serialize(currencyResult.Data);
-            return this.View(createTransactionViewModel);
-           
-            
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> Update([FromRoute] int id, CreateTransactionDto transactionDto)
-        {
-            
-                if (!this.ModelState.IsValid)
-                {
-                    return View(transactionDto);
-                }
-                var loggedUserResult = await FindLoggedUserAsync();
-                if (!loggedUserResult.IsSuccessful)
-                {
-                    return await EntityErrorViewAsync(loggedUserResult.Message);
-                }
-                var result = await this.transactionService.UpdateAsync(id, loggedUserResult.Data, transactionDto);
-                if (!result.IsSuccessful)
-                {
-                    return await EntityErrorViewAsync(result.Message);
-                }
-                return this.RedirectToAction("Index", "Transaction", new { Username = loggedUserResult.Data.Username });
-            
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> Delete([FromRoute] int id)
-        {
-            
-                var loggedUserResult = await FindLoggedUserAsync();
-                if (!loggedUserResult.IsSuccessful)
-                {
-                    return await EntityErrorViewAsync(loggedUserResult.Message);
-                }
-                var transactionResult = await this.transactionService.GetByIdAsync(id, loggedUserResult.Data);
-                if (!transactionResult.IsSuccessful)
-                {
-                    return await EntityErrorViewAsync(transactionResult.Message);
-                }
-                var result = await InitializedExecuteTransactionViewModelAsync(transactionResult.Data);
-                if (!result.IsSuccessful)
-                {
-                    return await EntityErrorViewAsync(transactionResult.Message);
-                }
-            ExecuteTransactionViewModel executeTransactionViewModel=result.Data;
+            ExecuteTransactionViewModel executeTransactionViewModel = result.Data;
             return this.View(executeTransactionViewModel);
         }
 
         [HttpPost]
-        public async Task<IActionResult>Delete(
-            [FromRoute] int id, 
+        public async Task<IActionResult> Delete(
+            [FromRoute] int id,
             ExecuteTransactionViewModel executeTransactionViewModel)
         {
-            
-                var loggedUserResult = await FindLoggedUserAsync();
-                if (!loggedUserResult.IsSuccessful)
-                {
-                    return await EntityErrorViewAsync(loggedUserResult.Message);
-                }
-                var result = await this.transactionService.DeleteAsync(id, loggedUserResult.Data);
-                if (!result.IsSuccessful)
-                {
-                    return await EntityErrorViewAsync(result.Message);
-                }
 
-                return this.RedirectToAction("SuccessfulDelete", "Transaction");
-           
+            var loggedUserResult = await FindLoggedUserAsync();
+            if (!loggedUserResult.IsSuccessful)
+            {
+                return await EntityErrorViewAsync(loggedUserResult.Message);
+            }
+            var result = await this.transactionService.DeleteAsync(id, loggedUserResult.Data);
+            if (!result.IsSuccessful)
+            {
+                return await EntityErrorViewAsync(result.Message);
+            }
+
+            return this.RedirectToAction("SuccessfulDelete", "Transaction");
+
         }
         [HttpGet]
         public async Task<IActionResult> SuccessfulDelete()
@@ -268,7 +270,7 @@ namespace VirtualWallet.Controllers.MVC
             return this.View(transactionResult.Data);
         }
 
-        
+
 
 
         private async Task<IActionResult> EntityErrorViewAsync(string message)
@@ -299,7 +301,9 @@ namespace VirtualWallet.Controllers.MVC
             GetTransactionDto transaction)
         {
             var result = new Response<ExecuteTransactionViewModel>();
+
             ExecuteTransactionViewModel executeTransactionViewModel = new ExecuteTransactionViewModel();
+
             executeTransactionViewModel.GetTransactionDto = transaction;
 
             var userResult = await this.userService.GetLoggedUserByUsernameAsync(transaction.RecipientUsername);

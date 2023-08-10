@@ -10,6 +10,6 @@ namespace Business.DTOs.Responses
         public string CurrencyCode { get; set; }
         public string CardNumber { get; set; }
         public string TransferType { get; set; }
-        public double Amount { get; set; }
+        public decimal Amount { get; set; }
     }
 }
