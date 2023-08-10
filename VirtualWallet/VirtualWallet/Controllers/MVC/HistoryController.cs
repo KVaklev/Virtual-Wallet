@@ -1,6 +1,7 @@
 ﻿
 using Business.QueryParameters;
 using Business.Services.Contracts;
+using Business.ViewModels;
 using DataAccess.Models.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -31,18 +32,21 @@ namespace VirtualWallet.Controllers.MVC
         {
 
             var loggedUserResponse = await GetLoggedUserAsync();
-        
             if (!loggedUserResponse.IsSuccessful)
             {
                 return await EntityErrorViewAsync(loggedUserResponse.Message);
             }
-                var result = await this.historyService.FilterByAsync(parameters, loggedUserResponse.Data);
+
+            var result = await this.historyService.FilterByAsync(parameters, loggedUserResponse.Data);
             if (!result.IsSuccessful)
             {
                 return await EntityErrorViewAsync(result.Message);
             }
 
-                return this.View(result);
+            var indexHistoryViewModel = new IndexHistoryViewModel();
+            indexHistoryViewModel.GetHistoryDtos = result.Data;
+
+                return this.View(indexHistoryViewModel);
         }
 
         private async Task<Response<User>> GetLoggedUserAsync()

@@ -146,7 +146,7 @@ namespace VirtualWallet.Controllers.API
             {
                 return StatusCode(StatusCodes.Status404NotFound, loggedUserResult.Message);
             }
-            var result = await this.transactionService.ExecuteAsync(id, loggedUserResult.Data);
+            var result = await this.transactionService.ConfirmAsync(id, loggedUserResult.Data);
             if (!result.IsSuccessful)
             {
                 if (loggedUserResult.Message == Constants.NoFoundResulte)

@@ -2,10 +2,8 @@
 using Business.Services.Contracts;
 using Business.Services.Helpers;
 using DataAccess.Models.Models;
-using DataAccess.Repositories.Data;
 using DataAccess.Repositories.Contracts;
 using AutoMapper;
-using Microsoft.EntityFrameworkCore;
 using Business.DTOs.Requests;
 using Business.DTOs.Responses;
 using Business.Mappers;
@@ -86,11 +84,23 @@ namespace Business.Services.Models
                 return result;
             }
 
-            List<GetTransactionDto> transactionDtos = transactions
-                    .Select(transaction => mapper.Map<GetTransactionDto>(transaction))
-                    .ToList(); 
+            List<GetTransactionDto> transactionDtos = new List<GetTransactionDto>();
 
+            if (!loggedUser.IsAdmin)
+            {
+                transactionDtos = transactions
+                    .Where(u => u.AccountSenderId == loggedUser.AccountId)
+                    .Select(transaction => mapper.Map<GetTransactionDto>(transaction))
+                    .ToList();
+            }
+            else
+            {
+                transactionDtos = transactions
+                        .Select(transaction => mapper.Map<GetTransactionDto>(transaction))
+                        .ToList();
+            }
             result.Data = new PaginatedList<GetTransactionDto>(transactionDtos, totalPages, filterParameters.PageNumber);
+            
             return result;
         }
 
@@ -223,7 +233,7 @@ namespace Business.Services.Models
         }
 
 
-        public async Task<Response<bool>> ExecuteAsync(int transactionId, User loggedUser)
+        public async Task<Response<bool>> ConfirmAsync(int transactionId, User loggedUser)
         {
             var result = new Response<bool>();
             var transactionOut = await this.transactionRepository.GetByIdAsync(transactionId);
@@ -263,12 +273,12 @@ namespace Business.Services.Models
             await AddTransactionToHistoryAsync(transactionOut);
             await AddTransactionToHistoryAsync(transactionInResult.Data);
 
-            transactionOut.IsExecuted = true;
+            transactionOut.IsConfirmed = true;
             transactionOut.Date = DateTime.UtcNow;
             await transactionRepository.SaveChangesAsync();
 
-            result.Message = Constants.ModifyTransactionExecuteMessage;
-            result.Data = transactionOut.IsExecuted;
+            result.Message = Constants.ModifyTransactionConfirmMessage;
+            result.Data = transactionOut.IsConfirmed;
             return result;
         }
 

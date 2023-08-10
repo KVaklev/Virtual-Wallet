@@ -8,12 +8,9 @@ using System.Threading.Tasks;
 
 namespace Business.ViewModels
 {
-    public class ExecuteTransactionViewModel
+    public class IndexHistoryViewModel
     {
-        public GetTransactionDto GetTransactionDto { get; set; }
-        public User Recipient { get; set; }
 
-        public decimal RecipientGetsAmount { get; set; }
-
+        public PaginatedList<GetHistoryDto> GetHistoryDtos { get; set; }
     }
 }
