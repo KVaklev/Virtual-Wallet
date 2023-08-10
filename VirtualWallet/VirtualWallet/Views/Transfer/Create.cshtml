@@ -12,7 +12,7 @@
     this.ViewData["Title"] = "Speed Pay - Quick and Trustworthy Money Transfers ";
 
     var currencies = JsonSerializer.Deserialize<List<Currency>>(TempData.Peek("Currencies").ToString());
-    var cards = JsonSerializer.Deserialize<PaginatedList<Card>>(TempData.Peek("Cards").ToString());
+    //var cards = JsonSerializer.Deserialize<PaginatedList<Card>>(TempData.Peek("Cards").ToString());
     //var cards = new SelectList(cardService.GetAll(@Model.User));
 }
 
@@ -26,7 +26,7 @@
 <div class="bg-primary">
     <div class="container d-flex justify-content-center">
         <ul class="nav nav-pills alternate nav-lg border-bottom-0">
-            <li class="nav-item"> <a class="nav-link active">TRANSFER</a></li>
+            <li class="nav-item"> <a class="nav-link active">Transfer</a></li>
 
         </ul>
     </div>
