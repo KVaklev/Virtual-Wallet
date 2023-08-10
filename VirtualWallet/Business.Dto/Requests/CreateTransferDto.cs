@@ -5,7 +5,7 @@ namespace Business.DTOs.Requests
 {
     public class CreateTransferDto
     {
-        [Required(ErrorMessage = Constants.EmptyFieldErrorMessage)]
+        [Range(Constants.MinAmount, Constants.MaxAmount, ErrorMessage = Constants.RangeFieldErrorMessage)]
         public decimal Amount { get; set; }
 
         [Required(ErrorMessage = Constants.EmptyFieldErrorMessage)]
@@ -17,7 +17,9 @@ namespace Business.DTOs.Requests
         [StringLength(16, ErrorMessage = Constants.LengthErrorMessage)]
         public string CardNumber { get; set; }
 
-        [Required(ErrorMessage = Constants.EmptyFieldTransferTypeErrorMessage)]
+        [Required(ErrorMessage = Constants.EmptyFieldErrorMessage)]
+        [MinLength(Constants.DescriptionMinLength, ErrorMessage = Constants.MinLengthErrorMessage)]
+        [MaxLength(Constants.DescriptionMaxLength, ErrorMessage = Constants.MaxLengthErrorMessage)]
         public string TransferType { get; set; }
     }
 }
