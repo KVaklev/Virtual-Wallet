@@ -1,4 +1,5 @@
 ﻿@using System.Globalization;
+@using DataAccess.Models.Enums;
 @model IndexTransactionViewModel
 
 <!-- Secondary menu
@@ -102,7 +103,18 @@
                                 string formattedMonth = dateTimeValue.ToString("MMM").ToUpper();
 
                                 <div class="col-2 col-sm-1 text-center"> <span class="d-block text-4 fw-300">@formattedDay</span> <span class="d-block text-1 fw-300 text-uppercase">@formattedMonth</span> </div>
-                                <div class="col col-sm-7"> <span class="d-block text-4">@transaction.Direction from @transaction.SenderUsername</span> <span class="text-muted">@transaction.Description</span> </div>
+                                <div class="col col-sm-7"> <span class="d-block text-4">@transaction.RecipientUsername </span>
+                                @if (transaction.Description==DirectionType.Out.ToString())
+                                    {
+                                        <span class="text-muted">Payment Sent</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">Payment Received</span>
+                                    }
+
+                                </div>
+                                
 
                                 @if (transaction.IsConfirmed)
                                 {
@@ -115,13 +127,13 @@
                                 }
                                 else
                                 {
-                                    <div class="col-auto col-sm-2 d-none d-sm-block text-center text-3"> <span class="text-warning" data-bs-toggle="tooltip" title="In Progress"><i class="fas fa-ellipsis-h"></i></span> </div>
+                                    <div class="col-auto col-sm-2 d-none d-sm-block text-center text-3">
+                                    <a class="btn-link" asp-controller="Transaction" asp-action="Update" asp-route-id="@transaction.Id">Update</a>
+                                    <span style="margin-right:5%"></span>
+                                    <span class="text-warning" data-bs-toggle="tooltip" title="In Progress">
+                                    <i class="fas fa-ellipsis-h"></i></span> </div>
                                 }
-
-                                
-
-
-                                @if (transaction.Direction == "In")
+                                @if (transaction.Direction == DirectionType.In.ToString())
                                 {
                                     <div class="col-3 col-sm-2 text-end text-4"> <span class="text-nowrap">+$@transaction.Amount</span> <span class="text-2 text-uppercase">(@transaction.CurrencyCode)</span> </div>
                                 }

@@ -68,14 +68,14 @@
                     <form asp-controller="Transaction" asp-action="Update" id="form-send-money" method="post">
                         <div class="mb-3">
                             <label for="emailID" class="form-label">Recipient</label>
-                            <input asp-for="CreateTransactionDto.RecipientUsername" type="text" value="" class="form-control" data-bv-field="emailid" id="emailID" required placeholder="@Model.CreateTransactionDto.RecipientUsername">
+                            <input asp-for="CreateTransactionDto.RecipientUsername" type="text" value="" class="form-control" data-bv-field="emailid" id="emailID" required placeholder="">
                             <span asp-validation-for="CreateTransactionDto.RecipientUsername" class="error-message"></span>
                         </div>
                         <div class="mb-3">
                             <label for="youSend" class="form-label">You Send</label>
                             <div class="input-group">
                                 <span class="input-group-text">$</span>
-                                <input asp-for="CreateTransactionDto.Amount" type="number" class="form-control" data-bv-field="youSend" id="youSend" value="" placeholder="@Model.CreateTransactionDto.Amount">
+                                <input asp-for="CreateTransactionDto.Amount" type="number" class="form-control" data-bv-field="youSend" id="youSend" value="" placeholder="">
                                 <span class="input-group-text p-0">
                                     <select asp-for="CreateTransactionDto.CurrencyCode" id="youSendCurrency" data-style="form-select bg-transparent border-0" data-container="body" data-live-search="true" class="selectpicker form-control bg-transparent" required="">
                                         <optgroup label="Popular Currency">
@@ -88,9 +88,9 @@
                                         </optgroup>
                                     </select>
                                 </span>
-                                <span asp-validation-for="CreateTransactionDto.Amount" class="error-message"></span>
                             </div>
                         </div>
+                                <span asp-validation-for="CreateTransactionDto.Amount" class="error-message"></span>
                         <div class="mb-4 mb-sm-5">
                             <label for="description" class="form-label">Description</label>
                             <textarea asp-for="CreateTransactionDto.Description" class="form-control" rows="4" id="description" required placeholder="@Model.CreateTransactionDto.Description"></textarea>

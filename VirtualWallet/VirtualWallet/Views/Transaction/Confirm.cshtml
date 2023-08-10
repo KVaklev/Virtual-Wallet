@@ -85,9 +85,11 @@
             <div></div>
                     <div> <span style="margin-right:15%"></span></div>
                     <div><span style="margin-right:15%"></span></div>
-                    <spam style="margin-right:15%"></spam>  <a asp-action="Delete" asp-controller="Transaction" asp-route-id="@Model.GetTransactionDto.Id" class="btn btn-dark shadow-none px-5 m-2">Delete</a>
+                    <div class="text-center">
+                     <a asp-action="Delete" asp-controller="Transaction" asp-route-id="@Model.GetTransactionDto.Id" class="btn btn-dark shadow-none px-5 m-2">Delete</a>
                   <spam style="margin-right:5%"></spam>  <a asp-action="Index" asp-controller="Transaction" class="btn btn-dark shadow px-5 m-2">Close</a>
-            <!-- Request Money Confirm Details end --> 
+            </div>
+                  <!-- Request Money Confirm Details end --> 
           </div>
         </div>
       </div>
