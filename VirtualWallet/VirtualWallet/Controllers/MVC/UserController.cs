@@ -1,4 +1,5 @@
-﻿using Business.Exceptions;
+﻿using Business.DTOs.Requests;
+using Business.Exceptions;
 using Business.Mappers;
 using Business.QueryParameters;
 using Business.Services.Contracts;
@@ -104,10 +105,15 @@ namespace VirtualWallet.Controllers.MVC
                 return (IActionResult)result.Data;
             }
 
-            //var updateUserDto = 
-            //var user = await this.userService.UpdateAsync(id, updateUserDto, loggedUserResult.Data);
-            return this.View(userDetailsViewModel);
-
+            var isChanged = await this.userService.ChangeStatusAsync(id, userDetailsViewModel, loggedUserResult.Data);
+            if (!isChanged.IsSuccessful)
+            {
+                result.IsSuccessful = false;
+                result.Message = loggedUserResult.Message;
+                return (IActionResult)result.Data;
+            }
+            return this.RedirectToAction("Index", "User");
+            
         }
 
         [HttpGet]
