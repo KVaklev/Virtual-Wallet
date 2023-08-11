@@ -43,7 +43,7 @@
                     <aside class="col-lg-3">
                     <div class="bg-white shadow-sm rounded text-center p-3 mb-4">
                         <div class="profile-thumb mt-3 mb-4">
-                                <img class= "center rounded-circle" src="~/images/profile-thumb-sm.jpg" alt="" style="width: 110px; height: 110px;">
+                                <img class="center rounded-circle" src="@Url.Content("~/UploadedImages/" + username + ".png")" height="30" width="30" alt="" style="width: 110px; height: 110px;">
                                 <p class="text-black opacity-12 mb-4">
                                     Hello, <b>@username.Value</b>! <br>
                                  @DateTime.Now.DayOfWeek, @DateTime.Now.Date.ToShortDateString()<p>
@@ -87,7 +87,7 @@
                                             <div class="transaction-item px-2 py-2" data-bs-toggle="modal" data-bs-target="#transaction-detail">
                                                 <div class="row d-flex align-items-center flex-row bg-white">
                                                     <div class="col-2 col-sm-1">
-                                                        <img src="~/images/profile-thumb-sm.jpg" class="rounded-circle" alt="">
+                                                        <img src="@Url.Content("~/UploadedImages/" + username + ".png")" height="30" width="30" class="rounded-circle" alt="">
                                                     </div> 
                                                     <div class="col-4 col-sm-4">
                                                         <span class="d-block text-2 mt-2">@currentUser.FirstName @currentUser.LastName / <b>@currentUser.Username</b></span>

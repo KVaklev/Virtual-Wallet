@@ -1,4 +1,7 @@
-﻿namespace Business.DTOs.Responses
+﻿using Microsoft.AspNetCore.Http;
+using System.ComponentModel;
+
+namespace Business.DTOs.Responses
 {
     public class GetUserDto
     {
@@ -16,6 +19,9 @@
         public string? City { get; set; }
         public decimal? AccountBalance { get; set; }
         public bool ConfirmedRegistration { get; set; }
+        public IFormFile? ImageFile { get; set; }
+        public string? ProfilePhotoPath { get; set; }
+        public string? ProfilePhotoFileName { get; set; }
 
     }
 }

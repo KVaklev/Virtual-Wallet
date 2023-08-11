@@ -11,6 +11,7 @@ using static Business.Services.Helpers.Constants;
 using DataAccess.Models.Enums;
 using Business.ViewModels;
 using Business.ViewModels.UserViewModels;
+using Microsoft.AspNetCore.Hosting;
 
 namespace Business.Services.Models
 {
@@ -19,17 +20,20 @@ namespace Business.Services.Models
         private readonly IUserRepository userRepository;
         private readonly IAccountService accountService;
         private readonly IMapper mapper;
+        private readonly IWebHostEnvironment webHostEnvironment;
 
         public UserService(
             IUserRepository userRepository,
             IAccountService accountService,
-            IMapper mapper
+            IMapper mapper,
+            IWebHostEnvironment webHostEnvironment
             )
         {
             this.userRepository = userRepository;
             this.accountService = accountService;
             this.mapper = mapper;
-        }
+            this.webHostEnvironment = webHostEnvironment;
+    }
 
         public async Task<Response<PaginatedList<GetCreatedUserDto>>> FilterByAsync(UserQueryParameters filterParameters)
         {
@@ -215,6 +219,33 @@ namespace Business.Services.Models
 
             await this.userRepository.SaveChangesAsync();
 
+            return result;
+        }
+        public async Task<Response<GetUpdatedUserDto>> ChangeProfilePictureAsync(int id, UserDetailsViewModel userDetailsViewModel, User loggedUser)
+        {
+            var result = new Response<GetUpdatedUserDto>();
+           
+            var userToUpdate = await this.GetByIdAsync(id, loggedUser);
+            if (userToUpdate == null)
+            {
+                result.IsSuccessful = false;
+                result.Message = NoUsersErrorMessage;
+                return result;
+            }
+           
+            if (userDetailsViewModel.User.ImageFile != null)
+            {
+                string imageUploadedFolder = Path.Combine(webHostEnvironment.WebRootPath, "UploadedImages");
+                string uniqueFileName = userDetailsViewModel.User.Username + ".png";
+                string filePath = Path.Combine(imageUploadedFolder, uniqueFileName);
+
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    userDetailsViewModel.User.ImageFile.CopyTo(fileStream);
+                }
+                userToUpdate.Data.ProfilePhotoPath = "~/UploadedImages";
+                userToUpdate.Data.ProfilePhotoFileName = uniqueFileName;
+            }
             return result;
         }
 
@@ -500,5 +531,6 @@ namespace Business.Services.Models
             }
          return await Task.FromResult(result);
         }
+
     }
 }

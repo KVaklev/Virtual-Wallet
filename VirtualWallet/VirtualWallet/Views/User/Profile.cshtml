@@ -3,9 +3,39 @@
 
 @{
     this.ViewData["Title"] = "Speed Pay - Profile";
+    var loggedUserId = User.FindFirst(ClaimTypes.NameIdentifier);
     var isAdmin = User.FindFirst("IsAdmin");
     var isBlocked = User.FindFirst("IsBlocked");
-}
+    var username = User.FindFirst(ClaimTypes.Name);
+    }
+
+<script>
+    function previewimage() {
+        var preview = document.getElementById("ProductImage");
+        var file = document.getElementById("customFile").files[0];
+        var reader = new FileReader();
+
+        reader.onloadend = function () {
+            preview.src = reader.result;
+        }
+
+        if (file) {
+            // load image as a base64 encoded uri
+            reader.readAsDataURL(file);
+        }
+        else {
+            preview.src = "";
+        }
+    }
+</script>
+
+<style>
+  .small-button {
+    padding: 3px 8px;
+    font-size: 15px;
+  }
+</style>
+
 <body>
  
   <!-- Content
@@ -21,27 +51,32 @@
           <!-- Profile Details
           =============================== -->
           <div class="bg-white shadow-sm rounded text-center p-3 mb-4">
-            <div class="profile-thumb mt-3 mb-4"> <img class="rounded-circle" src="~/images/profile-thumb.jpg" alt="">
-              <div class="profile-thumb-edit bg-primary text-white" data-bs-toggle="tooltip" title="Change Profile Picture"> <i class="fas fa-camera position-absolute"></i>
-                <input type="file" class="custom-file-input" id="customFile">
+                        <form asp-controller="User" asp-action="ChangeProfilePicture" asp-route-id="@this.Model.DetailsViewModel.User.Id" method="post">
+              <div class="profile-thumb mt-3 mb-4">
+               <img class="rounded-circle" src="@Url.Content("~/UploadedImages/" + username + ".png")" height="110" width="110" alt="" id="ProductImage">
+              <div class="profile-thumb-edit bg-primary text-white" title="Change Profile Picture"> <i class="fas fa-camera position-absolute"></i>
+              <input asp-for = "DetailsViewModel.User.ImageFile" onchange="previewimage()" type="file" class="custom-file-input" id="customFile">
               </div>
             </div>
-            <p class="text-3 fw-500 mb-2">Hello, Smith Rhodes</p>
-            <p class="mb-2"><a href="settings-profile.html" class="text-5 text-light" data-bs-toggle="tooltip" title="Edit Profile"><i class="fas fa-edit"></i></a></p>
+            <p class="text-3 fw-500 mb-2">Hello, @this.Model.DetailsViewModel.User.Username<br />@DateTime.Now.DayOfWeek, @DateTime.Now.Date.ToShortDateString()</p>
+              <button class="small-button btn-primary" type="submit">Change</button>
+            </form>
           </div>
           <!-- Profile Details End --> 
           
           <!-- Available Balance
           =============================== -->
           <div class="bg-white shadow-sm rounded text-center p-3 mb-4">
-            <div class="text-17 text-light my-3"><i class="fas fa-wallet"></i></div>
-            <h3 class="text-9 fw-400">$2956.00</h3>
+            <div class="text-17 text-light my-3"><i class="fas fa-wallet text-primary"></i></div>
+            <h3 class="text-9 fw-400">@this.Model.DetailsViewModel.User.AccountBalance</h3>
             <p class="mb-2 text-muted opacity-8">Available Balance</p>
             <hr class="mx-n3">
-            <div class="d-flex"><a href="withdraw-money.html" class="btn-link me-auto">Withdraw</a> <a href="deposit-money.html" class="btn-link ms-auto">Deposit</a></div>
+            <div class="d-flex">
+            <a asp-controller="Transfer" asp-action="Create" asp-route-id="@User.FindFirst(ClaimTypes.NameIdentifier)" class="btn-link me-auto">Withdraw</a>
+            <a asp-controller="Transfer" asp-action="Create" asp-route-id="@User.FindFirst(ClaimTypes.NameIdentifier)" class="btn-link ms-auto">Deposit</a>
           </div>
+          </div>       
           <!-- Available Balance End --> 
-                    
         </aside>
         <!-- Left Panel End --> 
         
