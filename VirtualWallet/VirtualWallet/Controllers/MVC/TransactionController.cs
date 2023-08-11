@@ -305,7 +305,9 @@ namespace VirtualWallet.Controllers.MVC
             GetTransactionDto transaction)
         {
             var result = new Response<ConfirmTransactionViewModel>();
+
             ConfirmTransactionViewModel executeTransactionViewModel = new ConfirmTransactionViewModel();
+
             executeTransactionViewModel.GetTransactionDto = transaction;
 
             var userResult = await this.userService.GetLoggedUserByUsernameAsync(transaction.RecipientUsername);

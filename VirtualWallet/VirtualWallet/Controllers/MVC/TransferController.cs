@@ -224,22 +224,6 @@ namespace VirtualWallet.Controllers.MVC
             //     createTransferDepositViewModel.CreateTransferDto = await TransfersMapper.MapGetDtoToCreateDto(result.Data);
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
             //ExecuteTransferViewModel executeTransferViewModel = 
             //result.Data;
 
@@ -268,6 +252,12 @@ namespace VirtualWallet.Controllers.MVC
             }
 
             return RedirectToAction("SuccessfulDelete", "Transaction");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> SuccessfulDelete()
+        {
+            return this.View();
         }
 
         [HttpGet]
