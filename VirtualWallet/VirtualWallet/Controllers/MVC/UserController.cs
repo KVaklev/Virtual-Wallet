@@ -301,7 +301,7 @@ namespace VirtualWallet.Controllers.MVC
                 return (IActionResult)result.Data;
             }
 
-            return this.RedirectToAction("Profile", "User");
+            return this.RedirectToAction("ChangePassword", "User");
 
         }
 

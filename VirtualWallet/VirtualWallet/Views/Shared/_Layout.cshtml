@@ -67,7 +67,7 @@
                       <a class="dropdown-toggle" href="#">Account</a>
                       <ul class="dropdown-menu">
                           <li class="dropdown"><a asp-controller="User" asp-action="Profile" asp-route-id="@User.FindFirst(ClaimTypes.NameIdentifier)"class="dropdown-item">My Profile</a></li>
-                          <li class="dropdown"><a asp-controller="User" asp-action="Security" class="dropdown-item">Security</a></li>
+                          <li class="dropdown"><a asp-controller="User" asp-action="ChangePassword" class="dropdown-item">Security</a></li>
                           <li class="dropdown"><a asp-controller="Card" asp-action="Add" class="dropdown-item">Payment Methods</a></li>
                       </ul>
                   </li>
@@ -133,7 +133,7 @@
                                             <li class="text-center text-3 py-2">Hi, @username.Value</li>
                                             <li class="dropdown-divider mx-n3"></li>
                                             <li><a asp-controller="User" asp-action="Profile" asp-route-id="@User.FindFirst(ClaimTypes.NameIdentifier)" class="dropdown-item"><i class="fas fa-user"></i>My Profile</a></li>
-                                            <li><a asp-controller="User" asp-action="Security" class="dropdown-item"><i class="fas fa-shield-alt"></i>Security</a></li>
+                                            <li><a asp-controller="User" asp-action="ChangePassword" class="dropdown-item"><i class="fas fa-shield-alt"></i>Security</a></li>
                                             <li><a asp-controller="Card" asp-action="Add" class="dropdown-item"><i class="fas fa-credit-card"></i>Payment Methods</a></li>
                                             <li class="dropdown-divider mx-n3"></li>
                                             <li><a asp-controller="Account" asp-action="Logout" class="dropdown-item" ><i class="fas fa-sign-out-alt"></i>Sign Out</a></li>
