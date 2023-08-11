@@ -1,11 +1,15 @@
-﻿using Business.QueryParameters;
+﻿using AutoMapper;
+using Business.Exceptions;
+using Business.QueryParameters;
 using Business.Services.Contracts;
 using Business.ViewModels.UserViewModels;
 using DataAccess.Models.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors.Infrastructure;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using System.Text;
 
 namespace VirtualWallet.Controllers.MVC
 {
@@ -148,14 +152,14 @@ namespace VirtualWallet.Controllers.MVC
                 return (IActionResult)result.Data;
             }
             return this.RedirectToAction("Index", "User");
-            
+
         }
 
         [HttpGet]
         public async Task<IActionResult> Profile([FromRoute] int id)
         {
             var result = new Response<UserDetailsViewModel>();
-           
+
             var loggedUserResult = await FindLoggedUserAsync();
             if (!loggedUserResult.IsSuccessful)
             {
@@ -165,9 +169,41 @@ namespace VirtualWallet.Controllers.MVC
             }
 
             var user = await this.userService.GetByIdAsync(loggedUserResult.Data.Id, loggedUserResult.Data);
-            var userDetailsViewModel = new UserDetailsViewModel { User = user.Data };
+            var userUpdatePersonalProfileViewModel = new UserUpdateProfileViewModel()
+            {
+                DetailsViewModel = new UserDetailsViewModel()
+            };
+            userUpdatePersonalProfileViewModel.DetailsViewModel.User = user.Data;
 
-            return this.View(userDetailsViewModel);
+
+            return this.View(userUpdatePersonalProfileViewModel);
+        }
+
+
+        [HttpPost]
+        public async Task<IActionResult> Profile([FromRoute] int id, UserUpdateProfileViewModel userUpdateProfileViewModel)
+        {
+
+            var result = new Response<UserUpdateProfileViewModel>();
+            var loggedUserResult = await FindLoggedUserAsync();
+            if (!loggedUserResult.IsSuccessful)
+            {
+                result.IsSuccessful = false;
+                result.Message = loggedUserResult.Message;
+                return (IActionResult)result.Data;
+            }
+
+            var userToUpdate = await this.userService.UpdateAsync(loggedUserResult.Data.Id, userUpdateProfileViewModel.UpdateUserDto, loggedUserResult.Data);
+
+            if (!userToUpdate.IsSuccessful)
+            {
+                result.IsSuccessful = false;
+                result.Message = userToUpdate.Message;
+                return (IActionResult)result.Data;
+            }
+
+            return this.RedirectToAction("Profile", "User");
+            
         }
         private async Task<Response<User>> FindLoggedUserAsync()
 		{
