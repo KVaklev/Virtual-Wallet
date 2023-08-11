@@ -2,6 +2,8 @@
 
 @{
     this.ViewData["Title"] = "Speed Pay - Profile";
+    var isAdmin = User.FindFirst("IsAdmin");
+    var isBlocked = User.FindFirst("IsBlocked");
 }
 <body>
  
@@ -62,12 +64,36 @@
             <div class="row gx-3 align-items-baseline">
               <p class="col-sm-3 text-muted text-sm-end mb-0 mb-sm-3">Address:</p>
               <p class="col-sm-9 text-3">@this.Model.DetailsViewModel.User.Address<br>
-                                @this.Model.DetailsViewModel.User.Country
-                            </p>
+                @this.Model.DetailsViewModel.User.Country</p>
+            </div>
+            <div class="row gx-3 align-items-center">
+                <p class="col-sm-3 text-muted text-sm-end mb-0 mb-sm-3">Email:</p>
+                <p class="col-sm-9 text-3">@this.Model.DetailsViewModel.User.Email</p>
+            </div>
+            <div class="row gx-3 align-items-center">
+             <div>
+                 <hr class="mx-n4 mb-4">
+                 <div class="row gx-3 align-items-center">
+                     <p class="col-sm-3 text-muted text-sm-end mb-0 mb-sm-3">User status:</p>
+                     <p class="col-sm-9 text-3"><b>@((isAdmin.Value == "True") ? "Admin" : "Regular User")</b></p>
+                 </div>
+                 <div class="row gx-3 align-items-center">
+                     <p class="col-sm-3 text-muted text-sm-end mb-0 mb-sm-3">Account Status:</p>
+                     @if (isBlocked.Value == "True")
+                     {
+                         <p class="col-sm-9 text-3"><span class="bg-danger text-white rounded-pill d-inline-block px-2 mb-0"><i class="fas fa-check-circle"></i>Blocked</span></p>
+                     }
+                     else
+                     {
+                         <p class="col-sm-9 text-3"><span class="bg-success text-white rounded-pill d-inline-block px-2 mb-0"><i class="fas fa-check-circle"></i>Active</span></p>
+                     }
+                 </div>
+             </div>
             </div>
           </div>
           <!-- Edit Details Modal
           ================================== -->
+
           <div id="edit-personal-details" class="modal fade " role="dialog" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered" role="document">
               <div class="modal-content">
@@ -135,9 +161,11 @@
               </div>
             </div>
           </div>
-          <!-- Personal Details End -->          
+          <!-- Personal Details End -->     
+          
         </div>
         <!-- Middle Panel End --> 
+
       </div>
     </div>
   </div>
