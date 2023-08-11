@@ -27,6 +27,7 @@ namespace DataAccess.Repositories.Models
                 .ThenInclude(c => c.Currency)
                 .Include(ac=>ac.Account)
                 .ThenInclude(u=>u.User)
+                .OrderByDescending(d=>d.EventTime)
                 .FirstOrDefaultAsync(h => h.Id == id);
 
             return history;
