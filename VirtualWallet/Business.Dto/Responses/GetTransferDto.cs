@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using DataAccess.Models.Models;
+using System.ComponentModel.DataAnnotations;
 
 namespace Business.DTOs.Responses
 {
@@ -9,7 +10,13 @@ namespace Business.DTOs.Responses
         public DateTime DateCreated { get; set; }
         public string CurrencyCode { get; set; }
         public string CardNumber { get; set; }
+
+        public Card Card { get; set; }
         public string TransferType { get; set; }
         public decimal Amount { get; set; }
+
+        public bool IsConfirmed { get; set; }
+
+        public bool IsCancelled {get; set;}
     }
 }

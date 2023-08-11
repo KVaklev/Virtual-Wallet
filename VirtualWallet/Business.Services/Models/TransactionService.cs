@@ -46,7 +46,7 @@ namespace Business.Services.Models
             if (transaction==null)
             {
                 result.IsSuccessful = false;
-                result.Message = Constants.NoFoundResulte;
+                result.Message = Constants.NotFoundResults;
                 return result;
             }
             if (!await Security.IsTransactionSenderAsync(transaction, loggedUser.Id))
@@ -80,7 +80,7 @@ namespace Business.Services.Models
             if (!transactions.Any())
             {
                 result.IsSuccessful = false;
-                result.Message = Constants.NoFoundResulte;
+                result.Message = Constants.NotFoundResults;
                 return result;
             }
 
@@ -120,14 +120,14 @@ namespace Business.Services.Models
             if (account == null) 
             {
                 result.IsSuccessful = false;
-                result.Message = Constants.NoFoundResulte;
+                result.Message = Constants.NotFoundResults;
                 return result;
             }
             var currency = await currencyRepository.GetByCurrencyCodeAsync(transactionDto.CurrencyCode);
             if (currency == null)
             {
                 result.IsSuccessful = false;
-                result.Message = Constants.NoFoundResulte;
+                result.Message = Constants.NotFoundResults;
                 return result;
             }
             var transaction = await TransactionsMapper.MapDtoТоTransactionAsync(transactionDto, loggedUser, account, currency);
@@ -153,7 +153,7 @@ namespace Business.Services.Models
             if (transactionToUpdate==null)
             {
                 result.IsSuccessful = false;
-                result.Message = Constants.NoFoundResulte;
+                result.Message = Constants.NotFoundResults;
                 return result;
             }
             if (!await Security.IsTransactionSenderAsync(transactionToUpdate, loggedUser.Id))
@@ -178,14 +178,14 @@ namespace Business.Services.Models
             if (account == null)
             {
                 result.IsSuccessful = false;
-                result.Message = Constants.NoFoundResulte;
+                result.Message = Constants.NotFoundResults;
                 return result;
             }
             var currency = await currencyRepository.GetByCurrencyCodeAsync(transactionDto.CurrencyCode);
             if (currency == null)
             {
                 result.IsSuccessful = false;
-                result.Message = Constants.NoFoundResulte;
+                result.Message = Constants.NotFoundResults;
                 return result;
             }
 
@@ -211,7 +211,7 @@ namespace Business.Services.Models
             if (transaction == null)
             {
                 result.IsSuccessful = false;
-                result.Message = Constants.NoFoundResulte;
+                result.Message = Constants.NotFoundResults;
                 return result;
             }
             if (!await Security.IsTransactionSenderAsync(transaction, loggedUser.Id))
@@ -240,7 +240,7 @@ namespace Business.Services.Models
             if (transactionOut == null)
             {
                 result.IsSuccessful = false;
-                result.Message = Constants.NoFoundResulte;
+                result.Message = Constants.NotFoundResults;
                 return result;
             }
             if (!await Security.IsTransactionSenderAsync(transactionOut, loggedUser.Id))

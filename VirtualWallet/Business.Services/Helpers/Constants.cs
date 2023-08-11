@@ -93,8 +93,8 @@
 
         //Other Constant messages 
 
-        public const string NoFoundResulte = "No result is found.";
-        public const string NoHostError= "No such host is known.";
+        public const string NotFoundResults = "No results found.";
+        public const string NoHostError= "Such a host is not known.";
         public const string JsonDeserializationError = "JSON Deserialization Error";
         public const string ArgumentOutOfRangeError = "Index and length must refer to a location within the string.";
 

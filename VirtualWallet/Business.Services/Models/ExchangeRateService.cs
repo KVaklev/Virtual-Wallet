@@ -32,7 +32,7 @@ namespace DataAccess.Models.Models
                 if (currencyValue == null)
                 {
                     result.IsSuccessful = false;
-                    result.Message = Constants.NoFoundResulte;
+                    result.Message = Constants.NotFoundResults;
                     return result;
                 }
                 exchangeRateData.CurrencyValue = decimal.Parse(currencyValue, CultureInfo.InvariantCulture); ;

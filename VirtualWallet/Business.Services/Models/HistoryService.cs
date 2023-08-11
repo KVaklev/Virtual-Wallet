@@ -28,7 +28,7 @@ namespace Business.Services.Models
             if (history == null) 
             {
                 result.IsSuccessful = false;
-                result.Message = Constants.NoFoundResulte;
+                result.Message = Constants.NotFoundResults;
                 return result;
             }
             if (!await Security.IsHistoryOwnerAsync(history, loggedUser))
@@ -69,7 +69,7 @@ namespace Business.Services.Models
             if (!historyRecords.Any())
             {
                result.IsSuccessful = false;
-               result.Message = Constants.NoFoundResulte;
+               result.Message = Constants.NotFoundResults;
                return result;
             }
 

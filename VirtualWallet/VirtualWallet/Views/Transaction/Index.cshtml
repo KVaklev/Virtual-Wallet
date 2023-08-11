@@ -97,7 +97,7 @@
                         <div class="row align-items-center flex-row">
                             @{
                                 string dateString = transaction.Date.ToString();
-                                DateTime dateTimeValue = DateTime.ParseExact(dateString, "d.M.yyyy г. H:mm:ss", CultureInfo.InvariantCulture);
+                                DateTime dateTimeValue = DateTime.ParseExact(dateString, "M/d/yyyy h:mm:ss tt", CultureInfo.InvariantCulture);
                                 string formattedDay = dateTimeValue.ToString("dd");
                                 string formattedMonth = dateTimeValue.ToString("MMM").ToUpper();
 
@@ -118,7 +118,7 @@
                                     <div class="col-auto col-sm-2 d-none d-sm-block text-center text-3"> <span class="text-warning" data-bs-toggle="tooltip" title="In Progress"><i class="fas fa-ellipsis-h"></i></span> </div>
                                 }
 
-                                
+
 
 
                                 @if (transaction.Direction == "In")

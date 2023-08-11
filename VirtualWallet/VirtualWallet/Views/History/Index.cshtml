@@ -109,7 +109,7 @@
                     <div class="row align-items-center flex-row">
                             @{
                                 string dateString = operation.EventTime.ToString();
-                                DateTime dateTimeValue = DateTime.ParseExact(dateString, "d.M.yyyy г. H:mm:ss", CultureInfo.InvariantCulture);
+                                DateTime dateTimeValue = DateTime.ParseExact(dateString, "M/d/yyyy h:mm:ss tt", CultureInfo.InvariantCulture);
                                 string formattedDay = dateTimeValue.ToString("dd");
                                 string formattedMonth = dateTimeValue.ToString("MMM").ToUpper();
                             

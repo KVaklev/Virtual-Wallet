@@ -42,6 +42,7 @@ namespace VirtualWallet.Controllers.MVC
 
 
         [HttpGet]
+
         public async Task<IActionResult> Index([FromQuery] TransactionQueryParameters parameters)
         {
             
