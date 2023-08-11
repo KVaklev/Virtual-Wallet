@@ -260,7 +260,7 @@ namespace Business.Services.Models
         }
 
 
-        public async Task<Response<bool>> ExecuteAsync(int transferId, User user)
+        public async Task<Response<bool>> ConfirmAsync(int transferId, User user)
         {
             var result = new Response<bool>();
 

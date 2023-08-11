@@ -159,7 +159,7 @@ namespace VirtualWallet.Controllers.API
                 return StatusCode(StatusCodes.Status404NotFound, loggedUser.Message);
             }
 
-            var result = await this.transferService.ExecuteAsync(id, loggedUser.Data);
+            var result = await this.transferService.ConfirmAsync(id, loggedUser.Data);
 
             if (!result.IsSuccessful)
             {

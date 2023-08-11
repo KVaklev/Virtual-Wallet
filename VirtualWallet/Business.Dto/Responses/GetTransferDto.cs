@@ -12,6 +12,8 @@ namespace Business.DTOs.Responses
         public string CardNumber { get; set; }
 
         public Card Card { get; set; }
+
+        public Account Account { get; set; }
         public string TransferType { get; set; }
         public decimal Amount { get; set; }
 
