@@ -13,6 +13,7 @@
         public DateTime? DateOfBirth { get; set; }
         public string? Address { get; set; }
         public string? Country { get; set; }
+        public string? City { get; set; }
         public decimal? AccountBalance { get; set; }
         public bool ConfirmedRegistration { get; set; }
 
