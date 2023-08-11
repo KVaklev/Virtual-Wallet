@@ -42,6 +42,10 @@ namespace Business.Mappers
             userToUpdate.PhoneNumber = updateUserDto.PhoneNumber ?? userToUpdate.PhoneNumber;
             userToUpdate.FirstName = updateUserDto.FirstName ?? userToUpdate.FirstName;
             userToUpdate.LastName = updateUserDto.LastName ?? userToUpdate.LastName;
+            userToUpdate.Address = updateUserDto?.Address ?? userToUpdate.Address;
+            userToUpdate.City = updateUserDto?.City ?? userToUpdate.City;
+            userToUpdate.Country = updateUserDto?.Country ?? userToUpdate.Country;
+            userToUpdate.DateOfBirth = updateUserDto?.DateOfBirth ?? userToUpdate.DateOfBirth;
 
             return userToUpdate;
         }

@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Business.DTOs.Requests;
 using Business.Exceptions;
 using Business.QueryParameters;
 using Business.Services.Contracts;

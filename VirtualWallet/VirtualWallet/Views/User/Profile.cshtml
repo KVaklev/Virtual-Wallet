@@ -1,5 +1,6 @@
 ﻿@model UserUpdateProfileViewModel
 
+
 @{
     this.ViewData["Title"] = "Speed Pay - Profile";
     var isAdmin = User.FindFirst("IsAdmin");
@@ -59,12 +60,19 @@
             </div>
             <div class="row gx-3 align-items-center">
               <p class="col-sm-3 text-muted text-sm-end mb-0 mb-sm-3">Date of Birth:</p>
-              <p class="col-sm-9 text-3">@this.Model.DetailsViewModel.User.DateOfBirth</p>
+              <p class="col-sm-9 text-3">@this.Model.DetailsViewModel.User.DateOfBirth?.ToString("yyyy-MM-dd")</p>
+            </div>
+            <div class="row gx-3 align-items-baseline">
+              <p class="col-sm-3 text-muted text-sm-end mb-0 mb-sm-3">Country:</p>
+              <p class="col-sm-9 text-3">@this.Model.DetailsViewModel.User.Country</p>
+            </div>
+            <div class="row gx-3 align-items-baseline">
+                <p class="col-sm-3 text-muted text-sm-end mb-0 mb-sm-3">City:</p>
+                <p class="col-sm-9 text-3">@this.Model.DetailsViewModel.User.City</p>
             </div>
             <div class="row gx-3 align-items-baseline">
               <p class="col-sm-3 text-muted text-sm-end mb-0 mb-sm-3">Address:</p>
-              <p class="col-sm-9 text-3">@this.Model.DetailsViewModel.User.Address<br>
-                @this.Model.DetailsViewModel.User.Country</p>
+              <p class="col-sm-9 text-3">@this.Model.DetailsViewModel.User.Address</p>
             </div>
             <div class="row gx-3 align-items-center">
                 <p class="col-sm-3 text-muted text-sm-end mb-0 mb-sm-3">Email:</p>
@@ -105,20 +113,20 @@
                   <form id="personaldetails" asp-controller="User" asp-action="Profile" method="post">
                     <div class="row g-3">
                       <div class="col-12 col-sm-6">
-                        <label asp-for="@this.Model.DetailsViewModel.User.FirstName" class="form-label">First Name</label>
-                        <input asp-for ="DetailsViewModel.User.FirstName" type="text" value="" class="form-control" data-bv-field="firstName" id="firstName" required placeholder="First Name">
-                        <span asp-validation-for="DetailsViewModel.User.FirstName" class="form-error"></span>
+                        <label asp-for="@this.Model.UpdateUserDto.FirstName" class="form-label">First Name</label>
+                        <input asp-for ="UpdateUserDto.FirstName" type="text" value="" class="form-control" data-bv-field="firstName" id="firstName" placeholder="First Name">
+                        <span asp-validation-for="UpdateUserDto.FirstName" class="form-error"></span>
                       </div>
                       <div class="col-12 col-sm-6">
-                        <label asp-for="@this.Model.DetailsViewModel.User.LastName" class="form-label">Last Name</label>
-                        <input asp-for ="DetailsViewModel.User.FirstName" type="text" value="" class="form-control" data-bv-field="lastName" id="lastName" required placeholder="Last Name">
-                        <span asp-validation-for="DetailsViewModel.User.LastName" class="form-error"></span>
+                        <label asp-for="@this.Model.UpdateUserDto.LastName" class="form-label">Last Name</label>
+                        <input asp-for ="UpdateUserDto.LastName" type="text" value="" class="form-control" data-bv-field="lastName" id="lastName" placeholder="Last Name">
+                        <span asp-validation-for="UpdateUserDto.LastName" class="form-error"></span>
                       </div>
                       <div class="col-12">
-                        <label asp-for="@this.Model.DetailsViewModel.User.DateOfBirth" for="birthDate" class="form-label">Date of Birth</label>
+                        <label asp-for="@this.Model.UpdateUserDto.DateOfBirth" for="birthDate" class="form-label">Date of Birth</label>
                         <div class="position-relative">
-                          <input asp-for="DetailsViewModel.User.DateOfBirth" type="date" id="birthDate" value="" class="form-control" required placeholder="Date of Birth">
-                          <span asp-validation-for="DetailsViewModel.User.DateOfBirth" class="form-error"></span>
+                          <input asp-for="UpdateUserDto.DateOfBirth" type="date" id="birthDate" value="" class="form-control" placeholder="Date of Birth">
+                          <span asp-validation-for="UpdateUserDto.DateOfBirth" class="form-error"></span>
                           <span class="icon-inside"><i class="fas fa-calendar-alt"></i></span>
 						</div>
                       </div>
@@ -127,32 +135,32 @@
                       <hr>
                       <div class="row g-3">
 					  <div class="col-12">
-                        <label asp-for="@this.Model.DetailsViewModel.User.Address" for="address" class="form-label">Address</label>
-                        <input asp-for="DetailsViewModel.User.Address" type="text" value="" class="form-control" data-bv-field="address" id="address" required placeholder="Address">
-                        <span asp-validation-for="DetailsViewModel.User.Address" class="form-error"></span>
+                        <label asp-for="@this.Model.UpdateUserDto.Address" for="address" class="form-label">Address</label>
+                        <input asp-for="UpdateUserDto.Address" type="text" value="" class="form-control" data-bv-field="address" id="address" placeholder="Address">
+                        <span asp-validation-for="UpdateUserDto.Address" class="form-error"></span>
                       </div>
                       <div class="col-12 col-sm-6">
-                          <label asp-for="@this.Model.DetailsViewModel.User.City" for="input-zone" class="form-label">City</label>
-                          <input asp-for="DetailsViewModel.User.City" type="text" value="" class="form-control" data-bv-field="address" id="address" required placeholder="City"> 
-                          <span asp-validation-for="DetailsViewModel.User.City" class="form-error"></span>
+                        <label asp-for="@this.Model.UpdateUserDto.City" for="input-zone" class="form-label">City</label>
+                        <input asp-for="UpdateUserDto.City" type="text" value="" class="form-control" data-bv-field="address" id="address" placeholder="City">
+                        <span asp-validation-for="UpdateUserDto.City" class="form-error"></span>
                       </div>
                       <div class="col-12 col-sm-6">
-                          <label asp-for="@this.Model.DetailsViewModel.User.Country" for="inputCountry" class="form-label">Country</label>
-                          <input asp-for="DetailsViewModel.User.Country" type="text" value="" class="form-control" data-bv-field="address" id="address" required placeholder="Country"> 
-                          <span asp-validation-for="DetailsViewModel.User.Country" class="form-error"></span>
+                        <label asp-for="@this.Model.UpdateUserDto.Country" for="inputCountry" class="form-label">Country</label>
+                        <input asp-for="UpdateUserDto.Country" type="text" value="" class="form-control" data-bv-field="address" id="address" placeholder="Country">
+                        <span asp-validation-for="UpdateUserDto.Country" class="form-error"></span>
                       </div>
                       <h3 class="text-5 fw-400 mt-4">Other</h3>
                       <hr>
 
                        <div class="col-12 col-sm-6">
-                          <label asp-for="@this.Model.DetailsViewModel.User.Email" for="emailID" class="form-label d-inline-flex align-items-center">Email</label>
-                          <input asp-for="DetailsViewModel.User.Email" type="text" value="" class="form-control" data-bv-field="emailid" id="emailID" required placeholder="Email">
-                          <span asp-validation-for="DetailsViewModel.User.Email" class="form-error"></span>
+                          <label asp-for="@this.Model.UpdateUserDto.Email" for="emailID" class="form-label d-inline-flex align-items-center">Email</label>
+                          <input asp-for="UpdateUserDto.Email" type="text" value="" class="form-control" data-bv-field="emailid" id="emailID" placeholder="Email">
+                          <span asp-validation-for="UpdateUserDto.Email" class="form-error"></span>
                       </div>
                        <div class="col-12 col-sm-6">
-                       <label asp-for="@this.Model.DetailsViewModel.User.PhoneNumber" class="form-label d-inline-flex align-items-center">Mobile</label>
-                       <input asp-for="DetailsViewModel.User.PhoneNumber" type="text" value="" class="form-control" data-bv-field="mobilenumber" id="mobileNumber" required placeholder="Mobile Number">
-                        <span asp-validation-for="DetailsViewModel.User.PhoneNumber" class="form-error"></span>
+                       <label asp-for="@this.Model.UpdateUserDto.PhoneNumber" class="form-label d-inline-flex align-items-center">Mobile</label>
+                       <input asp-for="UpdateUserDto.PhoneNumber" type="text" value="" class="form-control" data-bv-field="mobilenumber" id="mobileNumber" placeholder="Mobile Number">
+                        <span asp-validation-for="UpdateUserDto.PhoneNumber" class="form-error"></span>
                       </div>
 					  <div class="col-12 mt-4 d-grid"><button class="btn btn-primary" type="submit">Save Changes</button></div>
                      </div>

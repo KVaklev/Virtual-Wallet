@@ -11,7 +11,7 @@ namespace DataAccess.Models.ValidationAttributes
         public const int UsernameMaxLength = 20;
         public const int PhoneNumberLength = 10;
         public const int AddressMaxLength = 150;
-        public const int CountryMaxLength = 60;
+        public const int CountryMaxLength = 25;
         public const int CityMaxLength = 85;
 
         //Constants for cards
