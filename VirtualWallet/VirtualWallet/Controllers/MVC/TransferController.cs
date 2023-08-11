@@ -131,6 +131,9 @@ namespace VirtualWallet.Controllers.MVC
                 return await EntityNotFoundErrorViewAsync(loggedUser.Message);
             }
 
+            transferDto.CreateTransferDto.CurrencyCode = "USD";
+            transferDto.CreateTransferDto.CardNumber = "5554567891011121";
+
             var result = await this.transferService.CreateAsync(transferDto.CreateTransferDto, loggedUser.Data);
             if (!result.IsSuccessful)
             {
@@ -260,7 +263,7 @@ namespace VirtualWallet.Controllers.MVC
         }
 
         [HttpGet]
-        public async Task<IActionResult> SuccessfulDelete()
+        public async Task<IActionResult> SuccessfulCancellation()
         {
             return this.View();
         }
