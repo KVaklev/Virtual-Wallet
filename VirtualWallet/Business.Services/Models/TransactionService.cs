@@ -8,6 +8,7 @@ using Business.DTOs.Requests;
 using Business.DTOs.Responses;
 using Business.Mappers;
 using DataAccess.Models.Enums;
+using Microsoft.EntityFrameworkCore;
 
 namespace Business.Services.Models
 {
@@ -68,11 +69,13 @@ namespace Business.Services.Models
             var result = new Response<PaginatedList<GetTransactionDto>>();
             IQueryable<Transaction> transactions = this.transactionRepository.GetAll(loggedUser.Username);
 
-            transactions = await FilterByRecipientAsync(transactions, filterParameters.ResipientUsername);
+            transactions = await FilterByRecipientAsync(transactions, filterParameters.RecipientUsername);
             transactions = await FilterByDirectionAsync(transactions, filterParameters.Direction);
             transactions = await FilterByFromDataAsync(transactions, filterParameters.FromDate);
             transactions = await FilterByToDataAsync(transactions, filterParameters.ToDate);
             transactions = await SortByAsync(transactions, filterParameters.SortBy);
+
+            transactions = await GetUserTransactionsAsync(transactions, loggedUser);
 
             int totalPages = (transactions.Count() + filterParameters.PageSize - 1) / filterParameters.PageSize;
             transactions = await Common<Transaction>.PaginateAsync(transactions, filterParameters.PageNumber, filterParameters.PageSize);
@@ -84,22 +87,13 @@ namespace Business.Services.Models
                 return result;
             }
 
-            List<GetTransactionDto> transactionDtos = new List<GetTransactionDto>();
-
-            if (!loggedUser.IsAdmin)
-            {
-                transactionDtos = transactions
-                    .Where(u => u.AccountSenderId == loggedUser.AccountId)
-                    .Select(transaction => mapper.Map<GetTransactionDto>(transaction))
-                    .ToList();
-            }
-            else
-            {
-                transactionDtos = transactions
-                        .Select(transaction => mapper.Map<GetTransactionDto>(transaction))
-                        .ToList();
-            }
-            result.Data = new PaginatedList<GetTransactionDto>(transactionDtos, totalPages, filterParameters.PageNumber);
+            var transactionDtos = transactions
+                            .Select(transaction => mapper.Map<GetTransactionDto>(transaction))
+                            .ToList();
+            result.Data = new PaginatedList<GetTransactionDto>(
+                            transactionDtos, 
+                            totalPages, 
+                            filterParameters.PageNumber);
             
             return result;
         }
@@ -304,7 +298,9 @@ namespace Business.Services.Models
             result.Data = transactionIn;
             return result;
         }
-        private async Task<Response<bool>> UpdateAccountsBalancesAsync(Transaction transactionOut, Transaction transactionIn)
+        private async Task<Response<bool>> UpdateAccountsBalancesAsync(
+            Transaction transactionOut, 
+            Transaction transactionIn)
         {
             var result = new Response<bool>();
             var amountSenderResult = await this.exchangeRateService
@@ -319,8 +315,15 @@ namespace Business.Services.Models
                 return result;
             }
 
-            await this.accountService.DecreaseBalanceAsync(transactionOut.AccountSenderId, amountSenderResult.Data, transactionOut.AccountSender.User);
-            await this.accountService.IncreaseBalanceAsync(transactionIn.AccountRecepientId, transactionIn.Amount, transactionIn.AccountRecipient.User);
+            await this.accountService.DecreaseBalanceAsync(
+                transactionOut.AccountSenderId, 
+                amountSenderResult.Data, 
+                transactionOut.AccountSender.User);
+
+            await this.accountService.IncreaseBalanceAsync(
+                transactionIn.AccountRecepientId, 
+                transactionIn.Amount, 
+                transactionIn.AccountRecipient.User);
             result.Data = true;
 
             return result;
@@ -343,7 +346,9 @@ namespace Business.Services.Models
                 return false;
             }
         }
-        private async Task<IQueryable<Transaction>> FilterByRecipientAsync(IQueryable<Transaction> result, string? username)
+        private async Task<IQueryable<Transaction>> FilterByRecipientAsync(
+            IQueryable<Transaction> result, 
+            string? username)
         {
             if (!string.IsNullOrEmpty(username))
             {
@@ -351,7 +356,9 @@ namespace Business.Services.Models
             }
             return await Task.FromResult(result);
         }
-        private async Task<IQueryable<Transaction>> FilterByFromDataAsync(IQueryable<Transaction> result, string? fromData)
+        private async Task<IQueryable<Transaction>> FilterByFromDataAsync(
+            IQueryable<Transaction> result, 
+            string? fromData)
         {
             if (!string.IsNullOrEmpty(fromData))
             {
@@ -360,7 +367,9 @@ namespace Business.Services.Models
             }
             return result;
         }
-        private async Task<IQueryable<Transaction>> FilterByToDataAsync(IQueryable<Transaction> result, string? toData)
+        private async Task<IQueryable<Transaction>> FilterByToDataAsync(
+            IQueryable<Transaction> result, 
+            string? toData)
         {
             if (!string.IsNullOrEmpty(toData))
             {
@@ -370,7 +379,9 @@ namespace Business.Services.Models
             }
             return result;
         }
-        private async Task<IQueryable<Transaction>> FilterByDirectionAsync(IQueryable<Transaction> result, string? direction)
+        private async Task<IQueryable<Transaction>> FilterByDirectionAsync(
+            IQueryable<Transaction> result, 
+            string? direction)
         {
             if (!string.IsNullOrEmpty(direction))
             {
@@ -395,6 +406,23 @@ namespace Business.Services.Models
                 }
             }
             return result;
+        }
+
+        private async Task<IQueryable<Transaction>> GetUserTransactionsAsync(IQueryable<Transaction> userTransactions, User loggedUser)
+        {
+             
+            if (!loggedUser.IsAdmin)
+            {
+                userTransactions = userTransactions
+                    .Where(transaction =>
+                        (transaction.Direction == DirectionType.Out 
+                        && transaction.AccountSenderId == loggedUser.AccountId) 
+                        || (transaction.Direction == DirectionType.In 
+                        && transaction.AccountRecepientId == loggedUser.AccountId)
+                    );
+            }
+
+            return userTransactions;
         }
     }
 }

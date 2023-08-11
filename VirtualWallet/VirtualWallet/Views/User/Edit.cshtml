@@ -1,1 +1,87 @@
-﻿
+﻿@model UserDetailsViewModel
+
+@{
+    this.ViewData["Title"] = "Speed Pay - Edit";
+}
+
+<title>Edit User Status</title>
+
+<body>
+    <div class="container mt-4">
+        <div class="row">
+            <aside class="col-lg-3">
+                <div class="bg-white shadow-sm rounded text-center p-3 mb-4">
+                    <div class="profile-thumb mt-3 mb-4">
+                        <img class="center rounded-circle" src="~/images/profile-thumb-sm.jpg" alt=""
+                             style="width: 110px; height: 110px;">
+                        <p class="text-black opacity-12 mb-4">
+                            <b>@this.Model.User.Username</b> <br> @DateTime.Now.DayOfWeek,
+                                    @DateTime.Now.Date.ToShortDateString()
+                        <p>
+                    </div>
+                </div>
+            </aside>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="mb-0 text-center">
+                            Change User Status
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        <form asp-controller="User" asp-action="Edit" method="post">
+                            <table class="table">
+                                <tbody>
+                                    <tr>
+                                        <th scope="row">
+                                            Admin Status
+                                        </th>
+                                        <td>
+                                            <div class="form-check">
+                                                <input asp-for="@this.Model.User.Admin" class="form-check-input"
+                                                       type="radio" value="true" id="isAdminTrue">
+                                                <label class="form-check-label" for="isAdminTrue">
+                                                    Promote user with admin rights
+                                                </label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input asp-for="@this.Model.User.Admin" class="form-check-input"
+                                                       type="radio" value="false" id="isAdminFalse">
+                                                <label class="form-check-label" for="isAdminFalse">
+                                                    Remove admin privileges from user
+                                                </label>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">
+                                            Block Status
+                                        </th>
+                                        <td>
+                                            <div class="form-check">
+                                                <input asp-for="@this.Model.User.Blocked" class="form-check-input"
+                                                       type="radio" value="true" id="isBlockedTrue">
+                                                <label class="form-check-label" for="isBlockedTrue">
+                                                    Block user and restrict transactions
+                                                </label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input asp-for="@this.Model.User.Blocked" class="form-check-input"
+                                                       type="radio" value="false" id="isBlockedFalse">
+                                                <label class="form-check-label" for="isBlockedFalse">
+                                                    Unblock user and restore transaction access
+                                                </label>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <input type="submit" value="@this.ViewData["ButtonText"]" class="btn btn-warning" />
+                            <a asp-controller="User" asp-action="Index" class="btn btn-primary">Back</a>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>

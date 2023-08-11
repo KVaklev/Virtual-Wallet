@@ -1,4 +1,4 @@
-﻿namespace Business.ViewModels
+﻿namespace Business.ViewModels.UserViewModels
 {
     public class UserUpdateProfileViewModel
     {
