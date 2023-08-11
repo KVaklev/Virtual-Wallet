@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Business.DTOs.Requests;
 using Business.DTOs.Responses;
+using Business.ViewModels.UserViewModels;
 using DataAccess.Models.Models;
 
 namespace Business.Mappers
@@ -22,6 +23,7 @@ namespace Business.Mappers
             CreateMap<UpdateUserDto, User>();
             CreateMap<User, GetUserDto>();
             CreateMap<GetUserDto, User>();
+            
 
         }
 

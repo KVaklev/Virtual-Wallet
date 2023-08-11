@@ -10,6 +10,7 @@ using Business.DTOs.Responses;
 using static Business.Services.Helpers.Constants;
 using DataAccess.Models.Enums;
 using Business.ViewModels;
+using Business.ViewModels.UserViewModels;
 
 namespace Business.Services.Models
 {
@@ -192,6 +193,27 @@ namespace Business.Services.Models
             userToUpdate = await this.userRepository.UpdateAsync(userToUpdate);
 
             result.Data = mapper.Map<GetUpdatedUserDto>(userToUpdate);
+
+            return result;
+        }
+
+        public async Task<Response<bool>> ChangeStatusAsync(int id, UserDetailsViewModel userDetailsViewModel, User loggedUser)
+        {
+            var result = new Response<bool>();
+
+            if (!await Security.IsAdminAsync(loggedUser))
+            {
+                result.IsSuccessful = false;
+                result.Message = ModifyUserErrorMessage;
+                return result;
+            }
+
+            User userToEditStatus = await this.userRepository.GetByIdAsync(id);
+
+            userToEditStatus.IsAdmin = userDetailsViewModel.User.Admin;
+            userToEditStatus.IsBlocked = userDetailsViewModel.User.Blocked;
+
+            await this.userRepository.SaveChangesAsync();
 
             return result;
         }
