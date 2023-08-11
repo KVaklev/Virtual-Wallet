@@ -8,6 +8,7 @@ using Business.DTOs.Requests;
 using Business.DTOs.Responses;
 using Business.Mappers;
 using DataAccess.Models.Enums;
+using Microsoft.EntityFrameworkCore;
 
 namespace Business.Services.Models
 {
@@ -68,11 +69,13 @@ namespace Business.Services.Models
             var result = new Response<PaginatedList<GetTransactionDto>>();
             IQueryable<Transaction> transactions = this.transactionRepository.GetAll(loggedUser.Username);
 
-            transactions = await FilterByRecipientAsync(transactions, filterParameters.ResipientUsername);
+            transactions = await FilterByRecipientAsync(transactions, filterParameters.RecipientUsername);
             transactions = await FilterByDirectionAsync(transactions, filterParameters.Direction);
             transactions = await FilterByFromDataAsync(transactions, filterParameters.FromDate);
             transactions = await FilterByToDataAsync(transactions, filterParameters.ToDate);
             transactions = await SortByAsync(transactions, filterParameters.SortBy);
+
+            transactions = await GetUserTransactionsAsync(transactions, loggedUser);
 
             int totalPages = (transactions.Count() + filterParameters.PageSize - 1) / filterParameters.PageSize;
             transactions = await Common<Transaction>.PaginateAsync(transactions, filterParameters.PageNumber, filterParameters.PageSize);
@@ -84,8 +87,7 @@ namespace Business.Services.Models
                 return result;
             }
 
-            var userTransaction = await GetLoggedUserTransactionsAsync(transactions, loggedUser);
-            var transactionDtos = userTransaction
+            var transactionDtos = transactions
                             .Select(transaction => mapper.Map<GetTransactionDto>(transaction))
                             .ToList();
             result.Data = new PaginatedList<GetTransactionDto>(
@@ -406,30 +408,20 @@ namespace Business.Services.Models
             return result;
         }
 
-        private async Task<List<Transaction>> GetLoggedUserTransactionsAsync(
-            IQueryable<Transaction> transactions, 
-            User loggedUser)
-
+        private async Task<IQueryable<Transaction>> GetUserTransactionsAsync(IQueryable<Transaction> userTransactions, User loggedUser)
         {
-
-            List<Transaction> userTransactions = new List<Transaction>();
-
+             
             if (!loggedUser.IsAdmin)
             {
-                foreach (var transaction in transactions)
-                {
-                    if (transaction.Direction == DirectionType.Out
-                        && transaction.AccountSenderId == loggedUser.AccountId)
-                    {
-                        userTransactions.Add(transaction);
-                    }
-                    if (transaction.Direction == DirectionType.In
+                userTransactions = userTransactions
+                    .Where(transaction =>
+                        (transaction.Direction == DirectionType.Out 
+                        && transaction.AccountSenderId == loggedUser.AccountId) 
+                        || (transaction.Direction == DirectionType.In 
                         && transaction.AccountRecepientId == loggedUser.AccountId)
-                    {
-                        userTransactions.Add(transaction);
-                    }
-                }
+                    );
             }
+
             return userTransactions;
         }
     }

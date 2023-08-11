@@ -82,7 +82,7 @@
                                             @foreach (var currency in currencies)
                                             {
 
-                                                <option data-icon="currency-flag currency-flag-inr me-1" data-subtext="@currency.Name " value="@currency.CurrencyCode">@currency.CurrencyCode</option>
+                                                <option class="currency-flag currency-flag-@currency.CurrencyCode.ToLower() me-1" data-icon="currency-flag currency-flag-@currency.CurrencyCode.ToLower() me-1" data-subtext="@currency.Name " value="@currency.CurrencyCode">@currency.CurrencyCode</option>
 
                                             }
                                         </optgroup>

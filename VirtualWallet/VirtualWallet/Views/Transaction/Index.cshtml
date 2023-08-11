@@ -2,6 +2,18 @@
 @using DataAccess.Models.Enums;
 @model IndexTransactionViewModel
 
+@{
+
+    var parameters = new Dictionary<string, string>
+ {
+      {"RecipientUsername", Model.TransactionQueryParameters.RecipientUsername},
+      {"FromDate", Model.TransactionQueryParameters.FromDate},
+      {"ToDate", Model.TransactionQueryParameters.ToDate},
+      {"Direction", Model.TransactionQueryParameters.Direction},
+ };
+
+}
+
 <!-- Secondary menu
   ============================================= -->
 <div class="bg-primary">
@@ -29,47 +41,53 @@
         ============================================= -->
         <div class="row">
             <div class="col mb-2">
-                <form id="filterTransactions" method="post">
-                    <div class="row g-3 mb-3">
+                <form asp-controller="Transaction" asp-action="Index" method="get" id="filterTransactions" method="post">
+                    <div >
                         <!-- Date Range
                         ========================= -->
-                        <div class="col-sm-6 col-md-5">
-                            <div class="position-relative">
-                                <input id="dateRange" type="text" class="form-control" placeholder="Date Range">
-                                <span class="icon-inside"><i class="fas fa-calendar-alt"></i></span>
+                        
+
+                        <div class="row g-3">
+                            <div class="col-6 col-md-3">
+                                <input type="date" name="FromDate" class="form-control" required placeholder="From Date">
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <input type="date" name="ToDate" class="form-control"  required placeholder="To Date">
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <input type="text" name="RecipientUsername" class="form-control"  required placeholder="Username">
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <input type="submit" class="btn btn-primary shadow-none">Filter</a>
                             </div>
                         </div>
+                        
+
                         <!-- All Filters Link
                         ========================= -->
                         <div class="col-auto d-flex align-items-center me-auto form-group" data-bs-toggle="collapse"> <a class="btn-link" data-bs-toggle="collapse" href="#allFilters" aria-expanded="false" aria-controls="allFilters">All Filters<i class="fas fa-sliders-h text-3 ms-1"></i></a> </div>
 
-                        <!-- Statements Link
-                        ========================= -->
-                        <div class="col-auto d-flex align-items-center ms-auto">
-                            <div class="dropdown">
-                                <a class="text-muted btn-link" href="#" role="button" id="statements" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-file-download text-3 me-1"></i>Statements</a>
-                                <div class="dropdown-menu dropdown-menu-end" aria-labelledby="statements"> <a class="dropdown-item" href="#">CSV</a> <a class="dropdown-item" href="#">PDF</a> </div>
-                            </div>
-                        </div>
+                       
 
                         <!-- All Filters collapse
                         ================================ -->
                         <div class="col-12 collapse" id="allFilters">
                             <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" id="allTransactions" name="allFilters" checked>
+                                <input class="form-check-input" type="radio" id="allTransactions" name="Direction" checked>
                                 <label class="form-check-label" for="allTransactions">All Money Operations</label>
                             </div>
                             <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" id="paymentsSend" name="allFilters">
+                                <input class="form-check-input" type="radio" value="@DirectionType.In" id="paymentsSend" name="Direction">
                                 <label class="form-check-label" for="paymentsSend">Payments Send</label>
                             </div>
                             <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" id="paymentsReceived" name="allFilters">
+                                <input class="form-check-input" type="radio" value="@DirectionType.Out" id="paymentsReceived" name="Direction">
                                 <label class="form-check-label" for="paymentsReceived">Payments Received</label>
                             </div>
                         </div>
                         <!-- All Filters collapse End -->
                     </div>
+                    
                 </form>
             </div>
         </div>
@@ -202,24 +220,62 @@
             <!-- Transaction Item Details Modal End -->
             <!-- Pagination
             ============================================= -->
+            @{
+                string prevButtonState = this.Model.TransactionDtos.HasPrevPage ? "" : "disabled";
+                string nextButtonState = this.Model.TransactionDtos.HasNextPage ? "" : "disabled";
+           }
             <ul class="pagination justify-content-center mt-4 mb-0">
-                <li class="page-item disabled"> <a class="page-link" href="#" tabindex="-1"><i class="fas fa-angle-left"></i></a> </li>
-                <li class="page-item"><a class="page-link" href="#">1</a></li>
-                <li class="page-item active"><a class="page-link" href="#">2</a></li>
-                <li class="page-item"><a class="page-link" href="#">3</a></li>
-                <li class="page-item d-flex align-content-center flex-wrap text-muted text-5 mx-1">......</li>
-                <li class="page-item"><a class="page-link" href="#">15</a></li>
-                <li class="page-item"> <a class="page-link" href="#"><i class="fas fa-angle-right"></i></a> </li>
+                <li class="page-item @prevButtonState"> 
+                    <a class="page-link" 
+                    asp-controller="Transaction" 
+                    asp-action="Index" 
+                    asp-all-route-data="@parameters" 
+                    asp-route-PageNumber="@(this.Model.TransactionDtos.PageNumber-1)" 
+                    class="btn btn-link @prevButtonState">
+                    <i class="fas fa-angle-left"></i></a> </li>
+               
+                @{
+                    int currentPageNumber = this.Model.TransactionDtos.PageNumber;
+                    for (int i = 1; i <= this.Model.TransactionDtos.TotalPages; i++)
+                    {
+                        if (i == currentPageNumber)
+                        {
+                            <li class="page-item active"><a class="page-link">@i</a></li>
+                        }
+                        else
+                        {
+                            <li class="page-item">
+                            <a class="page-link" 
+                            asp-controller="Transaction" 
+                            asp-all-route-data="@parameters" 
+                            asp-action="Index" 
+                            asp-route-PageNumber="@i">@i</a></li>
+                        }
+                    }
+                }
+
+                <li class="page-item @nextButtonState"> 
+                    <a class="page-link" 
+                    asp-controller="Transaction" 
+                    asp-action="Index" 
+                    asp-all-route-data="@parameters" 
+                    asp-route-PageNumber="@(this.Model.TransactionDtos.PageNumber+1)" 
+                    class="btn btn-link @nextButtonState">
+                    <i class="fas fa-angle-right"></i></a></li>
             </ul>
             <!-- Paginations end -->
 
         </div>
-        <!-- All Transactions End -->
+        
+        
+            <!-- All Transactions End -->
     </div>
     <!-- Middle End -->
     </div>
     </div>
     </div>
     <!-- Content end -->
-
+    </div>
+    
+    
 </body>
