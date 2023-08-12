@@ -24,5 +24,11 @@ namespace VirtualWallet.Controllers.MVC
         {
             return View();
         }
+
+        [HttpGet]
+        public IActionResult ContactUs()
+        {
+            return View();
+        }
     }
 }
