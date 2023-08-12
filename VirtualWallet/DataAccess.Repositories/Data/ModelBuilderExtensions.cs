@@ -42,8 +42,9 @@ namespace DataAccess.Repositories.Data
 
             var currencies = new List<Currency>()
             {
-               new Currency() { Id=1, Name = "Български лев", CurrencyCode="BGN" },
-               new Currency() { Id = 2, Name = "Американски долар", CurrencyCode = "USD" }
+               new Currency() { Id=1, Name = "Bulgarian Lev", CurrencyCode="BGN", Country = "Bulgaria" },
+               new Currency() { Id = 2, Name = "US Dollar", CurrencyCode = "USD", Country = "United States Of America"},
+               new Currency() { Id = 3, Name = "Euro", CurrencyCode = "EUR", Country = "European Union"}
             };
 
             var cards = new List<Card>()

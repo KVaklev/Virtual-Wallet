@@ -7,17 +7,14 @@ namespace DataAccess.Models.Models
 {
     public class Transaction
 
-    {
-        
+    {   
         public int Id { get; set; }
-
-       
+  
         [Range(Constants.IdMin, Constants.IdMax, ErrorMessage = Constants.RangeFieldErrorMessage)]
         public int AccountSenderId { get; set; } 
 
         [JsonIgnore]
         public Account AccountSender { get; set; }
-
         
         [Range(Constants.IdMin, Constants.IdMax, ErrorMessage = Constants.RangeFieldErrorMessage)]
         public int AccountRecepientId { get; set; } 
@@ -26,10 +23,15 @@ namespace DataAccess.Models.Models
         public Account AccountRecipient { get; set; }
 
         public DirectionType Direction { get; set; }
-
-        
+      
         [Range(Constants.MinAmount, Constants.MaxAmount, ErrorMessage = Constants.RangeFieldErrorMessage)]
         public decimal Amount { get; set; }
+
+        [Range(Constants.MinAmount, Constants.MaxAmount, ErrorMessage = Constants.RangeFieldErrorMessage)]
+        public decimal AmountExchange { get; set; }
+        
+        [Range(Constants.MinAmount, Constants.MaxAmount, ErrorMessage = Constants.RangeFieldErrorMessage)]
+        public decimal ExchangeRate { get; set; }
 
         public DateTime Date { get; set; }
 
