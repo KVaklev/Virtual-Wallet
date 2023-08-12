@@ -42,6 +42,26 @@ namespace Business.Services.Helpers
         public const string TermsOfUseMessageFirst = "🌟 These Terms of Use (\"Terms\") govern your access to and use of this web application (the \"Service\") powered by a team of brilliant minds (\"we,\" \"us,\" or \"our\") who have come together to create a seamless experience for you. By using the Service, you agree to be bound by these Terms.";
         public const string TermsOfUseMessageSecond = "By engaging with the Service, you enter into a partnership with us, entrusting your financial well-being to a team that's dedicated to your success. These Terms encapsulate our commitment to your privacy, security, and satisfaction. Your agreement to these Terms is not only a legal obligation but a pact between you and the brilliant minds behind this application.";
         public const string TermsOfUseMessageThird = "In your hands, you hold more than an app; you hold a gateway to financial empowerment, convenience, and peace of mind. Welcome to our digital ecosystem—your Virtual Wallet—where your financial aspirations take center stage!🌟";
+        public const string TermsOfUseMessageFourth = "By accessing or using the Service, you acknowledge that you have read, understood, and agree to be bound by these Terms. If you do not agree to these Terms, please do not use the Service.";
+        public const string TermsOfUseMessageFifth = "You agree to use the Service in compliance with all applicable laws, regulations, and these Terms. You may not use the Service for any unlawful or unauthorized purpose.";
+        public const string TermsOfUseMessageSixth = "To use certain features of the Service, you may need to create a user account. You are responsible for maintaining the confidentiality of your account credentials.";
+        public const string TermsOfUseMessageSeventh = "Your use of the Service is also governed by our Privacy Policy, which can be found on the same page. Please read it carefully!";
+        public const string TermsOfUseMessageEight = "When making transactions through the Service, you agree to provide accurate and complete payment information. You are responsible for all charges incurred through your account.";
+        public const string TermsOfUseMessageNinth = "The content and materials are protected by intellectual property rights.You may not copy, reproduce, distribute, or create works without our prior written consent.";
+        public const string TermsOfUseMessageTenth = "We reserve the right to suspend or terminate your access to the Service at any time for any reason, including violation of these Terms.";
+
+        public const string PrivacyPolicyMessageFirst = "We gather various user data such as personal information (username, email, phone), transaction details, usage patterns, and device specifics for improved services.";
+        public const string PrivacyPolicyMessageSecond = "Collected data is used to maintain the Service, process transactions, provide support, enhance user experience, and meet legal obligations.";
+        public const string PrivacyPolicyMessageThird = "We may share your details with third-party providers assisting in Service operation, and in compliance with legal requirements.";
+        public const string PrivacyPolicyMessageFourth = "Manage your account details, adjust cookie settings, and control marketing communications to tailor your experience.";
+        public const string PrivacyPolicyMessageFifth = "We take appropriate measures to safeguard personal information from unauthorized access, alteration, or destruction.";
+        public const string PrivacyPolicyMessageSixth = "Our Service is designed for users aged 18 and above; we don't knowingly collect data from those under 18.";
+        public const string PrivacyPolicyMessageSeventh = "We may update our Privacy Policy periodically, with any revisions becoming effective immediately upon posting.";
+        public const string PrivacyPolicyMessageEight = "We keep your personal information only for the time needed to fulfill the purposes outlined here, and we securely delete or anonymize it when it's no longer required.";
+        public const string PrivacyPolicyMessageNinth = "Our Service may include links to external websites or services not under our control. We aren't responsible for their privacy practices, so we recommend reviewing their policies before using those sites.";
+        public const string PrivacyPolicyMessageTenth = "You have rights regarding your personal information, including access, correction, data portability, deletion, and withdrawal of consent. Reach out to us for more details on how to exercise these rights.";
+
+
         //Constant messages for account
 
         public const string NoAccountsErrorMessage = "No accounts are found.";
