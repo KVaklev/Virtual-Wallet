@@ -61,6 +61,12 @@ namespace Business.Services.Helpers
         public const string PrivacyPolicyMessageNinth = "Our Service may include links to external websites or services not under our control. We aren't responsible for their privacy practices, so we recommend reviewing their policies before using those sites.";
         public const string PrivacyPolicyMessageTenth = "You have rights regarding your personal information, including access, correction, data portability, deletion, and withdrawal of consent. Reach out to us for more details on how to exercise these rights.";
 
+        //Constant messages for Home Page
+
+        public const string WhyChooseReasonOne = "Speed Pay offers a user-friendly interface and intuitive features, making it effortless to navigate and manage your finances. Its simple design ensures that even those unfamiliar with online banking can easily handle transactions and monitor their funds.";
+        public const string WhyChooseReasonTwo = "With Speed Pay, you can experience the convenience of rapid transactions that ensure your money moves swiftly. Whether you're sending funds to family or settling bills, the platform's efficient processing ensures your payments reach their destination promptly.";
+        public const string WhyChooseReasonThree = "Opting for a Speed Pay account means enjoying the advantage of reduced transaction fees compared to traditional banking methods. By minimizing costs associated with transfers and payments, you can make the most of your hard-earned money.";
+        public const string WhyChooseReasonFour = "Your financial security is a top priority with Speed Pay. Utilizing advanced encryption and stringent security protocols, the platform ensures that your personal and financial information remains confidential and well-protected, giving you peace of mind while conducting transactions online.";
 
         //Constant messages for account
 

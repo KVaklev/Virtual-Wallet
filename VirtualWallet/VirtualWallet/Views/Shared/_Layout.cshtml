@@ -45,7 +45,7 @@
         <div class="header-column justify-content-start"> 
           <!-- Logo
           ============================= -->
-          <div class="logo me-3"> <a class="d-flex" href="index.html" title="SpeedPay"><img src="~/images/logo.png" width="201" height="50" alt="Runner" /></a> </div>
+          <div class="logo me-3"> <a asp-controller="Home" asp-action="Index" class="d-flex"  title="SpeedPay"><img src="~/images/logo.png" width="201" height="50" alt="Runner" /></a> </div>
           <!-- Logo end --> 
           <!-- Collapse Button
           ============================== -->
@@ -205,6 +205,8 @@
           <div class="col-lg d-lg-flex align-items-center justify-content-lg-end">
             <ul class="nav justify-content-center">
               <li class="nav-item"> <a asp-controller="Help" asp-action="PrivacyPolicyAndTermsOfUse" class="nav-link active">Privacy Policy and Terms of Use</a></li>
+              <br />
+              <li><a href=http://localhost:5116/swagger />Swagger</li>
 
             </ul>
           </div>

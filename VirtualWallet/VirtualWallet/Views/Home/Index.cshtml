@@ -1,10 +1,64 @@
-﻿@{
-    ViewData["Title"] = "Home page";
-}
-
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-
-    <a href = http://localhost:5116/swagger/>Swagger</a>
-</div>
+﻿<!-- Page Header
+  ============================================= -->
+<section class="page-header page-header-text-light py-0 mb-0">
+    <section class="hero-wrap section">
+        <div class="hero-mask opacity-7 bg-dark"></div>
+        <div class="hero-bg hero-bg-scroll" style="background-image:url('./images/bg/image-2.jpg');"></div>
+        <div class="hero-content">
+            <div class="container">
+                <div class="row">
+                    <div class="col-12 text-center">
+                        <div class="col-lg-6 col-xl-7 my-auto text-center text-lg-start pb-4 pb-lg-0">
+                            <h2 class="text-14 fw-400 text-white mb-4">
+                                The Secure,<br class="d-none d-xl-block">
+                                easiest and fastest <br class="d-none d-xl-block">
+                                way to transfer money.
+                            </h2>
+                            <p class="lead text-light mb-4">
+                                Send & Receive money to your loved ones in minutes with great rates and low
+                                fees. Over 180 countries and 30 currencies supported.
+                            </p>
+                        <a asp-controller="Account" asp-action="Register" class="btn btn-primary m-2">Open a Free Account</a> 
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</section>
+<!-- Page Header end -->
+<section class="section bg-white">
+    <div class="container">
+        <h2 class="text-9 text-center">Why should you choose Speed Pay?</h2>
+        <p class="lead text-center mb-5">Here's Top 4 reasons why using a Payyed account to manage your money.</p>
+        <div class="row gy-5">
+            <div class="col-sm-6 col-lg-3">
+                <div class="featured-box">
+                    <div class="featured-box-icon text-primary"> <i class="fas fa-hand-pointer"></i> </div>
+                    <h3>Easy to use</h3>
+                    <p class="text-3">@Constants.WhyChooseReasonOne</p>
+                </div>
+            </div>
+            <div class="col-sm-6 col-lg-3">
+                <div class="featured-box">
+                    <div class="featured-box-icon text-primary"> <i class="fas fa-share"></i> </div>
+                    <h3>Faster Payments</h3>
+                    <p class="text-3">@Constants.WhyChooseReasonTwo</p>
+                </div>
+            </div>
+            <div class="col-sm-6 col-lg-3">
+                <div class="featured-box">
+                    <div class="featured-box-icon text-primary"> <i class="fas fa-dollar-sign"></i> </div>
+                    <h3>Lower Fees</h3>
+                    <p class="text-3">@Constants.WhyChooseReasonThree</p>
+                </div>
+            </div>
+            <div class="col-sm-6 col-lg-3">
+                <div class="featured-box">
+                    <div class="featured-box-icon text-primary"> <i class="fas fa-lock"></i> </div>
+                    <h3>100% Secure</h3>
+                    <p class="text-3">@Constants.WhyChooseReasonFour</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
