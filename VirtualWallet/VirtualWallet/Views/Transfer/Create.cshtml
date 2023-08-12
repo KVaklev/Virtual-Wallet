@@ -91,7 +91,7 @@
                                 <option value="">My Cards</option>
                                 @foreach (var card in Model.Cards)
                                 {
-                                    <option value="@card.CurrencyCode"> @card.CardType - @card.CardNumber - @card.CurrencyCode </option>
+                                    <option data-subtext="@card.CurrencyCode" value="@card.CardNumber"> @card.CardType - @card.CardNumber - @card.CurrencyCode </option>
                                 }
                             </select>
                         </div>
@@ -101,10 +101,13 @@
                             <div class="input-group">
                                 <span class="input-group-text">$</span>
                                 <input asp-for="CreateTransferDto.Amount" type="number" class="form-control" data-bv-field="youSend" id="youSend" value="" placeholder="">
-                                <span id="amountCurrency" class="input-group-text">USD</span>
+                                <span asp-for="CreateTransferDto.CurrencyCode" value="" id="amountCurrency" class="input-group-text">USD</span>
 
                             </div>
                         </div>
+
+                        <input id="hiddenCurrency" asp-for="CreateTransferDto.CurrencyCode" hidden value="USD" />
+
                         <hr>
                         <p class="text-4 fw-500">You'll deposit <span class="float-end">1,000.00 USD</span></p>
                         <div class="d-grid"><button type="submit" class="btn btn-primary">Continue</button></div>
@@ -125,9 +128,10 @@
         var newValue = '';
         for (const child of document.getElementById('cardType').children) {
             if (child.selected) {
-                newValue = child.value;
+                newValue = child.getAttribute('data-subtext');
             }
         }
         document.getElementById("amountCurrency").textContent = newValue;
+        document.getElementById("hiddenCurrency").setAttribute('value', newValue);
     });
 </script>

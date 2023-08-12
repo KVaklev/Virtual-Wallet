@@ -1,4 +1,5 @@
-﻿@model Business.ViewModels.ConfirmTransferViewModel
+﻿@using DataAccess.Models.Enums;
+@model Business.ViewModels.ConfirmTransferViewModel
 @*@{
     string firstName = Model.UserDetails.FirstName.ToString();
     string lastName = Model.UserDetails.FirstName.ToString();
@@ -9,7 +10,7 @@
 <div class="bg-primary">
     <div class="container d-flex justify-content-center">
         <ul class="nav nav-pills alternate nav-lg border-bottom-0">
-            <li class="nav-item"> <a class="nav-link active" href="send-money.html">Send</a></li>
+            <li class="nav-item"> <a class="nav-link active" href="send-money.html">Transfer</a></li>
         </ul>
     </div>
 </div>
@@ -47,9 +48,21 @@
                 </div>
             </div>
         </div>
-        <h2 class="fw-400 text-center mt-3">Send Money</h2>
 
-        <p class="lead text-center mb-4">You are transferring money from <span class="fw-500">@Model.GetTransferDto.CardNumber</span></p>
+        @if (Model.GetTransferDto.TransferType == TransferDirection.Deposit.ToString())
+        {
+            <h2 class="fw-400 text-center mt-3">Deposit Money</h2>
+
+            <p class="lead text-center mb-4">You are transferring money from Card No.<span class="fw-500">@Model.GetTransferDto.CardNumber</span></p>
+
+        }
+        else
+        {
+            <h2 class="fw-400 text-center mt-3">Withdraw Money</h2>
+
+            <p class="lead text-center mb-4">You are withdrawing money to Card No.<span class="fw-500">@Model.GetTransferDto.CardNumber</span></p>
+        }
+
         <div class="row">
             <div class="col-md-9 col-lg-7 col-xl-6 mx-auto">
                 <div class="bg-white shadow-sm rounded p-3 pt-sm-4 pb-sm-5 px-sm-5 mb-4">
@@ -61,20 +74,37 @@
                         <p class="col-sm-4 text-muted text-sm-end mb-0 mb-sm-3">Name:</p>
                         <p class="col-sm-8 text-3">@Model.UserDetails.FirstName @Model.UserDetails.LastName</p>
                     </div>
+                    @if (Model.GetTransferDto.TransferType == TransferDirection.Deposit.ToString())
+                    {
+                        <div class="row g-3 align-items-center">
+                            <p class="col-sm-4 text-muted text-sm-end fw-500 mb-0 mb-sm-3">Deposit:</p>
+                            <p class="col-sm-8 text-4 fw-500">@Model.GetTransferDto.Amount.ToString("F2") @Model.GetTransferDto.CurrencyCode</p>
+                        </div>
 
+                    }
+                    else
+                    {
+                        <div class="row g-3 align-items-center">
+                            <p class="col-sm-4 text-muted text-sm-end fw-500 mb-0 mb-sm-3">Withdrawal:</p>
+                            <p class="col-sm-8 text-4 fw-500">@Model.GetTransferDto.Amount.ToString("F2") @Model.GetTransferDto.CurrencyCode</p>
+
+                        </div>
+                    }
+
+                    
                     <div class="row g-3 align-items-center">
-                        <p class="col-sm-4 text-muted text-sm-end fw-500 mb-0 mb-sm-3">You Send:</p>
-                        <p class="col-sm-8 text-4 fw-500">@Model.GetTransferDto.Amount @Model.GetTransferDto.CurrencyCode</p>
-                    </div>
-                    <div class="row g-3 align-items-center">
-                        <p class="col-sm-4 text-muted text-sm-end mb-0 mb-sm-3">Card:</p>
-                        <p class="col-sm-8 text-4 fw-500">
-                            @Model.GetTransferDto.CardNumber - @Model.GetTransferDto.Card.Currency.CurrencyCode - @Model.GetTransferDto.Card.CardType
-                        </p>
+
+                        <p class="col-sm-4 text-muted text-sm-end mb-0 mb-sm-3">Card No.:</p>
+                        <p class="col-sm-8 text-4 fw-500">@Model.GetTransferDto.CardNumber </p>
+                        <p class="col-sm-4 text-muted text-sm-end mb-0 mb-sm-3">Card Type:</p>
+                        <p class="col-sm-8 text-4 fw-500">@Model.GetTransferDto.Card.CardType </p>
+                        <p class="col-sm-4 text-muted text-sm-end mb-0 mb-sm-3">Card Currency:</p>
+                        <p class="col-sm-8 text-4 fw-500"> @Model.GetTransferDto.Card.Currency.CurrencyCode</p>
+
                     </div>
 
                     <form id="form-send-money" method="post">
-                        <div class="d-grid"><button class="btn btn-primary">Send Money</button></div>
+                        <div class="d-grid"><button class="btn btn-primary">Transfer</button></div>
                     </form>
                     <div></div>
                     <div></div>
