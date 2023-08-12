@@ -23,7 +23,15 @@ namespace Business.Mappers
             CreateMap<UpdateUserDto, User>();
             CreateMap<User, GetUserDto>();
             CreateMap<GetUserDto, User>();
-            
+            CreateMap<GetUpdatedUserDto, GetUserDto>()
+               .ForMember(u => u.Admin, u => u.MapFrom(u => u.IsAdmin))
+               .ForMember(u => u.Blocked, u => u.MapFrom(u => u.IsBlocked));
+
+            CreateMap<GetUserDto,GetUpdatedUserDto>()
+               .ForMember(u => u.IsAdmin, u => u.MapFrom(u => u.Admin))
+               .ForMember(u => u.IsBlocked, u => u.MapFrom(u => u.Blocked));
+
+
 
         }
 

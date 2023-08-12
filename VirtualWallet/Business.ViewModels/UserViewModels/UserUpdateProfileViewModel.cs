@@ -1,4 +1,5 @@
 ﻿using Business.DTOs.Requests;
+using Microsoft.AspNetCore.Http;
 
 namespace Business.ViewModels.UserViewModels
 {
@@ -7,5 +8,6 @@ namespace Business.ViewModels.UserViewModels
         public UpdateUserDto UpdateUserDto { get; set; }
 
         public UserDetailsViewModel DetailsViewModel { get; set; }
+
     }
 }

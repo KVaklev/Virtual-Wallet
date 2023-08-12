@@ -7,7 +7,9 @@
     var isAdmin = User.FindFirst("IsAdmin");
     var isBlocked = User.FindFirst("IsBlocked");
     var username = User.FindFirst(ClaimTypes.Name);
-    }
+    var imagePath = @Url.Content("~/UploadedImages/" + username.Value + ".png");
+    
+}
 
 <script>
     function previewimage() {
@@ -51,16 +53,14 @@
           <!-- Profile Details
           =============================== -->
           <div class="bg-white shadow-sm rounded text-center p-3 mb-4">
-                        <form asp-controller="User" asp-action="ChangeProfilePicture" asp-route-id="@this.Model.DetailsViewModel.User.Id" method="post">
-              <div class="profile-thumb mt-3 mb-4">
-               <img class="rounded-circle" src="@Url.Content("~/UploadedImages/" + username + ".png")" height="110" width="110" alt="" id="ProductImage">
-              <div class="profile-thumb-edit bg-primary text-white" title="Change Profile Picture"> <i class="fas fa-camera position-absolute"></i>
-              <input asp-for = "DetailsViewModel.User.ImageFile" onchange="previewimage()" type="file" class="custom-file-input" id="customFile">
-              </div>
-            </div>
-            <p class="text-3 fw-500 mb-2">Hello, @this.Model.DetailsViewModel.User.Username<br />@DateTime.Now.DayOfWeek, @DateTime.Now.Date.ToShortDateString()</p>
-              <button class="small-button btn-primary" type="submit">Change</button>
-            </form>
+              <form asp-controller="User" asp-action="ChangeProfilePicture" asp-route-id="@this.Model.DetailsViewModel.User.Id" method="post" enctype="multipart/form-data">
+                 <div class="profile-thumb mt-3 mb-4">
+                 <img class="rounded-circle" src="@imagePath" height="110" width="110" alt="" id="ProductImage">
+                 <div class="profile-thumb-edit bg-primary text-white" title="Change Profile Picture"> <i class="fas fa-camera position-absolute"></i>
+                 <input asp-for = "@this.Model.DetailsViewModel.User.ImageFile" onchange="previewimage()" type="file" class="custom-file-input" id="customFile"></div></div>
+                  <p class="text-3 fw-500 mb-2">Hello, @this.Model.DetailsViewModel.User.Username<br />@DateTime.Now.DayOfWeek, @DateTime.Now.Date.ToShortDateString()</p>
+                 <button class="small-button btn-primary" type="submit">Change</button>
+              </form>
           </div>
           <!-- Profile Details End --> 
           

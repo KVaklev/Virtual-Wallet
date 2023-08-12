@@ -250,7 +250,7 @@ namespace VirtualWallet.Controllers.MVC
                 result.Message = userToChangePictureTo.Message;
                 return (IActionResult)result.Data;
             }
-
+           
             return this.RedirectToAction("Profile", "User");
         }
 

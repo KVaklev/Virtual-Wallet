@@ -225,7 +225,7 @@ namespace Business.Services.Models
         {
             var result = new Response<GetUpdatedUserDto>();
            
-            var userToUpdate = await this.GetByIdAsync(id, loggedUser);
+            var userToUpdate = await this.userRepository.GetByIdAsync(id);
             if (userToUpdate == null)
             {
                 result.IsSuccessful = false;
@@ -236,16 +236,21 @@ namespace Business.Services.Models
             if (userDetailsViewModel.User.ImageFile != null)
             {
                 string imageUploadedFolder = Path.Combine(webHostEnvironment.WebRootPath, "UploadedImages");
-                string uniqueFileName = userDetailsViewModel.User.Username + ".png";
+                string username = userToUpdate.Username;
+                string uniqueFileName = username + ".png";
                 string filePath = Path.Combine(imageUploadedFolder, uniqueFileName);
 
                 using (var fileStream = new FileStream(filePath, FileMode.Create))
                 {
                     userDetailsViewModel.User.ImageFile.CopyTo(fileStream);
                 }
-                userToUpdate.Data.ProfilePhotoPath = "~/UploadedImages";
-                userToUpdate.Data.ProfilePhotoFileName = uniqueFileName;
+                userToUpdate.ProfilePhotoPath = "~/UploadedImages";
+                userToUpdate.ProfilePhotoFileName = uniqueFileName;
+                userToUpdate.ImageFile = userDetailsViewModel.User.ImageFile;
             }
+
+            result.Data = mapper.Map<GetUpdatedUserDto>(userToUpdate);
+            await this.userRepository.SaveChangesAsync();
             return result;
         }
 

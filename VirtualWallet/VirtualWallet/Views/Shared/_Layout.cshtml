@@ -1,4 +1,8 @@
-﻿<!DOCTYPE html>
+﻿@{
+    var username = User.FindFirst(ClaimTypes.Name);
+}
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
@@ -110,7 +114,7 @@
           ============================== -->
           @if (User.Claims.Any())
                         {
-                            var username = User.FindFirst(ClaimTypes.Name);
+                            
                             <!-- My Profile
                             ============================== -->
                             <nav class="login-signup navbar navbar-expand">
@@ -128,7 +132,7 @@
                                         </ul>
                                     </li>
                                     <li class="dropdown profile ms-2">
-                                        <a class="px-0 dropdown-toggle" href="#"><img class="rounded-circle" src="@Url.Content("~/UploadedImages/" + username + ".png")" height="30" width="30" alt=""></a>
+                                        <a class="px-0 dropdown-toggle" href="#"><img class="rounded-circle" src="@Url.Content("~/UploadedImages/" + username.Value + ".png")" height="50" width="50" alt="" enctype="multipart/form-data"></a>
                                         <ul class="dropdown-menu">
                                             <li class="text-center text-3 py-2">Hi, @username.Value</li>
                                             <li class="dropdown-divider mx-n3"></li>
