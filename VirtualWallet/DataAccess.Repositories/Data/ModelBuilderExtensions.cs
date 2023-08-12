@@ -1,6 +1,7 @@
 ﻿using DataAccess.Models.Enums;
 using DataAccess.Models.Models;
 using Microsoft.EntityFrameworkCore;
+using System;
 
 namespace DataAccess.Repositories.Data
 {
@@ -11,7 +12,8 @@ namespace DataAccess.Repositories.Data
             var users = new List<User>()
             {
                 new User { Id = 1, FirstName = "Ivan", LastName = "Draganov", Email = "i.draganov@gmail.com", Username = "ivanchoDraganchov",
-                           Password = new byte[] {0x65, 0x23, 0x25, 0x55}, PhoneNumber = "0878558547", AccountId = 1, IsAdmin = true, IsBlocked = false    },
+                          // Address = "", City = "", Country = "", DateOfBirth = DateTime.
+            Password = new byte[] {0x65, 0x23, 0x25, 0x55}, PhoneNumber = "0878558547", AccountId = 1, IsAdmin = true, IsBlocked = false    },
                 new User { Id = 2, FirstName = "Mariq", LastName = "Petrova", Email = "m.petrova@gmail.com", Username = "mariicheto",
                            Password = new byte[] { 0x65, 0x23, 0x25, 0x55 }, PhoneNumber = "0898568569", AccountId = 2, IsAdmin = false, IsBlocked = false },
                 new User { Id = 3, FirstName = "Mara",  LastName = "Dobreva", Email = "m.dobreva@gmail.com", Username = "marcheto",

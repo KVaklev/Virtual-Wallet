@@ -1,4 +1,7 @@
-﻿namespace Business.Services.Helpers
+﻿using Microsoft.AspNetCore.DataProtection;
+using static System.Net.Mime.MediaTypeNames;
+
+namespace Business.Services.Helpers
 {
     public class Constants
     {
@@ -21,6 +24,16 @@
         public const string SuccessfullPromoteddUserMessage = "User was successfully promoted with admin rights.";
         public const string SuccessfullBlockedUserMessage = "User was successfully blocked.";
         public const string SuccessfullUnblockedUserMessage = "User was successfully unblocked.";
+
+        public const string ChangePasswordMessage = "🚀 How to Supercharge Your Password?";
+        public const string ChangePasswordMessageFirst = "1. ** Be a Password Picasso ** : Imagine your password as a unique work of art! @#$%^&*()—create a masterpiece only you can decipher!";
+        public const string ChangePasswordMessageSecond = "2. ** Stretch it Out ** : Think of your password's length as a digital shield. The longer, the better! Aim for a minimum of 8 characters!";
+        public const string ChangePasswordMessageThird = "3. ** Mix & Match, But No Predictable Pairs ** : Play matchmaker with letters, numbers, and symbols. Avoid predictable duos like 'Aa' or '123'. Your password should be as unique as you are!❤️";
+        public const string ChangePasswordMessageFourth = "4. ** Lowercase Love ** : Show some affection to lowercase letters! Sneak them into your password!";
+        public const string ChangePasswordMessageFifth = "5. ** Embrace the Uppercase ** : Give your password a confidence boost with uppercase letters.";
+        public const string ChangePasswordMessageSixth = "6. ** Digits Do the Trick ** : Introduce digits to the party! They add complexity and a touch of mystery to your password, making it a tough nut to crack!";
+        public const string ChangePasswordMessageSeventh = "7. ** The Special Ingredient ** : Don't forget to sprinkle in special characters! They make your password unbreakable! Choose from characters like !@#$%^&*() to keep things interesting.";
+        public const string ChangePasswordMessageEight = "8. ** Stay Original, Stay Safe ** : Avoid clichés like 'password123'. Password is your ultimate secret weapon!";
 
         //Constant messages for account
 

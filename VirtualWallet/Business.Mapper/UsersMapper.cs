@@ -23,7 +23,15 @@ namespace Business.Mappers
             CreateMap<UpdateUserDto, User>();
             CreateMap<User, GetUserDto>();
             CreateMap<GetUserDto, User>();
-            
+            CreateMap<GetUpdatedUserDto, GetUserDto>()
+               .ForMember(u => u.Admin, u => u.MapFrom(u => u.IsAdmin))
+               .ForMember(u => u.Blocked, u => u.MapFrom(u => u.IsBlocked));
+
+            CreateMap<GetUserDto,GetUpdatedUserDto>()
+               .ForMember(u => u.IsAdmin, u => u.MapFrom(u => u.Admin))
+               .ForMember(u => u.IsBlocked, u => u.MapFrom(u => u.Blocked));
+
+
 
         }
 
@@ -42,6 +50,10 @@ namespace Business.Mappers
             userToUpdate.PhoneNumber = updateUserDto.PhoneNumber ?? userToUpdate.PhoneNumber;
             userToUpdate.FirstName = updateUserDto.FirstName ?? userToUpdate.FirstName;
             userToUpdate.LastName = updateUserDto.LastName ?? userToUpdate.LastName;
+            userToUpdate.Address = updateUserDto?.Address ?? userToUpdate.Address;
+            userToUpdate.City = updateUserDto?.City ?? userToUpdate.City;
+            userToUpdate.Country = updateUserDto?.Country ?? userToUpdate.Country;
+            userToUpdate.DateOfBirth = updateUserDto?.DateOfBirth ?? userToUpdate.DateOfBirth;
 
             return userToUpdate;
         }

@@ -18,6 +18,7 @@ namespace Business.Services.Contracts
         Task<Response<GetCreatedUserDto>> CreateAsync(CreateUserModel createUserDto);
         Task<Response<GetUpdatedUserDto>> UpdateAsync(int id, UpdateUserDto updateUserDto, User loggedUser);
         Task<Response<bool>> ChangeStatusAsync(int id, UserDetailsViewModel userDetailsViewModel, User loggedUser);
+        Task<Response<GetUpdatedUserDto>> ChangeProfilePictureAsync(int id, UserDetailsViewModel userDetailsViewModel, User loggedUser);
         Task<Response<bool>> DeleteAsync(int id, User loggedUser);
         Task<Response<GetUserDto>> PromoteAsync(int id, User loggedUser);
         Task<Response<GetUserDto>> BlockUserAsync(int id, User loggedUser);

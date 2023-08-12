@@ -52,14 +52,15 @@ namespace VirtualWallet.Controllers.MVC
                     return await EntityErrorViewAsync(loggedUser.Message);
                 }
 
-
-                var result = await this.transactionService.FilterByAsync(parameters, loggedUser.Data);
+            
+            var result = await this.transactionService.FilterByAsync(parameters, loggedUser.Data);
             if (!result.IsSuccessful)
             {
                 return await EntityErrorViewAsync(result.Message);
             }
             var indexTransactionViewModel = new IndexTransactionViewModel();
             indexTransactionViewModel.TransactionDtos = result.Data;
+            indexTransactionViewModel.TransactionQueryParameters = parameters;
             return View(indexTransactionViewModel);
  
         }
@@ -131,12 +132,12 @@ namespace VirtualWallet.Controllers.MVC
         }
 
         [HttpPost]
-        public async Task<IActionResult> Update([FromRoute] int id, CreateTransactionViewModel transactionDto)
+        public async Task<IActionResult> Update([FromRoute] int id, CreateTransactionViewModel createTransactionViewModel)
         {
             
                 if (!this.ModelState.IsValid)
                 {
-                    return View(transactionDto);
+                    return View(createTransactionViewModel);
                 }
 
                 var loggedUserResult = await FindLoggedUserAsync();
@@ -148,7 +149,7 @@ namespace VirtualWallet.Controllers.MVC
                 var result = await this.transactionService.UpdateAsync(
                             id, 
                             loggedUserResult.Data, 
-                            transactionDto.CreateTransactionDto);
+                            createTransactionViewModel.CreateTransactionDto);
                 if (!result.IsSuccessful)
                 {
                     return await EntityErrorViewAsync(result.Message);

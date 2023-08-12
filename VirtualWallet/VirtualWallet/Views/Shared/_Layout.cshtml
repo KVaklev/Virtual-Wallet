@@ -1,4 +1,8 @@
-﻿<!DOCTYPE html>
+﻿@{
+    var username = User.FindFirst(ClaimTypes.Name);
+}
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
@@ -66,9 +70,9 @@
                   <li class="dropdown active">
                       <a class="dropdown-toggle" href="#">Account</a>
                       <ul class="dropdown-menu">
-                          <li class="dropdown"><a asp-controller="User" asp-action="Profile" class="dropdown-item">My Profile</a></li>
-                          <li class="dropdown"><a asp-controller="User" asp-action="Security" class="dropdown-item">Security</a></li>
-                          <li class="dropdown"><a asp-controller="User" asp-action="Payment" class="dropdown-item">Payment Methods</a></li>
+                          <li class="dropdown"><a asp-controller="User" asp-action="Profile" asp-route-id="@User.FindFirst(ClaimTypes.NameIdentifier)"class="dropdown-item">My Profile</a></li>
+                          <li class="dropdown"><a asp-controller="User" asp-action="ChangePassword" class="dropdown-item">Security</a></li>
+                          <li class="dropdown"><a asp-controller="Card" asp-action="Add" class="dropdown-item">Payment Methods</a></li>
                       </ul>
                   </li>
                   <li class="dropdown active">
@@ -110,7 +114,7 @@
           ============================== -->
           @if (User.Claims.Any())
                         {
-                            var username = User.FindFirst(ClaimTypes.Name);
+                            
                             <!-- My Profile
                             ============================== -->
                             <nav class="login-signup navbar navbar-expand">
@@ -128,13 +132,13 @@
                                         </ul>
                                     </li>
                                     <li class="dropdown profile ms-2">
-                                        <a class="px-0 dropdown-toggle" href="#"><img class="rounded-circle" src="~/images/profile-thumb-sm.jpg" alt=""></a>
+                                        <a class="px-0 dropdown-toggle" href="#"><img class="rounded-circle" src="@Url.Content("~/UploadedImages/" + username.Value + ".png")" height="50" width="50" alt="" enctype="multipart/form-data"></a>
                                         <ul class="dropdown-menu">
                                             <li class="text-center text-3 py-2">Hi, @username.Value</li>
                                             <li class="dropdown-divider mx-n3"></li>
-                                            <li><a asp-controller="Account" asp-action="Logout" class="dropdown-item"><i class="fas fa-user"></i>My Profile</a></li>
-                                            <li><a asp-controller="Account" asp-action="Logout" class="dropdown-item"><i class="fas fa-shield-alt"></i>Security</a></li>
-                                            <li><a asp-controller="Account" asp-action="Logout" class="dropdown-item"><i class="fas fa-credit-card"></i>Payment Methods</a></li>
+                                            <li><a asp-controller="User" asp-action="Profile" asp-route-id="@User.FindFirst(ClaimTypes.NameIdentifier)" class="dropdown-item"><i class="fas fa-user"></i>My Profile</a></li>
+                                            <li><a asp-controller="User" asp-action="ChangePassword" class="dropdown-item"><i class="fas fa-shield-alt"></i>Security</a></li>
+                                            <li><a asp-controller="Card" asp-action="Add" class="dropdown-item"><i class="fas fa-credit-card"></i>Payment Methods</a></li>
                                             <li class="dropdown-divider mx-n3"></li>
                                             <li><a asp-controller="Account" asp-action="Logout" class="dropdown-item" ><i class="fas fa-sign-out-alt"></i>Sign Out</a></li>
                                         </ul>

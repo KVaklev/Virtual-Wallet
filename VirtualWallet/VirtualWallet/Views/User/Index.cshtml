@@ -8,6 +8,7 @@
     var isBlocked = User.FindFirst("IsBlocked");
     var isLogged = false;
     if (User.Claims.Any()) { isLogged = true; };
+    var loggedUserImagePath = @Url.Content("~/UploadedImages/" + username.Value + ".png");
 }
 
 <style>
@@ -43,7 +44,7 @@
                     <aside class="col-lg-3">
                     <div class="bg-white shadow-sm rounded text-center p-3 mb-4">
                         <div class="profile-thumb mt-3 mb-4">
-                                <img class= "center rounded-circle" src="~/images/profile-thumb-sm.jpg" alt="" style="width: 110px; height: 110px;">
+                                <img class="center rounded-circle" src="@loggedUserImagePath" height="30" width="30" alt="" style="width: 110px; height: 110px;" enctype="multipart/form-data">
                                 <p class="text-black opacity-12 mb-4">
                                     Hello, <b>@username.Value</b>! <br>
                                  @DateTime.Now.DayOfWeek, @DateTime.Now.Date.ToShortDateString()<p>
@@ -82,12 +83,13 @@
                                 @for (int i = 0; i < @Model.Users.Data.Count; i++)
                                 {
                                     var currentUser = @Model.Users.Data[i];
+                                    var currentUserImagePath = @Url.Content("~/UploadedImages/" + currentUser.Username + ".png");
                                     <div class="col-lg-12">
                                         <div class="transaction-list">
                                             <div class="transaction-item px-2 py-2" data-bs-toggle="modal" data-bs-target="#transaction-detail">
                                                 <div class="row d-flex align-items-center flex-row bg-white">
                                                     <div class="col-2 col-sm-1">
-                                                        <img src="~/images/profile-thumb-sm.jpg" class="rounded-circle" alt="">
+                                                        <img src="@currentUserImagePath" height="50" width="50" class="rounded-circle" alt="" enctype="multipart/form-data">
                                                     </div> 
                                                     <div class="col-4 col-sm-4">
                                                         <span class="d-block text-2 mt-2">@currentUser.FirstName @currentUser.LastName / <b>@currentUser.Username</b></span>
@@ -161,14 +163,14 @@
                                 <form class="bg-white shadow-sm rounded p-4 mb-5 col-sm-6 col-md-5">
                                     <div class="row">
                                         <div class="col-md-5 mb-2">
-                                            <input type="text" name="Username" placeholder="Username" class="form-control" style="height: 40px; max-width: 350px;" />
+                                            <input type="text" name="Username" placeholder="Username" class="form-control" style="height: 40px; max-width: 330px;" />
                                         </div>
                                         <div class="col-md-5">
                                             <input type="submit" value="Search" class="btn-sm btn-primary btn-block" onclick="toggleUserResults()" />
                                         </div>
                                     </div>
-                                    <input type="text" name="Email" placeholder="Email" class="form-control mb-2" style="height: 40px; max-width: 350px;" />
-                                    <input type="text" name="PhoneNumber" placeholder="Phone number" class="form-control mb-2" style="height: 40px; max-width: 350px;" />
+                                    <input type="text" name="Email" placeholder="Email" class="form-control mb-2" style="height: 40px; max-width: 330px;" />
+                                    <input type="text" name="PhoneNumber" placeholder="Phone number" class="form-control mb-2" style="height: 40px; max-width: 330px;" />
                                 </form>
                                   </div>
                             </div>
@@ -184,11 +186,12 @@
                                     @for (int i = 0; i < @Model.Users.Data.Count; i++)
                                     {
                                         var currentUser = @Model.Users.Data[i];
-                                        <div class="col-lg-12 mt-4">
+                                        var currentUserImagePath = @Url.Content("~/UploadedImages/" + currentUser.Username + ".png");
+                                        <div class="col-lg-8 mt-4">
                                             <div class="transaction-list">
                                                 <div class="transaction-item px-6 py-6" data-bs-toggle="modal" data-bs-target="#transaction-detail">
                                                     <div class="row d-flex align-items-center flex-row">
-                                                        <div class="col-2 col-sm-3"><img src="~/images/profile-thumb-sm.jpg" class="rounded-circle" src="~/images/profile-thumb-sm.jpg" alt=""></div>
+                                                        <div class="col-5 col-sm-3"><img src="@currentUserImagePath" height="110" width="110" class="rounded-circle" alt="" enctype="multipart/form-data"></div>
                                                         <div class="col-12 col-sm-8 col-md-6">
                                                             <div class="d-flex flex-column">
                                                                 <span class="text-3">@currentUser.FirstName @currentUser.LastName / <b>@currentUser.Username</b></span>

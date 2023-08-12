@@ -10,6 +10,7 @@
       {"FromDate", Model.TransactionQueryParameters.FromDate},
       {"ToDate", Model.TransactionQueryParameters.ToDate},
       {"Direction", Model.TransactionQueryParameters.Direction},
+      {"SortBy", Model.TransactionQueryParameters.SortBy},
  };
 
 }
@@ -49,22 +50,23 @@
 
                         <div class="row g-3">
                             <div class="col-6 col-md-3">
-                                <input type="date" name="FromDate" class="form-control" required placeholder="From Date">
+                                <input type="date" name="FromDate" value="FromDate" class="form-control" placeholder="">
                             </div>
                             <div class="col-6 col-md-3">
-                                <input type="date" name="ToDate" class="form-control"  required placeholder="To Date">
+                                <input type="date" name="ToDate" value="ToDate" class="form-control" placeholder="">
                             </div>
                             <div class="col-6 col-md-3">
-                                <input type="text" name="RecipientUsername" class="form-control"  required placeholder="Username">
+                                <input type="text" name="RecipientUsername" class="form-control" placeholder="Username">
                             </div>
                             <div class="col-6 col-md-3">
-                                <input type="submit" class="btn btn-primary shadow-none">Filter</a>
+                                <button type="submit" class="btn btn-primary shadow-none">Filter</button>
                             </div>
                         </div>
                         
 
                         <!-- All Filters Link
                         ========================= -->
+                        <div><span style="margin-right:15%"></div>
                         <div class="col-auto d-flex align-items-center me-auto form-group" data-bs-toggle="collapse"> <a class="btn-link" data-bs-toggle="collapse" href="#allFilters" aria-expanded="false" aria-controls="allFilters">All Filters<i class="fas fa-sliders-h text-3 ms-1"></i></a> </div>
 
                        
@@ -72,22 +74,24 @@
                         <!-- All Filters collapse
                         ================================ -->
                         <div class="col-12 collapse" id="allFilters">
+                           
                             <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" id="allTransactions" name="Direction" checked>
-                                <label class="form-check-label" for="allTransactions">All Money Operations</label>
-                            </div>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" value="@DirectionType.In" id="paymentsSend" name="Direction">
+                                <input class="form-check-input" type="radio" value="@DirectionType.Out" id="paymentsSend" name="Direction">
                                 <label class="form-check-label" for="paymentsSend">Payments Send</label>
                             </div>
                             <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" value="@DirectionType.Out" id="paymentsReceived" name="Direction">
+                                <input class="form-check-input" type="radio" value="@DirectionType.In" id="paymentsReceived" name="Direction">
                                 <label class="form-check-label" for="paymentsReceived">Payments Received</label>
                             </div>
-
+                            <label class="form-check-label" for="paymentsReceived">
+                                &nbsp; &nbsp; Sort by (Asc):  &nbsp;</lable>
                             <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" value="@DirectionType.Out" id="paymentsReceived" name="Direction">
-                                <label class="form-check-label" for="paymentsReceived">Payments Received</label>
+                                    <input class="form-check-input" type="radio" value="@SortCriteria.Date" id="paymentsReceived" name="SortBy">
+                                <label class="form-check-label" for="paymentsReceived">Date</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" value="@SortCriteria.Amount" id="paymentsReceived" name="SortBy">
+                                <label class="form-check-label" for="paymentsReceived">Amount</label>
                             </div>
                         </div>
                         <!-- All Filters collapse End -->
@@ -120,12 +124,11 @@
                     <div class="transaction-item px-4 py-3" data-bs-toggle="modal" data-bs-target="#transaction-detail">
                         <div class="row align-items-center flex-row">
                             @{
-                                string dateString = transaction.Date.ToString();
-                                DateTime dateTimeValue = DateTime.ParseExact(dateString, "M/d/yyyy h:mm:ss tt", CultureInfo.InvariantCulture);
-                                string formattedDay = dateTimeValue.ToString("dd");
-                                string formattedMonth = dateTimeValue.ToString("MMM").ToUpper();
+                                
+                                var day = transaction.Date.Day.ToString();
+                                var month = transaction.Date.ToString("MMM").ToUpper(); 
 
-                                <div class="col-2 col-sm-1 text-center"> <span class="d-block text-4 fw-300">@formattedDay</span> <span class="d-block text-1 fw-300 text-uppercase">@formattedMonth</span> </div>
+                                <div class="col-2 col-sm-1 text-center"> <span class="d-block text-4 fw-300">@day</span> <span class="d-block text-1 fw-300 text-uppercase">@month</span> </div>
                                 <div class="col col-sm-7"> <span class="d-block text-4">@transaction.RecipientUsername </span>
                                 @if (transaction.Description==DirectionType.Out.ToString())
                                     {
@@ -158,11 +161,11 @@
                                 }
                                 @if (transaction.Direction == DirectionType.In.ToString())
                                 {
-                                    <div class="col-3 col-sm-2 text-end text-4"> <span class="text-nowrap">+$@transaction.Amount</span> <span class="text-2 text-uppercase">(@transaction.CurrencyCode)</span> </div>
+                                    <div class="col-3 col-sm-2 text-end text-4"> <span class="text-nowrap">+ @transaction.Amount</span> <span class="text-2 text-uppercase">(@transaction.CurrencyCode)</span> </div>
                                 }
                                 else
                                 {
-                                    <div class="col-3 col-sm-2 text-end text-4"> <span class="text-nowrap">-$@transaction.Amount</span> <span class="text-2 text-uppercase">(@transaction.CurrencyCode)</span> </div>
+                                    <div class="col-3 col-sm-2 text-end text-4"> <span class="text-nowrap">- @transaction.Amount</span> <span class="text-2 text-uppercase">(@transaction.CurrencyCode)</span> </div>
                                 }
                             }
                         </div>

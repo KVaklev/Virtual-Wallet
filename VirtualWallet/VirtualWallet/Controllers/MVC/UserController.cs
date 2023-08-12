@@ -1,10 +1,16 @@
-﻿using Business.QueryParameters;
+﻿using AutoMapper;
+using Business.DTOs.Requests;
+using Business.Exceptions;
+using Business.QueryParameters;
 using Business.Services.Contracts;
 using Business.ViewModels.UserViewModels;
 using DataAccess.Models.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors.Infrastructure;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using System.Text;
 
 namespace VirtualWallet.Controllers.MVC
 {
@@ -13,6 +19,7 @@ namespace VirtualWallet.Controllers.MVC
     {
         private readonly IUserService userService;
         private readonly ICardService cardService;
+
         public UserController(IUserService userService, ICardService cardService)
         {
             this.userService = userService;
@@ -24,7 +31,6 @@ namespace VirtualWallet.Controllers.MVC
         {
 
             var result = await this.userService.FilterByAsync(userQueryParameters);
-
             if (!result.IsSuccessful)
             {
                 this.ModelState.AddModelError(result.Error.InvalidPropertyName, result.Message);
@@ -44,6 +50,7 @@ namespace VirtualWallet.Controllers.MVC
         public async Task<IActionResult> Details([FromRoute] int id)
         {
             var result = new Response<UserDetailsViewModel>();
+           
             var loggedUserResult = await FindLoggedUserAsync();
 			if (!loggedUserResult.IsSuccessful)
 			{
@@ -67,6 +74,7 @@ namespace VirtualWallet.Controllers.MVC
         public async Task<IActionResult> Edit([FromRoute] int id)
         {
             var result = new Response<UserDetailsViewModel>();
+
             var loggedUserResult = await FindLoggedUserAsync();
             if (!loggedUserResult.IsSuccessful)
             {
@@ -76,22 +84,16 @@ namespace VirtualWallet.Controllers.MVC
             }
 
             var user = await this.userService.GetByIdAsync(id, loggedUserResult.Data);
-
-            var cardsResult = this.cardService.GetByAccountId(id);
-            var userDetailsViewModel = new UserDetailsViewModel
-            {
-                User = user.Data,
-                Cards = (!cardsResult.IsSuccessful) ? 0 : cardsResult.Data.Count()
-            };
+            var userDetailsViewModel = new UserDetailsViewModel {  User = user.Data  };
 
             return this.View(userDetailsViewModel);
-
         }
 
         [HttpPost]
         public async Task<IActionResult> Edit([FromRoute] int id, UserDetailsViewModel userDetailsViewModel)
         {
             var result = new Response<UserDetailsViewModel>();
+           
             var loggedUserResult = await FindLoggedUserAsync();
             if (!loggedUserResult.IsSuccessful)
             {
@@ -107,6 +109,7 @@ namespace VirtualWallet.Controllers.MVC
                 result.Message = loggedUserResult.Message;
                 return (IActionResult)result.Data;
             }
+
             return this.RedirectToAction("Index", "User");
             
         }
@@ -115,6 +118,7 @@ namespace VirtualWallet.Controllers.MVC
         public async Task<IActionResult> Delete([FromRoute] int id)
         {
             var result = new Response<UserDetailsViewModel>();
+            
             var loggedUserResult = await FindLoggedUserAsync();
             if (!loggedUserResult.IsSuccessful)
             {
@@ -124,15 +128,9 @@ namespace VirtualWallet.Controllers.MVC
             }
 
             var user = await this.userService.GetByIdAsync(id, loggedUserResult.Data);
-            var cardsResult = this.cardService.GetByAccountId(id);
-            var userDetailsViewModel = new UserDetailsViewModel
-            {
-                User = user.Data,
-                Cards = (!cardsResult.IsSuccessful) ? 0 : cardsResult.Data.Count()
-            };
+            var userDetailsViewModel = new UserDetailsViewModel { User = user.Data };
 
             return this.View(userDetailsViewModel);
-
         }
 
         [HttpPost, ActionName("Delete")]
@@ -156,8 +154,157 @@ namespace VirtualWallet.Controllers.MVC
                 return (IActionResult)result.Data;
             }
             return this.RedirectToAction("Index", "User");
+
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Profile()
+        {
+            var result = new Response<UserDetailsViewModel>();
+
+            var loggedUserResult = await FindLoggedUserAsync();
+            if (!loggedUserResult.IsSuccessful)
+            {
+                result.IsSuccessful = false;
+                result.Message = loggedUserResult.Message;
+                return (IActionResult)result.Data;
+            }
+
+            var user = await this.userService.GetByIdAsync(loggedUserResult.Data.Id, loggedUserResult.Data);
+            var userUpdatePersonalProfileViewModel = new UserUpdateProfileViewModel()
+            {
+                DetailsViewModel = new UserDetailsViewModel()
+            };
+            userUpdatePersonalProfileViewModel.DetailsViewModel.User = user.Data;
+
+
+            return this.View(userUpdatePersonalProfileViewModel);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Profile(UserUpdateProfileViewModel userUpdateProfileViewModel)
+        {
+
+            var result = new Response<UserUpdateProfileViewModel>();
+            var loggedUserResult = await FindLoggedUserAsync();
+            if (!loggedUserResult.IsSuccessful)
+            {
+                result.IsSuccessful = false;
+                result.Message = loggedUserResult.Message;
+                return (IActionResult)result.Data;
+            }
+
+            var userToUpdate = await this.userService.UpdateAsync(loggedUserResult.Data.Id, userUpdateProfileViewModel.UpdateUserDto, loggedUserResult.Data);
+
+            if (!userToUpdate.IsSuccessful)
+            {
+                result.IsSuccessful = false;
+                result.Message = userToUpdate.Message;
+                return (IActionResult)result.Data;
+            }
+
+            return this.RedirectToAction("Profile", "User");
             
         }
+
+        [HttpGet]
+        public async Task<IActionResult> ChangeProfilePicture()
+        {
+            var result = new Response<UserDetailsViewModel>();
+
+            var loggedUserResult = await FindLoggedUserAsync();
+            if (!loggedUserResult.IsSuccessful)
+            {
+                result.IsSuccessful = false;
+                result.Message = loggedUserResult.Message;
+                return (IActionResult)result.Data;
+            }
+
+            var user = await this.userService.GetByIdAsync(loggedUserResult.Data.Id, loggedUserResult.Data);
+            var userUpdatePersonalProfileViewModel = new UserUpdateProfileViewModel()
+            {
+                DetailsViewModel = new UserDetailsViewModel()
+            };
+            userUpdatePersonalProfileViewModel.DetailsViewModel.User = user.Data;
+
+
+            return this.View(userUpdatePersonalProfileViewModel);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ChangeProfilePicture(UserUpdateProfileViewModel userUpdateProfileViewModel)
+        {
+            var result = new Response<UserDetailsViewModel>();
+            var loggedUserResult = await FindLoggedUserAsync();
+            if (!loggedUserResult.IsSuccessful)
+            {
+                result.IsSuccessful = false;
+                result.Message = loggedUserResult.Message;
+                return (IActionResult)result.Data;
+            }
+            
+            var userToChangePictureTo = await this.userService.ChangeProfilePictureAsync(loggedUserResult.Data.Id, userUpdateProfileViewModel.DetailsViewModel, loggedUserResult.Data);
+            if (!userToChangePictureTo.IsSuccessful)
+            {
+                result.IsSuccessful = false;
+                result.Message = userToChangePictureTo.Message;
+                return (IActionResult)result.Data;
+            }
+           
+            return this.RedirectToAction("Profile", "User");
+        }
+
+
+        [HttpGet]
+        public async Task<IActionResult> ChangePassword()
+        {
+            var result = new Response<UserDetailsViewModel>();
+
+            var loggedUserResult = await FindLoggedUserAsync();
+            if (!loggedUserResult.IsSuccessful)
+            {
+                result.IsSuccessful = false;
+                result.Message = loggedUserResult.Message;
+                return (IActionResult)result.Data;
+            }
+
+            var user = await this.userService.GetByIdAsync(loggedUserResult.Data.Id, loggedUserResult.Data);
+            var userUpdatePersonalProfileViewModel = new UserUpdateProfileViewModel()
+            {
+                DetailsViewModel = new UserDetailsViewModel()
+            };
+            userUpdatePersonalProfileViewModel.DetailsViewModel.User = user.Data;
+
+
+            return this.View(userUpdatePersonalProfileViewModel);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ChangePassword(UserUpdateProfileViewModel userUpdateProfileViewModel)
+        {
+
+            var result = new Response<UserUpdateProfileViewModel>();
+            var loggedUserResult = await FindLoggedUserAsync();
+            if (!loggedUserResult.IsSuccessful)
+            {
+                result.IsSuccessful = false;
+                result.Message = loggedUserResult.Message;
+                return (IActionResult)result.Data;
+            }
+
+            var userToUpdate = await this.userService.UpdateAsync(loggedUserResult.Data.Id, userUpdateProfileViewModel.UpdateUserDto, loggedUserResult.Data);
+
+            if (!userToUpdate.IsSuccessful)
+            {
+                result.IsSuccessful = false;
+                result.Message = userToUpdate.Message;
+                return (IActionResult)result.Data;
+            }
+
+            return this.RedirectToAction("ChangePassword", "User");
+
+        }
+
         private async Task<Response<User>> FindLoggedUserAsync()
 		{
 			var loggedUsersUsername = User.FindFirst(ClaimTypes.Name);
