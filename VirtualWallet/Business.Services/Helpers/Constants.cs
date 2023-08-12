@@ -25,6 +25,8 @@ namespace Business.Services.Helpers
         public const string SuccessfullBlockedUserMessage = "User was successfully blocked.";
         public const string SuccessfullUnblockedUserMessage = "User was successfully unblocked.";
 
+        //Constant message for Security menu
+
         public const string ChangePasswordMessage = "🚀 How to Supercharge Your Password?";
         public const string ChangePasswordMessageFirst = "1. ** Be a Password Picasso ** : Imagine your password as a unique work of art! @#$%^&*()—create a masterpiece only you can decipher!";
         public const string ChangePasswordMessageSecond = "2. ** Stretch it Out ** : Think of your password's length as a digital shield. The longer, the better! Aim for a minimum of 8 characters!";
@@ -35,6 +37,11 @@ namespace Business.Services.Helpers
         public const string ChangePasswordMessageSeventh = "7. ** The Special Ingredient ** : Don't forget to sprinkle in special characters! They make your password unbreakable! Choose from characters like !@#$%^&*() to keep things interesting.";
         public const string ChangePasswordMessageEight = "8. ** Stay Original, Stay Safe ** : Avoid clichés like 'password123'. Password is your ultimate secret weapon!";
 
+        //Constant messages for Terms of Use and Privacy Policy
+
+        public const string TermsOfUseMessageFirst = "🌟 These Terms of Use (\"Terms\") govern your access to and use of this web application (the \"Service\") powered by a team of brilliant minds (\"we,\" \"us,\" or \"our\") who have come together to create a seamless experience for you. By using the Service, you agree to be bound by these Terms.";
+        public const string TermsOfUseMessageSecond = "By engaging with the Service, you enter into a partnership with us, entrusting your financial well-being to a team that's dedicated to your success. These Terms encapsulate our commitment to your privacy, security, and satisfaction. Your agreement to these Terms is not only a legal obligation but a pact between you and the brilliant minds behind this application.";
+        public const string TermsOfUseMessageThird = "In your hands, you hold more than an app; you hold a gateway to financial empowerment, convenience, and peace of mind. Welcome to our digital ecosystem—your Virtual Wallet—where your financial aspirations take center stage!🌟";
         //Constant messages for account
 
         public const string NoAccountsErrorMessage = "No accounts are found.";

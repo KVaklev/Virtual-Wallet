@@ -39,7 +39,6 @@ namespace Business.Services.Models
             }
             catch (Exception)
             {
-
                 throw new InvalidOperationException(Constants.InvalidSendEmailOperation);
             }
             finally

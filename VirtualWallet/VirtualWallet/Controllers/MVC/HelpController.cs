@@ -6,16 +6,21 @@ namespace VirtualWallet.Controllers.MVC
     [AllowAnonymous]
     public class HelpController : Controller
     {
-        [Route("/AboutUs")]
+        
         [HttpGet]
         public IActionResult AboutUs()
         {
             return View();
         }
 
-        [Route("/FAQ")]
         [HttpGet]
         public IActionResult FAQ()
+        {
+            return View();
+        }
+
+        [HttpGet]
+        public IActionResult PrivacyPolicyAndTermsOfUse()
         {
             return View();
         }
