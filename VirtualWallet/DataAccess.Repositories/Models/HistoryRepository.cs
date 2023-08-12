@@ -27,6 +27,7 @@ namespace DataAccess.Repositories.Models
                 .ThenInclude(c => c.Currency)
                 .Include(ac=>ac.Account)
                 .ThenInclude(u=>u.User)
+                .OrderByDescending(d=>d.EventTime)
                 .FirstOrDefaultAsync(h => h.Id == id);
 
             return history;
@@ -39,7 +40,7 @@ namespace DataAccess.Repositories.Models
             return history;
         }
 
-        public IQueryable<History> GetAll(User loggedUser)
+        public IQueryable<History> GetAll()
         {
             IQueryable<History> result = context.History
                 .Include(tr => tr.Transaction)
@@ -49,10 +50,6 @@ namespace DataAccess.Repositories.Models
                 .Include(ac => ac.Account)
                 .ThenInclude(u => u.User);
 
-            if (!loggedUser.IsAdmin)
-            { 
-                result = result.Where(t => t.AccountId==loggedUser.AccountId);//TODO
-            }
             return result;
         }
 

@@ -1,9 +1,11 @@
 ﻿using Business.DTOs.Requests;
 using Business.Services.Contracts;
 using Business.Services.Helpers;
+using Business.Services.Models;
 using DataAccess.Repositories.Contracts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Text.Json;
 
 namespace VirtualWallet.Controllers.MVC
 {
@@ -15,17 +17,20 @@ namespace VirtualWallet.Controllers.MVC
         private readonly IAccountService accountService;
         private readonly IUserRepository userRepository;
         private readonly IEmailService emailService;
+        private readonly ICurrencyService currencyService;
 
         public AccountController(
             IUserService userService,
             IAccountService accountService,
             IUserRepository userRepository,
-            IEmailService emailService)
+            IEmailService emailService,
+            ICurrencyService currencyService)
         {
             this.userService = userService;
             this.accountService = accountService;
             this.userRepository = userRepository;
             this.emailService = emailService;
+            this.currencyService = currencyService;
         }
 
         [HttpGet("login")]
@@ -81,7 +86,12 @@ namespace VirtualWallet.Controllers.MVC
         public IActionResult Register()
         {
             var createUserModel = new CreateUserModel();
-
+            var currencyResult = this.currencyService.GetAll();
+            if (!currencyResult.IsSuccessful)
+            {
+                return this.View("Error");
+            }
+            TempData["Currencies"] = JsonSerializer.Serialize(currencyResult.Data);
             return this.View(createUserModel);
         }
 

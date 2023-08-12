@@ -62,6 +62,7 @@ namespace DataAccess.Repositories.Models
                 .Include(r => r.AccountRecipient)
                 .ThenInclude(u =>u.User)
                 .Include(c => c.Currency)
+                .OrderByDescending(d=>d.Date)
                 .AsQueryable();
 
             return result;

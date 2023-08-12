@@ -57,7 +57,7 @@ namespace Business.Services.Models
                 return result;
             }
                         
-            IQueryable<History> historyRecords = this.historyRepository.GetAll(loggedUser);
+            IQueryable<History> historyRecords = this.historyRepository.GetAll();
 
             historyRecords = await FilterByUsernameAsync(historyRecords, filterParameters.Username);
             historyRecords = await FilterByFromDataAsync(historyRecords, filterParameters.FromDate);
@@ -73,6 +73,13 @@ namespace Business.Services.Models
                return result;
             }
 
+            if (!loggedUser.IsAdmin)
+            {
+                historyRecords = historyRecords
+                    .Where(u => u.AccountId == loggedUser.AccountId)
+                    .AsQueryable();
+            }
+            
             var resultDto = historyRecords
                              .Select(history => HistoryMapper.MapHistoryToDtoAsync(history)) 
                              .ToList();

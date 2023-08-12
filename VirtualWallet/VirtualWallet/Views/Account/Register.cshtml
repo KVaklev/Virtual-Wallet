@@ -2,6 +2,7 @@
 
 @{
     this.ViewData["Title"] = "Speed Pay - Registration";
+    var currencies = JsonSerializer.Deserialize<List<Currency>>(TempData.Peek("Currencies").ToString());
 }
 
 <!-- Content
@@ -37,7 +38,18 @@
                         </div>
                         <div class="mb-3">
                             <label asp-for="CurrencyCode" class="form-label">Currency</label>
-                            <input asp-for="CurrencyCode" type="text" class="form-control" required placeholder="Enter Password">
+                            <select asp-for="CurrencyCode" id="youSendCurrency" data-style="form-select bg-transparent border-0" data-container="body" data-live-search="true" class="selectpicker form-control bg-transparent" required="">
+                                <optgroup label="Popular Currency">
+                                    @foreach (var currency in currencies)
+                                    {
+
+                                        <option data-icon="currency-flag currency-flag-inr me-1" data-subtext="@currency.Name " value="@currency.CurrencyCode">@currency.CurrencyCode @currency.Name</option>
+
+                                    }
+                                </optgroup>
+                            </select>
+                            
+                            
                             <span asp-validation-for="CurrencyCode" class="form-error text-danger"></span>
                         </div>
                         <div class="d-grid mt-4 mb-3"><button class="btn btn-primary" type="submit">Sign Up</button></div>
