@@ -161,11 +161,11 @@
                                 }
                                 @if (transaction.Direction == DirectionType.In.ToString())
                                 {
-                                    <div class="col-3 col-sm-2 text-end text-4"> <span class="text-nowrap">+@transaction.Amount</span> <span class="text-2 text-uppercase">(@transaction.CurrencyCode)</span> </div>
+                                    <div class="col-3 col-sm-2 text-end text-4"> <span class="text-nowrap">+ @transaction.Amount</span> <span class="text-2 text-uppercase">(@transaction.CurrencyCode)</span> </div>
                                 }
                                 else
                                 {
-                                    <div class="col-3 col-sm-2 text-end text-4"> <span class="text-nowrap">-@transaction.Amount</span> <span class="text-2 text-uppercase">(@transaction.CurrencyCode)</span> </div>
+                                    <div class="col-3 col-sm-2 text-end text-4"> <span class="text-nowrap">- @transaction.Amount</span> <span class="text-2 text-uppercase">(@transaction.CurrencyCode)</span> </div>
                                 }
                             }
                         </div>
