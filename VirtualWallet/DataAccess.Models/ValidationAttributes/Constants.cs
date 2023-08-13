@@ -10,6 +10,9 @@ namespace DataAccess.Models.ValidationAttributes
         public const int UsernameMinLength = 2;
         public const int UsernameMaxLength = 20;
         public const int PhoneNumberLength = 10;
+        public const int AddressMaxLength = 150;
+        public const int CountryMaxLength = 25;
+        public const int CityMaxLength = 85;
 
         //Constants for cards
 
@@ -53,6 +56,7 @@ namespace DataAccess.Models.ValidationAttributes
         public const string UserWithIdDoesntExistErrorMessage = "User with this ID does not exist.";
         public const string NoUsersErrorMessage = "No users are found.";
         public const string NoUsersAfterFilterErrorMessage = "No users match the specified filter criteria.";
+        public const string BirthDateErrorMessage = "Nice try, time traveller! We're not ready for tomorrow's babies. Enter a valid birthdate!";
 
         //Messages for cards
 

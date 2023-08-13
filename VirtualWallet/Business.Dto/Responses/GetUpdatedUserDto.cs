@@ -1,4 +1,5 @@
 ﻿using DataAccess.Models.ValidationAttributes;
+using Microsoft.AspNetCore.Http;
 using System.ComponentModel.DataAnnotations;
 
 namespace Business.DTOs.Responses
@@ -11,5 +12,7 @@ namespace Business.DTOs.Responses
         public string PhoneNumber { get; set; }
         public bool IsAdmin { get; set; }
         public bool IsBlocked { get; set; }
+
+        public IFormFile? ImageFile { get; set; }
     }
 }

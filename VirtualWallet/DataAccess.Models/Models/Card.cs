@@ -15,6 +15,8 @@ namespace DataAccess.Models.Models
         public string CardNumber { get; set; }
 
         [Required(ErrorMessage = Constants.EmptyFieldErrorMessage)]
+        [ValidExpirationDate(ErrorMessage = Constants.ExpirationDateErrorMessage)]
+        [DataType(DataType.Date)]
         public DateTime ExpirationDate { get; set; }
 
         [Required(ErrorMessage = Constants.EmptyFieldErrorMessage)]

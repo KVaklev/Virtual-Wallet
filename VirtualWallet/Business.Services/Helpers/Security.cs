@@ -114,20 +114,32 @@ namespace Business.Services.Helpers
 
             if (dto is CreateUserModel createDto)
             {
+
                 password = createDto.Password;
+                using (var hmac = new HMACSHA512())
+                {
+                    passwordKey = hmac.Key;
+                    passwordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
+                }
+
+                user.Password = passwordHash;
+                user.PasswordKey = passwordKey;
             }
             else if (dto is UpdateUserDto updateDto)
             {
-                password = updateDto.Password;
-            }
-            using (var hmac = new HMACSHA512())
-            {
-                passwordKey = hmac.Key;
-                passwordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
-            }
+                if (updateDto.Password!=null)
+                {
+                    password = updateDto.Password;
+                    using (var hmac = new HMACSHA512())
+                    {
+                        passwordKey = hmac.Key;
+                        passwordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
+                    }
 
-            user.Password = passwordHash;
-            user.PasswordKey = passwordKey;
+                    user.Password = passwordHash;
+                    user.PasswordKey = passwordKey;
+                }  
+            }
 
             return await Task.FromResult(user);
         }

@@ -2,6 +2,8 @@
 
 @{
     this.ViewData["Title"] = "Speed Pay - Details";
+    var username = User.FindFirst(ClaimTypes.Name);
+    var currentUserImagePath = @Url.Content("~/UploadedImages/" + Model.User.Username + ".png");
 }
 
 <title> @this.Model.User.Username</title>
@@ -13,7 +15,7 @@
             <aside class="col-lg-3">
                 <div class="bg-white shadow-sm rounded text-center p-3 mb-4">
                     <div class="profile-thumb mt-3 mb-4">
-                        <img class="center rounded-circle" src="~/images/profile-thumb-sm.jpg" alt="" style="width: 110px; height: 110px;">
+                        <img class="center rounded-circle" src="@currentUserImagePath" height="30" width="30" alt="" style="width: 110px; height: 110px;" enctype="multipart/form-data">
                         <p class="text-black opacity-12 mb-4">
                             <b>@this.Model.User.Username</b> <br>
                                     @DateTime.Now.DayOfWeek, @DateTime.Now.Date.ToShortDateString()
@@ -47,7 +49,8 @@
                                 <tr>
                                     <th scope="row">
                                         <i class="fas fa-robot text-primary"></i> Lastname
-                                    <td>@this.Model.User.LastName</td>
+                                        </th>
+                                        <td>@this.Model.User.LastName</td>
                                 </tr>
                                 <tr>
                                     <th scope="row">
@@ -63,9 +66,9 @@
                                 </tr>
                                 <tr>
                                     <th scope="row">
-                                        <i class="fas fa-map-marker-alt text-primary"></i>  Address
+                                        <i class="fas fa-map-marker-alt text-primary"></i> Country
                                     </th>
-                                    <td>@this.Model.User.Country @this.Model.User.Address</td>
+                                    <td>@this.Model.User.Country</td>
                                 </tr>
                                 <tr>
                                     <th scope="row">

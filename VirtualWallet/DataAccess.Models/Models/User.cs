@@ -50,8 +50,18 @@ namespace DataAccess.Models.Models
         public int? AccountId { get; set; }
         public bool IsDeleted { get; set; }
         public bool IsVerified { get; set; }
+
+        [DateOfBirth(ErrorMessage = Constants.BirthDateErrorMessage)]
+        [DataType(DataType.Date)]
         public DateTime? DateOfBirth { get; set; }
+
+        [MaxLength(Constants.AddressMaxLength, ErrorMessage = Constants.MaxLengthErrorMessage)]
         public string? Address { get; set; }
+
+        [MaxLength(Constants.CountryMaxLength, ErrorMessage = Constants.MaxLengthErrorMessage)]
         public string? Country { get; set; }
+
+        [MaxLength(Constants.CityMaxLength, ErrorMessage = Constants.MaxLengthErrorMessage)]
+        public string? City { get; set; }
     }
 }
