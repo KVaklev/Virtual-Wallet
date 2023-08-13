@@ -68,6 +68,7 @@ namespace VirtualWallet.Controllers.MVC
 
             indexTransferViewModel.TransferDtos = result.Data;
             indexTransferViewModel.TransferQueryParameters= parameters;
+            indexTransferViewModel.User = loggedUser.Data;
 
             return View(indexTransferViewModel);
         }

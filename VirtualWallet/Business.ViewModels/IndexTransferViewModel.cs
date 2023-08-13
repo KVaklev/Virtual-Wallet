@@ -14,5 +14,7 @@ namespace Business.ViewModels
         public PaginatedList<GetTransferDto> TransferDtos { get; set; }
 
         public TransferQueryParameters TransferQueryParameters { get; set; } = new TransferQueryParameters();
+
+        public User User { get; set; }
     }
 }
