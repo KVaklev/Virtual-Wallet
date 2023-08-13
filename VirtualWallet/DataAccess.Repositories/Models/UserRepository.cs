@@ -42,6 +42,7 @@ namespace DataAccess.Repositories.Models
             User? user = await context.Users
                 .Where(u => u.IsDeleted == false)
                 .Include(u => u.Account)
+                .ThenInclude(c => c.Currency)
                 .Where(users => users.Username == username)
                 .FirstOrDefaultAsync();
 

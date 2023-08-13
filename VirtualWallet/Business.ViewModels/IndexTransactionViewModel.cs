@@ -9,5 +9,7 @@ namespace Business.ViewModels
         public PaginatedList<GetTransactionDto> TransactionDtos { get; set; }
 
         public TransactionQueryParameters TransactionQueryParameters { get; set; } = new TransactionQueryParameters();
+
+        public User User { get; set; }
     }
 }

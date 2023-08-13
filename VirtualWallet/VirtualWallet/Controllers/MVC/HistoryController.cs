@@ -42,9 +42,10 @@ namespace VirtualWallet.Controllers.MVC
             {
                 return await EntityErrorViewAsync(result.Message);
             }
-
             var indexHistoryViewModel = new IndexHistoryViewModel();
             indexHistoryViewModel.GetHistoryDtos = result.Data;
+            indexHistoryViewModel.HistoryQueryParameters = parameters;
+
 
                 return this.View(indexHistoryViewModel);
         }
@@ -62,7 +63,7 @@ namespace VirtualWallet.Controllers.MVC
            this.HttpContext.Response.StatusCode = StatusCodes.Status404NotFound;
             this.ViewData["ErrorMessage"] = message;
 
-            return this.View("Error404");
+            return this.View("Error");
         }
 
     }

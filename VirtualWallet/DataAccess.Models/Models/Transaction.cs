@@ -28,10 +28,10 @@ namespace DataAccess.Models.Models
         public decimal Amount { get; set; }
 
         [Range(Constants.MinAmount, Constants.MaxAmount, ErrorMessage = Constants.RangeFieldErrorMessage)]
-        public decimal AmountExchange { get; set; }
-        
+        public decimal? AmountExchange { get; set; }
+
         [Range(Constants.MinAmount, Constants.MaxAmount, ErrorMessage = Constants.RangeFieldErrorMessage)]
-        public decimal ExchangeRate { get; set; }
+        public decimal ExchangeRate { get; set; } 
 
         public DateTime Date { get; set; }
 

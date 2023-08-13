@@ -1,18 +1,13 @@
 ﻿using AutoMapper;
-using Business.DTOs.Requests;
 using Business.DTOs.Responses;
-using Business.Exceptions;
 using Business.Mappers;
 using Business.QueryParameters;
 using Business.Services.Contracts;
 using Business.ViewModels;
 using DataAccess.Models.Models;
-using DataAccess.Repositories.Contracts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Security.Claims;
-using System.Security.Cryptography.Xml;
 using System.Text.Json;
 
 namespace VirtualWallet.Controllers.MVC
@@ -60,10 +55,11 @@ namespace VirtualWallet.Controllers.MVC
             var indexTransactionViewModel = new IndexTransactionViewModel();
             indexTransactionViewModel.TransactionDtos = result.Data;
             indexTransactionViewModel.TransactionQueryParameters = parameters;
+            indexTransactionViewModel.User = loggedUser.Data;
             return View(indexTransactionViewModel);
- 
         }
 
+        
         [HttpGet]
         public async Task<IActionResult> Create()
         {
@@ -125,9 +121,7 @@ namespace VirtualWallet.Controllers.MVC
                 return await EntityErrorViewAsync(currencyResult.Message);
             }
             TempData["Currencies"] = JsonSerializer.Serialize(currencyResult.Data);
-            return this.View(createTransactionViewModel);
-           
-            
+            return this.View(createTransactionViewModel); 
         }
 
         [HttpPost]

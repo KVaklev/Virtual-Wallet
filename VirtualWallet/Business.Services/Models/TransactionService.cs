@@ -16,28 +16,28 @@ namespace Business.Services.Models
         private readonly ITransactionRepository transactionRepository;
         private readonly IAccountRepository accountRepository;
         private readonly ICurrencyRepository currencyRepository;
-        private readonly IMapper mapper;
         private readonly IExchangeRateService exchangeRateService;
         private readonly IAccountService accountService;
         private readonly IHistoryRepository historyRepository;
+        private readonly IMapper mapper;
 
         public TransactionService(
             ITransactionRepository transactionRepository,
             IAccountRepository accountRepository,
             ICurrencyRepository currencyRepository,
-            IMapper mapper,
             IExchangeRateService exchangeRateService,
             IAccountService accountService,
-            IHistoryRepository historyRepository
+            IHistoryRepository historyRepository,
+            IMapper mapper
             )
         {
             this.transactionRepository = transactionRepository;
             this.accountRepository = accountRepository;
             this.currencyRepository = currencyRepository;
-            this.mapper = mapper;
             this.exchangeRateService = exchangeRateService;
             this.accountService = accountService;
-            this.historyRepository= historyRepository; ;
+            this.historyRepository= historyRepository;
+            this.mapper = mapper;
         }
         public async Task<Response<GetTransactionDto>> GetByIdAsync(int id, User loggedUser)
         {
@@ -133,23 +133,31 @@ namespace Business.Services.Models
                 return result;
             }
 
-            var exchangeRateResult = await this.exchangeRateService.ExchangeAsync(
-                transactionDto.Amount, 
-                transactionDto.CurrencyCode, 
-                loggedUser.Account.Currency.CurrencyCode);
-            if (!exchangeRateResult.IsSuccessful)
+            decimal exchangeRate = 0;
+            if (transactionDto.CurrencyCode != loggedUser.Account.Currency.CurrencyCode)
             {
-                result.IsSuccessful = false;
-                result.Message = Constants.NoFoundResulte;
-                return result;
-            }
+                var exchangeRateResult = await this.exchangeRateService.GetExchangeRateDataAsync(
+                    transactionDto.CurrencyCode,
+                    loggedUser.Account.Currency.CurrencyCode);
 
+                if (!exchangeRateResult.IsSuccessful)
+                {
+                    result.IsSuccessful = false;
+                    result.Message = exchangeRateResult.Message;
+                    return result;
+                }
+                else 
+                {
+                    exchangeRate = exchangeRateResult.Data.CurrencyValue;
+                }
+            }
+           
             var transaction = await TransactionsMapper.MapDtoТоTransactionAsync(
                 transactionDto, 
                 loggedUser, 
                 recipient, 
                 currency,
-                exchangeRateResult.Data);
+                exchangeRate);
             
 
             var newTransaction = await this.transactionRepository.CreateTransactionAsync(transaction);
@@ -210,19 +218,16 @@ namespace Business.Services.Models
             if (!exchangeRateResult.IsSuccessful)
             {
                 result.IsSuccessful = false;
-                result.Message = Constants.NoFoundResulte;
+                result.Message = exchangeRateResult.Message;
                 return result;
             }
-            var newTransaction = await TransactionsMapper.MapDtoТоTransactionAsync(
-                transactionDto, 
-                loggedUser, 
-                recipient, 
-                currency,
-                exchangeRateResult.Data.CurrencyValue);
 
             var updatedTransacion = await TransactionsMapper.MapUpdateDtoToTransactionAsync(
-                transactionToUpdate, 
-                newTransaction);
+                transactionToUpdate,
+                transactionDto,
+                recipient,
+                currency,
+                exchangeRateResult.Data.CurrencyValue);
 
             await this.transactionRepository.SaveChangesAsync();
             result.Data = this.mapper.Map<GetTransactionDto>(updatedTransacion);
@@ -311,8 +316,7 @@ namespace Business.Services.Models
         {
             var result = new Response<Transaction>();
 
-            var exchangeAmountResult = await this.exchangeRateService
-                    .ExchangeAsync(
+            var exchangeAmountResult = await this.exchangeRateService.ExchangeAsync(
                   transaction.Amount, 
                   transaction.Currency.CurrencyCode, 
                   transaction.AccountRecipient.Currency.CurrencyCode);
@@ -324,7 +328,8 @@ namespace Business.Services.Models
                     return result;
                 } 
             
-            var transactionIn = await TransactionsMapper.MapCreateDtoToTransactionInAsync(transaction, exchangeAmountResult.Data);
+            var transactionIn = await TransactionsMapper
+                            .MapCreateDtoToTransactionInAsync(transaction, exchangeAmountResult.Data);
             await this.transactionRepository.CreateTransactionAsync(transactionIn);
             result.Data = transactionIn;
             return result;
@@ -334,29 +339,29 @@ namespace Business.Services.Models
             Transaction transactionIn)
         {
             var result = new Response<bool>();
-            var amountSenderResult = await this.exchangeRateService
-                    .ExchangeAsync(
-                transactionOut.Amount,
-                transactionOut.Currency.CurrencyCode,
-                transactionOut.AccountSender.Currency.CurrencyCode);
-            if (!amountSenderResult.IsSuccessful)
+            var acountDecrResult = await this.accountService.DecreaseBalanceAsync(
+                transactionOut.AccountSenderId, 
+                (decimal)transactionOut.AmountExchange, 
+                transactionOut.AccountSender.User);
+            if (!acountDecrResult.IsSuccessful)
             {
                 result.IsSuccessful = false;
-                result.Message = amountSenderResult.Message;
+                result.Message = acountDecrResult.Message;
                 return result;
             }
 
-            await this.accountService.DecreaseBalanceAsync(
-                transactionOut.AccountSenderId, 
-                amountSenderResult.Data, 
-                transactionOut.AccountSender.User);
-
-            await this.accountService.IncreaseBalanceAsync(
+           var acountIncrResult = await this.accountService.IncreaseBalanceAsync(
                 transactionIn.AccountRecepientId, 
                 transactionIn.Amount, 
                 transactionIn.AccountRecipient.User);
-            result.Data = true;
+            if (!acountIncrResult.IsSuccessful)
+            {
+                result.IsSuccessful = false;
+                result.Message = acountIncrResult.Message;
+                return result;
+            }
 
+            result.Data = true;
             return result;
         }
         private async Task<bool> AddTransactionToHistoryAsync(Transaction transaction)
@@ -365,10 +370,9 @@ namespace Business.Services.Models
             int historyCount = await this.historyRepository.GetHistoryCountAsync();
             History history = await HistoryMapper.MapCreateWithTransactionAsync(transaction);
             await this.historyRepository.CreateAsync(history);
-
             int newHistoryCount = await this.historyRepository.GetHistoryCountAsync();
 
-            if (newHistoryCount == historyCount + 1)
+            if (newHistoryCount == historyCount + 1) 
             {
                 return true;
             }
