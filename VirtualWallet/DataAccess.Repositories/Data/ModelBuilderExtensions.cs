@@ -11,23 +11,30 @@ namespace DataAccess.Repositories.Data
         {
             var users = new List<User>()
             {
-                new User { Id = 1, FirstName = "Ivan", LastName = "Draganov", Email = "i.draganov@gmail.com", Username = "ivanchoDraganchov",
-                          // Address = "", City = "", Country = "", DateOfBirth = DateTime.
-            Password = new byte[] {0x65, 0x23, 0x25, 0x55}, PhoneNumber = "0878558547", AccountId = 1, IsAdmin = true, IsBlocked = false    },
+                new User { Id = 1, FirstName = "Ivan", LastName = "Draganov", Email = "i.draganov@gmail.com", Username = "ivanchoDraganchov", 
+                           Password = new byte[] {0x65, 0x23, 0x25, 0x55}, PhoneNumber = "0878558547", AccountId = 1, IsAdmin = true, IsBlocked = false,
+                           Address = "Blvd Patriarh Evtimii 72", City = "Sofia", Country = "Bulgaria", },
                 new User { Id = 2, FirstName = "Mariq", LastName = "Petrova", Email = "m.petrova@gmail.com", Username = "mariicheto",
-                           Password = new byte[] { 0x65, 0x23, 0x25, 0x55 }, PhoneNumber = "0898568569", AccountId = 2, IsAdmin = false, IsBlocked = false },
+                           Password = new byte[] { 0x65, 0x23, 0x25, 0x55 }, PhoneNumber = "0898568569", AccountId = 2, IsAdmin = false, IsBlocked = false,
+                           Address = "Kajmakchalan 1", City = "Plovdiv", Country = "Bulgaria", },
                 new User { Id = 3, FirstName = "Mara",  LastName = "Dobreva", Email = "m.dobreva@gmail.com", Username = "marcheto",
-                           Password = new byte[] { 0x65, 0x23, 0x25, 0x55 }, PhoneNumber = "0888524585", AccountId = 3, IsAdmin = false, IsBlocked = true  },
+                           Password = new byte[] { 0x65, 0x23, 0x25, 0x55 }, PhoneNumber = "0888524585", AccountId = 3, IsAdmin = false, IsBlocked = true,
+                           Address = "Zone B 3-5", City = "Yambol", Country = "Bulgaria", },
                 new User { Id = 4, FirstName = "Andrei", LastName = "Sokolov", Email = "a.sokolov@gmail.com", Username = "sokolov",
-                           Password = new byte[] { 0x65, 0x23, 0x25, 0x55 }, PhoneNumber = "0898652365", AccountId = 4, IsAdmin = true, IsBlocked = false   },
+                           Password = new byte[] { 0x65, 0x23, 0x25, 0x55 }, PhoneNumber = "0898652365", AccountId = 4, IsAdmin = true, IsBlocked = false,
+                           Address = "A Slavyanska 44", City = "Vratsa", Country = "Bulgaria", },
                 new User { Id = 5, FirstName = "Margarita", LastName = "Ivanova", Email = "marg89@gmail.com", Username = "margIvanova",
-                           Password = new byte[] { 0x65, 0x23, 0x25, 0x55 }, PhoneNumber = "0885659856",AccountId = 5, IsAdmin = false, IsBlocked = false   },
+                           Password = new byte[] { 0x65, 0x23, 0x25, 0x55 }, PhoneNumber = "0885659856",AccountId = 5, IsAdmin = false, IsBlocked = false,
+                           Address = "Akad. Boris Stefanov 55", City = "Varna", Country = "Bulgaria", },
                 new User { Id = 6, FirstName = "Dimitar", LastName = "Peev", Email = "dim@gmail.com", Username = "dimitarDimitrov",
-                           Password = new byte[] { 0x65, 0x23, 0x25, 0x55 }, PhoneNumber = "0887885778",AccountId = 6, IsAdmin = false, IsBlocked = false   },
+                           Password = new byte[] { 0x65, 0x23, 0x25, 0x55 }, PhoneNumber = "0887885778",AccountId = 6, IsAdmin = false, IsBlocked = false,
+                           Address = "50-52 Krum Popov", City = "Sofia", Country = "Bulgaria", },
                 new User { Id = 7, FirstName = "Ivan", LastName = "Apostolov", Email = "Apostolche@gmail.com", Username = "IApostolov99",
-                           Password = new byte[] { 0x65, 0x23, 0x25, 0x55 }, PhoneNumber = "0898658856", AccountId = 7, IsAdmin = true, IsBlocked = false   },
+                           Password = new byte[] { 0x65, 0x23, 0x25, 0x55 }, PhoneNumber = "0898658856", AccountId = 7, IsAdmin = true, IsBlocked = false,
+                           Address = "Parchevich 68/А/2/4", City = "Sofia", Country = "Bulgaria", },
                 new User { Id = 8, FirstName = "Ivan", LastName = "Atanasov", Email = "AtansovGerey@gmail.com", Username = "DreamerTillX",
-                           Password = new byte[] { 0x65, 0x23, 0x25, 0x55 }, PhoneNumber = "0889566547", AccountId = 8, IsAdmin = false, IsBlocked = false, }
+                           Password = new byte[] { 0x65, 0x23, 0x25, 0x55 }, PhoneNumber = "0889566547", AccountId = 8, IsAdmin = false, IsBlocked = false,
+                           Address = "Mladost II , bl. 281, ap.55", City = "Sofia", Country = "Bulgaria", },
             };
 
             var accounts = new List<Account>()
