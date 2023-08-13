@@ -29,7 +29,7 @@
 <!-- Preloader -->
 <div id="preloader">
     
-  <div data-loader="dual-ring"></div>
+<div data-loader="dual-ring"></div>
 </div>
 <!-- Preloader End --> 
 
@@ -43,10 +43,12 @@
     <div class="container">
       <div class="header-row">
         <div class="header-column justify-content-start"> 
+
           <!-- Logo
           ============================= -->
           <div class="logo me-3"> <a asp-controller="Home" asp-action="Index" class="d-flex"  title="SpeedPay"><img src="~/images/logo.png" width="201" height="50" alt="Runner" /></a> </div>
           <!-- Logo end --> 
+
           <!-- Collapse Button
           ============================== -->
           <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#header-nav"> <span></span> <span></span> <span></span> </button>
@@ -114,11 +116,12 @@
             </div>
           </nav>
           <!-- Primary Navigation end --> 
+
         </div>
         <div class="header-column justify-content-end"> 
 
-          <!-- Login & Signup Link
-          ============================== -->
+<!-- Login & Signup Link
+============================== -->
           @if (User.Claims.Any())
           {
               <!-- My Profile
@@ -166,7 +169,8 @@
               </nav>
           }
          
-          <!-- Login & Signup Link end --> 
+<!-- Login & Signup Link end --> 
+
         </div>
       </div>
     </div>
@@ -176,6 +180,7 @@
   
   <!-- Content
   ============================================= -->
+
   <div id="content"> 
             @RenderBody()   
   </div>
@@ -211,7 +216,7 @@
           <div class="col-lg d-lg-flex align-items-center justify-content-lg-end">
             <ul class="nav justify-content-center">
               <li class="nav-item"> <a asp-controller="Help" asp-action="PrivacyPolicyAndTermsOfUse" class="nav-link active">Privacy Policy and Terms of Use</a></li>
-              <br />
+              
               <li><a href=http://localhost:5116/swagger />Swagger</li>
 
             </ul>

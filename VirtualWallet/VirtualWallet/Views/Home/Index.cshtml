@@ -1,4 +1,10 @@
-﻿<!-- Page Header
+﻿@{
+    this.ViewData["Title"] = "Speed Pay - Home";
+}
+
+<body> 
+
+<!-- Page Header
   ============================================= -->
 <section class="page-header page-header-text-light py-0 mb-0">
     <section class="hero-wrap section">
@@ -26,6 +32,7 @@
     </section>
 </section>
 <!-- Page Header end -->
+
 <section class="section bg-white">
     <div class="container">
         <h2 class="text-9 text-center">Why should you choose Speed Pay?</h2>
@@ -62,8 +69,9 @@
         </div>
     </div>
 </section>
+
 <!-- How it works
-    ============================================= -->
+============================================= -->
 <section class="section">
     <div class="container">
         <h2 class="text-9 text-center text-uppercase fw-400">As simple as 1-2-3</h2>
@@ -99,5 +107,8 @@
         <div class="text-center mt-5">
             <a asp-controller="Account" asp-action="Register" class="btn btn-primary m-2">Open a Free Account</a>
         </div>
+        </div>
 </section>
 <!-- How it works End --> 
+
+</body>

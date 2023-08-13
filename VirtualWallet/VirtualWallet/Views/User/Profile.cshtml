@@ -22,7 +22,6 @@
         }
 
         if (file) {
-            // load image as a base64 encoded uri
             reader.readAsDataURL(file);
         }
         else {
@@ -46,12 +45,12 @@
     <div class="container">
       <div class="row"> 
         
-        <!-- Left Panel
-        ============================================= -->
+<!-- Left Panel
+============================================= -->
         <aside class="col-lg-3"> 
           
-          <!-- Profile Details
-          =============================== -->
+<!-- Profile Details
+=============================== -->
           <div class="bg-white shadow-sm rounded text-center p-3 mb-4">
               <form asp-controller="User" asp-action="ChangeProfilePicture" asp-route-id="@this.Model.DetailsViewModel.User.Id" method="post" enctype="multipart/form-data">
                  <div class="profile-thumb mt-3 mb-4">
@@ -62,10 +61,10 @@
                  <button class="small-button btn-primary" type="submit">Change</button>
               </form>
           </div>
-          <!-- Profile Details End --> 
+<!-- Profile Details End --> 
           
-          <!-- Available Balance
-          =============================== -->
+<!-- Available Balance
+=============================== -->
           <div class="bg-white shadow-sm rounded text-center p-3 mb-4">
             <div class="text-17 text-light my-3"><i class="fas fa-wallet text-primary"></i></div>
             <h3 class="text-9 fw-400">@this.Model.DetailsViewModel.User.AccountBalance</h3>
@@ -76,13 +75,14 @@
             <a asp-controller="Transfer" asp-action="Create" asp-route-id="@User.FindFirst(ClaimTypes.NameIdentifier)" class="btn-link ms-auto">Deposit</a>
           </div>
           </div>       
-          <!-- Available Balance End --> 
+<!-- Available Balance End --> 
+
         </aside>
-        <!-- Left Panel End --> 
+<!-- Left Panel End --> 
         
-        <!-- Middle Panel
-        ============================================= -->
-        <div class="col-lg-9"> 
+<!-- Middle Panel
+============================================= -->
+     <div class="col-lg-9"> 
           
           <!-- Personal Details
           ============================================= -->
@@ -134,9 +134,9 @@
              </div>
             </div>
           </div>
-          <!-- Edit Details Modal
-          ================================== -->
 
+<!-- Edit Details Modal
+================================== -->
           <div id="edit-personal-details" class="modal fade " role="dialog" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered" role="document">
               <div class="modal-content">
@@ -204,19 +204,15 @@
               </div>
             </div>
           </div>
-          <!-- Personal Details End -->     
+<!-- Personal Details End -->     
           
         </div>
-        <!-- Middle Panel End --> 
+<!-- Middle Panel End --> 
 
       </div>
     </div>
   </div>
-  <!-- Content end --> 
-
-<!-- Back to Top
-============================================= --> 
-<a id="back-to-top" data-bs-toggle="tooltip" title="Back to Top" href="javascript:void(0)"><i class="fa fa-chevron-up"></i></a> 
+<!-- Content end --> 
 
 <!-- Script --> 
 <script src="vendor/jquery/jquery.min.js"></script> 
@@ -238,4 +234,5 @@ $(function() {
   });
 </script> 
 <script src="js/theme.js"></script>
+
 </body>
