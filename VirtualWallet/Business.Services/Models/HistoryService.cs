@@ -49,15 +49,22 @@ namespace Business.Services.Models
             User loggedUser)
         {
             var result = new Response<PaginatedList<GetHistoryDto>>();
-            
-            if (filterParameters.Username != null && !loggedUser.IsAdmin)
-            {
-                result.IsSuccessful = false;
-                result.Message = Constants.ModifyAuthorizedErrorMessage;
-                return result;
-            }
-                        
+
+            //if (filterParameters.Username != null && !loggedUser.IsAdmin)
+            //{
+            //    result.IsSuccessful = false;
+            //    result.Message = Constants.ModifyAuthorizedErrorMessage;
+            //    return result;
+            //}
+
             IQueryable<History> historyRecords = this.historyRepository.GetAll();
+
+            if (!loggedUser.IsAdmin)
+            {
+                historyRecords = historyRecords
+                    .Where(u => u.AccountId == loggedUser.AccountId)
+                    .AsQueryable();
+            }
 
             historyRecords = await FilterByUsernameAsync(historyRecords, filterParameters.Username);
             historyRecords = await FilterByFromDataAsync(historyRecords, filterParameters.FromDate);
@@ -71,13 +78,6 @@ namespace Business.Services.Models
                result.IsSuccessful = false;
                result.Message = Constants.NotFoundResults;
                return result;
-            }
-
-            if (!loggedUser.IsAdmin)
-            {
-                historyRecords = historyRecords
-                    .Where(u => u.AccountId == loggedUser.AccountId)
-                    .AsQueryable();
             }
             
             var resultDto = historyRecords
