@@ -30,5 +30,11 @@ namespace VirtualWallet.Controllers.MVC
         {
             return View();
         }
+
+        [HttpGet]
+        public IActionResult Fees()
+        {
+            return View();
+        }
     }
 }
