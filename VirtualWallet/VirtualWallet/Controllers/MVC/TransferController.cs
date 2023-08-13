@@ -152,9 +152,9 @@ namespace VirtualWallet.Controllers.MVC
         //        return await EntityNotFoundErrorViewAsync(cards.Message);
         //    }
 
-        //    // createTransferViewModel.
+        //    createTransferViewModel.Cards = cards.Data;
 
-        //    //createTransferViewModel.Cards = cards.Data;
+        //    createTransferViewModel.selectedCard = cards.Data.Where(c => c.CardNumber == dto.CardNumber);
 
         //    //TempData["Currencies"] = JsonSerializer.Serialize(currencies.Data);
         //    //TempData["Cards"] = JsonSerializer.Serialize(cards.Data);
