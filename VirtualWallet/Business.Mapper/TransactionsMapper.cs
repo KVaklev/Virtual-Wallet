@@ -83,7 +83,7 @@ namespace Business.Mappers
             transaction.Direction = DirectionType.Out;
             transaction.Description = transactionDto.Description;
             transaction.Date = DateTime.UtcNow;
-            transaction.AmountExchange = transactionDto.Amount* exchangeRate;
+            transaction.AmountExchange = transactionDto.Amount*exchangeRate;
             transaction.ExchangeRate = exchangeRate;
             return transaction;
         }

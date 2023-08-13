@@ -171,7 +171,8 @@
                                             {
 
                                                 <div class="col col-sm-7"> 
-                                                <span class="d-block text-4">From Account:@transaction.SenderUsername To Account: @transaction.RecipientUsername</span>
+                                              <span class="d-block text-4">From Account: @transaction.SenderUsername</span>
+                                              <span class="d-block text-4">To Account: @transaction.RecipientUsername</span>
                                                 <span class="text-muted">@transaction.Direction  <a class="btn-link" asp-controller="Transaction" asp-action="Details" asp-route-id="@transaction.Id">Details</a></span>
                                                 </div>
                                             }

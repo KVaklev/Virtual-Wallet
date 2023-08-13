@@ -211,15 +211,23 @@ namespace Business.Services.Models
                 result.Message = Constants.NoFoundResulte;
                 return result;
             }
-            var exchangeRateResult = await this.exchangeRateService.GetExchangeRateDataAsync(
-                transactionDto.CurrencyCode,
-                recipient.Currency.CurrencyCode);
-            
-            if (!exchangeRateResult.IsSuccessful)
+            decimal exchangeRate = 1;
+            if (transactionDto.CurrencyCode != loggedUser.Account.Currency.CurrencyCode)
             {
-                result.IsSuccessful = false;
-                result.Message = exchangeRateResult.Message;
-                return result;
+                var exchangeRateResult = await this.exchangeRateService.GetExchangeRateDataAsync(
+                    transactionDto.CurrencyCode,
+                    loggedUser.Account.Currency.CurrencyCode);
+
+                if (!exchangeRateResult.IsSuccessful)
+                {
+                    result.IsSuccessful = false;
+                    result.Message = exchangeRateResult.Message;
+                    return result;
+                }
+                else
+                {
+                    exchangeRate = exchangeRateResult.Data.CurrencyValue;
+                }
             }
 
             var updatedTransacion = await TransactionsMapper.MapUpdateDtoToTransactionAsync(
@@ -227,7 +235,7 @@ namespace Business.Services.Models
                 transactionDto,
                 recipient,
                 currency,
-                exchangeRateResult.Data.CurrencyValue);
+                exchangeRate);
 
             await this.transactionRepository.SaveChangesAsync();
             result.Data = this.mapper.Map<GetTransactionDto>(updatedTransacion);
