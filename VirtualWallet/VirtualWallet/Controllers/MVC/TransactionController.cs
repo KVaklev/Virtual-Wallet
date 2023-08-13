@@ -42,6 +42,7 @@ namespace VirtualWallet.Controllers.MVC
         {
             
                 var loggedUser = await FindLoggedUserAsync();
+
                 if (!loggedUser.IsSuccessful)
                 {
                 return this.RedirectToAction("Login", "Account");
@@ -229,6 +230,7 @@ namespace VirtualWallet.Controllers.MVC
         {
             
                 var loggedUserResult = await FindLoggedUserAsync();
+
             if (!loggedUserResult.IsSuccessful)
             {
                 return this.RedirectToAction("Login", "Account");
@@ -278,6 +280,7 @@ namespace VirtualWallet.Controllers.MVC
             ConfirmTransactionViewModel executeTransactionViewModel)
         {
             var loggedUserResult = await FindLoggedUserAsync();
+
             if (!loggedUserResult.IsSuccessful)
             {
                 return this.RedirectToAction("Login", "Account");
@@ -309,6 +312,7 @@ namespace VirtualWallet.Controllers.MVC
         public async Task<IActionResult> SuccessfulConfirm([FromRoute] int id)
         {
             var loggedUserResult = await FindLoggedUserAsync();
+            
             if (!loggedUserResult.IsSuccessful)
             {
                 return this.RedirectToAction("Login", "Account");
