@@ -133,7 +133,7 @@ namespace Business.Services.Models
                 return result;
             }
 
-            decimal exchangeRate = 0;
+            decimal exchangeRate = 1;
             if (transactionDto.CurrencyCode != loggedUser.Account.Currency.CurrencyCode)
             {
                 var exchangeRateResult = await this.exchangeRateService.GetExchangeRateDataAsync(

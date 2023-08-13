@@ -8,5 +8,6 @@ namespace Business.ViewModels
     {
         public PaginatedList<GetHistoryDto> GetHistoryDtos { get; set; }
         public HistoryQueryParameters HistoryQueryParameters { get; set; }
+        public User LoggedUser { get; set; }
     }
 }

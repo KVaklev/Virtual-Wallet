@@ -45,6 +45,7 @@ namespace VirtualWallet.Controllers.MVC
             var indexHistoryViewModel = new IndexHistoryViewModel();
             indexHistoryViewModel.GetHistoryDtos = result.Data;
             indexHistoryViewModel.HistoryQueryParameters = parameters;
+            indexHistoryViewModel.LoggedUser = loggedUserResponse.Data;
 
 
                 return this.View(indexHistoryViewModel);
