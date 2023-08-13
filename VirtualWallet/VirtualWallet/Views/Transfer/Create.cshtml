@@ -31,7 +31,9 @@
         </ul>
     </div>
 </div>
-
+<!-- Secondary menu end -->
+<!-- Content
+============================================= -->
 <div id="content" class="py-4">
     <div class="container">
 
@@ -108,9 +110,15 @@
 
                         <input id="hiddenCurrency" asp-for="CreateTransferDto.CurrencyCode" hidden value="USD" />
 
-                        <hr>
+                        @*<hr>
                         <p class="text-4 fw-500">You'll deposit <span class="float-end">1,000.00 USD</span></p>
+                        <div class="d-grid"><button type="submit" class="btn btn-primary">Continue</button></div>*@
+
+                        <hr>
+                        <p class="text-4 fw-500">You'll deposit <span id="depositAmount" class="float-end">1,000.00 USD</span></p>
                         <div class="d-grid"><button type="submit" class="btn btn-primary">Continue</button></div>
+
+
                     </form>
                     <!-- Deposit Money Form end -->
                 </div>
@@ -135,3 +143,18 @@
         document.getElementById("hiddenCurrency").setAttribute('value', newValue);
     });
 </script>
+
+@*<script>
+    document.getElementById('cardType').addEventListener('change', function (event) {
+        var selectedOption = document.querySelector('#cardType option:checked');
+        var depositAmountElement = document.getElementById('depositAmount');
+
+        if (selectedOption) {
+            var currencyCode = selectedOption.getAttribute('data-subtext');
+            var amount = document.getElementById('youSend').value || '0.00';
+            depositAmountElement.textContent = amount + ' ' + currencyCode;
+        } else {
+            depositAmountElement.textContent = '0.00 USD';
+        }
+    });
+</script>*@
