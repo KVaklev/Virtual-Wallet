@@ -116,6 +116,53 @@ namespace VirtualWallet.Controllers.MVC
 
         }
 
+        //[HttpGet]
+        //public async Task<IActionResult> Create(GetTransferDto dto)
+        //{
+        //    var query = new CardQueryParameters();
+
+        //    var loggedUser = await FindLoggedUserAsync();
+
+        //    if (!loggedUser.IsSuccessful)
+        //    {
+        //        return StatusCode(StatusCodes.Status404NotFound, loggedUser.Message);
+        //    }
+        //    var createTransferViewModel = new CreateTransferViewModel();
+
+        //    var resultAccount = await this.accountService.GetByIdAsync((int)loggedUser.Data.AccountId, loggedUser.Data);
+
+        //    if (!resultAccount.IsSuccessful)
+        //    {
+        //        return await EntityNotFoundErrorViewAsync(resultAccount.Message);
+        //    }
+
+        //    createTransferViewModel.CurrencyCode = dto.CurrencyCode;
+
+        //    var currencies = this.currencyService.GetAll();
+
+        //    if (!currencies.IsSuccessful)
+        //    {
+        //        return await EntityNotFoundErrorViewAsync(currencies.Message);
+        //    }
+
+        //    var cards = await this.cardService.FilterByAsync(query, loggedUser.Data);
+
+        //    if (!cards.IsSuccessful)
+        //    {
+        //        return await EntityNotFoundErrorViewAsync(cards.Message);
+        //    }
+
+        //    // createTransferViewModel.
+
+        //    //createTransferViewModel.Cards = cards.Data;
+
+        //    //TempData["Currencies"] = JsonSerializer.Serialize(currencies.Data);
+        //    //TempData["Cards"] = JsonSerializer.Serialize(cards.Data);
+
+        //    return View(createTransferViewModel);
+
+        //}
+
         [HttpPost]
 
         public async Task<IActionResult> Create(CreateTransferViewModel transferDto)

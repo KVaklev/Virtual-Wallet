@@ -65,7 +65,7 @@
                 </div>
             </div>
         </div>
-        <h2 class="fw-400 text-center mt-3">Deposit Money</h2>
+        <h2 class="fw-400 text-center mt-3">Transfer Money</h2>
 
         <div class="row">
             <div class="col-md-9 col-lg-7 col-xl-6 mx-auto">
@@ -103,6 +103,7 @@
                             <div class="input-group">
                                 <span class="input-group-text">$</span>
                                 <input asp-for="CreateTransferDto.Amount" type="number" class="form-control" data-bv-field="youSend" id="youSend" value="" placeholder="">
+
                                 <span asp-for="CreateTransferDto.CurrencyCode" value="" id="amountCurrency" class="input-group-text">USD</span>
 
                             </div>
@@ -115,7 +116,10 @@
                         <div class="d-grid"><button type="submit" class="btn btn-primary">Continue</button></div>*@
 
                         <hr>
-                        <p class="text-4 fw-500">You'll deposit <span id="depositAmount" class="float-end">1,000.00 USD</span></p>
+                        <p class="text-4 fw-500">You'll transfer 
+                            <span id="depositAmountCurrency" class="float-end">USD</span>
+                            <span id="depositAmount" class="float-end">0.00</span> 
+                        </p>
                         <div class="d-grid"><button type="submit" class="btn btn-primary">Continue</button></div>
 
 
@@ -141,20 +145,14 @@
         }
         document.getElementById("amountCurrency").textContent = newValue;
         document.getElementById("hiddenCurrency").setAttribute('value', newValue);
+        document.getElementById('depositAmountCurrency').textContent = newValue;
     });
 </script>
 
-@*<script>
-    document.getElementById('cardType').addEventListener('change', function (event) {
-        var selectedOption = document.querySelector('#cardType option:checked');
-        var depositAmountElement = document.getElementById('depositAmount');
+<script>
+    document.getElementById('youSend').addEventListener('input', function (event) {
+        var depositAmountElement = event.target.value;
 
-        if (selectedOption) {
-            var currencyCode = selectedOption.getAttribute('data-subtext');
-            var amount = document.getElementById('youSend').value || '0.00';
-            depositAmountElement.textContent = amount + ' ' + currencyCode;
-        } else {
-            depositAmountElement.textContent = '0.00 USD';
-        }
+        document.getElementById('depositAmount').textContent = depositAmountElement;
     });
-</script>*@
+</script>
