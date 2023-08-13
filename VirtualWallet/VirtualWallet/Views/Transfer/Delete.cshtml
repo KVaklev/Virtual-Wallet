@@ -62,45 +62,61 @@
                     <h3 class="text-5 fw-400 mb-3 mb-sm-4">Confirm Details</h3>
                     <hr class="mx-n3 mx-sm-n5 mb-4">
                     <div class="row g-3 align-items-center">
-                        <p class="col-sm-4 text-muted text-sm-end mb-0 mb-sm-3">Name:</p>
-                        <p class="col-sm-8 text-3">@Model.UserDetails.FirstName @Model.UserDetails.LastName</p>
+                        <p class="col-sm-4 text-muted text-sm-end fw-500 mb-0 mb-sm-3">Name:</p>
+                        <p class="col-sm-8 text-4 fw-500">@Model.UserDetails.FirstName @Model.UserDetails.LastName</p>
                     </div>
 
-                    @if (Model.GetTransferDto.TransferType == TransferDirection.Deposit.ToString())
-                    {
-                        <div class="row g-3 align-items-center">
+                    <div class="row g-3 align-items-center">
+
+                        @if (Model.GetTransferDto.TransferType == TransferDirection.Deposit.ToString())
+                        {
                             <p class="col-sm-4 text-muted text-sm-end fw-500 mb-0 mb-sm-3">Deposit amount:</p>
                             <p class="col-sm-8 text-4 fw-500">@Model.GetTransferDto.Amount.ToString("F2") @Model.GetTransferDto.CurrencyCode</p>
-                        </div>
+                        }
+                        else
+                        {
 
-                    }
-                    else
-                    {
-                        <div class="row g-3 align-items-center">
                             <p class="col-sm-4 text-muted text-sm-end fw-500 mb-0 mb-sm-3">Withdrawal amount:</p>
                             <p class="col-sm-8 text-4 fw-500">@Model.GetTransferDto.Amount.ToString("F2") @Model.GetTransferDto.CurrencyCode</p>
-                        </div>
-                    }
-                    <div class="row g-3 align-items-center">
+
+                        }
+                    </div>
+
+                   
+                    <div class="row g-3 align-items-baseline">
 
                         <p class="col-sm-4 text-muted text-sm-end mb-0 mb-sm-3">Card No.:</p>
                         <p class="col-sm-8 text-4 fw-500">@Model.GetTransferDto.CardNumber </p>
+                    </div>
+
+                    <div class="row g-3 align-items-baseline">
+
                         <p class="col-sm-4 text-muted text-sm-end mb-0 mb-sm-3">Card Type:</p>
                         <p class="col-sm-8 text-4 fw-500">@Model.GetTransferDto.Card.CardType </p>
+                    </div>
+
+                    <div class="row g-3 align-items-baseline">
+
                         <p class="col-sm-4 text-muted text-sm-end mb-0 mb-sm-3">Card Currency:</p>
                         <p class="col-sm-8 text-4 fw-500"> @Model.GetTransferDto.Card.Currency.CurrencyCode</p>
-
                     </div>
-                    
-                    
+
+
                     <form id="form-send-money" method="post">
                         <div class="d-grid"><button class="btn btn-primary">Delete</button></div>
                     </form>
+
+                    <div></div>
+                    <div></div>
                     <div> <span style="margin-right:15%"></span></div>
                     <div><span style="margin-right:15%"></span></div>
-                    <spam style="margin-right:15%"></spam>  <a asp-action="Update" asp-controller="Transfer" asp-route-id="Model.GetTransferDto.Id" class="btn btn-dark shadow-none px-5 m-2">Back</a>
-                    <spam style="margin-right:5%"></spam>  <a asp-action="Index" asp-controller="Transfer" class="btn btn-dark shadow px-5 m-2">Close</a>
+                    <div class="text-center">
+                        <a asp-action="Update" asp-controller="Transfer" asp-route-id="@Model.GetTransferDto.Id" class="btn btn-outline-dark shadow-none px-5 m-2">Back</a>
+                        <spam style="margin-right:5%"></spam>  <a asp-action="Index" asp-controller="Transfer" class="btn btn-outline-dark shadow px-5 m-2">Close</a>
+                    </div>
+                                        
                     <!-- Request Money Confirm Details end -->
+
                 </div>
             </div>
         </div>
