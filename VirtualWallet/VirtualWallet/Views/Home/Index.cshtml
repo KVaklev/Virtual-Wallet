@@ -1,10 +1,114 @@
 ﻿@{
-    ViewData["Title"] = "Home page";
+    this.ViewData["Title"] = "Speed Pay - Home";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<body> 
 
-    <a href = http://localhost:5116/swagger/>Swagger</a>
-</div>
+<!-- Page Header
+  ============================================= -->
+<section class="page-header page-header-text-light py-0 mb-0">
+    <section class="hero-wrap section">
+        <div class="hero-mask opacity-7 bg-dark"></div>
+        <div class="hero-bg hero-bg-scroll" style="background-image:url('./images/bg/image-2.jpg');"></div>
+        <div class="hero-content">
+            <div class="container">
+                <div class="row">
+                    <div class="col-12 text-center">
+                        <div class="col-lg-6 col-xl-7 my-auto text-center text-lg-start pb-4 pb-lg-0">
+                            <h2 class="text-14 fw-400 text-white mb-4">
+                                The Secure,<br class="d-none d-xl-block">
+                                easiest and fastest <br class="d-none d-xl-block">
+                                way to transfer money.
+                            </h2>
+                            <p class="lead text-light mb-4">
+                                Send & Receive money to your loved ones in minutes with great rates and low
+                                fees. Over 180 countries and 30 currencies supported.
+                            </p>
+                        <a asp-controller="Account" asp-action="Register" class="btn btn-primary m-2">Open a Free Account</a> 
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</section>
+<!-- Page Header end -->
+
+<section class="section bg-white">
+    <div class="container">
+        <h2 class="text-9 text-center">Why should you choose Speed Pay?</h2>
+        <p class="lead text-center mb-5">Here's Top 4 reasons why using a Payyed account to manage your money.</p>
+        <div class="row gy-5">
+            <div class="col-sm-6 col-lg-3">
+                <div class="featured-box">
+                    <div class="featured-box-icon text-primary"> <i class="fas fa-hand-pointer"></i> </div>
+                    <h3>Easy to use</h3>
+                    <p class="text-3">@Constants.WhyChooseReasonOne</p>
+                </div>
+            </div>
+            <div class="col-sm-6 col-lg-3">
+                <div class="featured-box">
+                    <div class="featured-box-icon text-primary"> <i class="fas fa-share"></i> </div>
+                    <h3>Faster Payments</h3>
+                    <p class="text-3">@Constants.WhyChooseReasonTwo</p>
+                </div>
+            </div>
+            <div class="col-sm-6 col-lg-3">
+                <div class="featured-box">
+                    <div class="featured-box-icon text-primary"> <i class="fas fa-dollar-sign"></i> </div>
+                    <h3>Lower Fees</h3>
+                    <p class="text-3">@Constants.WhyChooseReasonThree</p>
+                </div>
+            </div>
+            <div class="col-sm-6 col-lg-3">
+                <div class="featured-box">
+                    <div class="featured-box-icon text-primary"> <i class="fas fa-lock"></i> </div>
+                    <h3>100% Secure</h3>
+                    <p class="text-3">@Constants.WhyChooseReasonFour</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- How it works
+============================================= -->
+<section class="section">
+    <div class="container">
+        <h2 class="text-9 text-center text-uppercase fw-400">As simple as 1-2-3</h2>
+        <p class="lead text-center mb-5">Join us now and simplify your financial journey</p>
+        <div class="row g-4 g-lg-5">
+            <div class="col-sm-4">
+                <div class="featured-box style-4">
+                    <div class="featured-box-icon text-dark shadow-none border-bottom"><span class="w-100 text-20 fw-500">1</span></div>
+                    <h3 class="mb-3">Become Our Member</h3>
+                    <p class="text-3 fw-300"><b>Register: </b>Just a few details and you're in.</p>
+                    <p class="text-3 fw-300"><b>Confirm by Email: </b>Check your inbox and click that magical confirmation button.</p>
+                    <p class="text-3 fw-300"><b>Fill your profile: </b>Tell us a bit about yourself.</p>
+                    <p class="text-3 fw-300"><b>Add Your Cards: </b>Time to make your wallet feel at home. Ready to roll?</p>
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="featured-box style-4">
+                    <div class="featured-box-icon text-dark shadow-none border-bottom"><span class="w-100 text-20 fw-500">2</span></div>
+                    <h3 class="mb-3">Money Moves</h3>
+                    <p class="text-3 fw-300"><b>Transfer and Transact: </b>Send, receive, and dance like nobody's watching – except for our encrypted servers.</p>
+                    <p class="text-3 fw-300"><b>Send a Surprise: </b>Spread the love! Send a few bucks to a friend.</p>
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="featured-box style-4">
+                    <div class="featured-box-icon text-dark shadow-none border-bottom"><span class="w-100 text-20 fw-500">3</span></div>
+                    <h3 class="mb-3">Sip Coffee, Refer Friends, and Get Rewarded</h3>
+                    <p class="text-3 fw-300"><b>Coffee Break: </b>Pause and enjoy a cup of joe. You've earned it!</p>
+                    <p class="text-3 fw-300"><b>Refer a Friend: </b>Feeling popular? Share the awesomeness with a friend. When they join the fun, you BOTH get a little extra in your wallets.</p>
+                </div>
+            </div>
+        </div>
+        <div class="text-center mt-5">
+            <a asp-controller="Account" asp-action="Register" class="btn btn-primary m-2">Open a Free Account</a>
+        </div>
+        </div>
+</section>
+<!-- How it works End --> 
+
+</body>

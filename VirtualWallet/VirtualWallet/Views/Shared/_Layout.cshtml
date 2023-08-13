@@ -29,7 +29,7 @@
 <!-- Preloader -->
 <div id="preloader">
     
-  <div data-loader="dual-ring"></div>
+<div data-loader="dual-ring"></div>
 </div>
 <!-- Preloader End --> 
 
@@ -43,10 +43,12 @@
     <div class="container">
       <div class="header-row">
         <div class="header-column justify-content-start"> 
+
           <!-- Logo
           ============================= -->
-          <div class="logo me-3"> <a class="d-flex" href="index.html" title="SpeedPay"><img src="~/images/logo.png" width="201" height="50" alt="Runner" /></a> </div>
+          <div class="logo me-3"> <a asp-controller="Home" asp-action="Index" class="d-flex"  title="SpeedPay"><img src="~/images/logo.png" width="201" height="50" alt="Runner" /></a> </div>
           <!-- Logo end --> 
+
           <!-- Collapse Button
           ============================== -->
           <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#header-nav"> <span></span> <span></span> <span></span> </button>
@@ -57,15 +59,12 @@
           <nav class="primary-menu navbar navbar-expand-lg">
             <div id="header-nav" class="collapse navbar-collapse">
               <ul class="navbar-nav me-auto">
-                <li><a asp-controller="Transfer" asp-action="Create">Deposit</a></li>
-                <li><a asp-controller="Transfer" asp-action="Create">Withdraw</a></li>
-
-                <li><a asp-controller="Transaction" asp-action="Create">Send</a></li>
-                <li><a asp-controller="Home" asp-action="Index">Receive</a></li>
-                <li><a asp-controller="Home" asp-action="Index">Fees</a></li>
-
+          
                 @if (User.Claims.Any())
-                { 
+                {
+                  <li><a asp-controller="Transfer" asp-action="Create">Deposit</a></li>
+                  <li><a asp-controller="Transfer" asp-action="Create">Withdraw</a></li>
+                  <li><a asp-controller="Transaction" asp-action="Create">Send</a></li>
                   <li><a asp-controller="User" asp-action="Index">Users</a></li>
                   <li class="dropdown active">
                       <a class="dropdown-toggle" href="#">Account</a>
@@ -92,75 +91,86 @@
                           </li>
                       </ul>
                   </li>
-                }
-                else
-                {
                   <li class="dropdown active">
                       <a class="dropdown-toggle" href="#">Help</a>
                       <ul class="dropdown-menu">
-                          <li class="dropdown"><a class="dropdown-item" asp-controller="Help" asp-action="AboutUs">About us</a></li>
-                          <li class="dropdown"><a class="dropdown-item" asp-controller="Help" asp-action="FAQ">FAQ</a></li>
+                      <li class="dropdown"><a class="dropdown-item" asp-controller="Help" asp-action="AboutUs">About us</a></li>
+                      <li class="dropdown"><a class="dropdown-item" asp-controller="Help" asp-action="FAQ">FAQ</a></li>
+                      <li class="dropdown"><a class="dropdown-item" asp-controller="Help" asp-action="ContactUs">Contact us</a></li>
+                  </ul>
+                  </li>
+                }
+                else
+                {
+                  <li><a asp-controller="Help" asp-action="AboutUs">About Us</a></li>
+                  <li><a asp-controller="Help" asp-action="Fees">Fees</a></li>
+                  <li class="dropdown active">
+                      <a class="dropdown-toggle" href="#">Help</a>
+                      <ul class="dropdown-menu">
+                          <li class="dropdown"><a asp-controller="Help" asp-action="FAQ" class="dropdown-item">FAQ</a></li>
                       </ul>
                   </li>
+                  <li><a asp-controller="Help" asp-action="ContactUs">Contact Us</a></li>
                 }
               </ul>
             </div>
           </nav>
           <!-- Primary Navigation end --> 
+
         </div>
         <div class="header-column justify-content-end"> 
 
-          <!-- Login & Signup Link
-          ============================== -->
+<!-- Login & Signup Link
+============================== -->
           @if (User.Claims.Any())
-                        {
-                            
-                            <!-- My Profile
-                            ============================== -->
-                            <nav class="login-signup navbar navbar-expand">
-                                
-                                <ul class="navbar-nav">
-                                    <li class="dropdown notifications">
-                                        <a class="dropdown-toggle" href="#"><span class="text-5"><i class="far fa-bell"></i></span><span class="count">2</span></a>
-                                        <ul class="dropdown-menu">
-                                            <li class="text-center text-3 py-2">Notifications (2)</li>
-                                            <li class="dropdown-divider mx-n3"></li>
-                                            <li><a class="dropdown-item" href="#"><i class="fas fa-bell"></i>Updates to our privacy policy. Please read.<span class="text-1 text-muted d-block">21 August 2023</span></a></li>
-                                            <li><a class="dropdown-item" href="#"><i class="fas fa-bell"></i>Update about Speed Pay fees<span class="text-1 text-muted d-block">18 Feb 2021</span></a></li>
-                                            <li class="dropdown-divider mx-n3"></li>
-                                            <li><a class="dropdown-item text-center text-primary px-0" href="notifications.html">See all Notifications</a></li>
-                                        </ul>
-                                    </li>
-                                    <li class="dropdown profile ms-2">
-                                        <a class="px-0 dropdown-toggle" href="#"><img class="rounded-circle" src="@Url.Content("~/UploadedImages/" + username.Value + ".png")" height="50" width="50" alt="" enctype="multipart/form-data"></a>
-                                        <ul class="dropdown-menu">
-                                            <li class="text-center text-3 py-2">Hi, @username.Value</li>
-                                            <li class="dropdown-divider mx-n3"></li>
-                                            <li><a asp-controller="User" asp-action="Profile" asp-route-id="@User.FindFirst(ClaimTypes.NameIdentifier)" class="dropdown-item"><i class="fas fa-user"></i>My Profile</a></li>
-                                            <li><a asp-controller="User" asp-action="ChangePassword" class="dropdown-item"><i class="fas fa-shield-alt"></i>Security</a></li>
-                                            <li><a asp-controller="Card" asp-action="Add" class="dropdown-item"><i class="fas fa-credit-card"></i>Payment Methods</a></li>
-                                            <li class="dropdown-divider mx-n3"></li>
-                                            <li><a asp-controller="Account" asp-action="Logout" class="dropdown-item" ><i class="fas fa-sign-out-alt"></i>Sign Out</a></li>
-                                        </ul>
-                                    </li>
-                                </ul>
-                            </nav>
-                        }
-                        else
-                        {
-                            <nav class="login-signup navbar navbar-expand">
-                                <ul class="navbar-nav">
-                                    <li>
-                                        <a asp-controller="Account" asp-action="Login" class="btn btn-outline-success">LOGIN</a>
-                                    </li>
-                                    <li class="align-items-center h-auto ms-sm-3">
-                                        <a asp-controller="Account" asp-action="Register" class="btn btn-primary">SIGN UP</a>
-                                    </li>
-                                </ul>
-                            </nav>
-                        }
+          {
+              <!-- My Profile
+              ============================== -->
+              <nav class="login-signup navbar navbar-expand">
+                  
+                  <ul class="navbar-nav">
+                      <li class="dropdown notifications">
+                          <a class="dropdown-toggle" href="#"><span class="text-5"><i class="far fa-bell"></i></span><span class="count">2</span></a>
+                          <ul class="dropdown-menu">
+                              <li class="text-center text-3 py-2">Notifications (2)</li>
+                              <li class="dropdown-divider mx-n3"></li>
+                              <li><a class="dropdown-item" href="#"><i class="fas fa-bell"></i>Updates to our privacy policy. Please read.<span class="text-1 text-muted d-block">21 August 2023</span></a></li>
+                              <li><a class="dropdown-item" href="#"><i class="fas fa-bell"></i>Update about Speed Pay fees<span class="text-1 text-muted d-block">18 Feb 2021</span></a></li>
+                              <li class="dropdown-divider mx-n3"></li>
+                              <li><a class="dropdown-item text-center text-primary px-0" href="notifications.html">See all Notifications</a></li>
+                          </ul>
+                      </li>
+                      <li class="dropdown profile ms-2">
+                          <a class="px-0 dropdown-toggle" href="#"><img class="rounded-circle" src="@Url.Content("~/UploadedImages/" + username.Value + ".png")" height="50" width="50" alt="" enctype="multipart/form-data"></a>
+                          <ul class="dropdown-menu">
+                              <li class="text-center text-3 py-2">Hi, @username.Value</li>
+                              <li class="dropdown-divider mx-n3"></li>
+                              <li><a asp-controller="User" asp-action="Profile" asp-route-id="@User.FindFirst(ClaimTypes.NameIdentifier)" class="dropdown-item"><i class="fas fa-user"></i>My Profile</a></li>
+                              <li><a asp-controller="User" asp-action="ChangePassword" class="dropdown-item"><i class="fas fa-shield-alt"></i>Security</a></li>
+                              <li><a asp-controller="Card" asp-action="Add" class="dropdown-item"><i class="fas fa-credit-card"></i>Payment Methods</a></li>
+                              <li class="dropdown-divider mx-n3"></li>
+                              <li><a asp-controller="Account" asp-action="Logout" class="dropdown-item" ><i class="fas fa-sign-out-alt"></i>Sign Out</a></li>
+                          </ul>
+                      </li>
+                  </ul>
+              </nav>
+          }
+          else
+          {
+              <nav class="login-signup navbar navbar-expand">
+                  <ul class="navbar-nav">
+                      <li>
+                          <a asp-controller="Account" asp-action="Login" class="btn btn-outline-success">LOGIN</a>
+                      </li>
+                      <li class="align-items-center h-auto ms-sm-3">
+                          <a asp-controller="Account" asp-action="Register" class="btn btn-primary">SIGN UP</a>
+                      </li>
+                  </ul>
+              </nav>
+          }
          
-          <!-- Login & Signup Link end --> 
+<!-- Login & Signup Link end --> 
+
         </div>
       </div>
     </div>
@@ -170,6 +180,7 @@
   
   <!-- Content
   ============================================= -->
+
   <div id="content"> 
             @RenderBody()   
   </div>
@@ -182,12 +193,10 @@
       <div class="row">
         <div class="col-lg d-lg-flex align-items-center">
           <ul class="nav justify-content-center justify-content-lg-start text-3">
-            <li class="nav-item"> <a class="nav-link active" href="#">About Us</a></li>
-            <li class="nav-item"> <a class="nav-link" href="#">Support</a></li>
-            <li class="nav-item"> <a class="nav-link" href="#">Help</a></li>
-            <li class="nav-item"> <a class="nav-link" href="#">Careers</a></li>
-            <li class="nav-item"> <a class="nav-link" href="#">Affiliate</a></li>
-            <li class="nav-item"> <a class="nav-link" href="#">Fees</a></li>
+            <li class="nav-item"> <a asp-controller="Help" asp-action="AboutUs" class="nav-link active">About Us</a></li>
+            <li class="nav-item"> <a asp-controller="Help" asp-action="FAQ" class="nav-link">FAQ</a></li>
+            <li class="nav-item"> <a asp-controller="Help" asp-action="Fees" class="nav-link">Fees</a></li>
+            <li class="nav-item"> <a asp-controller="Help" asp-action="ContactUs" class="nav-link">Contact us</a></li>
           </ul>
         </div>
         <div class="col-lg d-lg-flex justify-content-lg-end mt-3 mt-lg-0">
@@ -206,9 +215,10 @@
           </div>
           <div class="col-lg d-lg-flex align-items-center justify-content-lg-end">
             <ul class="nav justify-content-center">
-              <li class="nav-item"> <a class="nav-link active" href="#">Security</a></li>
-              <li class="nav-item"> <a class="nav-link" href="#">Terms</a></li>
-              <li class="nav-item"> <a class="nav-link" href="#">Privacy</a></li>
+              <li class="nav-item"> <a asp-controller="Help" asp-action="PrivacyPolicyAndTermsOfUse" class="nav-link active">Privacy Policy and Terms of Use</a></li>
+              
+              <li><a href=http://localhost:5116/swagger />Swagger</li>
+
             </ul>
           </div>
         </div>
