@@ -19,20 +19,18 @@ namespace VirtualWallet.Controllers.MVC
         private readonly IUserService userService;
         private readonly ICurrencyService currencyService;
         private readonly IExchangeRateService exchangeRateService;
-        private readonly IMapper mapper;
+       
 
         public TransactionController(
             ITransactionService transactionService,
             IUserService userService,
             ICurrencyService currencyService,
-            IExchangeRateService exchangeRateService,
-            IMapper mapper)
+            IExchangeRateService exchangeRateService)
         {
             this.transactionService = transactionService;
             this.userService = userService;
             this.currencyService = currencyService;
             this.exchangeRateService = exchangeRateService;
-            this.mapper = mapper;
         }
 
 
@@ -108,7 +106,7 @@ namespace VirtualWallet.Controllers.MVC
             }
 
             var createTransactionViewModel = new CreateTransactionViewModel();
-            var result = this.currencyService.GetAll();
+            var result = await this.currencyService.GetAllAsync();
             if (!result.IsSuccessful)
             {
                 return await EntityErrorViewAsync(result.Message);
@@ -158,7 +156,7 @@ namespace VirtualWallet.Controllers.MVC
             createTransactionViewModel.CreateTransactionDto = await TransactionsMapper
                             .MapGetDtoToCreateDto(transactionResult.Data);
 
-            var currencyResult = this.currencyService.GetAll();
+            var currencyResult = await this.currencyService.GetAllAsync();
             if (!currencyResult.IsSuccessful)
             {
                 return await EntityErrorViewAsync(currencyResult.Message);

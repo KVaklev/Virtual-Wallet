@@ -7,12 +7,11 @@ namespace Business.Services.Contracts
 {
     public interface ICurrencyService
     {
-        Response<List<CreateCurrencyDto>> GetAll();
-        Task<Response<CreateCurrencyDto>> GetByIdAsync(int id);
+        Task<Response<List<Currency>>> GetAllAsync();
         Task<Response<Currency>> GetCurrencyByIdAsync(int id);
         Task<Response<Currency>> GetByCurrencyCodeAsync(string id);
-        Task<Response<CreateCurrencyDto>> CreateAsync(CreateCurrencyDto currencyDto, User loggedUser);
-        Task<Response<CreateCurrencyDto>> UpdateAsync(int id, CreateCurrencyDto currencyDto, User loggedUser);
+        Task<Response<Currency>> CreateAsync(CreateCurrencyDto currencyDto, User loggedUser);
+        Task<Response<Currency>> UpdateAsync(int id, CreateCurrencyDto currencyDto, User loggedUser);
         Task<Response<bool>> DeleteAsync(int id, User loggedUser);
 
     }

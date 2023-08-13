@@ -58,7 +58,7 @@ namespace VirtualWallet.Controllers.API
 
             }
 
-            var result = this.currencyService.GetAll();
+            var result = await this.currencyService.GetAllAsync();
 
             if (!result.IsSuccessful)
             {
@@ -81,7 +81,7 @@ namespace VirtualWallet.Controllers.API
                 return StatusCode(StatusCodes.Status404NotFound, loggedUser.Message);
             }
 
-            var result = await this.currencyService.GetByIdAsync(id);
+            var result = await this.currencyService.GetCurrencyByIdAsync(id);
 
             if (!result.IsSuccessful)
             {
