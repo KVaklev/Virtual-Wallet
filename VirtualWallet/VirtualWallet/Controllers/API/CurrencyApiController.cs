@@ -110,7 +110,7 @@ namespace VirtualWallet.Controllers.API
 
             if (!result.IsSuccessful)
             {
-                if (result.Message == Constants.NoFoundResulte)
+                if (result.Message == Constants.NotFoundResults)
                 {
                     return StatusCode(StatusCodes.Status404NotFound, result.Message);
                 }

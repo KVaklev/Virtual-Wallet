@@ -73,7 +73,7 @@ namespace Business.Services.Models
             if(!currencies.Any())
             {
                 result.IsSuccessful = false;
-                result.Message = Constants.NoFoundResulte;
+                result.Message = Constants.NotFoundResults;
 ;
                 return result;
             }

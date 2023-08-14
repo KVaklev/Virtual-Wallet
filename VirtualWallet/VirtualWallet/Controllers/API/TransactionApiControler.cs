@@ -108,7 +108,7 @@ namespace VirtualWallet.Controllers.API
             var result = await this.transactionService.GetByIdAsync(id, loggedUserResult.Data);
             if (!result.IsSuccessful)
             {
-                if (loggedUserResult.Message == Constants.NoFoundResulte)
+                if (loggedUserResult.Message == Constants.NotFoundResults)
                 {
                     return StatusCode(StatusCodes.Status404NotFound, result.Message);
                 }
@@ -128,7 +128,7 @@ namespace VirtualWallet.Controllers.API
             var result = await this.transactionService.FilterByAsync(filterParameters, loggedUserResult.Data);
             if (!result.IsSuccessful)
             {
-                if (result.Message == Constants.NoFoundResulte)
+                if (result.Message == Constants.NotFoundResults)
                 {
                     return StatusCode(StatusCodes.Status404NotFound, result.Message);
                 }
