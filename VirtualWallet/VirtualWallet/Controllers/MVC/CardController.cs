@@ -1,4 +1,5 @@
-﻿using Business.QueryParameters;
+﻿using Business.DTOs.Requests;
+using Business.QueryParameters;
 using Business.Services.Contracts;
 using Business.ViewModels.CardViewModels;
 using Business.ViewModels.UserViewModels;
@@ -14,14 +15,12 @@ namespace VirtualWallet.Controllers.MVC
     {
         private readonly ICardService cardService;
         private readonly IUserService userService;
-        private readonly IAccountService accountService;
         public CardController(ICardService cardService,
-            IUserService userService,
-            IAccountService accountService)
+            IUserService userService)
+            
         {
             this.cardService = cardService;
             this.userService = userService;
-            this.accountService = accountService;
         }
         [HttpGet]
         public async Task<IActionResult> Index(CardQueryParameters cardQueryParameters)
@@ -32,16 +31,7 @@ namespace VirtualWallet.Controllers.MVC
                 return RedirectToAction("Login", "Account");
             }
 
-            //var userResult = await this.userService.GetByIdAsync(loggedUserResult.Data.Id, loggedUserResult.Data);
-            //if (!userResult.IsSuccessful)
-            //{
-            //    return View("HandleErrorNotFound", userResult.Message);
-            //}
-
-            //var userAccount = await this.accountService.GetByUsernameAsync(loggedUserResult.Data.Id, loggedUserResult.Data);
-
             var cardsResult = await this.cardService.FilterByAsync(cardQueryParameters, loggedUserResult.Data);
-            
             if (!cardsResult.IsSuccessful)
             {
                 return View("HandleErrorNotFound");
@@ -56,11 +46,40 @@ namespace VirtualWallet.Controllers.MVC
 
             return this.View(cardSearchModel);
         }
-        public IActionResult PaymentMethods()
-        {
-            return View();
-        }
 
+        [HttpGet]
+        public async Task<IActionResult> Create()
+        {
+            var loggedUser = await FindLoggedUserAsync();
+            if (!loggedUser.IsSuccessful)
+            {
+                return this.RedirectToAction("Login", "Account");
+            }
+
+            var createCardViewModel = new CreateCardViewModel();
+
+            return this.View(createCardViewModel);
+        }
+        [HttpPost]
+        public async Task<IActionResult> Create(CreateCardViewModel createCardViewModel)
+        {
+            var loggedUserResult = await FindLoggedUserAsync();
+            if (!loggedUserResult.IsSuccessful)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            createCardViewModel.CreateCardDto.AccountUsername = loggedUserResult.Data.Username;
+            createCardViewModel.CreateCardDto.CurrencyCode = loggedUserResult.Data.Account.Currency.CurrencyCode;
+
+            var result = await cardService.CreateAsync(loggedUserResult.Data.Id, createCardViewModel.CreateCardDto);
+            if (!result.IsSuccessful)
+            {
+                return View("HandleErrorNotFound", result.Message);
+            }
+
+            return RedirectToAction("Index", "Card");
+        }
         private async Task<Response<User>> FindLoggedUserAsync()
         {
             var result = new Response<User>();

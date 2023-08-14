@@ -64,7 +64,6 @@
                             <a asp-controller="Transfer" asp-action="Create" asp-route-id="@User.FindFirst(ClaimTypes.NameIdentifier)" class="btn-link ms-auto">Deposit</a>
                         </div>
                     </div>
-
                      <div class="bg-white shadow-sm rounded text-center p-3 mb-4">
                         <div class="text-17 text-light my-3"><i class="fas fa-credit-card text-primary"></i></div>
                     <a asp-controller="Card" asp-action="Create" data-bs-target="#add-new-card-details" data-bs-toggle="modal" class="modal-title fw-400">Add New Card</a>
@@ -84,41 +83,46 @@
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body p-4">
-                            <form id="addCard" method="post">
+                            <form asp-controller="Card" asp-action="Create" id="addCard" method="post">
                                 <div class="btn-group d-flex mb-3" role="group">
-                                    <input type="radio" class="btn-check" name="options" id="option1" autocomplete="off" checked>
+                                    <input asp-for="CreateCardDto.CardType" type="radio" value ="Debit" class="btn-check" name="options" id="option1" autocomplete="off" checked>
                                     <label class="btn btn-outline-secondary btn-sm shadow-none w-100" for="option1">Debit</label>
 
-                                    <input type="radio" class="btn-check" name="options" id="option2" autocomplete="off">
+                                    <input asp-for="CreateCardDto.CardType" type="radio" value ="Credit" class="btn-check" name="options" id="option2" autocomplete="off">
                                     <label class="btn btn-outline-secondary btn-sm shadow-none w-100" for="option2">Credit</label>
                                 </div>
                                 <div class="row g-3">
                                     <div class="col-12">
-                                        <label for="cardType" class="form-label">Card Type</label>
-                                        <select id="cardType" class="form-select" required="">
-                                            <option value="">Card Type</option>
-                                            <option>Visa</option>
-                                            <option>MasterCard</option>
-                                            <option>American Express</option>
-                                            <option>Discover</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-12">
                                         <label for="cardNumber" class="form-label">Card Number</label>
-                                        <input type="text" class="form-control" data-bv-field="cardnumber" id="cardNumber" required value="" placeholder="Card Number">
+                                        <input asp-for = "CreateCardDto.CardNumber" type="password" class="form-control" data-bv-field="cardnumber" id="cardNumber" required value="" placeholder="Card Number">
+                                        <span asp-validation-for="CreateCardDto.CardNumber" class="form-error"></span>
                                     </div>
                                     <div class="col-lg-6">
-                                        <label for="expiryDate" class="form-label">Expiry Date</label>
-                                        <input id="expiryDate" type="text" class="form-control" data-bv-field="expiryDate" required value="" placeholder="MM/YY">
+                                        <label for="expiryDate" class="form-label">Expiration Date</label>
+                                        <input asp-for="CreateCardDto.ExpirationDate" id="expiryDate" type="date" class="form-control" data-bv-field="expiryDate" required value="" placeholder="MM/YY">
+                                        <span asp-validation-for="CreateCardDto.ExpirationDate" class="form-error"></span>
                                     </div>
                                     <div class="col-lg-6">
                                         <label for="cvvNumber" class="form-label">CVV <span class="text-info ms-1" data-bs-toggle="tooltip" title="For Visa/Mastercard, the three-digit CVV number is printed on the signature panel on the back of the card immediately after the card's account number. For American Express, the four-digit CVV number is printed on the front of the card above the card account number."><i class="fas fa-question-circle"></i></span></label>
-                                        <input id="cvvNumber" type="password" class="form-control" data-bv-field="cvvnumber" required value="" placeholder="CVV (3 digits)">
+                                        <input asp-for="CreateCardDto.CheckNumber"id="cvvNumber" type="password" class="form-control" data-bv-field="cvvnumber" required value="" placeholder="CVV (3 digits)">
+                                        <span asp-validation-for="CreateCardDto.CheckNumber" class="form-error"></span>
                                     </div>
                                     <div class="col-12">
                                         <label for="cardHolderName" class="form-label">Card Holder Name</label>
-                                        <input type="text" class="form-control" data-bv-field="cardholdername" id="cardHolderName" required value="" placeholder="Card Holder Name">
+                                        <input asp-for="CreateCardDto.CardHolder" type="text" class="form-control" data-bv-field="cardholdername" id="cardHolderName" required value="" placeholder="Card Holder Name">
+                                        <span asp-validation-for="CreateCardDto.CardHolder" class="form-error"></span>
                                     </div>
+                                    <div class="col-12">
+                                        <label for="balance" class="form-label">Balance</label>
+                                        <input asp-for="CreateCardDto.Balance" type="number" class="form-control" data-bv-field="balance" id="cardHolderName" required value="" placeholder="Card Holder Name">
+                                        <span asp-validation-for="CreateCardDto.Balance" class="form-error"></span>
+                                    </div>
+                                     <div class="col-12">
+                                        <label for="balance" class="form-label">Credit Card Limit</label>
+                                        <input asp-for="CreateCardDto.CreditLimit" type="number" class="form-control" data-bv-field="creditCardLimit" id="cardHolderName" required value="" placeholder="Card Holder Name">
+                                        <span asp-validation-for="CreateCardDto.CreditLimit" class="form-error"></span>
+                                    </div>
+                                  
                                     <div class="col-12 d-grid mt-4">
                                         <button class="btn btn-primary" type="submit">Add Card</button>
                                     </div>

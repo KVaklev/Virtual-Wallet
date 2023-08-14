@@ -1,4 +1,5 @@
-﻿using Business.DTOs.Responses;
+﻿using Business.DTOs.Requests;
+using Business.DTOs.Responses;
 using Business.QueryParameters;
 using DataAccess.Models.Models;
 
@@ -11,6 +12,8 @@ namespace Business.ViewModels.CardViewModels
         public Response<PaginatedList<GetCreatedCardDto>> Cards { get; set; }
 
         public User Owner { get; set; }
+
+        public CreateCardDto CreateCardDto { get; set; }
 
     }
 }
