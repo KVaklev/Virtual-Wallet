@@ -62,7 +62,7 @@ namespace VirtualWallet.Controllers.MVC
             var userDetailsViewModel = new UserDetailsViewModel
             {
                 User = userResult.Data,
-                Cards = (!cardsResult.IsSuccessful) ? 0 : cardsResult.Data.Count()
+               Cards = (!cardsResult.IsSuccessful) ? 0 : cardsResult.Data.Count() 
             };
 
             return this.View(userDetailsViewModel);
