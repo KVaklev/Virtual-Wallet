@@ -44,7 +44,7 @@ namespace VirtualWallet.Controllers.MVC
             
             if (!cardsResult.IsSuccessful)
             {
-                return View();
+                return View("HandleErrorNotFound");
             }
             
             var cardSearchModel = new CardSearchViewModel
