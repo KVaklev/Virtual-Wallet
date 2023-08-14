@@ -90,7 +90,7 @@
                                         </div>
                                         <div class="col-6 col-md-3">
                                             <input type="date" name="ToDate" value="ToDate" class="form-control" placeholder="">
-                                        </div>
+                                        </div>                                       
                                         <div class="col-6 col-md-3">
                                             <button type="submit" class="btn btn-primary shadow-none">Filter</button>
                                         </div>
@@ -163,12 +163,23 @@
                                             <div class="col-2 col-sm-1 text-center"> <span class="d-block text-4 fw-300">@day</span> <span class="d-block text-1 fw-300 text-uppercase">@month</span> </div>
                                             if (Model.User.IsAdmin)
                                             {
+                                                @if (transfer.TransferType == TransferDirection.Deposit.ToString())
+                                                {
+                                                    <div class="col col-sm-7">
+                                                        <span class="d-block text-4">From Card: @transfer.CardNumber</span>
+                                                        <span class="d-block text-4">To Account: @transfer.Username</span>
+                                                        <span class="text-muted">@transfer.TransferType  <a class="btn-link" asp-controller="Transfer" asp-action="Details" asp-route-id="@transfer.Id">Details</a></span>
+                                                    </div>
 
-                                                <div class="col col-sm-7">
-                                                    <span class="d-block text-4">From Account: @transfer.Username</span>
-                                                    <span class="d-block text-4">To Account: @transfer.Username</span>
-                                                    <span class="text-muted">@transfer.TransferType  <a class="btn-link" asp-controller="Transfer" asp-action="Details" asp-route-id="@transfer.Id">Details</a></span>
-                                                </div>
+                                                }
+                                                else
+                                                {
+                                                    <div class="col col-sm-7">
+                                                        <span class="d-block text-4">From Account: @transfer.Username</span>
+                                                        <span class="d-block text-4">To Card: @transfer.CardNumber</span>
+                                                        <span class="text-muted">@transfer.TransferType  <a class="btn-link" asp-controller="Transfer" asp-action="Details" asp-route-id="@transfer.Id">Details</a></span>
+                                                    </div>                                                                                                      
+                                                }                                                                                             
                                             }
 
                                             else
