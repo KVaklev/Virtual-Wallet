@@ -57,13 +57,6 @@ namespace DataAccess.Repositories.Models
             return true;
         }
 
-        public async Task<bool> DeleteAsync(int id)
-        {
-            var currencyToDelete = await this.GetByIdAsync(id);
-            currencyToDelete.IsDeleted = true;
-
-            await context.SaveChangesAsync();
-            return currencyToDelete.IsDeleted;
-        }
+        
     }
 }

@@ -88,7 +88,7 @@ namespace VirtualWallet.Controllers.MVC
             }
             var createTransferDepositViewModel = new CreateTransferDepositViewModel();
                        
-            var currencies = this.currencyService.GetAll();
+            var currencies = await this.currencyService.GetAllAsync();
 
             var cards = await this.cardService.FilterByAsync(query, loggedUser.Data);
 

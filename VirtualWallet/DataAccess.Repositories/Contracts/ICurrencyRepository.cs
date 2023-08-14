@@ -9,7 +9,5 @@ namespace DataAccess.Repositories.Contracts
         Task<Currency> GetByCurrencyCodeAsync(string abbreviation);
         Task<Currency> CreateAsync(Currency currency);
         Task<bool> SaveChangesAsync();
-        Task<bool> DeleteAsync(int id);
-
     }
 }

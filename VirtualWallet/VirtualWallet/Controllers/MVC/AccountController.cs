@@ -84,10 +84,10 @@ namespace VirtualWallet.Controllers.MVC
         }
 
         [HttpGet("register")]
-        public IActionResult Register()
+        public async Task<IActionResult> Register()
         {
             var createUserModel = new CreateUserModel();
-            var currencyResult = this.currencyService.GetAll();
+            var currencyResult = await this.currencyService.GetAllAsync();
             if (!currencyResult.IsSuccessful)
             {
 				this.ViewData["ErrorMessage"] = currencyResult.Message;

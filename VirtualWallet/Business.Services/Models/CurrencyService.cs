@@ -23,27 +23,26 @@ namespace Business.Services.Models
             this.mapper = mapper;
         }
 
-        public async Task<Response<CreateCurrencyDto>> CreateAsync(CreateCurrencyDto currencyDto, User loggedUser)
+        public async Task<Response<Currency>> CreateAsync(CreateCurrencyDto currencyDto, User loggedUser)
         {
-            var result = new Response<CreateCurrencyDto>();
-            if (!await Security.IsAdminAsync(loggedUser))
+            var result = new Response<Currency>();
+            if (!loggedUser.IsAdmin)
             {
                 result.IsSuccessful = false;
                 result.Message = Constants.ModifyUserErrorMessage;
                 return result;
             }
             var currency = this.mapper.Map<Currency>(currencyDto);
-            var newCurrency = await this.currencyRepository.CreateAsync(currency); //not used, should we remove this?
-            var newCurrencyDto = this.mapper.Map<CreateCurrencyDto>(newCurrency);
-            result.Data = newCurrencyDto;
+            var newCurrency = await this.currencyRepository.CreateAsync(currency); 
+            result.Data = newCurrency;
             return result;
         }
 
-        public async Task<Response<bool>> DeleteAsync(int id, User loggedUser)
+        public async Task<Response<Currency>> DeleteAsync(int id, User loggedUser)
         {
-            var result = new Response<bool>();
+            var result = new Response<Currency>();
 
-            if (!await Security.IsAdminAsync(loggedUser))
+            if (!loggedUser.IsAdmin)
             {
                 result.IsSuccessful = false;
                 result.Message = Constants.ModifyUserErrorMessage;
@@ -58,26 +57,27 @@ namespace Business.Services.Models
                 result.Message = Constants.CurrencyNotFoundErrorMessage;
                 return result;
             }
-            result.Data = await this.currencyRepository.DeleteAsync(id);
-            result.Message = Constants.ModifyCurrencyDeleteMessage;
+                currencyExists.IsDeleted = true;
+                await this.currencyRepository.SaveChangesAsync();
+                result.Data = currencyExists;
+            
             return result;
         }
 
-        public Response<List<CreateCurrencyDto>> GetAll()
+        public async Task<Response<List<Currency>>> GetAllAsync()
         {
-            var result = new Response<List<CreateCurrencyDto>>();
+            var result = new Response<List<Currency>>();
 
             var currencies = this.currencyRepository.GetAll();
 
-            if(currencies.Count() == 0)
+            if(!currencies.Any())
             {
                 result.IsSuccessful = false;
-                result.Message = Constants.ModifyNoRecordsFound;
+                result.Message = Constants.NoFoundResulte;
+;
                 return result;
             }
-            result.Data = currencies
-                      .Select(currency => mapper.Map<CreateCurrencyDto>(currency))
-                      .ToList();
+            result.Data = currencies.ToList();
 
             return result;
         }
@@ -99,45 +99,30 @@ namespace Business.Services.Models
             return result;
         }
 
-        public async Task<Response<CreateCurrencyDto>> GetByIdAsync(int id)
-        {
-            var result = new Response<CreateCurrencyDto>(); 
-
-            Currency currencyToGet = await this.currencyRepository.GetByIdAsync(id);
-
-            if(currencyToGet == null)
-            {
-                result.IsSuccessful = false;
-                result.Message = Constants.ModifyNoRecordsFound;
-                return result;
-            }
-            var currencyDto = this.mapper.Map<CreateCurrencyDto>(currencyToGet);
-            result.Data = currencyDto;
-            return result;
-        }
+       
 
         public async Task<Response<Currency>> GetCurrencyByIdAsync(int id)
         {
             var result = new Response<Currency>();
 
-            Currency currencyToGet = await this.currencyRepository.GetByIdAsync(id);
+            var currency = await this.currencyRepository.GetByIdAsync(id);
 
-            if (currencyToGet == null)
+            if (currency == null)
             {
                 result.IsSuccessful = false;
                 result.Message = Constants.ModifyNoRecordsFound;
                 return result;
             }
            
-            result.Data = currencyToGet;
+            result.Data = currency;
             return result;
         }
 
-        public async Task<Response<CreateCurrencyDto>> UpdateAsync(int id, CreateCurrencyDto currencyDto, User loggedUser)
+        public async Task<Response<Currency>> UpdateAsync(int id, CreateCurrencyDto currencyDto, User loggedUser)
         {
-            var result = new Response<CreateCurrencyDto>();
+            var result = new Response<Currency>();
 
-            if (!await Security.IsAdminAsync(loggedUser))
+            if (!loggedUser.IsAdmin)
             {
                 result.IsSuccessful = false;
                 result.Message = Constants.ModifyUserErrorMessage;
@@ -145,7 +130,7 @@ namespace Business.Services.Models
             }
 
             var currencyToUpdate = await this.currencyRepository.GetByIdAsync(id);
-            if (currencyToUpdate.IsDeleted)
+            if (currencyToUpdate == null || currencyToUpdate.IsDeleted)
             {
                 result.IsSuccessful = false;
                 result.Message = Constants.CurrencyNotFoundErrorMessage;
@@ -155,7 +140,7 @@ namespace Business.Services.Models
             var currency = this.mapper.Map<Currency>(currencyDto);
             var updatedCurrency = await CurrenciesMapper.MapUpdateAsync(currencyToUpdate, currency);
             this.currencyRepository.SaveChangesAsync();
-            result.Data = this.mapper.Map<CreateCurrencyDto>(updatedCurrency);
+            result.Data = updatedCurrency;
             return result;
         }
 
