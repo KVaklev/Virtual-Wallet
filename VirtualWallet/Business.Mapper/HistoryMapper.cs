@@ -23,7 +23,7 @@ namespace Business.Mappers
         {
             var history = new History();
 
-            history.EventTime = DateTime.Now;
+            history.EventTime = DateTime.UtcNow;
             history.TransactionId = transaction.Id;
             history.Transaction = transaction;
             history.NameOperation = NameOperation.Transaction;
@@ -42,13 +42,12 @@ namespace Business.Mappers
             public static GetHistoryDto MapHistoryToDtoAsync(History history)
         {
             var historyDto = new GetHistoryDto();
-            historyDto.EventTime = history.EventTime.ToString();
+            historyDto.EventTime = history.EventTime;
             historyDto.NameOperation = history.NameOperation.ToString();
 
             if (history.TransactionId != null)
             {
-                historyDto.From = history.Account.User.Username;
-               // historyDto.To = transaction.AccountRecipient.User.Username;
+                historyDto.AccountUsername = history.Account.User.Username;
                 historyDto.Amount = history.Transaction.Amount;
                 historyDto.CurrencyCode = history.Transaction.Currency.CurrencyCode;
                 historyDto.Direction = history.Transaction.Direction.ToString();
@@ -58,17 +57,8 @@ namespace Business.Mappers
                 historyDto.Amount = history.Transfer.Amount;
                 historyDto.CurrencyCode = history.Transfer.Currency.CurrencyCode;
                 historyDto.Direction = history.Transfer.TransferType.ToString();
-
-                if (history.Transfer.TransferType == TransferDirection.Deposit)
-                {
-                    historyDto.From = history.Transfer.Card.CardNumber;
-                    historyDto.To = history.Account.User.Username;
-                }
-                else
-                {
-                    historyDto.From = history.Account.User.Username;
-                    historyDto.To = history.Transfer.Card.CardNumber;
-                }
+                historyDto.AccountUsername = history.Account.User.Username;
+                    
             }
             return historyDto;
         }

@@ -48,7 +48,8 @@ namespace DataAccess.Repositories.Models
                 .Include(tf => tf.Transfer)
                 .ThenInclude(c => c.Currency)
                 .Include(ac => ac.Account)
-                .ThenInclude(u => u.User);
+                .ThenInclude(u => u.User)
+                .OrderByDescending(d=>d.EventTime);
 
             return result;
         }

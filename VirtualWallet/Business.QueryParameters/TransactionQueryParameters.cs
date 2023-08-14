@@ -13,7 +13,7 @@ namespace Business.QueryParameters
         public string? ToDate { get; set; }
         public string? Direction { get; set; }
         public string? SortBy { get; set; }
-        public int PageSize { get; set; } = 6;
+        public int PageSize { get; set; } = 5;
         public int PageNumber { get; set; } = 1;
     }
 }
