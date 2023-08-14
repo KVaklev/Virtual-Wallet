@@ -5,7 +5,7 @@ using DataAccess.Models.Models;
 
 namespace Business.ViewModels.CardViewModels
 {
-    public class CardSearchViewModel
+    public class CardViewModel
     {
         public CardQueryParameters CardQueryParameters { get; set; }
 
@@ -14,6 +14,8 @@ namespace Business.ViewModels.CardViewModels
         public User Owner { get; set; }
 
         public CreateCardDto CreateCardDto { get; set; }
+
+        public UpdateCardDto UpdateCardDto { get; set; }
 
     }
 }

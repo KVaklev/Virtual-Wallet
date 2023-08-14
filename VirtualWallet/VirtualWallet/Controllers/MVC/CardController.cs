@@ -37,7 +37,7 @@ namespace VirtualWallet.Controllers.MVC
                 return View("HandleErrorNotFound");
             }
             
-            var cardSearchModel = new CardSearchViewModel
+            var cardSearchModel = new CardViewModel
             {
                 Owner = loggedUserResult.Data,
                 Cards = cardsResult,
@@ -50,18 +50,18 @@ namespace VirtualWallet.Controllers.MVC
         [HttpGet]
         public async Task<IActionResult> Create()
         {
-            var loggedUser = await FindLoggedUserAsync();
-            if (!loggedUser.IsSuccessful)
+            var loggedUserResult = await FindLoggedUserAsync();
+            if (!loggedUserResult.IsSuccessful)
             {
-                return this.RedirectToAction("Login", "Account");
+                return RedirectToAction("Login", "Account");
             }
 
-            var createCardViewModel = new CreateCardViewModel();
+            var cardViewModel = new CardViewModel();
 
-            return this.View(createCardViewModel);
+            return this.View(cardViewModel);
         }
         [HttpPost]
-        public async Task<IActionResult> Create(CreateCardViewModel createCardViewModel)
+        public async Task<IActionResult> Create(CardViewModel cardSearchViewModel)
         {
             var loggedUserResult = await FindLoggedUserAsync();
             if (!loggedUserResult.IsSuccessful)
@@ -69,10 +69,45 @@ namespace VirtualWallet.Controllers.MVC
                 return RedirectToAction("Login", "Account");
             }
 
-            createCardViewModel.CreateCardDto.AccountUsername = loggedUserResult.Data.Username;
-            createCardViewModel.CreateCardDto.CurrencyCode = loggedUserResult.Data.Account.Currency.CurrencyCode;
+            cardSearchViewModel.CreateCardDto.AccountUsername = loggedUserResult.Data.Username;
+            cardSearchViewModel.CreateCardDto.CurrencyCode = loggedUserResult.Data.Account.Currency.CurrencyCode;
 
-            var result = await cardService.CreateAsync(loggedUserResult.Data.Id, createCardViewModel.CreateCardDto);
+            var result = await cardService.CreateAsync(loggedUserResult.Data.Id, cardSearchViewModel.CreateCardDto);
+            if (!result.IsSuccessful)
+            {
+                return View("HandleErrorNotFound", result.Message);
+            }
+
+            return RedirectToAction("Index", "Card");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Edit()
+        {
+            var loggedUserResult = await FindLoggedUserAsync();
+            if (!loggedUserResult.IsSuccessful)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            var cardViewModel = new CardViewModel();
+
+            return this.View(cardViewModel);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Edit(CardViewModel cardViewModel)
+        {
+            var loggedUserResult = await FindLoggedUserAsync();
+            if (!loggedUserResult.IsSuccessful)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            cardViewModel.CreateCardDto.AccountUsername = loggedUserResult.Data.Username;
+            cardViewModel.CreateCardDto.CurrencyCode = loggedUserResult.Data.Account.Currency.CurrencyCode;
+
+            var result = await cardService.UpdateAsync(loggedUserResult.Data.Id, loggedUserResult.Data, cardViewModel.UpdateCardDto);
             if (!result.IsSuccessful)
             {
                 return View("HandleErrorNotFound", result.Message);

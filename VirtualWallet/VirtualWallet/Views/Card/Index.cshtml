@@ -1,4 +1,4 @@
-﻿@model CardSearchViewModel
+﻿@model CardViewModel
 
 @{
     this.ViewData["Title"] = "Speed Pay - Payment Methods";
@@ -119,7 +119,7 @@
                                     </div>
                                      <div class="col-12">
                                         <label for="balance" class="form-label">Credit Card Limit</label>
-                                        <input asp-for="CreateCardDto.CreditLimit" type="number" class="form-control" data-bv-field="creditCardLimit" id="cardHolderName" required value="" placeholder="Card Holder Name">
+                                        <input asp-for="CreateCardDto.CreditLimit" type="number" class="form-control" data-bv-field="creditCardLimit" id="cardHolderName" required value="" placeholder="Credit Card Limit">
                                         <span asp-validation-for="CreateCardDto.CreditLimit" class="form-error"></span>
                                     </div>
                                   
@@ -213,28 +213,40 @@
                   <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body p-4">
-                  <form id="updateCard" method="post">
+                  <form asp-controller="Card" asp-action="Edit" asp-route-id="" id="updateCard" method="post">
                     <div class="mb-3">
+                        <div class="btn-group d-flex mb-3" role="group">
+                          <input asp-for="UpdateCardDto.CardType" type="radio" value ="Debit" class="btn-check" name="options" id="option1" autocomplete="off" checked>
+                          <label class="btn btn-outline-secondary btn-sm shadow-none w-100" for="option1">Debit</label>
+
+                          <input asp-for="UpdateCardDto.CardType" type="radio" value ="Credit" class="btn-check" name="options" id="option2" autocomplete="off">
+                          <label class="btn btn-outline-secondary btn-sm shadow-none w-100" for="option2">Credit</label>
+                          </div>
                       <label for="edircardNumber" class="form-label">Card Number</label>
                       <div class="input-group">
                         <span class="input-group-text"><img class="ms-auto" src="images/payment/visa.png" alt="visa" title=""></span>
-                        <input type="text" class="form-control" data-bv-field="edircardNumber" id="edircardNumber" disabled value="XXXXXXXXXXXX4151" placeholder="Card Number">
-                      </div>
+                        <input asp-for="UpdateCardDto.CardNumber" type="password" class="form-control" data-bv-field="edircardNumber" id="edircardNumber" disabled value="XXXXXXXXXXXX4151" placeholder="Card Number">
+                        <span asp-validation-for="UpdateCardDto.CardNumber" class="form-error"></span>
+                    </div>
                     </div>
                     <div class="row g-3 mb-3">
                       <div class="col-lg-6">
                           <label for="editexpiryDate" class="form-label">Expiry Date</label>
-                          <input id="editexpiryDate" type="text" class="form-control" data-bv-field="editexpiryDate" required value="07/24" placeholder="MM/YY">
+                          <input asp-for="UpdateCardDto.ExpirationDate "id="editexpiryDate" type="date" class="form-control" data-bv-field="editexpiryDate" required value="07/24" placeholder="MM/YY">
+                          <span asp-validation-for="UpdateCardDto.ExpirationDate" class="form-error"></span>
                       </div>
                       <div class="col-lg-6">
                           <label for="editcvvNumber" class="form-label">CVV <span class="text-info ms-1" data-bs-toggle="tooltip" title="For Visa/Mastercard, the three-digit CVV number is printed on the signature panel on the back of the card immediately after the card's account number. For American Express, the four-digit CVV number is printed on the front of the card above the card account number."><i class="fas fa-question-circle"></i></span></label>
-                          <input id="editcvvNumber" type="password" class="form-control" data-bv-field="editcvvNumber" required value="321" placeholder="CVV (3 digits)">
+                         <input asp-for="UpdateCardDto.CheckNumber" type="number"id="editcvvNumber" type="password" class="form-control" data-bv-field="editcvvNumber" required value="321" placeholder="CVV (3 digits)">
+                         <span asp-validation-for="UpdateCardDto.CheckNumber" class="form-error"></span>
                       </div>
                     </div>
                     <div class="mb-3">
                       <label for="editcardHolderName" class="form-label">Card Holder Name</label>
-                      <input type="text" class="form-control" data-bv-field="editcardHolderName" id="editcardHolderName" required value="Smith Rhodes" placeholder="Card Holder Name">
-                    </div>
+                      <input asp-for="UpdateCardDto.CardHolder" type="text" class="form-control" data-bv-field="editcardHolderName" id="editcardHolderName" required value="Smith Rhodes" placeholder="Card Holder Name">
+                      <span asp-validation-for="UpdateCardDto.CardHolder" class="form-error"></span>
+                  </div>
+                  
                     <div class="d-grid mt-4"><button class="btn btn-primary" type="submit">Update Card</button></div>
                   </form>
                 </div>

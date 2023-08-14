@@ -55,7 +55,6 @@ namespace Business.Mappers
             cardToUpdate.CardNumber = updateCardDto.CardNumber ?? cardToUpdate.CardNumber;
             cardToUpdate.CheckNumber = updateCardDto.CheckNumber ?? cardToUpdate.CheckNumber;
             cardToUpdate.CardHolder = updateCardDto.CardHolder ?? cardToUpdate.CardHolder;
-            cardToUpdate.CreditLimit = updateCardDto.CreditLimit ?? cardToUpdate.CreditLimit;
 
             await UpdateCardTypeAsync(updateCardDto, cardToUpdate);
             await UpdateExpirationDateAsync(updateCardDto, cardToUpdate);
