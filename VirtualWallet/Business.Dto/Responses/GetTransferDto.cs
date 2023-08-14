@@ -10,8 +10,12 @@ namespace Business.DTOs.Responses
         public DateTime DateCreated { get; set; }
         public string CurrencyCode { get; set; }
         public string CardNumber { get; set; }
+        public decimal AmountExchange { get; set; }
+        public decimal ExchangeRate { get; set; }
 
         public Card Card { get; set; }
+
+        public User User { get; set; }
 
         public Account Account { get; set; }
         public string TransferType { get; set; }
@@ -19,6 +23,6 @@ namespace Business.DTOs.Responses
 
         public bool IsConfirmed { get; set; }
 
-        public bool IsCancelled {get; set;}
+        public bool IsCancelled { get; set; }
     }
 }
