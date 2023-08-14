@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using Business.DTOs.Responses;
+﻿using Business.DTOs.Responses;
 using Business.Mappers;
 using Business.QueryParameters;
 using Business.Services.Contracts;
@@ -12,27 +11,25 @@ using System.Text.Json;
 
 namespace VirtualWallet.Controllers.MVC
 {
-    [Authorize]
+    [AllowAnonymous]
     public class TransactionController : Controller
     {
         private readonly ITransactionService transactionService;
         private readonly IUserService userService;
         private readonly ICurrencyService currencyService;
         private readonly IExchangeRateService exchangeRateService;
-        private readonly IMapper mapper;
+       
 
         public TransactionController(
             ITransactionService transactionService,
             IUserService userService,
             ICurrencyService currencyService,
-            IExchangeRateService exchangeRateService,
-            IMapper mapper)
+            IExchangeRateService exchangeRateService)
         {
             this.transactionService = transactionService;
             this.userService = userService;
             this.currencyService = currencyService;
             this.exchangeRateService = exchangeRateService;
-            this.mapper = mapper;
         }
 
 
@@ -45,8 +42,8 @@ namespace VirtualWallet.Controllers.MVC
 
                 if (!loggedUser.IsSuccessful)
                 {
-                return this.RedirectToAction("Login", "Account");
-            }
+                    return this.RedirectToAction("Login", "Account");
+                }
 
 
             var result = await this.transactionService.FilterByAsync(parameters, loggedUser.Data);
@@ -110,7 +107,7 @@ namespace VirtualWallet.Controllers.MVC
             }
 
             var createTransactionViewModel = new CreateTransactionViewModel();
-            var result = this.currencyService.GetAll();
+            var result = await this.currencyService.GetAllAsync();
             if (!result.IsSuccessful)
             {
                 return await EntityErrorViewAsync(result.Message);
@@ -160,7 +157,7 @@ namespace VirtualWallet.Controllers.MVC
             createTransactionViewModel.CreateTransactionDto = await TransactionsMapper
                             .MapGetDtoToCreateDto(transactionResult.Data);
 
-            var currencyResult = this.currencyService.GetAll();
+            var currencyResult = await this.currencyService.GetAllAsync();
             if (!currencyResult.IsSuccessful)
             {
                 return await EntityErrorViewAsync(currencyResult.Message);
@@ -347,9 +344,19 @@ namespace VirtualWallet.Controllers.MVC
 
         private async Task<Response<User>> FindLoggedUserAsync()
         {
+            var result = new Response<User>();
             var loggedUsersUsername = User.FindFirst(ClaimTypes.Name);
+            if (loggedUsersUsername==null)
+            {
+                result.IsSuccessful = false;
+                return result;
+            }
             var loggedUserResult = await this.userService.GetLoggedUserByUsernameAsync(loggedUsersUsername.Value);
-
+            if (loggedUserResult==null)
+            {
+                result.IsSuccessful = false;
+                return result;
+            }
             return loggedUserResult;
         }
 

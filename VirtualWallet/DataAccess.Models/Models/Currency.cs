@@ -21,9 +21,15 @@ namespace DataAccess.Models.Models
         [MaxLength(Constants.CurrencyNameMaxLength, ErrorMessage = Constants.MaxLengthErrorMessage)]
         public string Country { get; set; }
 
+
+        public byte[] FlagImage { get; set; }
+
+
         public List<Account> Accounts { get; set; } = new List<Account>();
         public List<Card> Cards { get; set; } = new List<Card>();
         public List<Transaction> Transactions { get; set; } = new List<Transaction>();
         public bool IsDeleted { get; set; }
+
+
     }
 }

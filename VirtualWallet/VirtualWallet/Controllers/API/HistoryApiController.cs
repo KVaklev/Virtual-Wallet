@@ -29,7 +29,7 @@ namespace VirtualWallet.Controllers.API
             var loggedUserResult = await FindLoggedUserAsync();
             if (!loggedUserResult.IsSuccessful)
             {
-                return StatusCode(StatusCodes.Status404NotFound, loggedUserResult.Message);
+                return StatusCode(StatusCodes.Status401Unauthorized, loggedUserResult.Message);
 
             }
 
@@ -40,12 +40,9 @@ namespace VirtualWallet.Controllers.API
                 {
                     return StatusCode(StatusCodes.Status404NotFound, result.Message);
                 }
-                else
-                {
-                    return StatusCode(StatusCodes.Status401Unauthorized, result.Message);
-                }
+                return BadRequest(result.Message);
             }
-          return StatusCode(StatusCodes.Status200OK, result.Data);
+            return StatusCode(StatusCodes.Status200OK, result.Data);
         }
 
         [HttpGet, Authorize]
@@ -55,8 +52,8 @@ namespace VirtualWallet.Controllers.API
            var loggedUserResult = await FindLoggedUserAsync();
            if (!loggedUserResult.IsSuccessful)
            {
-               return StatusCode(StatusCodes.Status404NotFound, loggedUserResult.Message);
-           }
+                return StatusCode(StatusCodes.Status401Unauthorized, loggedUserResult.Message);
+            }
 
            var result = await this.historyService.FilterByAsync(historyQueryParameters, loggedUserResult.Data);
 
@@ -77,8 +74,19 @@ namespace VirtualWallet.Controllers.API
 
         private async Task<Response<User>> FindLoggedUserAsync()
         {
+            var result = new Response<User>();
             var loggedUsersUsername = User.FindFirst(ClaimTypes.Name);
+            if (loggedUsersUsername == null)
+            {
+                result.IsSuccessful = false;
+                return result;
+            }
             var loggedUserResult = await this.userService.GetLoggedUserByUsernameAsync(loggedUsersUsername.Value);
+            if (loggedUserResult == null)
+            {
+                result.IsSuccessful = false;
+                return result;
+            }
             return loggedUserResult;
         }
     }

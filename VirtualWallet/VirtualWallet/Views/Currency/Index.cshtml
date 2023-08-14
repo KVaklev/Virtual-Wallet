@@ -1,0 +1,100 @@
+﻿@model CurrencyViewModel	
+
+@{
+    var loggedUserId = User.FindFirst(ClaimTypes.NameIdentifier);
+    var isAdmin = User.FindFirst("IsAdmin");
+    var isBlocked = User.FindFirst("IsBlocked");
+    var username = User.FindFirst(ClaimTypes.Name);
+    var imagePath = @Url.Content("~/UploadedImages/" + username.Value + ".png");
+}
+
+<!-- Secondary menu
+  ============================================= -->
+<div class="bg-primary">
+    <div class="container d-flex justify-content-center">
+        <ul class="nav nav-pills alternate nav-lg border-bottom-0">
+           
+            <li class="nav-item"> <a class="nav-link active" >Currency</a></li>
+           
+        </ul>
+    </div>
+</div>
+<!-- Secondary menu end -->
+
+<body>
+
+    <div id="content" class="py-4">
+        <div class="container">
+            <div class="row">
+                <!-- Left Panel
+       ============================================= -->
+    <aside class="col-lg-3">
+
+        <!-- Profile Details
+        =============================== -->
+        <div class="bg-white shadow-sm rounded text-center p-3 mb-4">
+            <form  enctype="multipart/form-data">
+                <div class="profile-thumb mt-3 mb-4">
+                    <img class="rounded-circle" src="@imagePath" height="110" width="110" alt="" id="ProductImage">
+                    
+                </div>
+                <p class="text-3 fw-500 mb-2">Hello, @this.Model.User.Username<br />@DateTime.Now.DayOfWeek, @DateTime.Now.Date.ToShortDateString()</p>
+                            <p class="mb-2"><a asp-action="Profile" asp-controller="User" asp-route-id="@Model.User.Id" class="text-5 text-light" data-bs-toggle="tooltip" title="Edit Profile"><i class="fas fa-edit"></i></a></p>
+            </form>
+        </div>
+        <!-- Profile Details End -->
+        
+    </aside>
+    <!-- Left Panel End -->
+    <!-- Middle Panel
+            ============================================= -->
+    <div class="col-lg-9">
+        <h2 class="fw-400 mb-3">Transaction</h2>
+
+       
+        <!-- Filter End -->
+        <!-- All Transactions
+        ============================================= -->
+        <div class="bg-white shadow-sm rounded py-4 mb-4">
+                        <div class="d-flex justify-content-between align-items-center px-4 mb-4">
+                            <h3 class="text-5 fw-400">Currencies</h3>
+                            <a asp-action="Create" asp-controller="Currency" class="btn btn-primary" aria-label="">Add Currency</a>
+                        </div>
+            <!-- Title
+            =============================== -->
+            <div class="transaction-title py-2 px-4">
+                <div class="row">
+                    <div class="col-2 col-sm-1 text-center"><span class="">Flag</span></div>
+                    <div class="col col-sm-7">Name</div>
+                    <div class="col-auto col-sm-2 d-none d-sm-block text-center">Status</div>
+                    <div class="col-3 col-sm-2 text-end">Delete</div>
+                </div>
+            </div>
+            <!-- Title End -->
+            <!-- Transaction List
+            =============================== -->
+            @foreach (var curency in Model.Currencies)
+            {
+            <div class="transaction-list">
+               
+                    <div class="transaction-item px-4 py-3" data-bs-toggle="modal" data-bs-target="#transaction-detail">
+                        <div class="row align-items-center flex-row">
+                                
+                                            <div class="col-2 col-sm-1 text-center"> <span class="d-block text-4 fw-300">FLAG</span>  </div>
+
+                                                <div class="col col-sm-7">
+                                            <span class="d-block text-4">@curency.CurrencyCode: @curency.Name</span>
+                                              <span class="d-block text-4">@curency.Country</span>
+                                               
+                                                </div>
+                  
+                                    <div class="col-auto col-sm-2 d-none d-sm-block text-center text-3"> <span class="text-success" data-bs-toggle="tooltip" title="Actove"><i class="fas fa-check-circle"></i></span> </div>
+                                
+                                        <div class="col-3 col-sm-2 text-end text-4"> <span class="text-nowrap"><a class="btn-link" asp-action="Delete" asp-controller="Currency" asp-route-id="@curency.Id">Delete</a></span>  </div>
+                            
+                        </div>
+                    </div>
+                
+            </div>
+         }
+</body>

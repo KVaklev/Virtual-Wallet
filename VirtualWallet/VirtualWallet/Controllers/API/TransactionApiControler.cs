@@ -33,7 +33,7 @@ namespace VirtualWallet.Controllers.API
             var loggedUserResult = await FindLoggedUserAsync();
             if (!loggedUserResult.IsSuccessful)
             {
-                return StatusCode(StatusCodes.Status404NotFound, loggedUserResult.Message);
+                return StatusCode(StatusCodes.Status401Unauthorized, loggedUserResult.Message);
             }
             var result = await this.transactionService.CreateOutTransactionAsync(transactionDto, loggedUserResult.Data);
 
@@ -43,10 +43,7 @@ namespace VirtualWallet.Controllers.API
                 {
                     return StatusCode(StatusCodes.Status404NotFound, result.Message);
                 }
-                else
-                {
-                    return BadRequest(result.Message);
-                }
+                return BadRequest(result.Message);
             }
 
             return StatusCode(StatusCodes.Status201Created, result.Data);
@@ -59,7 +56,7 @@ namespace VirtualWallet.Controllers.API
             var loggedUserResult = await FindLoggedUserAsync();
             if (!loggedUserResult.IsSuccessful)
             {
-                return StatusCode(StatusCodes.Status404NotFound, loggedUserResult.Message);
+                return StatusCode(StatusCodes.Status401Unauthorized, loggedUserResult.Message);
             }
             var result = await this.transactionService.DeleteAsync(id, loggedUserResult.Data);
             if (!result.IsSuccessful)
@@ -68,10 +65,7 @@ namespace VirtualWallet.Controllers.API
                 {
                     return StatusCode(StatusCodes.Status404NotFound, result.Message);
                 }
-                else
-                {
-                    return BadRequest(result.Message);
-                }
+                return BadRequest(result.Message);
             }
             return StatusCode(StatusCodes.Status200OK, result.Data);
         }
@@ -83,12 +77,13 @@ namespace VirtualWallet.Controllers.API
 
             if (!loggedUserResult.IsSuccessful)
             {
-                return StatusCode(StatusCodes.Status404NotFound, loggedUserResult.Message);
+                return StatusCode(StatusCodes.Status401Unauthorized, loggedUserResult.Message);
             }
             var result = await this.transactionService.UpdateAsync(id, loggedUserResult.Data, transactionDto);
 
             if (!result.IsSuccessful)
             {
+                if (!result.IsSuccessful)
                 if (loggedUserResult.Message == Constants.NotFoundResults)
                 {
                     return StatusCode(StatusCodes.Status404NotFound, loggedUserResult.Message);
@@ -108,19 +103,16 @@ namespace VirtualWallet.Controllers.API
             var loggedUserResult = await FindLoggedUserAsync();
             if (!loggedUserResult.IsSuccessful)
             {
-                return StatusCode(StatusCodes.Status404NotFound, loggedUserResult.Message);
+                return StatusCode(StatusCodes.Status401Unauthorized, loggedUserResult.Message);
             }
             var result = await this.transactionService.GetByIdAsync(id, loggedUserResult.Data);
             if (!result.IsSuccessful)
             {
-                if (loggedUserResult.Message == Constants.NotFoundResults)
+                if (loggedUserResult.Message == Constants.NoFoundResulte)
                 {
-                    return StatusCode(StatusCodes.Status404NotFound, loggedUserResult.Message);
+                    return StatusCode(StatusCodes.Status404NotFound, result.Message);
                 }
-                else
-                {
-                    return BadRequest(result.Message);
-                }
+                return BadRequest(result.Message);
             }
             return StatusCode(StatusCodes.Status200OK, result.Data);
         }
@@ -131,9 +123,17 @@ namespace VirtualWallet.Controllers.API
             var loggedUserResult = await FindLoggedUserAsync();
             if (!loggedUserResult.IsSuccessful)
             {
-                return StatusCode(StatusCodes.Status404NotFound, loggedUserResult.Message);
+                return StatusCode(StatusCodes.Status401Unauthorized, loggedUserResult.Message);
             }
             var result = await this.transactionService.FilterByAsync(filterParameters, loggedUserResult.Data);
+            if (!result.IsSuccessful)
+            {
+                if (result.Message == Constants.NoFoundResulte)
+                {
+                    return StatusCode(StatusCodes.Status404NotFound, result.Message);
+                }
+                return BadRequest(result.Message);
+            }
 
             return StatusCode(StatusCodes.Status200OK, result.Data);
         }
@@ -144,26 +144,34 @@ namespace VirtualWallet.Controllers.API
             var loggedUserResult = await FindLoggedUserAsync();
             if (!loggedUserResult.IsSuccessful)
             {
-                return StatusCode(StatusCodes.Status404NotFound, loggedUserResult.Message);
+                return StatusCode(StatusCodes.Status401Unauthorized, loggedUserResult.Message);
             }
             var result = await this.transactionService.ConfirmAsync(id, loggedUserResult.Data);
             if (!result.IsSuccessful)
             {
                 if (loggedUserResult.Message == Constants.NotFoundResults)
                 {
-                    return StatusCode(StatusCodes.Status404NotFound, loggedUserResult.Message);
+                    return StatusCode(StatusCodes.Status404NotFound, result.Message);
                 }
-                else
-                {
-                    return BadRequest(result.Message);
-                }
+                return BadRequest(result.Message);
             }
             return StatusCode(StatusCodes.Status200OK, result.Data);
         }
         private async Task<Response<User>> FindLoggedUserAsync()
         {
+            var result = new Response<User>();
             var loggedUsersUsername = User.FindFirst(ClaimTypes.Name);
+            if (loggedUsersUsername == null)
+            {
+                result.IsSuccessful = false;
+                return result;
+            }
             var loggedUserResult = await this.userService.GetLoggedUserByUsernameAsync(loggedUsersUsername.Value);
+            if (loggedUserResult == null)
+            {
+                result.IsSuccessful = false;
+                return result;
+            }
             return loggedUserResult;
         }
     }
