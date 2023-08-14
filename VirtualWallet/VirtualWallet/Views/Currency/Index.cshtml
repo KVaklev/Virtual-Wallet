@@ -56,7 +56,10 @@
         <!-- All Transactions
         ============================================= -->
         <div class="bg-white shadow-sm rounded py-4 mb-4">
-            <h3 class="text-5 fw-400 d-flex align-items-center px-4 mb-4">Currencies</h3>
+                        <div class="d-flex justify-content-between align-items-center px-4 mb-4">
+                            <h3 class="text-5 fw-400">Currencies</h3>
+                            <a asp-action="Create" asp-controller="Currency" class="btn btn-primary" aria-label="">Add Currency</a>
+                        </div>
             <!-- Title
             =============================== -->
             <div class="transaction-title py-2 px-4">
