@@ -39,7 +39,7 @@ namespace VirtualWallet.Controllers.API
 
             if (!result.IsSuccessful)
             {
-                if (result.Message == Constants.NoFoundResulte)
+                if (result.Message == Constants.NoRecordsFound)
                 {
                     return StatusCode(StatusCodes.Status404NotFound, result.Message);
                 }
@@ -61,7 +61,7 @@ namespace VirtualWallet.Controllers.API
             var result = await this.transactionService.DeleteAsync(id, loggedUserResult.Data);
             if (!result.IsSuccessful)
             {
-                if (result.Message == Constants.NoFoundResulte)
+                if (result.Message == Constants.NoRecordsFound)
                 {
                     return StatusCode(StatusCodes.Status404NotFound, result.Message);
                 }
@@ -85,7 +85,7 @@ namespace VirtualWallet.Controllers.API
             {
                 if (!result.IsSuccessful)
                 {
-                    if (result.Message == Constants.NoFoundResulte)
+                    if (result.Message == Constants.NoRecordsFound)
                     {
                         return StatusCode(StatusCodes.Status404NotFound, result.Message);
                     }
@@ -107,7 +107,7 @@ namespace VirtualWallet.Controllers.API
             var result = await this.transactionService.GetByIdAsync(id, loggedUserResult.Data);
             if (!result.IsSuccessful)
             {
-                if (result.Message == Constants.NoFoundResulte)
+                if (result.Message == Constants.NoRecordsFound)
                 {
                     return StatusCode(StatusCodes.Status404NotFound, result.Message);
                 }
@@ -127,7 +127,7 @@ namespace VirtualWallet.Controllers.API
             var result = await this.transactionService.FilterByAsync(filterParameters, loggedUserResult.Data);
             if (!result.IsSuccessful)
             {
-                if (result.Message == Constants.NoFoundResulte)
+                if (result.Message == Constants.NoRecordsFound)
                 {
                     return StatusCode(StatusCodes.Status404NotFound, result.Message);
                 }
@@ -148,7 +148,7 @@ namespace VirtualWallet.Controllers.API
             var result = await this.transactionService.ConfirmAsync(id, loggedUserResult.Data);
             if (!result.IsSuccessful)
             {
-                if (result.Message == Constants.NoFoundResulte)
+                if (result.Message == Constants.NoRecordsFound)
                 {
                     return StatusCode(StatusCodes.Status404NotFound, result.Message);
                 }

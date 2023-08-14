@@ -7,5 +7,7 @@ namespace Business.ViewModels
         public List<Currency> Currencies {get; set;}
     
         public  User User { get; set;}
+
+
     }
 }

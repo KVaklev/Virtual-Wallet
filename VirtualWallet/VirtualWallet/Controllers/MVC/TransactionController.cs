@@ -1,4 +1,5 @@
-﻿using Business.DTOs.Responses;
+﻿using Business.DTOs.Requests;
+using Business.DTOs.Responses;
 using Business.Mappers;
 using Business.QueryParameters;
 using Business.Services.Contracts;
@@ -47,7 +48,7 @@ namespace VirtualWallet.Controllers.MVC
             var result = await this.transactionService.FilterByAsync(parameters, loggedUser.Data);
             if (!result.IsSuccessful)
             {
-                return await EntityErrorViewAsync(result.Message);
+                return View("ErrorMessage", result.Message);
             }
             var indexTransactionViewModel = new IndexTransactionViewModel();
             indexTransactionViewModel.TransactionDtos = result.Data;
@@ -113,6 +114,30 @@ namespace VirtualWallet.Controllers.MVC
             
             TempData["Currencies"] = JsonSerializer.Serialize(result.Data);
             return this.View(createTransactionViewModel);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> CreateWithUsername(string username)
+        {
+            var loggedUser = await FindLoggedUserAsync();
+            if (!loggedUser.IsSuccessful)
+            {
+                return this.RedirectToAction("Login", "Account");
+            }
+
+            var createTransactionViewModel = new CreateTransactionViewModel();
+            createTransactionViewModel.CreateTransactionDto = new CreateTransactionDto()
+            {
+                RecipientUsername = username
+            };
+            var result = await this.currencyService.GetAllAsync();
+            if (!result.IsSuccessful)
+            {
+                return await EntityErrorViewAsync(result.Message);
+            }
+
+            TempData["Currencies"] = JsonSerializer.Serialize(result.Data);
+            return  View("Create", createTransactionViewModel);
         }
 
         [HttpPost]

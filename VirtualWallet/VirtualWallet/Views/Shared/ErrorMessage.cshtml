@@ -1,0 +1,48 @@
+﻿@model String
+
+<!-- Secondary menu
+  ============================================= -->
+<div class="bg-primary">
+    <div class="container d-flex justify-content-center">
+        <ul class="nav nav-pills alternate nav-lg border-bottom-0">
+            <li class="nav-item"> <a class="nav-link" href="send-money.html"></a></li>
+        </ul>
+    </div>
+</div>
+<!-- Secondary menu end -->
+<!-- Content
+============================================= -->
+<div id="content" class="py-4">
+    <div class="container">
+
+
+        
+        <div class="row">
+            <div class="col-md-9 col-lg-7 col-xl-6 mx-auto">
+                <div class="bg-white shadow-sm rounded p-3 pt-sm-4 pb-sm-5 px-sm-5 mb-4">
+                    <!-- Request Money Confirm Details
+                    ============================================= -->
+                    <a asp-action="Index" asp-controller="History" class="btn-close text-2 float-end" aria-label="Close"></a>
+                    <h3 class="text-5 fw-400 mb-3 mb-sm-4">Message</h3>
+                    <hr class="mx-n3 mx-sm-n5 mb-4">
+                    
+                    <div class="d-flex justify-content-center align-items-center" style="height: 50vh;">
+                        <div class="text-center">
+                            <p class="text-muted text-20 lh-1"><i class="fas fa-info-circle"></i></p>
+                            <p class="text-muted text-8 fw-500 lh-1">Information</p>
+                          
+                            <p class="lead">@this.Model</p>
+                        </div>
+                    </div>
+                   
+                    
+                        <div class="d-grid"><a asp-action="Index" asp-controller="History" class="btn btn-primary">Ok</a></div>
+                    
+
+                    <!-- Request Money Confirm Details end -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Content end -->

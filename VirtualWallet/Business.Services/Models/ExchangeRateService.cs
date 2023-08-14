@@ -24,7 +24,7 @@ namespace DataAccess.Models.Models
             try
             {
                 string endOfUrl = fromCurrencyCode.ToLower() + "/" + toCurrencyCode.ToLower() + ".json";
-                HttpResponseMessage response = await httpClient.GetAsync(endOfUrl);//eur/usd.json
+                HttpResponseMessage response = await httpClient.GetAsync(endOfUrl);     //eur/usd.json
                 string jsonResponse = await response.Content.ReadAsStringAsync();
                 ExchangeRate exchangeRateData = JsonConvert.DeserializeObject<ExchangeRate>(jsonResponse);
 
@@ -32,7 +32,7 @@ namespace DataAccess.Models.Models
                 if (currencyValue == null)
                 {
                     result.IsSuccessful = false;
-                    result.Message = Constants.NoFoundResulte;
+                    result.Message = Constants.NoRecordsFound;
                     return result;
                 }
                 exchangeRateData.CurrencyValue = decimal.Parse(currencyValue, CultureInfo.InvariantCulture); ;
@@ -49,13 +49,13 @@ namespace DataAccess.Models.Models
             catch (JsonException)
             {
                 result.IsSuccessful = false;
-                result.Message = Constants.JsonDeserializationError;
+                result.Message = Constants.NoHostError;
                 return result;
             }
             catch (ArgumentOutOfRangeException)
             {
                 result.IsSuccessful = false;
-                result.Message = Constants.ArgumentOutOfRangeError;
+                result.Message = Constants.NoHostError;
                 return result;
             }
         }

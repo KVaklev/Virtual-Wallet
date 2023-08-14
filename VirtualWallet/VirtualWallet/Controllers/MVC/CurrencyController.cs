@@ -95,7 +95,8 @@ namespace VirtualWallet.Controllers.MVC
             {
                 return this.RedirectToAction("Login", "Account");
             }
-            var result = await this.currencyService.CreateAsync(currencyDto, loggedUser.Data);
+
+        var result = await this.currencyService.CreateAsync(currencyDto, loggedUser.Data);
             if (!result.IsSuccessful)
             {
                 return View("Error");

@@ -194,7 +194,7 @@
                                                         <div class="col-5 col-sm-3"><img src="@currentUserImagePath" height="110" width="110" class="rounded-circle" alt="" enctype="multipart/form-data"></div>
                                                         <div class="col-12 col-sm-8 col-md-6">
                                                             <div class="d-flex flex-column">
-                                                                <span class="text-3">@currentUser.FirstName @currentUser.LastName / <b>@currentUser.Username</b></span>
+                                                                <span class="text-3">@currentUser.FirstName @currentUser.LastName / <a asp-action="CreateWithUsername" asp-controller="Transaction" asp-route-username="@currentUser.Username"><b>@currentUser.Username</b></a></span>
                                                                 <span class="text-3">@currentUser.Email</span>
                                                                 <span class="text-3">@currentUser.PhoneNumber</span>
                                                             </div>

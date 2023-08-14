@@ -54,7 +54,7 @@ namespace Business.Services.Models
             if (currencyExists == null)
             {
                 result.IsSuccessful = false;
-                result.Message = Constants.CurrencyNotFoundErrorMessage;
+                result.Message = Constants.NoRecordsFound;
                 return result;
             }
                 currencyExists.IsDeleted = true;
@@ -73,7 +73,7 @@ namespace Business.Services.Models
             if(!currencies.Any())
             {
                 result.IsSuccessful = false;
-                result.Message = Constants.NoFoundResulte;
+                result.Message = Constants.NoRecordsFound;
 ;
                 return result;
             }
