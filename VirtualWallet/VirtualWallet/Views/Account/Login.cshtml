@@ -18,12 +18,12 @@
                         <form id="loginForm" asp-controller="Account" asp-action="Login" method="post">
                             <div class="mb-3">
                                 <label asp-for="Username" class="form-label">Username</label>
-                                <input asp-for="Username" type="text" class="form-control" required placeholder="Enter Your Username">
+                                <input asp-for="Username" type="text" class="form-control" placeholder="Enter Your Username">
                                 <span asp-validation-for="Username" class="form-error text-danger"></span>
                             </div>
                             <div class="mb-3">
                                 <label asp-for="Password" class="form-label">Password</label>
-                                <input asp-for="Password" type="password" class="form-control" required placeholder="Enter Password">
+                                <input asp-for="Password" type="password" class="form-control" placeholder="Enter Password">
                                 <span asp-validation-for="Password" class="form-error text-danger"></span>
                             </div>
                             <div class="row mb-3">

@@ -1,9 +1,9 @@
-﻿@using Business.Services.Helpers
+﻿@using Business.Services.Helpers;
 @{
-	this.ViewData["Title"] = "Successful registration";
+    this.ViewData["Title"] = "Speed Pay - Confirmation Email sent";
 }
 
-<h3 class="fw-400 text-center mt-3 mb-4">Ready to join us</h3>
+<h3 class="fw-400 text-center mt-3 mb-4">Final registration step</h3>
 
 <div class="row">
     <div class="col-md-6 col-lg-4 col-xl-4 mx-auto">
@@ -12,11 +12,10 @@
         <div class="bg-white text-center shadow-sm rounded p-3 pt-sm-4 pb-sm-5 px-sm-5 mb-4">
             <div class="my-4">
                 <p class="text-success text-20 lh-1"><i class="fas fa-check-circle"></i></p>
-                <p class="text-success text-8 fw-500 lh-1">Your registration is successful!</p>
+                <p class="text-success text-8 fw-500 lh-1">Confirmation Email sent successfully!</p>
             </div>
-            <p class="text-3 mb-4">You can now sign in with your credentials and explore your opportunities!</p>
+            <p class="text-3 mb-4">@Constants.SuccessfullConfirmationEmailSentMessage</p>
             <div class="d-grid">
-                <a asp-controller="Account" asp-action="Login" class="btn btn-primary">SIGN IN</a>
             </div>
         </div>
     </div>

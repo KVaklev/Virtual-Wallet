@@ -1,7 +1,6 @@
 ﻿using Business.DTOs.Requests;
 using Business.Services.Contracts;
 using Business.Services.Helpers;
-using Business.Services.Models;
 using DataAccess.Repositories.Contracts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -52,15 +51,16 @@ namespace VirtualWallet.Controllers.MVC
             var loggedUser = await this.userService.LoginAsync(loginUserModel.Username, loginUserModel.Password); 
             if (!loggedUser.IsSuccessful)
             {
-                this.ModelState.AddModelError(loggedUser.Error.InvalidPropertyName, loggedUser.Message);
-                return this.View(loginUserModel);
+                this.ViewData["ErrorMessage"] = loggedUser.Message;
+                return this.View("HandleErrorUnauthorized");
             }
 
             var result = await Security.CreateApiTokenAsync(loggedUser.Data);
             if (!result.IsSuccessful)
             {
-                return BadRequest(result.Message);
-            }
+				this.ViewData["ErrorMessage"] = result.Message;
+				return this.View("HandleErrorUnauthorized");
+			}
 
             Response.Cookies.Append("Cookie_JWT", result.Data, new CookieOptions()
             {
@@ -89,8 +89,9 @@ namespace VirtualWallet.Controllers.MVC
             var currencyResult = await this.currencyService.GetAllAsync();
             if (!currencyResult.IsSuccessful)
             {
-                return this.View("Error");
-            }
+				this.ViewData["ErrorMessage"] = currencyResult.Message;
+				return View("HandleErrorNotFound");
+			}
             TempData["Currencies"] = JsonSerializer.Serialize(currencyResult.Data);
             return this.View(createUserModel);
         }
@@ -107,9 +108,9 @@ namespace VirtualWallet.Controllers.MVC
             var result = await this.userService.CreateAsync(createUserModel);
             if (!result.IsSuccessful)
             {
-                this.ModelState.AddModelError(result.Error.InvalidPropertyName, result.Message);
-                return View(createUserModel);
-            }
+				this.ViewData["ErrorMessage"] = result.Message;
+				return View("HandleErrorInvalidOperation");
+			}
 
             return await SendConfirmationEmailAsync(result.Data.Username);
         }
@@ -122,39 +123,44 @@ namespace VirtualWallet.Controllers.MVC
 
             if (!generatedToken.IsSuccessful)
             {
-                return RedirectToAction("Register", "Account");
-            }
+				this.ViewData["ErrorMessage"] = generatedToken.Message;
+				return View("HandleErrorInvalidOperation");
+			}
 
-            var confirmationLink = Url.Action("confirm-registration", "Account", new { userId = user.Id, token = generatedToken }, Request.Scheme);
+            var confirmationLink = Url.Action("confirmed-registration", "Account", new { userId = user.Id, token = generatedToken }, Request.Scheme);
             var message = await this.emailService.BuildEmailAsync(user, confirmationLink);
 
-            await emailService.SendEMailAsync(message);
+            try
+            {
+                await emailService.SendEMailAsync(message);
+
+            }
+            catch (InvalidOperationException ex)
+            {
+				this.ViewData["ErrorMessage"] = ex.Message;
+				return View("HandleErrorInvalidOperation");
+			}
                 
-            return RedirectToAction("SuccessfulRegistration", "Account");
+            return RedirectToAction("SuccessfulEmailSent", "Account");
         }
 
-        [HttpGet("successful-registration")]
-        public IActionResult SuccessfulRegistration()
+        [HttpGet("successful-email-sent")]
+        public IActionResult SuccessfulEmailSent()
         {
 			return this.View();
 		}
 
-        //ToDo - fix messages if not confirmed
-        [HttpGet("confirm-registration")]
+        [HttpGet("confirmed-registration")]
         public async Task<IActionResult> ConfirmRegistrationAsync([FromQuery] int userId, [FromQuery] string token)
         {
-			if (!ModelState.IsValid)
-			{
-				return RedirectToAction("Index", "Home");
-			}
-
 			var result = await this.accountService.ConfirmRegistrationAsync(userId, token);
             if (!result.IsSuccessful)
             {
-				return RedirectToAction("Index", "Home");
-
+				this.ViewData["ErrorMessage"] = result.Message;
+				return View("HandleErrorInvalidOperation");
 			}
-          return RedirectToAction("Login", "Account");
+
+          return View("SuccessfulRegistration");
         }
     }
 }

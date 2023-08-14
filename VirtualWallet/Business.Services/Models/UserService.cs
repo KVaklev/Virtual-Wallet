@@ -380,7 +380,7 @@ namespace Business.Services.Models
             if (loggedUser == null)
             {
                 result.IsSuccessful = false;
-                result.Message = NoUsersErrorMessage;
+                result.Message = UsernameDoesntExistErrorMessage;
                 return result;
             }
 
