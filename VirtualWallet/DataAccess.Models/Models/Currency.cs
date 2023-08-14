@@ -22,7 +22,7 @@ namespace DataAccess.Models.Models
         public string Country { get; set; }
 
 
-        public byte[] FlagImage { get; set; }
+        //public byte[] FlagImage { get; set; }
 
 
         public List<Account> Accounts { get; set; } = new List<Account>();

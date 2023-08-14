@@ -136,7 +136,7 @@ namespace VirtualWallet.Controllers.MVC
             createTransferViewModel.Cards = cards.Data;
 
             //TempData["Currencies"] = JsonSerializer.Serialize(currencies.Data);
-            TempData["Cards"] = JsonSerializer.Serialize(cards.Data);
+            //TempData["Cards"] = JsonSerializer.Serialize(cards.Data);
 
             return View(createTransferViewModel);
 
