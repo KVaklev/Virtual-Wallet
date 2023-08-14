@@ -6,7 +6,7 @@ namespace VirtualWallet.Controllers.MVC
     [Authorize]
     public class CardController : Controller
     {
-        public IActionResult Index()
+        public IActionResult PaymentMethods()
         {
             return View();
         }
