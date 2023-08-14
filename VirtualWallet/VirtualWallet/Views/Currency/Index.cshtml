@@ -1,12 +1,6 @@
-﻿
-@model List<Currency>
-
-	
+﻿@model CurrencyViewModel	
 
 @{
-
-    
-
     var loggedUserId = User.FindFirst(ClaimTypes.NameIdentifier);
     var isAdmin = User.FindFirst("IsAdmin");
     var isBlocked = User.FindFirst("IsBlocked");
@@ -20,7 +14,7 @@
     <div class="container d-flex justify-content-center">
         <ul class="nav nav-pills alternate nav-lg border-bottom-0">
            
-            <li class="nav-item"> <a class="nav-link active" asp-controller="Transaction" asp-action="Index">Currency</a></li>
+            <li class="nav-item"> <a class="nav-link active" >Currency</a></li>
            
         </ul>
     </div>
@@ -44,8 +38,8 @@
                     <img class="rounded-circle" src="@imagePath" height="110" width="110" alt="" id="ProductImage">
                     
                 </div>
-                @*<p class="text-3 fw-500 mb-2">Hello, @this.Model.User.Username<br />@DateTime.Now.DayOfWeek, @DateTime.Now.Date.ToShortDateString()</p>
-                            <p class="mb-2"><a asp-action="Profile" asp-controller="User" asp-route-id="@Model.User.Id" class="text-5 text-light" data-bs-toggle="tooltip" title="Edit Profile"><i class="fas fa-edit"></i></a></p>*@
+                <p class="text-3 fw-500 mb-2">Hello, @this.Model.User.Username<br />@DateTime.Now.DayOfWeek, @DateTime.Now.Date.ToShortDateString()</p>
+                            <p class="mb-2"><a asp-action="Profile" asp-controller="User" asp-route-id="@Model.User.Id" class="text-5 text-light" data-bs-toggle="tooltip" title="Edit Profile"><i class="fas fa-edit"></i></a></p>
             </form>
         </div>
         <!-- Profile Details End -->
@@ -76,45 +70,28 @@
             <!-- Title End -->
             <!-- Transaction List
             =============================== -->
-            @foreach (var curency in Model)
+            @foreach (var curency in Model.Currencies)
             {
             <div class="transaction-list">
                
                     <div class="transaction-item px-4 py-3" data-bs-toggle="modal" data-bs-target="#transaction-detail">
                         <div class="row align-items-center flex-row">
                                 
-                                
-                            
                                             <div class="col-2 col-sm-1 text-center"> <span class="d-block text-4 fw-300">FLAG</span>  </div>
-                                           
 
                                                 <div class="col col-sm-7">
                                             <span class="d-block text-4">@curency.CurrencyCode: @curency.Name</span>
                                               <span class="d-block text-4">@curency.Country</span>
                                                
                                                 </div>
-
-
-                                @if (curency.IsDeleted)
-                                {
-
-                                    <div class="col-auto col-sm-2 d-none d-sm-block text-center text-3"> <span class="text-danger" data-bs-toggle="tooltip" title="Cancelled"><i class="fas fa-times-circle"></i></span> </div>
-                                }
-                                else
-                                {
-                                            <div class="col-auto col-sm-2 d-none d-sm-block text-center text-3"> <span class="text-success" data-bs-toggle="tooltip" title="Completed"><i class="fas fa-check-circle"></i></span> </div>
-                                }
-                                @if (!curency.IsDeleted)
-                                {
-                                    <div class="col-3 col-sm-2 text-end text-4"> <span class="text-nowrap">Delete</span>  </div>
-                                }
+                  
+                                    <div class="col-auto col-sm-2 d-none d-sm-block text-center text-3"> <span class="text-success" data-bs-toggle="tooltip" title="Actove"><i class="fas fa-check-circle"></i></span> </div>
                                 
-                            }
+                                        <div class="col-3 col-sm-2 text-end text-4"> <span class="text-nowrap"><a class="btn-link" asp-action="Delete" asp-controller="Currency" asp-route-id="@curency.Id">Delete</a></span>  </div>
+                            
                         </div>
                     </div>
                 
             </div>
-            <!-- Transaction List End -->
-            
-            }
+         }
 </body>

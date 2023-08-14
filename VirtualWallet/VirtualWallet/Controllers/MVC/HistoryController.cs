@@ -19,11 +19,10 @@ namespace VirtualWallet.Controllers.MVC
 
         public HistoryController(
             IHistoryService historyService,
-             IUserService userService)
+            IUserService userService)
         {
             this.historyService = historyService;
             this.userService = userService;
-
         }
 
 
@@ -31,10 +30,10 @@ namespace VirtualWallet.Controllers.MVC
         public async Task<IActionResult> IndexAsync([FromQuery] HistoryQueryParameters parameters)
         {
 
-            var loggedUserResponse = await GetLoggedUserAsync();
+            var loggedUserResponse = await FindLoggedUserAsync();
             if (!loggedUserResponse.IsSuccessful)
             {
-                return await EntityErrorViewAsync(loggedUserResponse.Message);
+                return this.RedirectToAction("Login", "Account");
             }
 
             var result = await this.historyService.FilterByAsync(parameters, loggedUserResponse.Data);
@@ -51,11 +50,21 @@ namespace VirtualWallet.Controllers.MVC
                 return this.View(indexHistoryViewModel);
         }
 
-        private async Task<Response<User>> GetLoggedUserAsync()
+        private async Task<Response<User>> FindLoggedUserAsync()
         {
+            var result = new Response<User>();
             var loggedUsersUsername = User.FindFirst(ClaimTypes.Name);
+            if (loggedUsersUsername == null)
+            {
+                result.IsSuccessful = false;
+                return result;
+            }
             var loggedUserResult = await this.userService.GetLoggedUserByUsernameAsync(loggedUsersUsername.Value);
-
+            if (loggedUserResult == null)
+            {
+                result.IsSuccessful = false;
+                return result;
+            }
             return loggedUserResult;
         }
 

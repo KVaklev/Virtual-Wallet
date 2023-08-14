@@ -38,9 +38,9 @@ namespace Business.Services.Models
             return result;
         }
 
-        public async Task<Response<bool>> DeleteAsync(int id, User loggedUser)
+        public async Task<Response<Currency>> DeleteAsync(int id, User loggedUser)
         {
-            var result = new Response<bool>();
+            var result = new Response<Currency>();
 
             if (!loggedUser.IsAdmin)
             {
@@ -59,8 +59,8 @@ namespace Business.Services.Models
             }
                 currencyExists.IsDeleted = true;
                 await this.currencyRepository.SaveChangesAsync();
-                result.Data = currencyExists.IsDeleted;
-            result.Message = Constants.ModifyCurrencyDeleteMessage;
+                result.Data = currencyExists;
+            
             return result;
         }
 
@@ -70,7 +70,7 @@ namespace Business.Services.Models
 
             var currencies = this.currencyRepository.GetAll();
 
-            if(currencies.Any())
+            if(!currencies.Any())
             {
                 result.IsSuccessful = false;
                 result.Message = Constants.NoFoundResulte;

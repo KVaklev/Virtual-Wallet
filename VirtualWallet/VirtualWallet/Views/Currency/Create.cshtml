@@ -1,0 +1,55 @@
+﻿@model CreateCurrencyDto;
+
+<!-- Secondary menu
+============================================= -->
+<div class="bg-primary">
+    <div class="container d-flex justify-content-center">
+        <ul class="nav nav-pills alternate nav-lg border-bottom-0">
+            <li class="nav-item"> <a class="nav-link active" href="send-money.html">Add Currency</a></li>
+
+        </ul>
+    </div>
+</div>
+<!-- Secondary menu end -->
+
+<div id="content" class="py-4">
+    <div class="container">
+
+        
+        <h2 class="fw-400 text-center mt-3">Add Currency</h2>
+        
+        <div class="row">
+            <div class="col-md-9 col-lg-7 col-xl-6 mx-auto">
+                <div class="bg-white shadow-sm rounded p-3 pt-sm-4 pb-sm-5 px-sm-5 mb-4">
+                    <a asp-action="Index" asp-controller="Currency" class="btn-close text-2 float-end" aria-label="Close"></a>
+                    <h3 class="text-5 fw-400 mb-3 mb-sm-4">Add Details</h3>
+                    <hr class="mx-n3 mx-sm-n5 mb-4">
+                    <!-- Send Money Form
+                    ============================ -->
+                    <form asp-controller="Currency" asp-action="Create" id="form-send-money" method="post">
+                        <div class="mb-3">
+                            <label for="emailID" class="form-label">Currency Code</label>
+                            <input asp-for="CurrencyCode" type="text" required value="" class="form-control" data-bv-field="emailid" id="emailID" required placeholder="">
+                            <span asp-validation-for="CurrencyCode" class="error-message"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label for="emailID" class="form-label">Name</label>
+                            <input asp-for="Name" type="text" required value="" class="form-control" data-bv-field="emailid" id="emailID" required placeholder="">
+                            <span asp-validation-for="Name" class="error-message"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label for="emailID" class="form-label">Recipient</label>
+                            <input asp-for="Country" type="text" required value="" class="form-control" data-bv-field="emailid" id="emailID" required placeholder="">
+                            <span asp-validation-for="Country" class="error-message"></span>
+                        </div>
+                        
+                        
+                        <div class="d-grid"><button type="submit" class="btn btn-primary">Add Currency</button></div>
+                    </form>
+                    <!-- Send Money Form end -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Content end -->

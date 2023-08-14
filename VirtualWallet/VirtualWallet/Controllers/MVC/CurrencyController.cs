@@ -1,5 +1,7 @@
-﻿using Business.Exceptions;
+﻿using Business.DTOs.Requests;
+using Business.Exceptions;
 using Business.Services.Contracts;
+using Business.ViewModels;
 using DataAccess.Models.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -8,6 +10,7 @@ using System.Security.Claims;
 
 namespace VirtualWallet.Controllers.MVC
 {
+    [AllowAnonymous]
     public class CurrencyController : Controller
     {
         private readonly ICurrencyService currencyService;
@@ -15,14 +18,13 @@ namespace VirtualWallet.Controllers.MVC
 
         public CurrencyController(
             ICurrencyService currencyService,
-            IUserService userService
-            ) 
+            IUserService userService) 
         {
             this.currencyService = currencyService;
             this.userService = userService;
         }
 
-        [HttpGet,Authorize]
+        [HttpGet]
         public async  Task<IActionResult> Index()
         {
             var loggedUser = await FindLoggedUserAsync();
@@ -30,15 +32,94 @@ namespace VirtualWallet.Controllers.MVC
             {
                 return this.RedirectToAction("Login", "Account");
             }
-                var currencies = await this.currencyService.GetAllAsync();
-                return View(currencies);
-        }
-            private async Task<Response<User>> FindLoggedUserAsync()
+            var result = await this.currencyService.GetAllAsync();
+            if (!result.IsSuccessful)
             {
-                var loggedUsersUsername = User.FindFirst(ClaimTypes.Name);
-                var loggedUserResult = await this.userService.GetLoggedUserByUsernameAsync(loggedUsersUsername.Value);
-
-                return loggedUserResult;
+                return View("Error");
             }
+            var currencyViwModel = new CurrencyViewModel();
+            currencyViwModel.Currencies = result.Data;
+            currencyViwModel.User = loggedUser.Data;
+            return View(currencyViwModel);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Delete([FromRoute] int id)
+        {
+            var loggedUser = await FindLoggedUserAsync();
+            if (!loggedUser.IsSuccessful)
+            {
+                return this.RedirectToAction("Login", "Account");
+            }
+            var result = await this.currencyService.GetCurrencyByIdAsync(id);
+            if (!result.IsSuccessful)
+            {
+                return View("Error");
+            }
+            
+            return View(result.Data);
+        }
+        [HttpPost]
+        public async Task<IActionResult> Delete(Currency currency)
+        {
+            var loggedUser = await FindLoggedUserAsync();
+            if (!loggedUser.IsSuccessful)
+            {
+                return this.RedirectToAction("Login", "Account");
+            }
+            var result = await this.currencyService.DeleteAsync(currency.Id, loggedUser.Data);
+            if (!result.IsSuccessful)
+            {
+                return View("Error");
+            }
+
+            return this.RedirectToAction("Index", "Currency");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Create()
+        {
+            var loggedUser = await FindLoggedUserAsync();
+            if (!loggedUser.IsSuccessful)
+            {
+                return this.RedirectToAction("Login", "Account");
+            }
+            var currency = new CreateCurrencyDto();
+            return View(currency);
+        }
+        [HttpPost]
+        public async Task<IActionResult> Create(CreateCurrencyDto currencyDto)
+        {
+            var loggedUser = await FindLoggedUserAsync();
+            if (!loggedUser.IsSuccessful)
+            {
+                return this.RedirectToAction("Login", "Account");
+            }
+            var result = await this.currencyService.CreateAsync(currencyDto, loggedUser.Data);
+            if (!result.IsSuccessful)
+            {
+                return View("Error");
+            }
+
+            return this.RedirectToAction("Index", "Currency");
+        }
+
+        private async Task<Response<User>> FindLoggedUserAsync()
+        {
+            var result = new Response<User>();
+            var loggedUsersUsername = User.FindFirst(ClaimTypes.Name);
+            if (loggedUsersUsername == null)
+            {
+                result.IsSuccessful = false;
+                return result;
+            }
+            var loggedUserResult = await this.userService.GetLoggedUserByUsernameAsync(loggedUsersUsername.Value);
+            if (loggedUserResult == null)
+            {
+                result.IsSuccessful = false;
+                return result;
+            }
+            return loggedUserResult;
+        }
     }
 }

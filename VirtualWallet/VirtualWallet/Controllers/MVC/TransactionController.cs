@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using Business.DTOs.Responses;
+﻿using Business.DTOs.Responses;
 using Business.Mappers;
 using Business.QueryParameters;
 using Business.Services.Contracts;
@@ -12,7 +11,7 @@ using System.Text.Json;
 
 namespace VirtualWallet.Controllers.MVC
 {
-    [Authorize]
+    [AllowAnonymous]
     public class TransactionController : Controller
     {
         private readonly ITransactionService transactionService;
@@ -41,8 +40,8 @@ namespace VirtualWallet.Controllers.MVC
                 var loggedUser = await FindLoggedUserAsync();
                 if (!loggedUser.IsSuccessful)
                 {
-                return this.RedirectToAction("Login", "Account");
-            }
+                    return this.RedirectToAction("Login", "Account");
+                }
 
 
             var result = await this.transactionService.FilterByAsync(parameters, loggedUser.Data);
@@ -340,9 +339,19 @@ namespace VirtualWallet.Controllers.MVC
 
         private async Task<Response<User>> FindLoggedUserAsync()
         {
+            var result = new Response<User>();
             var loggedUsersUsername = User.FindFirst(ClaimTypes.Name);
+            if (loggedUsersUsername==null)
+            {
+                result.IsSuccessful = false;
+                return result;
+            }
             var loggedUserResult = await this.userService.GetLoggedUserByUsernameAsync(loggedUsersUsername.Value);
-
+            if (loggedUserResult==null)
+            {
+                result.IsSuccessful = false;
+                return result;
+            }
             return loggedUserResult;
         }
 
