@@ -23,12 +23,11 @@ namespace VirtualWallet.Controllers.MVC
         [HttpGet]
         public async Task<IActionResult> Index(UserQueryParameters userQueryParameters)
         {
-
             var result = await this.userService.FilterByAsync(userQueryParameters);
             if (!result.IsSuccessful)
             {
-                this.ModelState.AddModelError(result.Error.InvalidPropertyName, result.Message);
-                return View(result.Data);
+                //this.ModelState.AddModelError(result.Error.InvalidPropertyName, result.Message);
+                return View("HandleErrorNotFound");
             }
 
             var newViewModel = new UserSearchModel
@@ -48,7 +47,7 @@ namespace VirtualWallet.Controllers.MVC
             var loggedUserResult = await FindLoggedUserAsync();
 			if (!loggedUserResult.IsSuccessful)
 			{
-                return View("HandleErrorNotLoggedIn", loggedUserResult.Message);
+                return View("Error", loggedUserResult.Message);
 			}
 
             var userResult = await this.userService.GetByIdAsync(id, loggedUserResult.Data);

@@ -221,7 +221,10 @@ namespace Business.Services.Models
             var result = new Response<bool>();
 
             result.Data = await this.accountRepository.ConfirmRegistrationAsync(id, token);
-            result.Message = ConfirmedRegistrationMessage;
+            if (result.Data==false)
+            {
+               result.Message = NotSuccessfullRegistrationMessage;
+            }
             return result;
         }
 
