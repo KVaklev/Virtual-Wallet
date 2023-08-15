@@ -5,36 +5,35 @@
    
 }
 <body>
-    <div class="container mt-4" style="margin-left: 10px;">
-        <div class="row justify-content-start">
+    <div class="container mt-4">
+        <div class="row justify-content-center">
             <div class="col-md-6">
                 <div class="card">
                     <div class="card-header">
-                        <h4 class="mb-0 text-center"> <span class="btn-outline-success">Are you absolutely sure that you want to delete the selected user?</span></h4>
+                        <h4 class="mb-0 text-center">
+                            <span class="btn-outline-success">Are you absolutely sure that you want to delete the selected user?</span>
+                        </h4>
                     </div>
                     <div class="card-body">
                         <table class="table">
                             <tbody>
                                 <tr>
-                                    <th scope="row" style="text-align: center; display: flex; align-items: center; justify-content: center;">
+                                    <td class="text-center">
                                         <i class="fas fa-arrow-alt-circle-right text-primary" style="font-size: 25px; margin-right: 10px;"></i>
-                                        <span style="font-size: 20px;">  @this.Model.User.Username</span>
-                                    </th>
+                                        <span style="font-size: 20px;">@Model.User.Username</span>
+                                    </td>
                                 </tr>
-                                <tr><td>@this.Model.User.FirstName @this.Model.User.LastName</td></tr>
                                 <tr>
-                                   
+                                    <td class="text-center">@Model.User.FirstName @Model.User.LastName</td>
+                                </tr>
                             </tbody>
                         </table>
-                    
-                    </div> 
-                    <div class="card-footer" style="display: flex;">
-                        <form asp-controller="User" asp-action="Delete" asp-route-id="@this.Model.User.Id">
-                            <input type="submit" value="Delete" class="btn-sm btn-danger me-3" method="post">
+                    </div>
+                    <div class="card-footer d-flex justify-content-center">
+                        <form asp-controller="User" asp-action="Delete" asp-route-id="@Model.User.Id" method="post">
+                            <input type="submit" value="Delete" class="btn-sm btn-danger" style="margin-right: 40px;">
                         </form>
-                        <div style="margin-left: 10px;"></div>
-                        <a asp-controller="User" asp-action="Index" class="btn-sm btn-primary" method="get">Go Back</a>
-                        <div style="margin-left: 10px;"></div>
+                        <a asp-controller="User" asp-action="Index" class="btn-sm btn-primary">Go Back</a>
                     </div>
                 </div>
             </div>

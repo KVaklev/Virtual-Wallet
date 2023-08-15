@@ -26,7 +26,8 @@ namespace VirtualWallet.Controllers.MVC
             var result = await this.userService.FilterByAsync(userQueryParameters);
             if (!result.IsSuccessful)
             {
-                return View("HandleErrorNotFound");
+                this.ViewData["Controller"] = "User";
+                return View("ErrorMessage", result.Message);
             }
 
             var newViewModel = new UserSearchModel
@@ -50,19 +51,21 @@ namespace VirtualWallet.Controllers.MVC
             var userResult = await this.userService.GetByIdAsync(id, loggedUserResult.Data);
             if (!userResult.IsSuccessful)
             {
-                return View("HandleErrorNotFound", userResult.Message);
+                this.ViewData["Controller"] = "User";
+                return View("ErrorMessage", userResult.Message);
             }
 
             var cardsResult = this.cardService.GetByAccountId(id);
             if (!cardsResult.IsSuccessful)
             {
-                return View("HandleErrorNotFound", cardsResult.Message);
+                this.ViewData["Controller"] = "User";
+                return View("ErrorMessage", cardsResult.Message);
             }
 
             var userDetailsViewModel = new UserDetailsViewModel
             {
                 User = userResult.Data,
-               Cards = (!cardsResult.IsSuccessful) ? 0 : cardsResult.Data.Count() 
+                Cards = (!cardsResult.IsSuccessful) ? 0 : cardsResult.Data.Count() 
             };
 
             return this.View(userDetailsViewModel);
@@ -80,7 +83,8 @@ namespace VirtualWallet.Controllers.MVC
             var userResult = await this.userService.GetByIdAsync(id, loggedUserResult.Data);
             if (!userResult.IsSuccessful)
             {
-                return View("HandleErrorNotFound", userResult.Message);
+                this.ViewData["Controller"] = "User";
+                return View("ErrorMessage", userResult.Message);
             }
 
             var userDetailsViewModel = new UserDetailsViewModel {  User = userResult.Data  };
@@ -101,7 +105,8 @@ namespace VirtualWallet.Controllers.MVC
             var isChanged = await this.userService.ChangeStatusAsync(id, userDetailsViewModel, loggedUserResult.Data);
             if (!isChanged.IsSuccessful)
             {
-                return View("HandleErrorInvalidOperation", isChanged.Message);
+                this.ViewData["Controller"] = "User";
+                return View("ErrorMessage", isChanged.Message);
             }
 
             return this.RedirectToAction("Index", "User");  
@@ -119,7 +124,8 @@ namespace VirtualWallet.Controllers.MVC
             var userResult = await this.userService.GetByIdAsync(id, loggedUserResult.Data);
             if (!userResult.IsSuccessful)
             {
-                return View("HandleErrorNotFound", userResult.Message);
+                this.ViewData["Controller"] = "User";
+                return View("ErrorMessage", userResult.Message);
             }
             var userDetailsViewModel = new UserDetailsViewModel { User = userResult.Data };
 
@@ -138,10 +144,11 @@ namespace VirtualWallet.Controllers.MVC
             var isDeleted = await this.userService.DeleteAsync(id, loggedUserResult.Data);
             if (!isDeleted.IsSuccessful)
             {
-                return View("HandleErrorInvalidOperation", isDeleted.Message);
+                this.ViewData["Controller"] = "User";
+                return View("ErrorMessage", isDeleted.Message);
             }
 
-            return this.RedirectToAction("Index", "User");
+            return View("SuccessfulDelete");
         }
 
         [HttpGet]

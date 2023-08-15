@@ -160,8 +160,15 @@ namespace VirtualWallet.Controllers.MVC
 
             var result = await this.cardService.DeleteAsync(id, loggedUserResult.Data);
 
-            return RedirectToAction("Index", "Card");
+            if (!result.IsSuccessful)
+            {
+                this.ViewData["Controller"] = "Card";
+                return View("ErrorMessage", result.Message);
+            }
+
+            return View("SuccessfulDelete");
         }
+
         private async Task<Response<User>> FindLoggedUserAsync()
         {
             var result = new Response<User>();
