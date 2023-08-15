@@ -48,6 +48,7 @@ namespace VirtualWallet.Controllers.MVC
             var result = await this.transactionService.FilterByAsync(parameters, loggedUser.Data);
             if (!result.IsSuccessful)
             {
+                this.ViewData["Controller"] = "Transaction";
                 return View("ErrorMessage", result.Message);
             }
             var indexTransactionViewModel = new IndexTransactionViewModel();
@@ -70,7 +71,8 @@ namespace VirtualWallet.Controllers.MVC
             var result = await this.transactionService.GetByIdAsync(id, loggedUser.Data);
             if (!result.IsSuccessful)
             {
-                return await EntityErrorViewAsync(result.Message);
+                this.ViewData["Controller"] = "Transaction";
+                return View("ErrorMessage", result.Message);
             }
 
             var detailsTransactionsViewModel = new DetailsTransactionsViewModel();
@@ -79,13 +81,15 @@ namespace VirtualWallet.Controllers.MVC
             var senderUserResult = await this.userService.GetLoggedUserByUsernameAsync(result.Data.SenderUsername);
             if (!senderUserResult.IsSuccessful)
             {
-                return await EntityErrorViewAsync(result.Message);
+                this.ViewData["Controller"] = "Transaction";
+                return View("ErrorMessage", result.Message);
             }
 
             var recipientUserResult = await this.userService.GetLoggedUserByUsernameAsync(result.Data.RecipientUsername);
             if (!recipientUserResult.IsSuccessful)
             {
-                return await EntityErrorViewAsync(result.Message);
+                this.ViewData["Controller"] = "Transaction";
+                return View("ErrorMessage", result.Message);
             }
 
             detailsTransactionsViewModel.SenderUser = senderUserResult.Data;
@@ -109,7 +113,8 @@ namespace VirtualWallet.Controllers.MVC
             var result = await this.currencyService.GetAllAsync();
             if (!result.IsSuccessful)
             {
-                return await EntityErrorViewAsync(result.Message);
+                this.ViewData["Controller"] = "Transaction";
+                return View("ErrorMessage", result.Message);
             }
             
             TempData["Currencies"] = JsonSerializer.Serialize(result.Data);
@@ -133,7 +138,8 @@ namespace VirtualWallet.Controllers.MVC
             var result = await this.currencyService.GetAllAsync();
             if (!result.IsSuccessful)
             {
-                return await EntityErrorViewAsync(result.Message);
+                this.ViewData["Controller"] = "Transaction";
+                return View("ErrorMessage", result.Message);
             }
 
             TempData["Currencies"] = JsonSerializer.Serialize(result.Data);
@@ -155,8 +161,9 @@ namespace VirtualWallet.Controllers.MVC
                 var result = await this.transactionService.CreateOutTransactionAsync(transactionDto.CreateTransactionDto, loggedUserResult.Data);
                 if (!result.IsSuccessful)
                 {
-                    return await EntityErrorViewAsync(result.Message);
-                }
+                this.ViewData["Controller"] = "Transaction";
+                return View("ErrorMessage", result.Message);
+            }
                 return this.RedirectToAction("Confirm", "Transaction", new { id = result.Data.Id });
         }
 
@@ -173,7 +180,8 @@ namespace VirtualWallet.Controllers.MVC
             var transactionResult = await this.transactionService.GetByIdAsync(id, loggedUserResult.Data);
             if (!transactionResult.IsSuccessful)
             {
-                return await EntityErrorViewAsync(transactionResult.Message);
+                this.ViewData["Controller"] = "Transaction";
+                return View("ErrorMessage", transactionResult.Message);
             }
 
             var createTransactionViewModel = new CreateTransactionViewModel();
@@ -183,7 +191,8 @@ namespace VirtualWallet.Controllers.MVC
             var currencyResult = await this.currencyService.GetAllAsync();
             if (!currencyResult.IsSuccessful)
             {
-                return await EntityErrorViewAsync(currencyResult.Message);
+                this.ViewData["Controller"] = "Transaction";
+                return View("ErrorMessage", transactionResult.Message);
             }
             TempData["Currencies"] = JsonSerializer.Serialize(currencyResult.Data);
             return this.View(createTransactionViewModel); 
@@ -201,8 +210,8 @@ namespace VirtualWallet.Controllers.MVC
                 var loggedUserResult = await FindLoggedUserAsync();
                 if (!loggedUserResult.IsSuccessful)
                 {
-                return this.RedirectToAction("Login", "Account");
-            }
+                    return this.RedirectToAction("Login", "Account");
+                }
 
                 var result = await this.transactionService.UpdateAsync(
                             id, 
@@ -210,13 +219,11 @@ namespace VirtualWallet.Controllers.MVC
                             createTransactionViewModel.CreateTransactionDto);
                 if (!result.IsSuccessful)
                 {
-                    return await EntityErrorViewAsync(result.Message);
-                }
+                this.ViewData["Controller"] = "Transaction";
+                return View("ErrorMessage", result.Message);
+            }
 
-                return this.RedirectToAction(
-                            "Confirm", 
-                            "Transaction", 
-                            new { id =  result.Data.Id});
+                return this.RedirectToAction("Confirm", "Transaction", new { id =  result.Data.Id});
             
         }
 
@@ -228,16 +235,18 @@ namespace VirtualWallet.Controllers.MVC
                 if (!loggedUserResult.IsSuccessful)
                 {
                 return this.RedirectToAction("Login", "Account");
-            }
+                }
                 var transactionResult = await this.transactionService.GetByIdAsync(id, loggedUserResult.Data);
                 if (!transactionResult.IsSuccessful)
                 {
-                    return await EntityErrorViewAsync(transactionResult.Message);
+                this.ViewData["Controller"] = "Transaction";
+                return View("ErrorMessage", transactionResult.Message);
                 }
                 var result = await InitializedExecuteTransactionViewModelAsync(transactionResult.Data);
                 if (!result.IsSuccessful)
                 {
-                    return await EntityErrorViewAsync(transactionResult.Message);
+                this.ViewData["Controller"] = "Transaction";
+                return View("ErrorMessage", result.Message);
                 }
             ConfirmTransactionViewModel confirmTransactionViewModel=result.Data;
             return this.View(confirmTransactionViewModel);
@@ -257,7 +266,8 @@ namespace VirtualWallet.Controllers.MVC
                 var result = await this.transactionService.DeleteAsync(id, loggedUserResult.Data);
                 if (!result.IsSuccessful)
                 {
-                    return await EntityErrorViewAsync(result.Message);
+                this.ViewData["Controller"] = "Transaction";
+                return View("ErrorMessage", result.Message);
                 }
 
                 return this.RedirectToAction("SuccessfulDelete", "Transaction");
@@ -280,12 +290,14 @@ namespace VirtualWallet.Controllers.MVC
             var transactionResult = await this.transactionService.GetByIdAsync(id, loggedUserResult.Data);
             if (!transactionResult.IsSuccessful)
             {
-                return await EntityErrorViewAsync(transactionResult.Message);
+                this.ViewData["Controller"] = "Transaction";
+                return View("ErrorMessage", transactionResult.Message);
             }
             var result = await InitializedExecuteTransactionViewModelAsync(transactionResult.Data);
             if (!result.IsSuccessful)
             {
-                return await EntityErrorViewAsync(transactionResult.Message);
+                this.ViewData["Controller"] = "Transaction";
+                return View("ErrorMessage", result.Message);
             }
             ConfirmTransactionViewModel confirmTransactionViewModel = result.Data;
 
@@ -306,21 +318,24 @@ namespace VirtualWallet.Controllers.MVC
             var transactionResult = await this.transactionService.GetByIdAsync(id, loggedUserResult.Data);
             if (!transactionResult.IsSuccessful)
             {
-                return await EntityErrorViewAsync(loggedUserResult.Message);
+                this.ViewData["Controller"] = "Transaction";
+                return View("ErrorMessage", transactionResult.Message);
             }
             executeTransactionViewModel.GetTransactionDto = transactionResult.Data;
 
             var userResult = await this.userService.GetLoggedUserByUsernameAsync(transactionResult.Data.RecipientUsername);
             if (!userResult.IsSuccessful)
             {
-                return await EntityErrorViewAsync(userResult.Message);
+                this.ViewData["Controller"] = "Transaction";
+                return View("ErrorMessage", userResult.Message);
             }
             executeTransactionViewModel.Recipient = userResult.Data;
 
             var result = await this.transactionService.ConfirmAsync(id, loggedUserResult.Data);
             if (!result.IsSuccessful)
             {
-                return await EntityErrorViewAsync(result.Message);
+                this.ViewData["Controller"] = "Transaction";
+                return View("ErrorMessage", result.Message);
             }
 
             return RedirectToAction("SuccessfulConfirm", "Transaction", new { id = transactionResult.Data.Id });
@@ -337,30 +352,12 @@ namespace VirtualWallet.Controllers.MVC
             var transactionResult = await this.transactionService.GetByIdAsync(id, loggedUserResult.Data);
             if (!transactionResult.IsSuccessful)
             {
-                return await EntityErrorViewAsync(loggedUserResult.Message);
+                this.ViewData["Controller"] = "Transaction";
+                return View("ErrorMessage", transactionResult.Message);
             }
 
             return this.View(transactionResult.Data);
         }
-
-        
-
-
-        private async Task<IActionResult> EntityErrorViewAsync(string message)
-        {
-            this.HttpContext.Response.StatusCode = StatusCodes.Status404NotFound;
-            this.ViewData["ErrorMessage"] = message;
-
-            return this.View("Error");
-        }
-
-        private IActionResult BlockedErrorView()
-        {
-            this.HttpContext.Response.StatusCode = StatusCodes.Status401Unauthorized;
-            this.ViewData["ErrorMessage"] = "You are a \"BLOCKED USER\"!";
-            return this.View("UnauthorizedError");
-        }
-
 
         private async Task<Response<User>> FindLoggedUserAsync()
         {
@@ -380,8 +377,7 @@ namespace VirtualWallet.Controllers.MVC
             return loggedUserResult;
         }
 
-        private async Task<Response<ConfirmTransactionViewModel>> InitializedExecuteTransactionViewModelAsync(
-            GetTransactionDto transaction)
+        private async Task<Response<ConfirmTransactionViewModel>> InitializedExecuteTransactionViewModelAsync(GetTransactionDto transaction)
         {
             var result = new Response<ConfirmTransactionViewModel>();
             ConfirmTransactionViewModel executeTransactionViewModel = new ConfirmTransactionViewModel();

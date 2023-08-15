@@ -22,7 +22,7 @@
                 <div class="bg-white shadow-sm rounded p-3 pt-sm-4 pb-sm-5 px-sm-5 mb-4">
                     <!-- Request Money Confirm Details
                     ============================================= -->
-                    <a asp-action="Index" asp-controller="History" class="btn-close text-2 float-end" aria-label="Close"></a>
+                    <a asp-action="Index" asp-controller="@this.ViewData["Controller"]" class="btn-close text-2 float-end" aria-label="Close"></a>
                     <h3 class="text-5 fw-400 mb-3 mb-sm-4">Message</h3>
                     <hr class="mx-n3 mx-sm-n5 mb-4">
                     
@@ -34,9 +34,9 @@
                             <p class="lead">@this.Model</p>
                         </div>
                     </div>
-                   
-                    
-                        <div class="d-grid"><a asp-action="Index" asp-controller="History" class="btn btn-primary">Ok</a></div>
+
+
+                    <div class="d-grid"><a asp-action="Index" asp-controller="@this.ViewData["Controller"]" class="btn btn-primary">Ok</a></div>
                     
 
                     <!-- Request Money Confirm Details end -->
