@@ -7,7 +7,6 @@ namespace Business.Services.Contracts
 {
     public interface IHistoryService
     {
-        Task<Response<GetHistoryDto>> GetByIdAsync(int id, User loggedUser);
         Task<Response<PaginatedList<GetHistoryDto>>> FilterByAsync(HistoryQueryParameters filterParameters,User loggedUser);
     }
 }

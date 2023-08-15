@@ -30,10 +30,10 @@ namespace VirtualWallet.Controllers.MVC
             {
                 return this.RedirectToAction("Login", "Account");
             }
-            var result = await this.currencyService.GetAllAsync();
+            var result = await this.currencyService.GetAllAndDeletedAsync(loggedUser.Data);
             if (!result.IsSuccessful)
             {
-                this.ViewData["Controller"] = "Transaction";
+                this.ViewData["Controller"] = "Currency";
                 return View("ErrorMessage", result.Message);
             }
             var currencyViwModel = new CurrencyViewModel();
@@ -53,12 +53,13 @@ namespace VirtualWallet.Controllers.MVC
             var result = await this.currencyService.GetCurrencyByIdAsync(id);
             if (!result.IsSuccessful)
             {
-                this.ViewData["Controller"] = "Transaction";
+                this.ViewData["Controller"] = "Currency";
                 return View("ErrorMessage", result.Message);
             }
             
             return View(result.Data);
         }
+
         [HttpPost]
         public async Task<IActionResult> Delete(Currency currency)
         {
@@ -70,7 +71,7 @@ namespace VirtualWallet.Controllers.MVC
             var result = await this.currencyService.DeleteAsync(currency.Id, loggedUser.Data);
             if (!result.IsSuccessful)
             {
-                this.ViewData["Controller"] = "Transaction";
+                this.ViewData["Controller"] = "Currency";
                 return View("ErrorMessage", result.Message);
             }
 
@@ -101,11 +102,30 @@ namespace VirtualWallet.Controllers.MVC
             var result = await this.currencyService.CreateAsync(currencyDto, loggedUser.Data);
             if (!result.IsSuccessful)
             {
-                this.ViewData["Controller"] = "Transaction";
+                this.ViewData["Controller"] = "Currency";
                 return View("ErrorMessage", result.Message);
             }
 
             return this.RedirectToAction("Index", "Currency");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Update([FromRoute] int id)
+        {
+            var loggedUser = await FindLoggedUserAsync();
+            if (!loggedUser.IsSuccessful)
+            {
+                return this.RedirectToAction("Login", "Account");
+            }
+            var result = await this.currencyService.UpdateAsync(id, loggedUser.Data);
+            if (!result.IsSuccessful)
+            {
+                this.ViewData["Controller"] = "Currency";
+                return View("ErrorMessage", result.Message);
+            }
+
+            this.ViewData["Controller"] = "Currency";
+            return View("ErrorMessage", result.Message);
         }
 
         private async Task<Response<User>> FindLoggedUserAsync()

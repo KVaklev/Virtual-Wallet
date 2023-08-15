@@ -58,7 +58,7 @@ namespace VirtualWallet.Controllers.API
 
             }
 
-            var result = await this.currencyService.GetAllAsync();
+            var result = await this.currencyService.GetAllAndDeletedAsync(loggedUser.Data);
 
             if (!result.IsSuccessful)
             {
@@ -106,7 +106,7 @@ namespace VirtualWallet.Controllers.API
                 return StatusCode(StatusCodes.Status401Unauthorized, loggedUser.Message);
             }
         
-            var result = await this.currencyService.UpdateAsync(id, currencyDto, loggedUser.Data);
+            var result = await this.currencyService.UpdateAsync(id, loggedUser.Data);
 
             if (!result.IsSuccessful)
             {

@@ -28,8 +28,8 @@ namespace Business.Services.Models
             IExchangeRateService exchangeRateService,
             IAccountService accountService,
             IHistoryRepository historyRepository,
-            IMapper mapper
-            )
+            IMapper mapper)
+
         {
             this.transactionRepository = transactionRepository;
             this.accountRepository = accountRepository;
@@ -66,9 +66,9 @@ namespace Business.Services.Models
             User loggedUser)
         {
             var result = new Response<PaginatedList<GetTransactionDto>>();
-            IQueryable<Transaction> transactions = this.transactionRepository.GetAll(loggedUser.Username);
+            IQueryable<Transaction> transactions = this.transactionRepository.GetAll();
 
-            transactions = await FilterByRecipientAsync(transactions, filterParameters.RecipientUsername);
+            transactions = await FilterByUsernameAsync(transactions, filterParameters.Username);
             transactions = await FilterByDirectionAsync(transactions, filterParameters.Direction);
             transactions = await FilterByFromDataAsync(transactions, filterParameters.FromDate);
             transactions = await FilterByToDataAsync(transactions, filterParameters.ToDate);
@@ -152,24 +152,14 @@ namespace Business.Services.Models
                 }
             }
            
-            var transaction = await TransactionsMapper.MapDtoТоTransactionAsync(
-                transactionDto, 
-                loggedUser, 
-                recipient, 
-                currency,
-                exchangeRate);
-            
-
+            var transaction = await TransactionsMapper.MapDtoТоTransactionAsync(transactionDto, loggedUser, recipient, currency, exchangeRate);
             var newTransaction = await this.transactionRepository.CreateTransactionAsync(transaction);
             result.Data = this.mapper.Map<GetTransactionDto>(newTransaction);
 
             return result;
         }
 
-        public async Task<Response<GetTransactionDto>> UpdateAsync(
-            int id, 
-            User loggedUser, 
-            CreateTransactionDto transactionDto)
+        public async Task<Response<GetTransactionDto>> UpdateAsync(int id, User loggedUser, CreateTransactionDto transactionDto)
         {
             var result = new Response<GetTransactionDto>();
             var transactionToUpdate = await this.transactionRepository.GetByIdAsync(id);
@@ -389,13 +379,17 @@ namespace Business.Services.Models
                 return false;
             }
         }
-        private async Task<IQueryable<Transaction>> FilterByRecipientAsync(
+        private async Task<IQueryable<Transaction>> FilterByUsernameAsync(
             IQueryable<Transaction> result, 
             string? username)
         {
             if (!string.IsNullOrEmpty(username))
             {
-                return result.Where(t => t.AccountRecipient.User.Username == username);
+                return result.Where(transaction =>
+                        (transaction.Direction == DirectionType.Out
+                        && transaction.AccountRecipient.User.Username == username)
+                        || (transaction.Direction == DirectionType.In
+                        && transaction.AccountSender.User.Username == username));
             }
             return await Task.FromResult(result);
         }

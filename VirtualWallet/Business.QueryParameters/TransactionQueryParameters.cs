@@ -8,7 +8,7 @@ namespace Business.QueryParameters
 {
     public class TransactionQueryParameters
     {
-        public string? RecipientUsername { get; set; }
+        public string? Username { get; set; }
         public string? FromDate { get; set; }
         public string? ToDate { get; set; }
         public string? Direction { get; set; }

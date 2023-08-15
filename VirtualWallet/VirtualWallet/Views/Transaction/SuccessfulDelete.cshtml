@@ -1,4 +1,4 @@
-﻿@model Business.DTOs.Responses.GetTransactionDto
+﻿@model String
 
 <!-- Secondary menu
  ============================================= -->
@@ -55,12 +55,12 @@
                         <p class="text-success text-8 fw-500 lh-1">Success!</p>
                         <p class="lead">Deleted Transaction</p>
                     </div>
-                    <p class="text-3 mb-4">
-                        The transaction has been successfully deleted.
+                    <p class="text-3 mb-4">@Model
+                        @*The transaction has been successfully deleted.
 
                         If you have any questions or concerns, please feel free to contact our support team for assistance.
 
-                        Thank you. </p>
+                        Thank you.*@ </p>
               
                     </p>
                     <div class="d-grid"><a class="btn btn-primary" asp-controller="History" asp-action="Index">Go To History</a></div>

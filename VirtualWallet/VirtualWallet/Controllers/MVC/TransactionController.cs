@@ -169,13 +169,13 @@ namespace VirtualWallet.Controllers.MVC
         [HttpGet]
         public async Task<IActionResult> Update([FromRoute] int id)
         {
-            var loggedUserResult = await FindLoggedUserAsync();
-            if (!loggedUserResult.IsSuccessful)
+            var loggedUser = await FindLoggedUserAsync();
+            if (!loggedUser.IsSuccessful)
             {
                 return this.RedirectToAction("Login", "Account");
             }
 
-            var transactionResult = await this.transactionService.GetByIdAsync(id, loggedUserResult.Data);
+            var transactionResult = await this.transactionService.GetByIdAsync(id, loggedUser.Data);
 
             if (!transactionResult.IsSuccessful)
             {
@@ -270,14 +270,10 @@ namespace VirtualWallet.Controllers.MVC
                 return View("ErrorMessage", result.Message);
                 }
 
-            return this.RedirectToAction("SuccessfulDelete", "Transaction");
+            return View("SuccessfulDelete", result.Message); ;
 
         }
-        [HttpGet]
-        public async Task<IActionResult> SuccessfulDelete()
-        {
-            return this.View();
-        }
+        
 
         [HttpGet]
         public async Task<IActionResult> Confirm([FromRoute] int id)

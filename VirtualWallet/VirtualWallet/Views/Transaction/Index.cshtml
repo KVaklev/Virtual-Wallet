@@ -6,7 +6,7 @@
 
     var parameters = new Dictionary<string, string>
  {
-      {"RecipientUsername", Model.TransactionQueryParameters.RecipientUsername},
+      {"Username", Model.TransactionQueryParameters.Username},
       {"FromDate", Model.TransactionQueryParameters.FromDate},
       {"ToDate", Model.TransactionQueryParameters.ToDate},
       {"Direction", Model.TransactionQueryParameters.Direction},
@@ -55,18 +55,24 @@
                         </form>
                     </div>
                     <!-- Profile Details End -->
-                    <!-- Available Balance
-                    =============================== -->
-                    <div class="bg-white shadow-sm rounded text-center p-3 mb-4">
-                        <div class="text-17 text-light my-3"><i class="fas fa-wallet text-primary"></i></div>
-                        <h3 class="text-9 fw-400">@Model.User.Account.Balance @Model.User.Account.Currency.CurrencyCode</h3>
-                        <p class="mb-2 text-muted opacity-8">Available Balance</p>
-                        <hr class="mx-n3">
-                        <div class="d-flex">
-                            <a asp-controller="Transfer" asp-action="Create" class="btn-link me-auto">Withdraw</a>
-                            <a asp-controller="Transfer" asp-action="Create" class="btn-link ms-auto">Deposit</a>
+
+                    @if (!Model.User.IsAdmin)
+                    {
+
+
+                        <!-- Available Balance
+                        =============================== -->
+                        <div class="bg-white shadow-sm rounded text-center p-3 mb-4">
+                            <div class="text-17 text-light my-3"><i class="fas fa-wallet text-primary"></i></div>
+                            <h3 class="text-9 fw-400">@Model.User.Account.Balance @Model.User.Account.Currency.CurrencyCode</h3>
+                            <p class="mb-2 text-muted opacity-8">Available Balance</p>
+                            <hr class="mx-n3">
+                            <div class="d-flex">
+                                <a asp-controller="Transfer" asp-action="Create" class="btn-link me-auto">Withdraw</a>
+                                <a asp-controller="Transfer" asp-action="Create" class="btn-link ms-auto">Deposit</a>
+                            </div>
                         </div>
-                    </div>
+                    }
                     <!-- Available Balance End -->
                 </aside>
                 <!-- Left Panel End -->
@@ -93,7 +99,7 @@
                                             <input type="date" name="ToDate" value="ToDate" class="form-control" placeholder="">
                                         </div>
                                         <div class="col-6 col-md-3">
-                                            <input type="text" name="RecipientUsername" class="form-control" placeholder="Username">
+                                            <input type="text" name="Username" class="form-control" placeholder="Username">
                                         </div>
                                         <div class="col-6 col-md-3">
                                             <button type="submit" class="btn btn-primary shadow-none">Filter</button>
@@ -190,7 +196,7 @@
                                                 else
                                                 {
                                                     <div class="col col-sm-7">
-                                                        <span class="d-block text-4">@transaction.SenderUsername </span>
+                                                        <span class="d-block text-4"><a asp-action="CreateWithUsername" asp-controller="Transaction" asp-route-username="@transaction.SenderUsername">@transaction.SenderUsername </a></span>
                                                         <span class="text-muted">Payment Received  <a class="btn-link" asp-controller="Transaction" asp-action="Details" asp-route-id="@transaction.Id">Details</a></span>
                                                     </div>
                                                 }

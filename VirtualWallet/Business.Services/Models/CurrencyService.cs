@@ -16,8 +16,7 @@ namespace Business.Services.Models
 
         public CurrencyService(
             ICurrencyRepository currencyRepository,
-            IMapper mapper
-      )
+            IMapper mapper )
         {
             this.currencyRepository = currencyRepository;
             this.mapper = mapper;
@@ -47,7 +46,6 @@ namespace Business.Services.Models
                 result.IsSuccessful = false;
                 result.Message = Constants.ModifyUserErrorMessage;
                 return result;
-
             }
             var currencyExists = await this.currencyRepository.GetByIdAsync(id);
 
@@ -65,6 +63,25 @@ namespace Business.Services.Models
         }
 
         public async Task<Response<List<Currency>>> GetAllAsync()
+
+        {
+            var result = new Response<List<Currency>>();
+
+            var currencies = this.currencyRepository.GetAll();
+
+            if (!currencies.Any())
+            {
+                result.IsSuccessful = false;
+                result.Message = Constants.NoRecordsFound;
+                return result;
+            }
+
+            currencies = currencies.Where(c => c.IsDeleted == false).AsQueryable();
+            result.Data = currencies.ToList();
+            return result;
+        }
+
+        public async Task<Response<List<Currency>>> GetAllAndDeletedAsync(User loggedUser)
         {
             var result = new Response<List<Currency>>();
 
@@ -74,11 +91,15 @@ namespace Business.Services.Models
             {
                 result.IsSuccessful = false;
                 result.Message = Constants.NoRecordsFound;
-;
+                return result;
+            }
+            if (!loggedUser.IsAdmin)
+            {
+                result.IsSuccessful = false;
+                result.Message = Constants.ModifyAuthorizedErrorMessage;
                 return result;
             }
             result.Data = currencies.ToList();
-
             return result;
         }
 
@@ -118,7 +139,7 @@ namespace Business.Services.Models
             return result;
         }
 
-        public async Task<Response<Currency>> UpdateAsync(int id, CreateCurrencyDto currencyDto, User loggedUser)
+        public async Task<Response<Currency>> UpdateAsync(int id, User loggedUser)
         {
             var result = new Response<Currency>();
 
@@ -130,17 +151,18 @@ namespace Business.Services.Models
             }
 
             var currencyToUpdate = await this.currencyRepository.GetByIdAsync(id);
-            if (currencyToUpdate == null || currencyToUpdate.IsDeleted)
+            if (currencyToUpdate == null)
             {
                 result.IsSuccessful = false;
                 result.Message = Constants.CurrencyNotFoundErrorMessage;
                 return result;
             }
+            currencyToUpdate.IsDeleted = false;
 
-            var currency = this.mapper.Map<Currency>(currencyDto);
-            var updatedCurrency = await CurrenciesMapper.MapUpdateAsync(currencyToUpdate, currency);
             this.currencyRepository.SaveChangesAsync();
-            result.Data = updatedCurrency;
+            result.Data = currencyToUpdate;
+            result.Message = Constants.CurrencySuccessfulUpdateMessage;
+
             return result;
         }
 

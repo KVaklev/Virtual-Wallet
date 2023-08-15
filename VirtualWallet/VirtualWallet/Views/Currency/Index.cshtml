@@ -39,7 +39,7 @@
                     
                 </div>
                 <p class="text-3 fw-500 mb-2">Hello, @this.Model.User.Username<br />@DateTime.Now.DayOfWeek, @DateTime.Now.Date.ToShortDateString()</p>
-                            <p class="mb-2"><a asp-action="Profile" asp-controller="User" asp-route-id="@Model.User.Id" class="text-5 text-light" data-bs-toggle="tooltip" title="Edit Profile"><i class="fas fa-edit"></i></a></p>
+                <p class="mb-2"><a asp-action="Profile" asp-controller="User" asp-route-id="@Model.User.Id" class="text-5 text-light" data-bs-toggle="tooltip" title="Edit Profile"><i class="fas fa-edit"></i></a></p>
             </form>
         </div>
         <!-- Profile Details End -->
@@ -91,16 +91,25 @@
                                             </span>
                                         </div>
 
-                                                <div class="col col-sm-7">
+                                            <div class="col col-sm-7">
                                             <span class="d-block text-4">@curency.CurrencyCode | @curency.Name</span>
-                                              <span class="d-block text-4">@curency.Country</span>
+                                            <span class="d-block text-4">@curency.Country</span>
                                                
-                                                </div>
+                                            </div>
                   
+                                            @if (curency.IsDeleted)
+                                        {
+                                            <div class="col-auto col-sm-2 d-none d-sm-block text-center text-3"> <span class="text-danger" data-bs-toggle="tooltip" title="Cancelled"><i class="fas fa-times-circle"></i></span> </div>
+                                            <div class="col-3 col-sm-2 text-end text-4"> <span class="text-nowrap"><a class="btn-link" asp-action="Update" asp-controller="Currency" asp-route-id="@curency.Id">Update</a></span>  </div>
+
+                                        }
+
+                                        else
+                                        {
                                     <div class="col-auto col-sm-2 d-none d-sm-block text-center text-3"> <span class="text-success" data-bs-toggle="tooltip" title="Actove"><i class="fas fa-check-circle"></i></span> </div>
                                 
                                         <div class="col-3 col-sm-2 text-end text-4"> <span class="text-nowrap"><a class="btn-link" asp-action="Delete" asp-controller="Currency" asp-route-id="@curency.Id">Delete</a></span>  </div>
-                            
+                            }
                         </div>
                     </div>
                 

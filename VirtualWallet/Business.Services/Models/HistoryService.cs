@@ -10,38 +10,11 @@ namespace Business.Services.Models
 {
     public class HistoryService : IHistoryService
     {
-        private readonly IHistoryRepository historyRepository;
-        private readonly ITransactionRepository transactionRepository;
+        private readonly IHistoryRepository historyRepository; 
         
-        public HistoryService(
-            IHistoryRepository historyRepository,
-            ITransactionRepository transactionRepository)
+        public HistoryService(IHistoryRepository historyRepository)
         {
             this.historyRepository = historyRepository;
-            this.transactionRepository = transactionRepository;
-        }
-
-        public async Task<Response<GetHistoryDto>> GetByIdAsync(int id, User loggedUser)
-        {
-            var result = new Response<GetHistoryDto>();
-            var history = await historyRepository.GetByIdAsync(id);
-            if (history == null) 
-            {
-                result.IsSuccessful = false;
-                result.Message = Constants.NoRecordsFound;
-                return result;
-            }
-            if (!await Security.IsHistoryOwnerAsync(history, loggedUser))
-            {
-                result.IsSuccessful = false;
-                result.Message = Constants.ModifyAuthorizedErrorMessage;
-                return result;
-            }
-
-            var historyDto = HistoryMapper.MapHistoryToDtoAsync(history);
-       
-            result.Data = historyDto;
-            return result;
         }
 
         public async Task<Response<PaginatedList<GetHistoryDto>>> FilterByAsync(
@@ -97,6 +70,7 @@ namespace Business.Services.Models
             }
             return await Task.FromResult(result);
         }
+
         private async Task<IQueryable<History>> FilterByFromDataAsync(IQueryable<History> result, string? fromData)
         {
             if (!string.IsNullOrEmpty(fromData))
@@ -107,6 +81,7 @@ namespace Business.Services.Models
             }
             return await Task.FromResult(result);
         }
+
         private async Task<IQueryable<History>> FilterByToDataAsync(IQueryable<History> result, string? toData)
         {
             if (!string.IsNullOrEmpty(toData))

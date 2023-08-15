@@ -12,11 +12,6 @@ namespace Business.Mappers
             CreateMap<CreateCurrencyDto, Currency>();
             CreateMap<Currency, CreateCurrencyDto>();
         }
-        public static async Task<Currency> MapUpdateAsync(Currency currencyToUpdate, Currency currency)
-        {
-            currencyToUpdate.Name = currency.Name;
-            currencyToUpdate.CurrencyCode = currency.CurrencyCode;
-            return currencyToUpdate;
-        }
+        
     }
 }
