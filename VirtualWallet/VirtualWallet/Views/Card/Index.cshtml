@@ -201,60 +201,61 @@
                                             </div>
                                         </div>
                                     </div>
+                            <!-- Edit Card Details Modal
+                            ================================== -->
+                            <div id="edit-card-details" class="modal fade" role="dialog" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title fw-400">Update Card</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body p-4">
+                                            <form asp-controller="Card" asp-action="Edit" asp-route-id="@currentCard.Id" method="post">
+                                                <div class="mb-3">
+                                                    <div class="btn-group d-flex mb-3" role="group">
+                                                        <span class="form-check mr-5">
+                                                            <input asp-for="UpdateCardDto.CardType" type="radio" name="CardType" value="Debit" class="form-check-input" id="debitRadio" />
+                                                            <label class="form-check-label" for="debitRadio">Debit</label>
+                                                        </span>
+                                                        <span class="form-check" style="margin-left: 30px;">
+                                                            <input asp-for="UpdateCardDto.CardType" type="radio" name="CardType" value="Credit" class="form-check-input" id="debitRadio" />
+                                                            <label class="form-check-label" for="debitRadio">Credit</label>
+                                                        </span>
+                                                    </div>
+                                                    <label for="edircardNumber" class="form-label">Card Number</label>
+                                                    <div class="input-group">
+                                                        <input asp-for="UpdateCardDto.CardNumber" type="password" class="form-control" data-bv-field="edircardNumber" id="edircardNumber" value="" placeholder="Card Number">
+                                                        <span asp-validation-for="UpdateCardDto.CardNumber" class="form-error"></span>
+                                                    </div>
+                                                </div>
+                                                <div class="row g-3 mb-3">
+                                                    <div class="col-lg-6">
+                                                        <label for="editexpiryDate" class="form-label">Expiration Date</label>
+                                                        <input asp-for="UpdateCardDto.ExpirationDate " id="editexpiryDate" type="date" class="form-control" data-bv-field="editexpiryDate" value="" placeholder="">
+                                                        <span asp-validation-for="UpdateCardDto.ExpirationDate" class="form-error"></span>
+                                                    </div>
+                                                    <div class="col-lg-6">
+                                                        <label for="editcvvNumber" class="form-label">CVV <span class="text-info ms-1" title="For Visa/Mastercard, the three-digit CVV number is printed on the signature panel on the back of the card immediately after the card's account number. For American Express, the four-digit CVV number is printed on the front of the card above the card account number."><i class="fas fa-question-circle"></i></span></label>
+                                                        <input asp-for="UpdateCardDto.CheckNumber" type="number" id="editcvvNumber" type="password" class="form-control" data-bv-field="editcvvNumber" value="" placeholder="CVV (3 digits)">
+                                                        <span asp-validation-for="UpdateCardDto.CheckNumber" class="form-error"></span>
+                                                    </div>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label for="editcardHolderName" class="form-label">Card Holder Name</label>
+                                                    <input asp-for="UpdateCardDto.CardHolder" type="text" class="form-control" data-bv-field="editcardHolderName" id="editcardHolderName" value="" placeholder="Card Holder Name">
+                                                    <span asp-validation-for="UpdateCardDto.CardHolder" class="form-error"></span>
+                                                </div>
+
+                                                <div class="d-grid mt-4"><button class="btn btn-primary" type="submit">Update Card</button></div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                                 }
                                 
-          <!-- Edit Card Details Modal
-          ================================== -->
-          <div id="edit-card-details" class="modal fade" role="dialog" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered" role="document">
-              <div class="modal-content">
-                <div class="modal-header">
-                  <h5 class="modal-title fw-400">Update Card</h5>
-                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body p-4">
-                  <form asp-controller="Card" asp-action="Edit"  method="post">
-                    <div class="mb-3">
-                        <div class="btn-group d-flex mb-3" role="group">
-                          <span class="form-check mr-5">
-                              <input asp-for="GetCardDto.CardType" type="radio" name="CardType" value="Debit" class="form-check-input" id="debitRadio" />
-                              <label class="form-check-label" for="debitRadio">Debit</label>
-                          </span>
-                          <span class="form-check" style="margin-left: 30px;">
-                              <input asp-for="GetCardDto.CardType" type="radio" name="CardType" value="Credit" class="form-check-input" id="debitRadio" />
-                              <label class="form-check-label" for="debitRadio">Credit</label>
-                          </span>
-                          </div>
-                      <label for="edircardNumber" class="form-label">Card Number</label>
-                      <div class="input-group">  
-                        <input asp-for="GetCardDto.CardNumber" type="password" class="form-control" data-bv-field="edircardNumber" id="edircardNumber" value="" placeholder="Card Number">
-                        <span asp-validation-for="UpdateCardDto.CardNumber" class="form-error"></span>
-                    </div>
-                    </div>
-                    <div class="row g-3 mb-3">
-                      <div class="col-lg-6">
-                          <label for="editexpiryDate" class="form-label">Expiration Date</label>
-                          <input asp-for="GetCardDto.ExpirationDate "id="editexpiryDate" type="date" class="form-control" data-bv-field="editexpiryDate" value="" placeholder="">
-                          <span asp-validation-for="GetCardDto.ExpirationDate" class="form-error"></span>
-                      </div>
-                      <div class="col-lg-6">
-                          <label for="editcvvNumber" class="form-label">CVV <span class="text-info ms-1" title="For Visa/Mastercard, the three-digit CVV number is printed on the signature panel on the back of the card immediately after the card's account number. For American Express, the four-digit CVV number is printed on the front of the card above the card account number."><i class="fas fa-question-circle"></i></span></label>
-                         <input asp-for="GetCardDto.CheckNumber" type="number"id="editcvvNumber" type="password" class="form-control" data-bv-field="editcvvNumber" value="" placeholder="CVV (3 digits)">
-                         <span asp-validation-for="GetCardDto.CheckNumber" class="form-error"></span>
-                      </div>
-                    </div>
-                    <div class="mb-3">
-                      <label for="editcardHolderName" class="form-label">Card Holder Name</label>
-                      <input asp-for="GetCardDto.CardHolder" type="text" class="form-control" data-bv-field="editcardHolderName" id="editcardHolderName" value="" placeholder="Card Holder Name">
-                      <span asp-validation-for="GetCardDto.CardHolder" class="form-error"></span>
-                  </div>
-                  
-                    <div class="d-grid mt-4"><button class="btn btn-primary" type="submit">Update Card</button></div>
-                  </form>
-                </div>
-              </div>
-            </div>
-          </div>
+         
 
          
           <!-- Credit or Debit Cards End --> 
