@@ -167,15 +167,28 @@ namespace Business.Services.Helpers
             return await Task.FromResult(isHistoryOwner);
         }
 
-        public static async Task<bool> IsTransactionSenderAsync(Transaction transaction, int userId)
+        public static async Task<bool> IsTransactionSenderAsync(Transaction transaction, User loggedUser)
         {
             bool isTransactionSender = true;
-
-            if (transaction.AccountSenderId != userId)
+            if (loggedUser.IsAdmin)
             {
-                isTransactionSender = false;
+                return isTransactionSender;
             }
-            return await Task.FromResult(isTransactionSender);
+            if (transaction.Direction == DirectionType.In)
+            {
+                if (transaction.AccountRecipient.Id != loggedUser.AccountId)
+                {
+                    isTransactionSender = false;
+                }
+            }
+            else
+            {
+                if (transaction.AccountSenderId != loggedUser.AccountId)
+                {
+                    isTransactionSender = false;
+                }
+            }                    
+            return isTransactionSender;
         }
 
         //ToDo-Check if we can combine and use only one with generic

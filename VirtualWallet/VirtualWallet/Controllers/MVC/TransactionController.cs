@@ -5,6 +5,7 @@ using Business.QueryParameters;
 using Business.Services.Contracts;
 using Business.Services.Helpers;
 using Business.ViewModels;
+using Business.ViewModels.TransactionViewModels;
 using DataAccess.Models.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -77,7 +78,6 @@ namespace VirtualWallet.Controllers.MVC
                 return this.RedirectToAction("Login", "Account");
             }
 
-            
             var result = await this.transactionService.GetByIdAsync(id, loggedUser.Data);
             if (!result.IsSuccessful)
             {
@@ -164,17 +164,17 @@ namespace VirtualWallet.Controllers.MVC
                 return this.View(transactionDto);
             }
             var loggedUserResult = await FindLoggedUserAsync();
-                if (!loggedUserResult.IsSuccessful)
-                {
-                     return this.RedirectToAction("Login", "Account");
-                }
-                var result = await this.transactionService.CreateOutTransactionAsync(transactionDto.CreateTransactionDto, loggedUserResult.Data);
-                if (!result.IsSuccessful)
-                {
+            if (!loggedUserResult.IsSuccessful)
+            {
+                return this.RedirectToAction("Login", "Account");
+            }
+            var result = await this.transactionService.CreateOutTransactionAsync(transactionDto.CreateTransactionDto, loggedUserResult.Data);
+            if (!result.IsSuccessful)
+            {
                 this.ViewData["Controller"] = "Transaction";
                 return View("ErrorMessage", result.Message);
             }
-                return this.RedirectToAction("Confirm", "Transaction", new { id = result.Data.Id });
+            return this.RedirectToAction("Confirm", "Transaction", new { id = result.Data.Id });
         }
 
         [HttpGet]

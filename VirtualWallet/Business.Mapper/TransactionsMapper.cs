@@ -3,7 +3,6 @@ using Business.DTOs.Requests;
 using Business.DTOs.Responses;
 using DataAccess.Models.Enums;
 using DataAccess.Models.Models;
-using Org.BouncyCastle.Cms;
 
 namespace Business.Mappers
 {
@@ -29,20 +28,22 @@ namespace Business.Mappers
                 
         }
 
-        public static async Task<Transaction> MapCreateDtoToTransactionInAsync(
+        public static async Task<Transaction> MapOutToInTransactionAsync(
             Transaction transactionOut, 
-            decimal amount)
+            decimal amountExchange,
+            decimal exchangeRate)
         {
             var transactionIn = new Transaction();
             transactionIn.AccountRecepientId = transactionOut.AccountRecepientId;
             transactionIn.AccountSenderId = transactionOut.AccountSenderId;
-            transactionIn.Amount = amount;
-            transactionIn.CurrencyId = (int)transactionOut.AccountRecipient.CurrencyId;
+            transactionIn.Amount = transactionOut.Amount;
+            transactionIn.CurrencyId = transactionOut.CurrencyId;
             transactionIn.Direction = DirectionType.In;
-            transactionIn.Date = DateTime.UtcNow;
+            transactionIn.Date = DateTime.Now;
             transactionIn.Description = transactionOut.Description;
             transactionIn.IsConfirmed = true;
-            transactionIn.ExchangeRate=transactionOut.ExchangeRate;
+            transactionIn.ExchangeRate=exchangeRate;
+            transactionIn.AmountExchange= amountExchange;
             return transactionIn;
         }
 
@@ -59,7 +60,7 @@ namespace Business.Mappers
             transactionToUpdate.CurrencyId = currency.Id;
             transactionToUpdate.Currency = currency;
             transactionToUpdate.Description = transactionDto.Description;
-            transactionToUpdate.Date = DateTime.UtcNow;
+            transactionToUpdate.Date = DateTime.Now;
             transactionToUpdate.AmountExchange = transactionDto.Amount*exchangeRate;
             transactionToUpdate.ExchangeRate = exchangeRate;
             return transactionToUpdate;
@@ -82,7 +83,7 @@ namespace Business.Mappers
             transaction.CurrencyId = currency.Id;
             transaction.Direction = DirectionType.Out;
             transaction.Description = transactionDto.Description;
-            transaction.Date = DateTime.UtcNow;
+            transaction.Date = DateTime.Now;
             transaction.AmountExchange = transactionDto.Amount*exchangeRate;
             transaction.ExchangeRate = exchangeRate;
             return transaction;
@@ -97,7 +98,6 @@ namespace Business.Mappers
             createTransactionDto.RecipientUsername = getTransactionDto.RecipientUsername;
 
             return createTransactionDto;
-
         }
     }
 }

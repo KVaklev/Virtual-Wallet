@@ -101,6 +101,7 @@ namespace Business.Services.Helpers
         public const string NoRecordsFound = "No records found.";
         public const string NoRecordsFoundByFilter = "No records found for now. You can try adjusting your search filters or check back later.";
         public const string NoHostError= "An error occurred while fetching exchange rate data. Please try again later.";
+        public const string NotSaved= "Something went wrong. The recording was not saved.";
        
         public static class PropertyName
         {

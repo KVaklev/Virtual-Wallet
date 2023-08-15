@@ -38,6 +38,7 @@ namespace VirtualWallet.Controllers.MVC
             }
 
             var result = await this.historyService.FilterByAsync(parameters, loggedUserResponse.Data);
+            
             var indexHistoryViewModel = new IndexHistoryViewModel();
             indexHistoryViewModel.HistoryQueryParameters = parameters;
             indexHistoryViewModel.LoggedUser = loggedUserResponse.Data;
@@ -56,8 +57,7 @@ namespace VirtualWallet.Controllers.MVC
             }
             indexHistoryViewModel.GetHistoryDtos = result.Data;
 
-
-                return this.View(indexHistoryViewModel);
+            return this.View(indexHistoryViewModel);
         }
 
         private async Task<Response<User>> FindLoggedUserAsync()
