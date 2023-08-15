@@ -5,94 +5,95 @@
 
 <!-- Secondary menu
   ============================================= -->
-  <div class="bg-primary">
+<div class="bg-primary">
     <div class="container d-flex justify-content-center">
-      <ul class="nav nav-pills alternate nav-lg border-bottom-0">
-        <li class="nav-item"> <a class="nav-link active" href="send-money.html">Send</a></li>
-      </ul>
+        <ul class="nav nav-pills alternate nav-lg border-bottom-0">
+            <li class="nav-item"> <a class="nav-link active" href="send-money.html">Send</a></li>
+        </ul>
     </div>
-  </div>
-  <!-- Secondary menu end --> 
+</div>
+<!-- Secondary menu end -->
+<!-- Content
+============================================= -->
+<div id="content" class="py-4">
+    <div class="container">
 
-  <!-- Content
-  ============================================= -->
-  <div id="content" class="py-4">
-    <div class="container"> 
-
-      <!-- Steps Progress bar -->
-      <div class="row mt-4 mb-5">
-        <div class="col-lg-11 mx-auto">
-          <div class="row widget-steps">
-            <div class="col-4 step complete">
-              <div class="step-name">Details</div>
-              <div class="progress">
-                <div class="progress-bar"></div>
-              </div>
-                    <a asp-action="Update" asp-controller="Transaction" asp-route-id="@Model.GetTransactionDto.Id" class="step-dot"></a>
+        <!-- Steps Progress bar -->
+        <div class="row mt-4 mb-5">
+            <div class="col-lg-11 mx-auto">
+                <div class="row widget-steps">
+                    <div class="col-4 step complete">
+                        <div class="step-name">Details</div>
+                        <div class="progress">
+                            <div class="progress-bar"></div>
+                        </div>
+                        <a asp-action="Update" asp-controller="Transaction" asp-route-id="@Model.GetTransactionDto.Id" class="step-dot"></a>
                     </div>
-            <div class="col-4 step active">
-              <div class="step-name">Confirm</div>
-              <div class="progress">
-                <div class="progress-bar"></div>
-              </div>
-              <a href="#" class="step-dot"></a> </div>
-            <div class="col-4 step disabled">
-              <div class="step-name">Success</div>
-              <div class="progress">
-                <div class="progress-bar"></div>
-              </div>
-              <a href="#" class="step-dot"></a> </div>
-          </div>
+                    <div class="col-4 step active">
+                        <div class="step-name">Confirm</div>
+                        <div class="progress">
+                            <div class="progress-bar"></div>
+                        </div>
+                        <a href="#" class="step-dot"></a>
+                    </div>
+                    <div class="col-4 step disabled">
+                        <div class="step-name">Success</div>
+                        <div class="progress">
+                            <div class="progress-bar"></div>
+                        </div>
+                        <a href="#" class="step-dot"></a>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
-      <h2 class="fw-400 text-center mt-3">Send Money</h2>
-     
-      <p class="lead text-center mb-4">You are sending money to <span class="fw-500">@Model.Recipient.Username</span></p>
-      <div class="row">
-        <div class="col-md-9 col-lg-7 col-xl-6 mx-auto">
-          <div class="bg-white shadow-sm rounded p-3 pt-sm-4 pb-sm-5 px-sm-5 mb-4"> 
-            <!-- Request Money Confirm Details
-            ============================================= -->
-            <h3 class="text-5 fw-400 mb-3 mb-sm-4">Confirm Details</h3>
-            <hr class="mx-n3 mx-sm-n5 mb-4">
-            <div class="row g-3 align-items-center">
-              <p class="col-sm-4 text-muted text-sm-end mb-0 mb-sm-3">Name:</p>
-              <p class="col-sm-8 text-3">@Model.Recipient.FirstName @Model.Recipient.LastName</p>
-            </div>
-            <div class="row g-3 align-items-center">
-              <p class="col-sm-4 text-muted text-sm-end mb-0 mb-sm-3">Email:</p>
-              <p class="col-sm-8 text-3">@Model.Recipient.Email</p>
-            </div>
-            
-            <div class="row g-3 align-items-center">
+        <h2 class="fw-400 text-center mt-3">Send Money</h2>
+
+        <p class="lead text-center mb-4">You are sending money to <span class="fw-500">@Model.Recipient.Username</span></p>
+        <div class="row">
+            <div class="col-md-9 col-lg-7 col-xl-6 mx-auto">
+                <div class="bg-white shadow-sm rounded p-3 pt-sm-4 pb-sm-5 px-sm-5 mb-4">
+                    <!-- Request Money Confirm Details
+                    ============================================= -->
+                    <h3 class="text-5 fw-400 mb-3 mb-sm-4">Confirm Details</h3>
+                    <hr class="mx-n3 mx-sm-n5 mb-4">
+                    <div class="row g-3 align-items-center">
+                        <p class="col-sm-4 text-muted text-sm-end mb-0 mb-sm-3">Name:</p>
+                        <p class="col-sm-8 text-3">@Model.Recipient.FirstName @Model.Recipient.LastName</p>
+                    </div>
+                    <div class="row g-3 align-items-center">
+                        <p class="col-sm-4 text-muted text-sm-end mb-0 mb-sm-3">Email:</p>
+                        <p class="col-sm-8 text-3">@Model.Recipient.Email</p>
+                    </div>
+
+                    <div class="row g-3 align-items-center">
                         <p class="col-sm-4 text-muted text-sm-end fw-500 mb-0 mb-sm-3">You Send:</p>
-              <p class="col-sm-8 text-4 fw-500">@Model.GetTransactionDto.Amount @Model.GetTransactionDto.CurrencyCode</p>
-            </div>
+                        <p class="col-sm-8 text-4 fw-500">@Model.GetTransactionDto.Amount @Model.GetTransactionDto.CurrencyCode</p>
+                    </div>
                     <div class="row g-3 align-items-center">
                         <p class="col-sm-4 text-muted text-sm-end mb-0 mb-sm-3">Recipient Gets:</p>
                         <p class="col-sm-8 text-4 fw-500">
                             @recipientGetsAmount @Model.Recipient.Account.Currency.CurrencyCode
                         </p>
                     </div>
-            <div class="row g-3 align-items-baseline">
-              <p class="col-sm-4 text-muted text-sm-end mb-0 mb-sm-3">Description:</p>
-              <p class="col-sm-8 text-3">@Model.GetTransactionDto.Direction</p>
-            </div>
-            <form id="form-send-money" method="post">
-              <div class="d-grid"><button class="btn btn-primary">Send Money</button></div>
-            </form>
-            <div></div>
-            <div></div>
+                    <div class="row g-3 align-items-baseline">
+                        <p class="col-sm-4 text-muted text-sm-end mb-0 mb-sm-3">Description:</p>
+                        <p class="col-sm-8 text-3">@Model.GetTransactionDto.Direction</p>
+                    </div>
+                    <form id="form-send-money" method="post">
+                        <div class="d-grid"><button class="btn btn-primary">Send Money</button></div>
+                    </form>
+                    <div></div>
+                    <div></div>
                     <div> <span style="margin-right:15%"></span></div>
                     <div><span style="margin-right:15%"></span></div>
                     <div class="text-center">
                         <a asp-action="Delete" asp-controller="Transaction" asp-route-id="@Model.GetTransactionDto.Id" class="btn btn-outline-dark shadow-none px-5 m-2">Delete</a>
                         <spam style="margin-right:5%"></spam>  <a asp-action="Index" asp-controller="Transaction" class="btn btn-outline-dark shadow px-5 m-2">Close</a>
+                    </div>
+                    <!-- Request Money Confirm Details end -->
+                </div>
             </div>
-                  <!-- Request Money Confirm Details end --> 
-          </div>
         </div>
-      </div>
     </div>
-  </div>
-  <!-- Content end --> 
+</div>
+<!-- Content end -->

@@ -54,6 +54,14 @@ namespace Business.Services.Models
         {
             var result = new Response<PaginatedList<GetTransferDto>>();
             var transfersResult = this.GetAll(loggedUser);
+
+            if(transfersResult.Data == null)
+            {
+                result.IsSuccessful = false;
+                result.Message = Constants.NotFoundResults;
+                return result;
+
+            }
             IQueryable<Transfer> transfers = transfersResult.Data;
 
             transfers = await FilterByUsernameAsync(transfers, filterParameters.Username);
@@ -117,8 +125,24 @@ namespace Business.Services.Models
             }
 
             var card = this.cardRepository.GetByAccountId((int)user.AccountId).FirstOrDefault(x => x.CardNumber == transferDto.CardNumber);
+
+            if (card == null)
+            {
+                result.IsSuccessful = false;
+                result.Message = Constants.NotFoundResults;
+                return result;
+            }
+
             var currency = await this.currencyRepository.GetByCurrencyCodeAsync(transferDto.CurrencyCode);
+
+            if (currency == null)
+            {
+                result.IsSuccessful = false;
+                result.Message = Constants.NotFoundResults;
+                return result;
+            }
             var transferType = Enum.Parse<TransferDirection>(transferDto.TransferType, true);
+
             var transfer = await TransfersMapper.MapCreateDtoToTransferAsync(transferDto, user, card, currency, transferType);
 
             if (transfer.TransferType == TransferDirection.Deposit)
@@ -236,7 +260,7 @@ namespace Business.Services.Models
         }
 
 
-        public async Task<Response<bool>> ExecuteAsync(int transferId, User user)
+        public async Task<Response<bool>> ConfirmAsync(int transferId, User user)
         {
             var result = new Response<bool>();
 

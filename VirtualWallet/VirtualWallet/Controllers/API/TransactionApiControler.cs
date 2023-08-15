@@ -84,6 +84,7 @@ namespace VirtualWallet.Controllers.API
             if (!result.IsSuccessful)
             {
                 if (!result.IsSuccessful)
+                if (loggedUserResult.Message == Constants.NotFoundResults)
                 {
                     if (result.Message == Constants.NoRecordsFound)
                     {

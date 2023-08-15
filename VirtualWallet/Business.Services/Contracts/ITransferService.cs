@@ -13,6 +13,6 @@ namespace Business.Services.Contracts
         Task<Response<GetTransferDto>> CreateAsync(CreateTransferDto transferDto, User user);
         Task<Response<GetTransferDto>> UpdateAsync(int id, UpdateTransferDto transferDto, User user);
         Task<Response<bool>> DeleteAsync(int id, User user);
-        Task<Response<bool>> ExecuteAsync(int transferId, User user);
+        Task<Response<bool>> ConfirmAsync(int transferId, User user);
     }
 }

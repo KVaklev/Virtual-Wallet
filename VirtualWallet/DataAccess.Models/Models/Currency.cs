@@ -30,5 +30,7 @@ namespace DataAccess.Models.Models
         public List<Card> Cards { get; set; } = new List<Card>();
         public List<Transaction> Transactions { get; set; } = new List<Transaction>();
         public bool IsDeleted { get; set; }
+
+
     }
 }

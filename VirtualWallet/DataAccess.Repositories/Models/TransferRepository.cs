@@ -20,7 +20,9 @@ namespace DataAccess.Repositories.Models
             .Include(a => a.Account)
             .ThenInclude(u => u.User)
             .Include(c => c.Currency)
-            .Include(t => t.Card);
+            .Include(t => t.Card)
+            .OrderByDescending(t => t.DateCreated);
+
 
             return result;
         }
