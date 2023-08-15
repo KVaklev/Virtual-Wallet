@@ -119,6 +119,8 @@ namespace VirtualWallet.Controllers.MVC
 
             var mappedCards = cards.Data.Select(card => mapper.Map<GetCreatedCardDto>(card)).ToList();
 
+            TempData.Clear();
+
             TempData["Cards"] = JsonSerializer.Serialize(mappedCards);
 
             return View(createTransferViewModel);

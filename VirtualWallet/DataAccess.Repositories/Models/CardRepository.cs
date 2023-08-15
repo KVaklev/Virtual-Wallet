@@ -18,8 +18,10 @@ namespace DataAccess.Repositories.Models
         {
             var cards = this.context.Cards
                .Where(c=>c.IsDeleted==false)
+               .Include(c=>c.Currency)
                .Include(c=>c.Account)
                .ThenInclude(c=>c.User)
+               
                .AsQueryable();
 
             return cards;
