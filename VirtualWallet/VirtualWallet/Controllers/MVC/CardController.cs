@@ -1,6 +1,8 @@
 ﻿using Business.DTOs.Requests;
 using Business.QueryParameters;
 using Business.Services.Contracts;
+using Business.Services.Helpers;
+using Business.ViewModels;
 using Business.ViewModels.CardViewModels;
 using Business.ViewModels.UserViewModels;
 using DataAccess.Models.Models;
@@ -31,20 +33,28 @@ namespace VirtualWallet.Controllers.MVC
                 return RedirectToAction("Login", "Account");
             }
 
-            var cardsResult = await this.cardService.FilterByAsync(cardQueryParameters, loggedUserResult.Data);
-            if (!cardsResult.IsSuccessful)
-            {
-                this.ViewData["Controller"] = "Card";
-                return View("ErrorMessage", cardsResult.Message);
-            }
-            
             var cardSearchModel = new CardViewModel
             {
                 Owner = loggedUserResult.Data,
-                Cards = cardsResult,
                 CardQueryParameters = cardQueryParameters,
             };
 
+            var cardsResult = await this.cardService.FilterByAsync(cardQueryParameters, loggedUserResult.Data);   
+            if (!cardsResult.IsSuccessful)
+            {
+                if (cardsResult.Message==Constants.NoRecordsFoundByFilter)
+                {
+                    this.ViewData["ErrorMessage"] = cardsResult.Message;
+                    return View(cardSearchModel);
+                }
+                else
+                {
+                    this.ViewData["Controller"] = "Card";
+                    return View("ErrorMessage", cardsResult.Message);
+                }  
+            }
+            cardSearchModel.Cards = cardsResult;
+           
             return this.View(cardSearchModel);
         }
 
