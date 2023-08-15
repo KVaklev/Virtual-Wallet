@@ -100,7 +100,7 @@ namespace Business.Services.Models
                 return result;
             }
 
-            if (!await Security.IsUserAuthorizedAsync(transferToGet, user) || user.IsAdmin)
+            if (!await Security.IsUserAuthorizedAsync(transferToGet, user) && !user.IsAdmin)
             {
                 result.IsSuccessful = false;
                 result.Message = Constants.ModifyTransferGetByIdErrorMessage;
