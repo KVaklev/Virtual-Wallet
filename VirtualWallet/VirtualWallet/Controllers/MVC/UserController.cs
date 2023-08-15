@@ -163,7 +163,8 @@ namespace VirtualWallet.Controllers.MVC
             var userResult = await this.userService.GetByIdAsync(loggedUserResult.Data.Id, loggedUserResult.Data);
             if (!userResult.IsSuccessful)
             {
-                return View("HandleErrorNotFound", userResult.Message);
+                this.ViewData["Controller"] = "User";
+                return View("ErrorMessage", userResult.Message);
             }
             var userUpdatePersonalProfileViewModel = new UserUpdateProfileViewModel()
             {
@@ -187,7 +188,8 @@ namespace VirtualWallet.Controllers.MVC
             var userToUpdate = await this.userService.UpdateAsync(loggedUserResult.Data.Id, userUpdateProfileViewModel.UpdateUserDto, loggedUserResult.Data);
             if (!userToUpdate.IsSuccessful)
             {
-                return View("HandleErrorInvalidOperation", userToUpdate.Message);
+                this.ViewData["Controller"] = "User";
+                return View("ErrorMessage", userToUpdate.Message);
             }
 
             return this.RedirectToAction("Profile", "User");   
@@ -205,7 +207,8 @@ namespace VirtualWallet.Controllers.MVC
             var userResult = await this.userService.GetByIdAsync(loggedUserResult.Data.Id, loggedUserResult.Data);
             if (!userResult.IsSuccessful)
             {
-                return View("HandleErrorNotFound", userResult.Message);
+                this.ViewData["Controller"] = "User";
+                return View("ErrorMessage", userResult.Message);
             }
 
             var userUpdatePersonalProfileViewModel = new UserUpdateProfileViewModel()
@@ -229,7 +232,8 @@ namespace VirtualWallet.Controllers.MVC
             var userToChangePictureTo = await this.userService.ChangeProfilePictureAsync(loggedUserResult.Data.Id, userUpdateProfileViewModel.DetailsViewModel, loggedUserResult.Data);
             if (!userToChangePictureTo.IsSuccessful)
             {
-                return View("HandleErrorInvalidOperation", userToChangePictureTo.Message);
+                this.ViewData["Controller"] = "User";
+                return View("ErrorMessage", userToChangePictureTo.Message);
             }
 
             return this.RedirectToAction("Profile", "User");
@@ -248,7 +252,8 @@ namespace VirtualWallet.Controllers.MVC
             var userResult = await this.userService.GetByIdAsync(loggedUserResult.Data.Id, loggedUserResult.Data);
             if (!userResult.IsSuccessful)
             {
-                return View("HandleErrorNotFound", userResult.Message);
+                this.ViewData["Controller"] = "User";
+                return View("ErrorMessage", userResult.Message);
             }
 
             var userUpdatePersonalProfileViewModel = new UserUpdateProfileViewModel()
@@ -272,7 +277,8 @@ namespace VirtualWallet.Controllers.MVC
             var userToUpdate = await this.userService.UpdateAsync(loggedUserResult.Data.Id, userUpdateProfileViewModel.UpdateUserDto, loggedUserResult.Data);
             if (!userToUpdate.IsSuccessful)
             {
-                return View("HandleErrorInvalidOperation", userToUpdate.Message);
+                this.ViewData["Controller"] = "User";
+                return View("ErrorMessage", userToUpdate.Message);
             }
 
             return this.RedirectToAction("ChangePassword", "User");
