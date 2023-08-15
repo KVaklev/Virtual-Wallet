@@ -73,7 +73,6 @@ namespace VirtualWallet.Controllers.MVC
             return View(indexTransferViewModel);
         }
                 
-
         [HttpGet]
         public async Task<IActionResult> Details([FromRoute] int id)
         {

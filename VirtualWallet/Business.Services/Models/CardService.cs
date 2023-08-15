@@ -313,7 +313,7 @@ namespace Business.Services.Models
                 case SortCriteria.CardType:
                     return await Task.FromResult(result.OrderBy(card => card.CardType));
                 case SortCriteria.Balance:
-                    return await Task.FromResult(result.OrderBy(card => card.Account.Balance));
+                    return await Task.FromResult(result.OrderBy(card => card.Balance));
                 }
             }
             return await Task.FromResult(result);
