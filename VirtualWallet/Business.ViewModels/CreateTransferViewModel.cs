@@ -16,10 +16,10 @@ namespace Business.ViewModels
 
        // public User User { get; set; }
 
-        public List<GetCreatedCardDto> Cards { get; set; }
+        //public List<GetCreatedCardDto> Cards { get; set; }
 
-        public string CurrencyCode { get; set; }
+        //public string CurrencyCode { get; set; }
 
-        public TransferDirection TransferDirection { get; set; }
+        //public TransferDirection TransferDirection { get; set; }
     }
 }

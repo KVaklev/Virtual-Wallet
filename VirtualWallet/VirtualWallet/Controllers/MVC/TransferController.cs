@@ -14,6 +14,7 @@ using Org.BouncyCastle.Security;
 using System.Security.Claims;
 using Business.Mappers;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
+using Microsoft.EntityFrameworkCore;
 
 namespace VirtualWallet.Controllers.MVC
 {
@@ -67,17 +68,18 @@ namespace VirtualWallet.Controllers.MVC
             var indexTransferViewModel = new IndexTransferViewModel();
 
             indexTransferViewModel.TransferDtos = result.Data;
-            indexTransferViewModel.TransferQueryParameters= parameters;
+            indexTransferViewModel.TransferQueryParameters = parameters;
             indexTransferViewModel.User = loggedUser.Data;
 
             return View(indexTransferViewModel);
         }
-                
+
 
         [HttpGet]
         public async Task<IActionResult> Details([FromRoute] int id)
         {
             var loggedUser = await FindLoggedUserAsync();
+
             if (!loggedUser.IsSuccessful)
             {
                 return this.RedirectToAction("Login", "Account");
@@ -100,8 +102,6 @@ namespace VirtualWallet.Controllers.MVC
         [HttpGet]
         public async Task<IActionResult> Create()
         {
-            var query = new CardQueryParameters();
-
             var loggedUser = await FindLoggedUserAsync();
 
             if (!loggedUser.IsSuccessful)
@@ -110,33 +110,16 @@ namespace VirtualWallet.Controllers.MVC
             }
             var createTransferViewModel = new CreateTransferViewModel();
 
-            var resultAccount = await this.accountService.GetByIdAsync((int)loggedUser.Data.AccountId, loggedUser.Data);
-
-            if (!resultAccount.IsSuccessful)
-            {
-                return await EntityNotFoundErrorViewAsync(resultAccount.Message);
-            }
-
-            //createTransferViewModel.CurrencyCode = resultAccount.Data.CurrencyCode;
-
-            //var currencies = this.currencyService.GetAll();
-
-            //if (!currencies.IsSuccessful)
-            //{
-            //    return await EntityNotFoundErrorViewAsync(currencies.Message);
-            //}
-
-            var cards = await this.cardService.FilterByAsync(query, loggedUser.Data);
+            var cards = this.cardService.GetAll(loggedUser.Data);
 
             if (!cards.IsSuccessful)
             {
                 return await EntityNotFoundErrorViewAsync(cards.Message);
             }
 
-            createTransferViewModel.Cards = cards.Data;
+            var mappedCards = cards.Data.Select(card => mapper.Map<GetCreatedCardDto>(card)).ToList();
 
-            //TempData["Currencies"] = JsonSerializer.Serialize(currencies.Data);
-            //TempData["Cards"] = JsonSerializer.Serialize(cards.Data);
+            TempData["Cards"] = JsonSerializer.Serialize(mappedCards);
 
             return View(createTransferViewModel);
 
@@ -146,10 +129,10 @@ namespace VirtualWallet.Controllers.MVC
 
         public async Task<IActionResult> Create(CreateTransferViewModel transferDto)
         {
-            //if (!this.ModelState.IsValid)
-            //{
-            //    return this.View(transferDto);
-            //}
+            if (!this.ModelState.IsValid)
+            {
+                return this.View(transferDto);
+            }
             var loggedUser = await FindLoggedUserAsync();
 
             if (!loggedUser.IsSuccessful)
@@ -173,8 +156,6 @@ namespace VirtualWallet.Controllers.MVC
         [HttpGet]
         public async Task<IActionResult> Update([FromRoute] int id)
         {
-            var query = new CardQueryParameters();
-
             var loggedUser = await FindLoggedUserAsync();
 
             if (!loggedUser.IsSuccessful)
@@ -194,31 +175,22 @@ namespace VirtualWallet.Controllers.MVC
             createTransferViewModel.CreateTransferDto = await TransfersMapper.MapGetDtoToCreateDto(result.Data);
 
 
-            var cards = await this.cardService.FilterByAsync(query, loggedUser.Data);
+            var cards = this.cardService.GetAll(loggedUser.Data);
 
-            createTransferViewModel.Cards = cards.Data;
+            var mappedCards = cards.Data.Select(card => mapper.Map<GetCreatedCardDto>(card)).ToList();
 
-            //var currencies = this.currencyService.GetAll();
-
-            //if (!currencies.IsSuccessful)
-            //{
-            //    return await EntityNotFoundErrorViewAsync(currencies.Message);
-            //}
-
-            //TempData["Currencies"] = JsonSerializer.Serialize(currencies.Data);
-            //TempData["Cards"] = JsonSerializer.Serialize(cards.Data);
+            TempData["Cards"] = JsonSerializer.Serialize(mappedCards);
 
             return View(createTransferViewModel);
-
         }
 
         [HttpPost]
         public async Task<IActionResult> Update(int id, UpdateTransferDto transferDto)
         {
-            //if (!this.ModelState.IsValid)
-            //{
-            //    return View(transferDto);
-            //}
+            if (!this.ModelState.IsValid)
+            {
+                return View(transferDto);
+            }
 
             var loggedUser = await FindLoggedUserAsync();
             if (!loggedUser.IsSuccessful)

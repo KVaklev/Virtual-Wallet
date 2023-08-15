@@ -5,14 +5,10 @@
 
 @model Business.ViewModels.CreateTransferViewModel;
 
-
-@inject ICardService cardService
-
 @{
     this.ViewData["Title"] = "Speed Pay - Quick and Trustworthy Money Transfers ";
 
-    //var currencies = JsonSerializer.Deserialize<List<Currency>>(TempData.Peek("Currencies").ToString());
-    //var cards = JsonSerializer.Deserialize<PaginatedList<Card>>(TempData.Peek("Cards").ToString());
+    var cards = JsonSerializer.Deserialize<List<GetCreatedCardDto>>(TempData.Peek("Cards").ToString());
     //var cards = new SelectList(cardService.GetAll(@Model.User));
 }
 
@@ -91,7 +87,7 @@
                             <label for="paymentMethod" class="form-label">Select Card</label>
                             <select asp-for="CreateTransferDto.CardNumber" id="cardType" class="form-select" required="">
                                 <option value="">My Cards</option>
-                                @foreach (var card in Model.Cards)
+                                @foreach (var card in cards)
                                 {
                                     <option data-subtext="@card.CurrencyCode" value="@card.CardNumber"> @card.CardType - @card.CardNumber - @card.CurrencyCode </option>
                                 }
@@ -102,7 +98,7 @@
                             <label for="youSend">Amount</label>
                             <div class="input-group">
                                 <span class="input-group-text">$</span>
-                                <input asp-for="CreateTransferDto.Amount" type="number" class="form-control" data-bv-field="youSend" id="youSend" value="" placeholder="">
+                                <input asp-for="CreateTransferDto.Amount" type="text" class="form-control" data-bv-field="youSend" id="youSend" value="" placeholder="">
 
                                 <span asp-for="CreateTransferDto.CurrencyCode" value="" id="amountCurrency" class="input-group-text">USD</span>
 
@@ -116,9 +112,10 @@
                         <div class="d-grid"><button type="submit" class="btn btn-primary">Continue</button></div>*@
 
                         <hr>
-                        <p class="text-4 fw-500">You'll transfer 
+                        <p class="text-4 fw-500">
+                            You'll transfer
                             <span id="depositAmountCurrency" class="float-end">USD</span>
-                            <span id="depositAmount" class="float-end">0.00</span> 
+                            <span id="depositAmount" class="float-end">0.00</span>
                         </p>
                         <div class="d-grid"><button type="submit" class="btn btn-primary">Continue</button></div>
 

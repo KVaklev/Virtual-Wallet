@@ -9,6 +9,7 @@
         public TItem Data { get; set; }
 
         public Error Error { get; set; }
+
     }
 }
 

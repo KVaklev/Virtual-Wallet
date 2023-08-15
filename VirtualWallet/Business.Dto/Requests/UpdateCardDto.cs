@@ -21,7 +21,6 @@ namespace Business.DTOs.Requests
 
         [AllowedCardTypes(ErrorMessage = Constants.EmptyFieldCardTypeErrorMessage)]
         public string? CardType { get; set; }
-        public decimal? CreditLimit { get; set; }
 
         [StringLength(Constants.CurrencyCodeLength, ErrorMessage = Constants.LengthErrorMessage)]
         public string? CurrencyCode { get; set; }

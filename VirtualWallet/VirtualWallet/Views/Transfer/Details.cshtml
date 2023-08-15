@@ -45,36 +45,37 @@
                             }
 
                             <div class="px-3">
-                                <ul class="list-unstyled">
-                                    <li class="mb-2">Payment Amount <span class="float-end text-3">@Model.GetTransferDto.Amount @Model.GetTransferDto.CurrencyCode</span></li>
-                                    <li class="mb-2">Balance Change Amount <span class="float-end text-3">@Model.GetTransferDto.AmountExchange @Model.LoggedUser.Account.Currency.CurrencyCode</span></li>
-                                    <li class="mb-2">Exchange Rate<span class="float-end text-3">@Model.GetTransferDto.ExchangeRate @Model.LoggedUser.Account.Currency.CurrencyCode/@Model.GetTransferDto.CurrencyCode</span></li>
-                                </ul>
                                 <hr class="mb-2">
 
                                 <ul class="list-unstyled">
                                     @if (Model.GetTransferDto.TransferType == TransferDirection.Deposit.ToString())
                                     {
-                                        <li class="fw-500">Transferred To Account With Username:</li>
+
+                                        <li class="fw-500">Transfer To:</li>
                                         <li class="text-muted">@Model.GetTransferDto.Username</li>
 
-                                        <li class="fw-500">Transferred From Card with No.:</li>
+
+
+                                        <li class="fw-500">Transfer From Card No.:</li>
                                         <li class="text-muted">@Model.GetTransferDto.CardNumber</li>
+
+                                        <hr class="mb-2">
 
                                         <li class="fw-500">Card Type:</li>
                                         <li class="text-muted">@Model.GetTransferDto.Card.CardType</li>
-                                                                           
 
 
                                     }
                                     else
                                     {
 
-                                        <li class="fw-500">Transferred From Account With Username:</li>
+                                        <li class="fw-500">Transfer From:</li>
                                         <li class="text-muted">@Model.GetTransferDto.Username</li>
 
-                                        <li class="fw-500">Transferred To Card with No.:</li>
+                                        <li class="fw-500">Transfer To Card No.:</li>
                                         <li class="text-muted">@Model.GetTransferDto.CardNumber</li>
+
+                                        <hr class="mb-2">
 
                                         <li class="fw-500">Card Type:</li>
                                         <li class="text-muted">@Model.GetTransferDto.Card.CardType</li>
