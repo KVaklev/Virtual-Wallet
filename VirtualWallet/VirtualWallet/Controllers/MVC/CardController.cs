@@ -122,6 +122,46 @@ namespace VirtualWallet.Controllers.MVC
 
             return RedirectToAction("Index", "Card");
         }
+
+        [HttpGet]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var loggedUserResult = await FindLoggedUserAsync();
+            if (!loggedUserResult.IsSuccessful)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            var cardResult = await this.cardService.GetByIdAsync(id, loggedUserResult.Data);
+            if (!cardResult.IsSuccessful)
+            {
+                return View("HandleErrorNotFound", cardResult.Message);
+            }
+
+            var cardViewModel = new CardViewModel();
+
+            return this.View(cardViewModel);
+        }
+
+        [HttpPost,ActionName("Delete")]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            var loggedUserResult = await FindLoggedUserAsync();
+            if (!loggedUserResult.IsSuccessful)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            var cardResult = await this.cardService.GetByIdAsync(id, loggedUserResult.Data);
+            if (!cardResult.IsSuccessful)
+            {
+                return View("HandleErrorNotFound", cardResult.Message);
+            }
+
+            var result = await this.cardService.DeleteAsync(id, loggedUserResult.Data);
+
+            return RedirectToAction("Index", "Card");
+        }
         private async Task<Response<User>> FindLoggedUserAsync()
         {
             var result = new Response<User>();

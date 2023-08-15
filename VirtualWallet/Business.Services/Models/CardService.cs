@@ -187,7 +187,16 @@ namespace Business.Services.Models
         {
             var result = new Response<bool>();
 
-            if (!await Security.IsAdminAsync(loggedUser))
+            var cardResult = await this.GetByIdAsync(id, loggedUser);
+            if (!cardResult.IsSuccessful)
+            {
+                result.IsSuccessful = false;
+                result.Message = NoCardFoundErrorMessage;
+                return result;
+            }
+
+            var accountId = cardResult.Data.AccountId;
+            if (!await Security.IsUserAuthorized(accountId,loggedUser))
             {
                 result.IsSuccessful = false;
                 result.Message = ModifyUserErrorMessage;
@@ -195,6 +204,12 @@ namespace Business.Services.Models
             }
 
             result.Data = await this.cardRepository.DeleteAsync(id);
+            if (!result.IsSuccessful)
+            {
+                result.IsSuccessful = false;
+                result.Message = ModifyUserErrorMessage;
+                return result;
+            }
             result.Message = SuccessfullDeletedCardMessage;
 
             return result;
