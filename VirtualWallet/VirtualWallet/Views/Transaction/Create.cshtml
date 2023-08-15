@@ -68,7 +68,7 @@
                     <form asp-controller="Transaction" asp-action="Create" id="form-send-money" method="post">
                         <div class="mb-3">
                             <label for="emailID" class="form-label">Recipient</label>
-                            <input asp-for="CreateTransactionDto.RecipientUsername" type="text" required value="" class="form-control" data-bv-field="emailid" id="emailID" required placeholder="Enter Username">
+                            <input asp-for="CreateTransactionDto.RecipientUsername" type="text" required  class="form-control" data-bv-field="emailid" id="emailID" required placeholder="">
                             <span asp-validation-for="CreateTransactionDto.RecipientUsername" class="error-message"></span>
                         </div>
                         <div class="mb-3">

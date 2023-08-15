@@ -8,6 +8,7 @@ using Business.Services.Helpers;
 using DataAccess.Models.Enums;
 using DataAccess.Models.Models;
 using DataAccess.Repositories.Contracts;
+using Microsoft.EntityFrameworkCore;
 using static Business.Services.Helpers.Constants;
 
 namespace Business.Services.Models
@@ -58,6 +59,7 @@ namespace Business.Services.Models
             var cardsResult = this.GetAll(loggedUser);
             IQueryable<Card> cards = cardsResult.Data;
 
+            cards = await FilterByUsernameAsync(cards, filterParameters.Username);
             cards = await FilterByExpirationDateAsync(cards, filterParameters.ExpirationDate);
             cards = await FilterByCardTypeAsync(cards, filterParameters.CardType);
             cards = await FilterByBalanceAsync(cards, filterParameters.Balance);
@@ -94,7 +96,7 @@ namespace Business.Services.Models
                 result.Message = NoCardsErrorMessage;
             }
             
-            if (!await Security.IsUserAuthorized(id, loggedUser))
+            if (!await Security.IsUserAuthorized(card.Account.Id, loggedUser))
             {
                 result.IsSuccessful = false;
                 result.Message = ModifyCardErrorMessage;
@@ -188,7 +190,16 @@ namespace Business.Services.Models
         {
             var result = new Response<bool>();
 
-            if (!await Security.IsAdminAsync(loggedUser))
+            var cardResult = await this.GetByIdAsync(id, loggedUser);
+            if (!cardResult.IsSuccessful)
+            {
+                result.IsSuccessful = false;
+                result.Message = NoCardFoundErrorMessage;
+                return result;
+            }
+
+            var accountId = cardResult.Data.AccountId;
+            if (!await Security.IsUserAuthorized(accountId,loggedUser))
             {
                 result.IsSuccessful = false;
                 result.Message = ModifyUserErrorMessage;
@@ -196,6 +207,12 @@ namespace Business.Services.Models
             }
 
             result.Data = await this.cardRepository.DeleteAsync(id);
+            if (!result.IsSuccessful)
+            {
+                result.IsSuccessful = false;
+                result.Message = ModifyUserErrorMessage;
+                return result;
+            }
             result.Message = SuccessfullDeletedCardMessage;
 
             return result;
@@ -248,19 +265,19 @@ namespace Business.Services.Models
             return await this.cardRepository.CardNumberExistsAsync(cardNumber);
         }
 
-        //private async Task<IQueryable<Card>> FilterByUsernameAsync(IQueryable<Card> result, string username)
-        //{
-        //    result = result
-        //        .Include(c => c.Account)
-        //        .ThenInclude(a => a.User);
+        private async Task<IQueryable<Card>> FilterByUsernameAsync(IQueryable<Card> result, string username)
+        {
+            result = result
+                .Include(c => c.Account)
+                .ThenInclude(a => a.User);
 
-        //    if (!string.IsNullOrEmpty(username))
-        //    {
-        //        return await Task.FromResult(result.Where(card => card.Account.User.Username.Contains(username.ToUpper())));
-        //    }
+            if (!string.IsNullOrEmpty(username))
+            {
+                return await Task.FromResult(result.Where(card => card.Account.User.Username.Contains(username.ToUpper())));
+            }
 
-        //    return await Task.FromResult(result);
-        //}
+            return await Task.FromResult(result);
+        }
         private async Task<IQueryable<Card>> FilterByExpirationDateAsync(IQueryable<Card> result, string expirationDate)
         {
             DateTime? date = !string.IsNullOrEmpty(expirationDate) ? DateTime.Parse(expirationDate) : null;
@@ -297,10 +314,10 @@ namespace Business.Services.Models
                 case SortCriteria.CardType:
                     return await Task.FromResult(result.OrderBy(card => card.CardType));
                 case SortCriteria.Balance:
-                    return await Task.FromResult(result.OrderBy(card => card.Account.Balance));
+                    return await Task.FromResult(result.OrderBy(card => card.Balance));
                 }
             }
-            return result;
+            return await Task.FromResult(result);
         }
         private async Task<IQueryable<Card>> SortOrderAsync(IQueryable<Card> result, string sortOrder)
         {

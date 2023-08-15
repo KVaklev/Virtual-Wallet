@@ -58,7 +58,7 @@ namespace Business.Services.Models
             if(transfersResult.Data == null)
             {
                 result.IsSuccessful = false;
-                result.Message = Constants.NotFoundResults;
+                result.Message = Constants.NoRecordsFound;
                 return result;
 
             }
@@ -129,7 +129,7 @@ namespace Business.Services.Models
             if (card == null)
             {
                 result.IsSuccessful = false;
-                result.Message = Constants.NotFoundResults;
+                result.Message = Constants.NoRecordsFound;
                 return result;
             }
 
@@ -138,7 +138,7 @@ namespace Business.Services.Models
             if (currency == null)
             {
                 result.IsSuccessful = false;
-                result.Message = Constants.NotFoundResults;
+                result.Message = Constants.NoRecordsFound;
                 return result;
             }
             var transferType = Enum.Parse<TransferDirection>(transferDto.TransferType, true);

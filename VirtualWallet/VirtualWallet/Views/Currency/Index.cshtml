@@ -49,17 +49,19 @@
     <!-- Middle Panel
             ============================================= -->
     <div class="col-lg-9">
-        <h2 class="fw-400 mb-3">Transaction</h2>
+        
 
        
         <!-- Filter End -->
         <!-- All Transactions
         ============================================= -->
         <div class="bg-white shadow-sm rounded py-4 mb-4">
-                        <div class="d-flex justify-content-between align-items-center px-4 mb-4">
-                            <h3 class="text-5 fw-400">Currencies</h3>
-                            <a asp-action="Create" asp-controller="Currency" class="btn btn-primary" aria-label="">Add Currency</a>
-                        </div>
+           
+            <div class="d-flex justify-content-between align-items-center px-4 mb-4">
+    <h3 class="text-5 fw-400">Currencies</h3>
+    <a asp-action="Create" asp-controller="Currency" class="btn btn-primary" aria-label="">Add Currency</a>
+</div>
+
             <!-- Title
             =============================== -->
             <div class="transaction-title py-2 px-4">
@@ -75,15 +77,22 @@
             =============================== -->
             @foreach (var curency in Model.Currencies)
             {
-            <div class="transaction-list">
-               
-                    <div class="transaction-item px-4 py-3" data-bs-toggle="modal" data-bs-target="#transaction-detail">
-                        <div class="row align-items-center flex-row">
-                                
-                                            <div class="col-2 col-sm-1 text-center"> <span class="d-block text-4 fw-300">FLAG</span>  </div>
+                            <div class="transaction-list">
+
+                                <div class="transaction-item px-4 py-3" data-bs-toggle="modal" data-bs-target="#transaction-detail">
+                                    <div class="row align-items-center flex-row">
+
+                                        <div class="col-2 col-sm-1 text-center">
+                                            <span class="d-block text-4 fw-300">
+                                                @{
+                                                    string flagName = curency.CurrencyCode.ToLower() + ".png";
+                                                }
+                                                <img src="~/vendor/currency-flags/src/flags/@flagName" alt="Flag" class="img-thumbnail">
+                                            </span>
+                                        </div>
 
                                                 <div class="col col-sm-7">
-                                            <span class="d-block text-4">@curency.CurrencyCode: @curency.Name</span>
+                                            <span class="d-block text-4">@curency.CurrencyCode | @curency.Name</span>
                                               <span class="d-block text-4">@curency.Country</span>
                                                
                                                 </div>

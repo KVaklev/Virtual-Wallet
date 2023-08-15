@@ -43,7 +43,7 @@ namespace VirtualWallet.Controllers.API
 
             if (!result.IsSuccessful)
             {
-                if (result.Message == Constants.NotFoundResults)
+                if (result.Message == Constants.NoRecordsFound)
                 {
                     return StatusCode(StatusCodes.Status404NotFound, result.Message);
                 }
@@ -86,7 +86,7 @@ namespace VirtualWallet.Controllers.API
 
             if (!result.IsSuccessful)
             {
-                if (result.Message == Constants.NotFoundResults)
+                if (result.Message == Constants.NoRecordsFound)
                 {
                     return StatusCode(StatusCodes.Status404NotFound, result.Message);
                 }
@@ -113,7 +113,7 @@ namespace VirtualWallet.Controllers.API
 
             if (!result.IsSuccessful)
             {
-                if (result.Message == Constants.NotFoundResults)
+                if (result.Message == Constants.NoRecordsFound)
                 {
                     return StatusCode(StatusCodes.Status404NotFound, result.Message);
                 }
@@ -139,7 +139,7 @@ namespace VirtualWallet.Controllers.API
 
             if (!result.IsSuccessful)
             {
-                if (result.Message == Constants.NotFoundResults)
+                if (result.Message == Constants.NoRecordsFound)
                 {
                     return StatusCode(StatusCodes.Status404NotFound, result.Message);
                 }
@@ -163,7 +163,7 @@ namespace VirtualWallet.Controllers.API
 
             if (!result.IsSuccessful)
             {
-                if (result.Message == Constants.NotFoundResults)
+                if (result.Message == Constants.NoRecordsFound)
                 {
                     return StatusCode(StatusCodes.Status404NotFound, result.Message);
                 }

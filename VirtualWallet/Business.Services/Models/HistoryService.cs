@@ -28,7 +28,7 @@ namespace Business.Services.Models
             if (history == null) 
             {
                 result.IsSuccessful = false;
-                result.Message = Constants.NotFoundResults;
+                result.Message = Constants.NoRecordsFound;
                 return result;
             }
             if (!await Security.IsHistoryOwnerAsync(history, loggedUser))
@@ -50,12 +50,12 @@ namespace Business.Services.Models
         {
             var result = new Response<PaginatedList<GetHistoryDto>>();
 
-            //if (filterParameters.Username != null && !loggedUser.IsAdmin)
-            //{
-            //    result.IsSuccessful = false;
-            //    result.Message = Constants.ModifyAuthorizedErrorMessage;
-            //    return result;
-            //}
+            if (filterParameters.Username != null && !loggedUser.IsAdmin)
+            {
+                result.IsSuccessful = false;
+                result.Message = Constants.ModifyAuthorizedErrorMessage;
+                return result;
+            }
 
             IQueryable<History> historyRecords = this.historyRepository.GetAll();
 
@@ -76,7 +76,7 @@ namespace Business.Services.Models
             if (!historyRecords.Any())
             {
                result.IsSuccessful = false;
-               result.Message = Constants.NotFoundResults;
+               result.Message = Constants.NoRecordsFoundByFilter;
                return result;
             }
             

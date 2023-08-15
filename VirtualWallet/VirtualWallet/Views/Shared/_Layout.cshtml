@@ -44,56 +44,59 @@
                 <div class="header-row">
                     <div class="header-column justify-content-start">
 
-                        <!-- Logo
-                        ============================= -->
-                        <div class="logo me-3"> <a asp-controller="Home" asp-action="Index" class="d-flex" title="SpeedPay"><img src="~/images/logo.png" width="201" height="50" alt="Runner" /></a> </div>
-                        <!-- Logo end -->
-                        <!-- Collapse Button
-                        ============================== -->
-                        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#header-nav"> <span></span> <span></span> <span></span> </button>
-                        <!-- Collapse Button end -->
-                        <!-- Primary Navigation
-                        ============================== -->
-                        <nav class="primary-menu navbar navbar-expand-lg">
-                            <div id="header-nav" class="collapse navbar-collapse">
-                                <ul class="navbar-nav me-auto">
+          <!-- Logo
+          ============================= -->
+          <div class="logo me-3"> <a asp-controller="Home" asp-action="Index" class="d-flex"  title="SpeedPay"><img src="~/images/logo.png" width="201" height="50" alt="Runner" /></a> </div>
+          <!-- Logo end --> 
 
-                                    @if (User.Claims.Any())
-                                    {
-                                        <li><a asp-controller="Transfer" asp-action="Create">Deposit/Withdraw</a></li>
-                                        @*<li><a asp-controller="Transfer" asp-action="Create">Withdraw</a></li>*@
-                                        <li><a asp-controller="Transaction" asp-action="Create">Send</a></li>
-                                        <li><a asp-controller="User" asp-action="Index">Users</a></li>
-                                        <li class="dropdown active">
-                                            <a class="dropdown-toggle" href="#">Account</a>
-                                            <ul class="dropdown-menu">
-                                                <li class="dropdown"><a asp-controller="User" asp-action="Profile" asp-route-id="@User.FindFirst(ClaimTypes.NameIdentifier)" class="dropdown-item">My Profile</a></li>
-                                                <li class="dropdown"><a asp-controller="User" asp-action="ChangePassword" class="dropdown-item">Security</a></li>
-                                                <li class="dropdown"><a asp-controller="Card" asp-action="Add" class="dropdown-item">Payment Methods</a></li>
-                                            </ul>
-                                        </li>
-                                        <li class="dropdown active">
-                                            <a class="dropdown-toggle" href="#">Dashboard</a>
-                                            <ul class="dropdown-menu">
-                                                <li class="dropdown"><a class="dropdown-item" asp-controller="History" asp-action="Index">History</a></li>
-                                                <li class="dropdown"><a class="dropdown-item" asp-controller="Transaction" asp-action="Index">Transactions</a></li>
-                                                <li class="dropdown"><a class="dropdown-item" asp-controller="Transfer" asp-action="Index">Transfers</a></li>
+          <!-- Collapse Button
+          ============================== -->
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#header-nav"> <span></span> <span></span> <span></span> </button>
+          <!-- Collapse Button end --> 
+          
+          <!-- Primary Navigation
+          ============================== -->
+          <nav class="primary-menu navbar navbar-expand-lg">
+            <div id="header-nav" class="collapse navbar-collapse">
+              <ul class="navbar-nav me-auto">
+          
+                @if (User.Claims.Any())
+                {
+                  <li><a asp-controller="Transfer" asp-action="Create">Deposit</a></li>
+                  <li><a asp-controller="Transfer" asp-action="Create">Withdraw</a></li>
+                  <li><a asp-controller="Transaction" asp-action="Create">Send</a></li>
+                  <li><a asp-controller="User" asp-action="Index">Users</a></li>
+                  <li class="dropdown active">
+                      <a class="dropdown-toggle" href="#">Account</a>
+                      <ul class="dropdown-menu">
+                          <li class="dropdown"><a asp-controller="User" asp-action="Profile" asp-route-id="@User.FindFirst(ClaimTypes.NameIdentifier)"class="dropdown-item">My Profile</a></li>
+                          <li class="dropdown"><a asp-controller="User" asp-action="ChangePassword" class="dropdown-item">Security</a></li>
+                          <li class="dropdown"><a asp-controller="Card" asp-action="Index" class="dropdown-item">Payment Methods</a></li>
+                      </ul>
+                  </li>
+                  <li class="dropdown active">
+                      <a class="dropdown-toggle" href="#">Dashboard</a>
+                      <ul class="dropdown-menu">
+                          <li class="dropdown"><a class="dropdown-item" asp-controller="History" asp-action="Index">History</a></li>
+                          <li class="dropdown"><a class="dropdown-item" asp-controller="Transaction" asp-action="Index">Transactions</a></li>
+                          <li class="dropdown"><a class="dropdown-item" asp-controller="Transfer" asp-action="Index">Transfers</a></li>
 
-                                                @if (isAdmin.Value == "True")
-                                                {
-                                                    <li class="dropdown"><a class="dropdown-item" asp-controller="Currency" asp-action="Index">Currenies</a></li>
-                                                }
-                                                else
-                                                {
-                                                    <li class="dropdown">
-                                                        <a class="dropdown-item dropdown-toggle" href="#">Money Operations</a>
-                                                        <ul class="dropdown-menu">
-                                                            <li><a asp-controller="Transaction" asp-action="Create" class="dropdown-item">Send</a></li>
-                                                            <li><a class="dropdown-item">Receive</a></li>
-                                                            <li><a asp-controller="Transfer" asp-action="Create" class="dropdown-item">Deposit/Withdraw</a></li>
-                                                        </ul>
-                                                    </li>
-                                                }
+                          @if (isAdmin.Value == "True")
+                          {
+                              <li class="dropdown"><a class="dropdown-item" asp-controller="Currency" asp-action="Index">Currenies</a></li>
+                              <li class="dropdown"><a class="dropdown-item" asp-controller="Card" asp-action="Details">All Users' Payment Methods</a></li>
+                          }
+                        else{
+                          <li class="dropdown">
+                              <a class="dropdown-item dropdown-toggle" href="#">Money Operations</a>
+                              <ul class="dropdown-menu">
+                                  <li><a asp-controller="Transaction" asp-action="Create" class="dropdown-item">Send</a></li>
+                                  <li><a class="dropdown-item">Receive</a></li>
+                                   <li><a asp-controller="Transfer" asp-action="Create" class="dropdown-item">Deposit</a></li>
+                                  <li><a class="dropdown-item">Withdraw</a></li>
+                              </ul>
+                          </li>
+                          }
 
 
                                             </ul>
@@ -127,56 +130,56 @@
                     </div>
                     <div class="header-column justify-content-end">
 
-                        <!-- Login & Signup Link
-                        ============================== -->
-                        @if (User.Claims.Any())
-                        {
-                            <!-- My Profile
-                            ============================== -->
-                            <nav class="login-signup navbar navbar-expand">
-
-                                <ul class="navbar-nav">
-                                    <li class="dropdown notifications">
-                                        <a class="dropdown-toggle" href="#"><span class="text-5"><i class="far fa-bell"></i></span><span class="count">2</span></a>
-                                        <ul class="dropdown-menu">
-                                            <li class="text-center text-3 py-2">Notifications (2)</li>
-                                            <li class="dropdown-divider mx-n3"></li>
-                                            <li><a class="dropdown-item" href="#"><i class="fas fa-bell"></i>Updates to our privacy policy. Please read.<span class="text-1 text-muted d-block">21 August 2023</span></a></li>
-                                            <li><a class="dropdown-item" href="#"><i class="fas fa-bell"></i>Update about Speed Pay fees<span class="text-1 text-muted d-block">18 Feb 2021</span></a></li>
-                                            <li class="dropdown-divider mx-n3"></li>
-                                            <li><a class="dropdown-item text-center text-primary px-0" href="notifications.html">See all Notifications</a></li>
-                                        </ul>
-                                    </li>
-                                    <li class="dropdown profile ms-2">
-                                        <a class="px-0 dropdown-toggle" href="#"><img class="rounded-circle" src="@Url.Content("~/UploadedImages/" + username.Value + ".png")" height="50" width="50" alt="" enctype="multipart/form-data"></a>
-                                        <ul class="dropdown-menu">
-                                            <li class="text-center text-3 py-2">Hi, @username.Value</li>
-                                            <li class="dropdown-divider mx-n3"></li>
-                                            <li><a asp-controller="User" asp-action="Profile" asp-route-id="@User.FindFirst(ClaimTypes.NameIdentifier)" class="dropdown-item"><i class="fas fa-user"></i>My Profile</a></li>
-                                            <li><a asp-controller="User" asp-action="ChangePassword" class="dropdown-item"><i class="fas fa-shield-alt"></i>Security</a></li>
-                                            <li><a asp-controller="Card" asp-action="Add" class="dropdown-item"><i class="fas fa-credit-card"></i>Payment Methods</a></li>
-                                            <li class="dropdown-divider mx-n3"></li>
-                                            <li><a asp-controller="Account" asp-action="Logout" class="dropdown-item"><i class="fas fa-sign-out-alt"></i>Sign Out</a></li>
-                                        </ul>
-                                    </li>
-                                </ul>
-                            </nav>
-                        }
-                        else
-                        {
-                            <nav class="login-signup navbar navbar-expand">
-                                <ul class="navbar-nav">
-                                    <li>
-                                        <a asp-controller="Account" asp-action="Login" class="btn btn-outline-success">LOGIN</a>
-                                    </li>
-                                    <li class="align-items-center h-auto ms-sm-3">
-                                        <a asp-controller="Account" asp-action="Register" class="btn btn-primary">SIGN UP</a>
-                                    </li>
-                                </ul>
-                            </nav>
-                        }
-
-                        <!-- Login & Signup Link end -->
+<!-- Login & Signup Link
+============================== -->
+          @if (User.Claims.Any())
+          {
+              <!-- My Profile
+              ============================== -->
+              <nav class="login-signup navbar navbar-expand">
+                  
+                  <ul class="navbar-nav">
+                      <li class="dropdown notifications">
+                          <a class="dropdown-toggle" href="#"><span class="text-5"><i class="far fa-bell"></i></span><span class="count">2</span></a>
+                          <ul class="dropdown-menu">
+                              <li class="text-center text-3 py-2">Notifications (2)</li>
+                              <li class="dropdown-divider mx-n3"></li>
+                              <li><a class="dropdown-item" href="#"><i class="fas fa-bell"></i>Updates to our privacy policy. Please read.<span class="text-1 text-muted d-block">21 August 2023</span></a></li>
+                              <li><a class="dropdown-item" href="#"><i class="fas fa-bell"></i>Update about Speed Pay fees<span class="text-1 text-muted d-block">18 Feb 2021</span></a></li>
+                              <li class="dropdown-divider mx-n3"></li>
+                              <li><a class="dropdown-item text-center text-primary px-0" href="notifications.html">See all Notifications</a></li>
+                          </ul>
+                      </li>
+                      <li class="dropdown profile ms-2">
+                          <a class="px-0 dropdown-toggle" href="#"><img class="rounded-circle" src="@Url.Content("~/UploadedImages/" + username.Value + ".png")" height="50" width="50" alt="" enctype="multipart/form-data"></a>
+                          <ul class="dropdown-menu">
+                              <li class="text-center text-3 py-2">Hi, @username.Value</li>
+                              <li class="dropdown-divider mx-n3"></li>
+                              <li><a asp-controller="User" asp-action="Profile" asp-route-id="@User.FindFirst(ClaimTypes.NameIdentifier)" class="dropdown-item"><i class="fas fa-user"></i>My Profile</a></li>
+                              <li><a asp-controller="User" asp-action="ChangePassword" class="dropdown-item"><i class="fas fa-shield-alt"></i>Security</a></li>
+                              <li><a asp-controller="Card" asp-action="Index" class="dropdown-item"><i class="fas fa-credit-card"></i>Payment Methods</a></li>
+                              <li class="dropdown-divider mx-n3"></li>
+                              <li><a asp-controller="Account" asp-action="Logout" class="dropdown-item" ><i class="fas fa-sign-out-alt"></i>Sign Out</a></li>
+                          </ul>
+                      </li>
+                  </ul>
+              </nav>
+          }
+          else
+          {
+              <nav class="login-signup navbar navbar-expand">
+                  <ul class="navbar-nav">
+                      <li>
+                          <a asp-controller="Account" asp-action="Login" class="btn btn-outline-success">LOGIN</a>
+                      </li>
+                      <li class="align-items-center h-auto ms-sm-3">
+                          <a asp-controller="Account" asp-action="Register" class="btn btn-primary">SIGN UP</a>
+                      </li>
+                  </ul>
+              </nav>
+          }
+         
+<!-- Login & Signup Link end --> 
 
                     </div>
                 </div>

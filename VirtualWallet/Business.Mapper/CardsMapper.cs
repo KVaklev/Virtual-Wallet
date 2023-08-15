@@ -35,6 +35,7 @@ namespace Business.Mappers
             
             CreateMap<GetCreatedCardDto, Card>()
                 .ForPath(c => c.Currency.CurrencyCode, c => c.MapFrom(c => c.CurrencyCode))
+                .ForPath(c=>c.Account.User.Username, c =>c.MapFrom(c=>c.Username))
                 .ReverseMap();
 
                    }
@@ -59,7 +60,6 @@ namespace Business.Mappers
             cardToUpdate.CardNumber = updateCardDto.CardNumber ?? cardToUpdate.CardNumber;
             cardToUpdate.CheckNumber = updateCardDto.CheckNumber ?? cardToUpdate.CheckNumber;
             cardToUpdate.CardHolder = updateCardDto.CardHolder ?? cardToUpdate.CardHolder;
-            cardToUpdate.CreditLimit = updateCardDto.CreditLimit ?? cardToUpdate.CreditLimit;
 
             await UpdateCardTypeAsync(updateCardDto, cardToUpdate);
             await UpdateExpirationDateAsync(updateCardDto, cardToUpdate);

@@ -36,7 +36,7 @@ namespace VirtualWallet.Controllers.API
             var result = await this.historyService.GetByIdAsync(id, loggedUserResult.Data);
             if (!result.IsSuccessful)
             {
-                if (result.Message == Constants.NotFoundResults)
+                if (result.Message == Constants.NoRecordsFound)
                 {
                     return StatusCode(StatusCodes.Status404NotFound, result.Message);
                 }
@@ -57,19 +57,15 @@ namespace VirtualWallet.Controllers.API
 
            var result = await this.historyService.FilterByAsync(historyQueryParameters, loggedUserResult.Data);
 
-           if (!result.IsSuccessful)
-           {
-               if (result.Message == Constants.NotFoundResults)
-               {
-                   return StatusCode(StatusCodes.Status404NotFound, loggedUserResult.Message);
-               }
-               else
-               {
-                   return StatusCode(StatusCodes.Status401Unauthorized, result.Message);
-
-               }
-           }
-          return StatusCode(StatusCodes.Status200OK, result.Data);   
+            if (!result.IsSuccessful)
+            {
+                if (result.Message == Constants.NoRecordsFound)
+                {
+                    return StatusCode(StatusCodes.Status404NotFound, result.Message);
+                }
+                return BadRequest(result.Message);
+            }
+            return StatusCode(StatusCodes.Status200OK, result.Data);   
         }
 
         private async Task<Response<User>> FindLoggedUserAsync()
