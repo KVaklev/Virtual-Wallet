@@ -50,7 +50,6 @@ namespace Business.Services.Models
                 result.IsSuccessful = false;
                 result.Message = NoAccountsErrorMessage;
             }
-
             return result;
         }
 
@@ -112,7 +111,7 @@ namespace Business.Services.Models
             if (currency == null)
             {
                 result.IsSuccessful = false;
-                result.Message = Constants.CurrencyNotFoundErrorMessage;
+                result.Message = CurrencyNotFoundErrorMessage;
                 return result;
             }
             accountToCreate = await AccountsMapper.MapCreateDtoToAccountAsync(accountToCreate, currency.Data, user);
@@ -133,7 +132,7 @@ namespace Business.Services.Models
             if (accountToDelete == null)
             {
                 result.IsSuccessful = false;
-                result.Message = Constants.NoAccountsErrorMessage;
+                result.Message = NoAccountsErrorMessage;
                 return result;
             }
 
@@ -152,7 +151,6 @@ namespace Business.Services.Models
                     await this.cardService.DeleteAsync(card.Id, loggedUser);
                 }
             }          
-
             result.Data = await this.accountRepository.DeleteAsync(id);
 
             return result;
@@ -195,7 +193,6 @@ namespace Business.Services.Models
                 result.Error = new Error(PropertyName.CardNumber);
                 return result;
             }
-
             return result;
         }
        
@@ -211,8 +208,7 @@ namespace Business.Services.Models
                 return result;
             }
 
-            result.Data = (DateTime.Now.ToString() + user.Username).ComputeSha256Hash();
-           
+            result.Data = (DateTime.Now.ToString() + user.Username).ComputeSha256Hash();        
             return result;
         }
 
@@ -241,8 +237,7 @@ namespace Business.Services.Models
             accountToDepositTo.Balance += amount;
             await this.accountRepository.SaveChangesAsync();
             result.Data = accountToDepositTo;
-            return result;
-            
+            return result;        
         }
 
         public async Task<Response<Account>> DecreaseBalanceAsync(int id, decimal amount, User loggedUser)

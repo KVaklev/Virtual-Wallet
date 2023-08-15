@@ -1,8 +1,4 @@
-﻿using Microsoft.AspNetCore.DataProtection;
-using System.Numerics;
-using static System.Net.Mime.MediaTypeNames;
-
-namespace Business.Services.Helpers
+﻿namespace Business.Services.Helpers
 {
     public class Constants
     {

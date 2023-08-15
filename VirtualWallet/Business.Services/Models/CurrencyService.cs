@@ -34,6 +34,7 @@ namespace Business.Services.Models
             var currency = this.mapper.Map<Currency>(currencyDto);
             var newCurrency = await this.currencyRepository.CreateAsync(currency); 
             result.Data = newCurrency;
+
             return result;
         }
 
@@ -78,35 +79,34 @@ namespace Business.Services.Models
 
             currencies = currencies.Where(c => c.IsDeleted == false).AsQueryable();
             result.Data = currencies.ToList();
-            return result;
+
+            return await Task.FromResult(result);
         }
 
         public async Task<Response<List<Currency>>> GetAllAndDeletedAsync(User loggedUser)
         {
             var result = new Response<List<Currency>>();
-
             var currencies = this.currencyRepository.GetAll();
 
             if(!currencies.Any())
             {
                 result.IsSuccessful = false;
                 result.Message = Constants.NoRecordsFound;
-                return result;
+                return await Task.FromResult(result);
             }
             if (!loggedUser.IsAdmin)
             {
                 result.IsSuccessful = false;
                 result.Message = Constants.ModifyAuthorizedErrorMessage;
-                return result;
+                return await Task.FromResult(result);
             }
             result.Data = currencies.ToList();
-            return result;
+            return await Task.FromResult(result);
         }
 
         public async Task<Response<Currency>> GetByCurrencyCodeAsync(string currencyCode)
         {
             var result = new Response<Currency>();
-
             Currency currencyToGet = await currencyRepository.GetByCurrencyCodeAsync(currencyCode);
 
             if(currencyToGet == null)
@@ -120,12 +120,9 @@ namespace Business.Services.Models
             return result;
         }
 
-       
-
         public async Task<Response<Currency>> GetCurrencyByIdAsync(int id)
         {
             var result = new Response<Currency>();
-
             var currency = await this.currencyRepository.GetByIdAsync(id);
 
             if (currency == null)
@@ -159,12 +156,11 @@ namespace Business.Services.Models
             }
             currencyToUpdate.IsDeleted = false;
 
-            this.currencyRepository.SaveChangesAsync();
+            await this.currencyRepository.SaveChangesAsync();
             result.Data = currencyToUpdate;
             result.Message = Constants.CurrencySuccessfulUpdateMessage;
 
             return result;
         }
-
     }
 }

@@ -29,9 +29,6 @@ namespace DataAccess.Repositories.Models
 
         public async Task<Transfer> CreateAsync(Transfer transfer)
         {
-            //transfer.DateCreated = DateTime.Now;
-            //transfer.IsConfirmed = false;
-            //transfer.IsCancelled = false;
             await context.AddAsync(transfer);
             await context.SaveChangesAsync();
 
@@ -42,7 +39,6 @@ namespace DataAccess.Repositories.Models
         {
             Transfer transferToDelete = await GetByIdAsync(id);
             transferToDelete.IsCancelled = true;
-            //context.Transfers.Remove(transferToDelete);
             await context.SaveChangesAsync();
 
             return transferToDelete.IsCancelled;
@@ -51,6 +47,7 @@ namespace DataAccess.Repositories.Models
         public async Task<bool> SaveChangesAsync()
         {
             await context.SaveChangesAsync();
+
             return true;
         }
 
@@ -67,7 +64,6 @@ namespace DataAccess.Repositories.Models
                 .FirstOrDefaultAsync(t => t.Id == id);
 
             return transfer;
-
         }
 
         public async Task<Transfer> GetByUserIdAsync(int userId)
@@ -83,6 +79,7 @@ namespace DataAccess.Repositories.Models
         public async Task<Transfer> UpdateAsync(Transfer transferToUpdate)
         {
             await context.SaveChangesAsync();
+
             return transferToUpdate;
         }
     }

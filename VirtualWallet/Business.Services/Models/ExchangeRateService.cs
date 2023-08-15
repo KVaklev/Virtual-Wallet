@@ -1,5 +1,4 @@
-﻿
-using Business.Services.Contracts;
+﻿using Business.Services.Contracts;
 using Business.Services.Helpers;
 using Newtonsoft.Json;
 using System.Globalization;
@@ -59,6 +58,7 @@ namespace DataAccess.Models.Models
                 return result;
             }
         }
+
         public async Task<Response<decimal>> ExchangeAsync(decimal amount, string fromCurrencyCode, string toCurrencyCode)
         {
             var result = new Response<decimal>();

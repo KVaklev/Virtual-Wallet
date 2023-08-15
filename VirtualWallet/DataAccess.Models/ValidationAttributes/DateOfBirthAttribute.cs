@@ -13,7 +13,6 @@ namespace DataAccess.Models.ValidationAttributes
                     return new ValidationResult(Constants.BirthDateErrorMessage);
                 }
             }
-
             return ValidationResult.Success;
         }
     }

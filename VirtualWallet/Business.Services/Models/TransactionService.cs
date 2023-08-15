@@ -49,12 +49,14 @@ namespace Business.Services.Models
                 result.Message = Constants.NoRecordsFound;
                 return result;
             }
+
             if (!await Security.IsTransactionSenderAsync(transaction, loggedUser.Id))
             {
                 result.IsSuccessful = false;
                 result.Message = Constants.ModifyAuthorizedErrorMessage;
                 return result;
             }
+
             var transactionDto = this.mapper.Map<GetTransactionDto>(transaction);
             result.Data = transactionDto;
 
@@ -169,24 +171,28 @@ namespace Business.Services.Models
                 result.Message = Constants.NoRecordsFound;
                 return result;
             }
+
             if (!await Security.IsTransactionSenderAsync(transactionToUpdate, loggedUser.Id))
             {
                 result.IsSuccessful = false;
                 result.Message = Constants.ModifyAuthorizedErrorMessage;
                 return result;
             }
+
             if (!await Security.CanModifyTransactionAsync(transactionToUpdate))
             {
                 result.IsSuccessful = false;
                 result.Message = Constants.ModifyTransactionNotExecuteErrorMessage;
                 return result;
             }
+
             if (!await Common.HasEnoughBalanceAsync(loggedUser.Account, transactionDto.Amount))
             {
                 result.IsSuccessful = false;
                 result.Message = Constants.ModifyAccountBalancetErrorMessage;
                 return result;
             }
+
             var recipient = await accountRepository.GetByUsernameAsync(transactionDto.RecipientUsername);
             if (recipient==null)
             {
@@ -194,6 +200,7 @@ namespace Business.Services.Models
                 result.Message = Constants.NoRecordsFound;
                 return result;
             }
+
             var currency = await currencyRepository.GetByCurrencyCodeAsync(transactionDto.CurrencyCode);
             if (currency == null)
             {
@@ -201,6 +208,7 @@ namespace Business.Services.Models
                 result.Message = Constants.NoRecordsFound;
                 return result;
             }
+
             decimal exchangeRate = 1;
             if (transactionDto.CurrencyCode != loggedUser.Account.Currency.CurrencyCode)
             {
@@ -260,7 +268,6 @@ namespace Business.Services.Models
             return result;
         }
 
-
         public async Task<Response<bool>> ConfirmAsync(int transactionId, User loggedUser)
         {
             var result = new Response<bool>();
@@ -271,12 +278,14 @@ namespace Business.Services.Models
                 result.Message = Constants.NoRecordsFound;
                 return result;
             }
+
             if (!await Security.IsTransactionSenderAsync(transactionOut, loggedUser.Id))
             {
                 result.IsSuccessful = false;
                 result.Message = Constants.ModifyAuthorizedErrorMessage;
                 return result;
             }
+
             if (!await Security.CanModifyTransactionAsync(transactionOut))
             {
                 result.IsSuccessful = false;
@@ -291,6 +300,7 @@ namespace Business.Services.Models
                 result.Message = transactionInResult.Message;
                 return result;
             }
+
             var updareResult =  await UpdateAccountsBalancesAsync(transactionOut, transactionInResult.Data);
             if (!updareResult.IsSuccessful)
             {
@@ -298,6 +308,7 @@ namespace Business.Services.Models
                 result.Message = updareResult.Message;
                 return result;
             }
+
             await AddTransactionToHistoryAsync(transactionOut);
             await AddTransactionToHistoryAsync(transactionInResult.Data);
 
@@ -307,6 +318,7 @@ namespace Business.Services.Models
 
             result.Message = Constants.ModifyTransactionConfirmMessage;
             result.Data = transactionOut.IsConfirmed;
+
             return result;
         }
 
@@ -444,7 +456,6 @@ namespace Business.Services.Models
             }
             return result;
         }
-
         private async Task<IQueryable<Transaction>> GetLoogedUserTransactionsAsync(IQueryable<Transaction> userTransactions, User loggedUser)
         {
              

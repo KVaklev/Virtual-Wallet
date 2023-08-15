@@ -29,6 +29,5 @@ namespace DataAccess.Models.Models
                 return PageNumber < TotalPages;
             }
         }
-
     }
 }

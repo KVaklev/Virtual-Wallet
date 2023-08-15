@@ -35,8 +35,8 @@ namespace DataAccess.Repositories.Models
 
         public async Task<History> CreateAsync(History history)
         {
-            await this.context.AddAsync(history);
-            await this.context.SaveChangesAsync();
+            await context.AddAsync(history);
+            await context.SaveChangesAsync();
             return history;
         }
 
@@ -57,6 +57,7 @@ namespace DataAccess.Repositories.Models
         public async Task<int> GetHistoryCountAsync()
         {
              var count = context.History.Count();
+
              return count;
         }
     }

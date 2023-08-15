@@ -68,15 +68,14 @@ namespace DataAccess.Repositories.Models
         {
             var accountToDelete = await this.GetByIdAsync(id);
             accountToDelete.IsDeleted = true;
-
             await context.SaveChangesAsync();
+
             return accountToDelete.IsDeleted;
         }
                
         public async Task<bool> AddCardAsync(int id, Card card)
         {
-            var accountToAddCard = await this.GetByIdAsync(id);
-           
+            var accountToAddCard = await this.GetByIdAsync(id);       
             accountToAddCard.Cards.Add(card);
             await context.SaveChangesAsync();
 
@@ -86,7 +85,6 @@ namespace DataAccess.Repositories.Models
         public async Task <bool> RemoveCardAsync(int id, Card card)
         {
             var accountToRemoveCard = await this.GetByIdAsync(id);
-
             accountToRemoveCard.Cards.Remove(card);
             await context.SaveChangesAsync();
 
@@ -108,6 +106,7 @@ namespace DataAccess.Repositories.Models
             }
             user.IsVerified = true;
             await this.context.SaveChangesAsync();
+
             return true;
         }
     }

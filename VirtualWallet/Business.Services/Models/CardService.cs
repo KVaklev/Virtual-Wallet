@@ -87,7 +87,6 @@ namespace Business.Services.Models
         public async Task<Response<GetCardDto>> GetByIdAsync(int id, User loggedUser)
         {
             var result = new Response<GetCardDto>();
-
             var card = await this.cardRepository.GetByIdAsync(id);
 
             if (card == null)
@@ -112,7 +111,6 @@ namespace Business.Services.Models
         public Response<List<GetCardDto>> GetByAccountId(int accountId)
         {
             var result = new Response<List<GetCardDto>>();
-
             var cards = this.cardRepository.GetByAccountId(accountId);
 
             var cardDto = cards
@@ -132,6 +130,7 @@ namespace Business.Services.Models
 
             return result;
         }
+
         public async Task<Response<GetCreatedCardDto>> CreateAsync(int accountId, CreateCardDto card)
         {
             var result = new Response<GetCreatedCardDto>();
@@ -147,10 +146,8 @@ namespace Business.Services.Models
             var cardToCreate = new Card();
             var currency = await currencyService.GetByCurrencyCodeAsync(card.CurrencyCode);
             cardToCreate = await CardsMapper.MapCreateDtoToCardAsync(accountId, cardToCreate, currency.Data, card);
-            var createdCard = await this.cardRepository.CreateAsync(accountId, cardToCreate);
-            
+            var createdCard = await this.cardRepository.CreateAsync(accountId, cardToCreate); 
             var cardDto = this.mapper.Map<GetCreatedCardDto>(createdCard);
-
             result.Data = cardDto;
 
             return result;
@@ -159,7 +156,6 @@ namespace Business.Services.Models
         public async Task<Response<GetUpdatedCardDto>> UpdateAsync(int id, User loggedUser, UpdateCardDto updateCardDto)
         {
             var result = new Response<GetUpdatedCardDto>();
-
             Card cardToUpdate = await this.cardRepository.GetByIdAsync(id);
 
             if (await CardNumberExistsAsync(updateCardDto.CardNumber))
@@ -180,7 +176,6 @@ namespace Business.Services.Models
             var currency = await currencyService.GetCurrencyByIdAsync((int)cardToUpdate.CurrencyId);
             cardToUpdate = await CardsMapper.MapUpdateDtoToCardAsync(cardToUpdate, updateCardDto, currency.Data);
             cardToUpdate = await this.cardRepository.UpdateAsync(id, cardToUpdate);
-
             var cardDto = mapper.Map<GetUpdatedCardDto>(cardToUpdate);
             result.Data = cardDto;
 
@@ -229,20 +224,18 @@ namespace Business.Services.Models
                 result.IsSuccessful = false;
                 result.Message = NoCardFoundErrorMessage;   
                 return result;
-
             }
 
             cardToDepositTo.Balance += amount;
             await this.cardRepository.SaveChangesAsync();
-
             result.Data = cardToDepositTo;
+
             return result;
         }
 
         public async Task<Response<Card>> DecreaseBalanceAsync(int id, decimal amount, User loggedUser)
         {
             var result = new Response<Card>();
-
             Card cardToWithdrawFrom = await this.cardRepository.GetByIdAsync(id);
 
             if (cardToWithdrawFrom == null)
@@ -264,7 +257,6 @@ namespace Business.Services.Models
         {
             return await this.cardRepository.CardNumberExistsAsync(cardNumber);
         }
-
         private async Task<IQueryable<Card>> FilterByUsernameAsync(IQueryable<Card> result, string username)
         {
             result = result

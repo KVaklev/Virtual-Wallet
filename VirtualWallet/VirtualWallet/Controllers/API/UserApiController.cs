@@ -95,7 +95,6 @@ namespace VirtualWallet.Controllers.API
             {
                 return BadRequest(result.Message);
             }
-
             result.Message = Constants.SuccessfullDeletedUserMessage;
 
             return StatusCode(StatusCodes.Status200OK, result.Message);
@@ -110,7 +109,6 @@ namespace VirtualWallet.Controllers.API
                 return StatusCode(StatusCodes.Status404NotFound, loggedUserResponse.Message);
             }
             var result = await userService.PromoteAsync(id, loggedUserResponse.Data);
-
             if (!result.IsSuccessful)
             {
                 return BadRequest(result.Message);
@@ -129,8 +127,8 @@ namespace VirtualWallet.Controllers.API
             {
                 return StatusCode(StatusCodes.Status404NotFound, loggedUserResponse.Message);
             }
-            var result = await userService.BlockUserAsync(id, loggedUserResponse.Data);
 
+            var result = await userService.BlockUserAsync(id, loggedUserResponse.Data);
             if (!result.IsSuccessful)
             {
                 return BadRequest(result.Message);
@@ -150,8 +148,8 @@ namespace VirtualWallet.Controllers.API
             {
                 return StatusCode(StatusCodes.Status404NotFound, loggedUserResponse.Message);
             }
-            var result = await userService.UnblockUserAsync(id, loggedUserResponse.Data);
 
+            var result = await userService.UnblockUserAsync(id, loggedUserResponse.Data);
             if (!result.IsSuccessful)
             {
                 return BadRequest(result.Message);

@@ -56,8 +56,7 @@ namespace VirtualWallet.Controllers.MVC
             }
             indexHistoryViewModel.GetHistoryDtos = result.Data;
 
-
-                return this.View(indexHistoryViewModel);
+            return this.View(indexHistoryViewModel);
         }
 
         private async Task<Response<User>> FindLoggedUserAsync()
@@ -69,12 +68,14 @@ namespace VirtualWallet.Controllers.MVC
                 result.IsSuccessful = false;
                 return result;
             }
+
             var loggedUserResult = await this.userService.GetLoggedUserByUsernameAsync(loggedUsersUsername.Value);
             if (loggedUserResult == null)
             {
                 result.IsSuccessful = false;
                 return result;
             }
+
             return loggedUserResult;
         }
 
