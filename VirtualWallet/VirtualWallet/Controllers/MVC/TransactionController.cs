@@ -37,13 +37,11 @@ namespace VirtualWallet.Controllers.MVC
         [HttpGet]
         public async Task<IActionResult> Index([FromQuery] TransactionQueryParameters parameters)
         {
-            
-                var loggedUser = await FindLoggedUserAsync();
-                if (!loggedUser.IsSuccessful)
-                {
-                    return this.RedirectToAction("Login", "Account");
-                }
-
+            var loggedUser = await FindLoggedUserAsync();
+            if (!loggedUser.IsSuccessful)
+            {
+                return this.RedirectToAction("Login", "Account");
+            }
 
             var result = await this.transactionService.FilterByAsync(parameters, loggedUser.Data);
             if (!result.IsSuccessful)
