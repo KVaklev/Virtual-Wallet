@@ -6,7 +6,7 @@
 
     var parameters = new Dictionary<string, string>
  {
-      {"RecipientUsername", Model.TransactionQueryParameters.RecipientUsername},
+      {"Username", Model.TransactionQueryParameters.Username},
       {"FromDate", Model.TransactionQueryParameters.FromDate},
       {"ToDate", Model.TransactionQueryParameters.ToDate},
       {"Direction", Model.TransactionQueryParameters.Direction},
@@ -55,18 +55,24 @@
                         </form>
                     </div>
                     <!-- Profile Details End -->
-                    <!-- Available Balance
-                    =============================== -->
-                    <div class="bg-white shadow-sm rounded text-center p-3 mb-4">
-                        <div class="text-17 text-light my-3"><i class="fas fa-wallet text-primary"></i></div>
-                        <h3 class="text-9 fw-400">@Model.User.Account.Balance @Model.User.Account.Currency.CurrencyCode</h3>
-                        <p class="mb-2 text-muted opacity-8">Available Balance</p>
-                        <hr class="mx-n3">
-                        <div class="d-flex">
-                            <a asp-controller="Transfer" asp-action="Create" class="btn-link me-auto">Withdraw</a>
-                            <a asp-controller="Transfer" asp-action="Create" class="btn-link ms-auto">Deposit</a>
+
+                    @if (!Model.User.IsAdmin)
+                    {
+
+
+                        <!-- Available Balance
+                        =============================== -->
+                        <div class="bg-white shadow-sm rounded text-center p-3 mb-4">
+                            <div class="text-17 text-light my-3"><i class="fas fa-wallet text-primary"></i></div>
+                            <h3 class="text-9 fw-400">@Model.User.Account.Balance @Model.User.Account.Currency.CurrencyCode</h3>
+                            <p class="mb-2 text-muted opacity-8">Available Balance</p>
+                            <hr class="mx-n3">
+                            <div class="d-flex">
+                                <a asp-controller="Transfer" asp-action="Create" class="btn-link me-auto">Withdraw</a>
+                                <a asp-controller="Transfer" asp-action="Create" class="btn-link ms-auto">Deposit</a>
+                            </div>
                         </div>
-                    </div>
+                    }
                     <!-- Available Balance End -->
                 </aside>
                 <!-- Left Panel End -->
@@ -93,7 +99,7 @@
                                             <input type="date" name="ToDate" value="ToDate" class="form-control" placeholder="">
                                         </div>
                                         <div class="col-6 col-md-3">
-                                            <input type="text" name="RecipientUsername" class="form-control" placeholder="Username">
+                                            <input type="text" name="Username" class="form-control" placeholder="Username">
                                         </div>
                                         <div class="col-6 col-md-3">
                                             <button type="submit" class="btn btn-primary shadow-none">Filter</button>
@@ -153,92 +159,108 @@
                             </div>
                         </div>
                         <!-- Title End -->
-                        <!-- Transaction List
-                        =============================== -->
-                        @foreach (var transaction in Model.TransactionDtos)
+                        @if (ViewData["ErrorMessage"] != null)
                         {
-                            <div class="transaction-list">
+                            <div class="row">
+                                <div class="col text-center">
+                                    <p>&nbsp;</p>
+                                    <p>@ViewData["ErrorMessage"]</p>
+                                </div>
+                            </div>
 
-                                <div class="transaction-item px-4 py-3" data-bs-toggle="modal" data-bs-target="#transaction-detail">
-                                    <div class="row align-items-center flex-row">
-                                        @{
+                        }
+                        else
+                        {
+                            <!-- Transaction List
+                            =============================== -->
+                            @foreach (var transaction in Model.TransactionDtos)
+                            {
+                                <div class="transaction-list">
 
-                                            var day = transaction.Date.Day.ToString();
-                                            var month = transaction.Date.ToString("MMM").ToUpper();
+                                    <div class="transaction-item px-4 py-3" data-bs-toggle="modal" data-bs-target="#transaction-detail">
+                                        <div class="row align-items-center flex-row">
+                                            @{
 
-                                            <div class="col-2 col-sm-1 text-center"> <span class="d-block text-4 fw-300">@day</span> <span class="d-block text-1 fw-300 text-uppercase">@month</span> </div>
-                                            if (Model.User.IsAdmin)
-                                            {
+                                                var day = transaction.Date.Day.ToString();
+                                                var month = transaction.Date.ToString("MMM").ToUpper();
 
-                                                <div class="col col-sm-7">
-                                                    <span class="d-block text-4">From Account: @transaction.SenderUsername</span>
-                                                    <span class="d-block text-4">To Account: @transaction.RecipientUsername</span>
-                                                    <span class="text-muted">@transaction.Direction  <a class="btn-link" asp-controller="Transaction" asp-action="Details" asp-route-id="@transaction.Id">Details</a></span>
-                                                </div>
-                                            }
-                                            else
-                                            {
-
-
-                                                @if (transaction.Direction == DirectionType.Out.ToString())
+                                                <div class="col-2 col-sm-1 text-center"> <span class="d-block text-4 fw-300">@day</span> <span class="d-block text-1 fw-300 text-uppercase">@month</span> </div>
+                                                if (Model.User.IsAdmin)
                                                 {
+
                                                     <div class="col col-sm-7">
-                                                        <span class="d-block text-4"><a asp-action="CreateWithUsername" asp-controller="Transaction" asp-route-username="@transaction.RecipientUsername">@transaction.RecipientUsername</a> </span>
-                                                        <span class="text-muted">Payment Sent  <a class="btn-link" asp-controller="Transaction" asp-action="Details" asp-route-id="@transaction.Id">Details</a></span>
+                                                        <span class="d-block text-4">From Account: @transaction.SenderUsername</span>
+                                                        <span class="d-block text-4">To Account: @transaction.RecipientUsername</span>
+                                                        <span class="text-muted">@transaction.Direction  <a class="btn-link" asp-controller="Transaction" asp-action="Details" asp-route-id="@transaction.Id">Details</a></span>
                                                     </div>
                                                 }
                                                 else
                                                 {
-                                                    <div class="col col-sm-7">
-                                                        <span class="d-block text-4">@transaction.SenderUsername </span>
-                                                        <span class="text-muted">Payment Received  <a class="btn-link" asp-controller="Transaction" asp-action="Details" asp-route-id="@transaction.Id">Details</a></span>
-                                                    </div>
+
+
+                                                    @if (transaction.Direction == DirectionType.Out.ToString())
+                                                    {
+                                                        <div class="col col-sm-7">
+                                                            <span class="d-block text-4"><a asp-action="CreateWithUsername" asp-controller="Transaction" asp-route-username="@transaction.RecipientUsername">@transaction.RecipientUsername</a> </span>
+                                                            <span class="text-muted">Payment Sent  <a class="btn-link" asp-controller="Transaction" asp-action="Details" asp-route-id="@transaction.Id">Details</a></span>
+                                                        </div>
+                                                    }
+                                                    else
+                                                    {
+                                                        <div class="col col-sm-7">
+                                                            <span class="d-block text-4"><a asp-action="CreateWithUsername" asp-controller="Transaction" asp-route-username="@transaction.SenderUsername">@transaction.SenderUsername </a></span>
+                                                            <span class="text-muted">Payment Received  <a class="btn-link" asp-controller="Transaction" asp-action="Details" asp-route-id="@transaction.Id">Details</a></span>
+                                                        </div>
+                                                    }
+
                                                 }
 
-                                            }
 
+                                                @if (transaction.IsConfirmed)
+                                                {
+                                                    <div class="col-auto col-sm-2 d-none d-sm-block text-center text-3"> <span class="text-success" data-bs-toggle="tooltip" title="Completed"><i class="fas fa-check-circle"></i></span> </div>
+                                                }
+                                                else if (transaction.IsDeleted)
+                                                {
 
-                                            @if (transaction.IsConfirmed)
-                                            {
-                                                <div class="col-auto col-sm-2 d-none d-sm-block text-center text-3"> <span class="text-success" data-bs-toggle="tooltip" title="Completed"><i class="fas fa-check-circle"></i></span> </div>
-                                            }
-                                            else if (transaction.IsDeleted)
-                                            {
+                                                    <div class="col-auto col-sm-2 d-none d-sm-block text-center text-3"> <span class="text-danger" data-bs-toggle="tooltip" title="Cancelled"><i class="fas fa-times-circle"></i></span> </div>
+                                                }
+                                                else
+                                                {
+                                                    <div class="col-auto col-sm-2 d-none d-sm-block text-center text-3">
 
-                                                <div class="col-auto col-sm-2 d-none d-sm-block text-center text-3"> <span class="text-danger" data-bs-toggle="tooltip" title="Cancelled"><i class="fas fa-times-circle"></i></span> </div>
+                                                        <span style="margin-right:5%"></span>
+                                                        <span class="text-warning" data-bs-toggle="tooltip" title="In Progress">
+                                                            <i class="fas fa-ellipsis-h"></i>
+                                                        </span>
+                                                    </div>
+                                                }
+                                                @if (transaction.Direction == DirectionType.In.ToString())
+                                                {
+                                                    <div class="col-3 col-sm-2 text-end text-4"> <span class="text-nowrap">+ @transaction.Amount</span> <span class="text-2 text-uppercase">(@transaction.CurrencyCode)</span> </div>
+                                                }
+                                                else
+                                                {
+                                                    <div class="col-3 col-sm-2 text-end text-4"> <span class="text-nowrap">- @transaction.Amount</span> <span class="text-2 text-uppercase">(@transaction.CurrencyCode)</span> </div>
+                                                }
                                             }
-                                            else
-                                            {
-                                                <div class="col-auto col-sm-2 d-none d-sm-block text-center text-3">
-
-                                                    <span style="margin-right:5%"></span>
-                                                    <span class="text-warning" data-bs-toggle="tooltip" title="In Progress">
-                                                        <i class="fas fa-ellipsis-h"></i>
-                                                    </span>
-                                                </div>
-                                            }
-                                            @if (transaction.Direction == DirectionType.In.ToString())
-                                            {
-                                                <div class="col-3 col-sm-2 text-end text-4"> <span class="text-nowrap">+ @transaction.Amount</span> <span class="text-2 text-uppercase">(@transaction.CurrencyCode)</span> </div>
-                                            }
-                                            else
-                                            {
-                                                <div class="col-3 col-sm-2 text-end text-4"> <span class="text-nowrap">- @transaction.Amount</span> <span class="text-2 text-uppercase">(@transaction.CurrencyCode)</span> </div>
-                                            }
-                                        }
+                                        </div>
                                     </div>
-                                </div>
 
-                            </div>
-                            <!-- Transaction List End -->
-                        }
+                                </div>
+                                <!-- Transaction List End -->
+
+                            }
+
+                        
                         <!-- Transaction Item Details Modal End -->
                         <!-- Pagination
                         ============================================= -->
-                        @{
+                       
+                        
                             string prevButtonState = this.Model.TransactionDtos.HasPrevPage ? "" : "disabled";
                             string nextButtonState = this.Model.TransactionDtos.HasNextPage ? "" : "disabled";
-                        }
+                        
                         <ul class="pagination justify-content-center mt-4 mb-0">
                             <li class="page-item @prevButtonState">
                                 <a class="page-link"
@@ -284,7 +306,7 @@
                             </li>
                         </ul>
                         <!-- Paginations end -->
-
+}
                     </div>
 
 

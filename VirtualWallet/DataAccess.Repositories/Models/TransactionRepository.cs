@@ -54,13 +54,17 @@ namespace DataAccess.Repositories.Models
             return transaction;
         }
         
-        public IQueryable<Transaction> GetAll(string username)
+        public IQueryable<Transaction> GetAll()
         {
             var result = context.Transactions
-                .Where(u => u.AccountSender.User.Username == username)
                 .Include(s => s.AccountSender)
+                .ThenInclude(u => u.User)
+                .Include(s => s.AccountSender)
+                .ThenInclude(u => u.Currency)
                 .Include(r => r.AccountRecipient)
                 .ThenInclude(u =>u.User)
+                .Include(r => r.AccountRecipient)
+                .ThenInclude(u => u.Currency)
                 .Include(c => c.Currency)
                 .OrderByDescending(d=>d.Date)
                 .AsQueryable();

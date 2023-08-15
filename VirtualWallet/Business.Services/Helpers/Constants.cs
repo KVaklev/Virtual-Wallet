@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.DataProtection;
+using System.Numerics;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace Business.Services.Helpers
@@ -44,7 +45,8 @@ namespace Business.Services.Helpers
         //Constant messages for transactions 
 
         public const string ModifyTransactionConfirmMessage = "The transaction has been successfully executed.";
-        public const string ModifyTransactionDeleteMessage = "The transacion has been successfully deleted.";
+        public const string ModifyTransactionDeleteMessage = "The transaction has been successfully deleted. If you have any questions or concerns, please feel free to contact our support team for assistance.Thank you.";
+
         public const string ModifyTransactionNotExecuteErrorMessage = "You cannot update or delete a completed transaction!";
         public const string ModifyTransactionBlockedErrorMessage = "You are not allowed to make transactions while being blocked!";
         
@@ -61,6 +63,7 @@ namespace Business.Services.Helpers
         //Constant messages for curencies
                 
         public const string CurrencyNotFoundErrorMessage = "This currency does not exist.";
+        public const string CurrencySuccessfulUpdateMessage = "Currency updated successfully!";
 
         //Constant messages for Authorized
 

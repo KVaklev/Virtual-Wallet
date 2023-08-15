@@ -23,28 +23,6 @@ namespace VirtualWallet.Controllers.API
             this.userService = userService;
         }
 
-        [HttpGet("{id}"), Authorize]
-        public async Task<IActionResult> GetbyIdAsync(int id)
-        {
-            var loggedUserResult = await FindLoggedUserAsync();
-            if (!loggedUserResult.IsSuccessful)
-            {
-                return StatusCode(StatusCodes.Status401Unauthorized, loggedUserResult.Message);
-
-            }
-
-            var result = await this.historyService.GetByIdAsync(id, loggedUserResult.Data);
-            if (!result.IsSuccessful)
-            {
-                if (result.Message == Constants.NoRecordsFound)
-                {
-                    return StatusCode(StatusCodes.Status404NotFound, result.Message);
-                }
-                return BadRequest(result.Message);
-            }
-            return StatusCode(StatusCodes.Status200OK, result.Data);
-        }
-
         [HttpGet, Authorize]
         public async Task<IActionResult> GetHistoryAsync([FromQuery] HistoryQueryParameters historyQueryParameters) 
         {

@@ -18,7 +18,6 @@ namespace DataAccess.Repositories.Models
         public IQueryable<Currency> GetAll()
         {
             var currencies = this.context.Currencies
-                .Where(c => c.IsDeleted == false)
                 .OrderBy(n => n.Name)
                 .AsQueryable();
 
@@ -56,7 +55,5 @@ namespace DataAccess.Repositories.Models
             await context.SaveChangesAsync();
             return true;
         }
-
-        
     }
 }

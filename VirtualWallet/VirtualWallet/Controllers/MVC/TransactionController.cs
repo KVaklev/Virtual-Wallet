@@ -3,6 +3,7 @@ using Business.DTOs.Responses;
 using Business.Mappers;
 using Business.QueryParameters;
 using Business.Services.Contracts;
+using Business.Services.Helpers;
 using Business.ViewModels;
 using DataAccess.Models.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -45,15 +46,25 @@ namespace VirtualWallet.Controllers.MVC
             }
 
             var result = await this.transactionService.FilterByAsync(parameters, loggedUser.Data);
-            if (!result.IsSuccessful)
-            {
-                this.ViewData["Controller"] = "Transaction";
-                return View("ErrorMessage", result.Message);
-            }
             var indexTransactionViewModel = new IndexTransactionViewModel();
-            indexTransactionViewModel.TransactionDtos = result.Data;
             indexTransactionViewModel.TransactionQueryParameters = parameters;
             indexTransactionViewModel.User = loggedUser.Data;
+
+            if (!result.IsSuccessful)
+            {
+                if (result.Message == Constants.NoRecordsFoundByFilter)
+                { 
+                    this.ViewData["ErrorMessage"] = result.Message;
+                    return View(indexTransactionViewModel);
+                }
+                else 
+                { 
+                    this.ViewData["Controller"] = "Transaction";
+                    return View("ErrorMessage", result.Message);
+                }
+            }
+
+            indexTransactionViewModel.TransactionDtos = result.Data;
             return View(indexTransactionViewModel);
         }
 
@@ -169,13 +180,13 @@ namespace VirtualWallet.Controllers.MVC
         [HttpGet]
         public async Task<IActionResult> Update([FromRoute] int id)
         {
-            var loggedUserResult = await FindLoggedUserAsync();
-            if (!loggedUserResult.IsSuccessful)
+            var loggedUser = await FindLoggedUserAsync();
+            if (!loggedUser.IsSuccessful)
             {
                 return this.RedirectToAction("Login", "Account");
             }
 
-            var transactionResult = await this.transactionService.GetByIdAsync(id, loggedUserResult.Data);
+            var transactionResult = await this.transactionService.GetByIdAsync(id, loggedUser.Data);
 
             if (!transactionResult.IsSuccessful)
             {
@@ -270,14 +281,10 @@ namespace VirtualWallet.Controllers.MVC
                 return View("ErrorMessage", result.Message);
                 }
 
-            return this.RedirectToAction("SuccessfulDelete", "Transaction");
+            return View("SuccessfulDelete", result.Message); ;
 
         }
-        [HttpGet]
-        public async Task<IActionResult> SuccessfulDelete()
-        {
-            return this.View();
-        }
+        
 
         [HttpGet]
         public async Task<IActionResult> Confirm([FromRoute] int id)
