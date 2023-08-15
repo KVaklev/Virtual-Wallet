@@ -5,14 +5,10 @@
 
 @model Business.ViewModels.CreateTransferViewModel;
 
-
-@inject ICardService cardService
-
 @{
     this.ViewData["Title"] = "Speed Pay - Quick and Trustworthy Money Transfers ";
 
-    //var currencies = JsonSerializer.Deserialize<List<Currency>>(TempData.Peek("Currencies").ToString());
-    //var cards = JsonSerializer.Deserialize<PaginatedList<Card>>(TempData.Peek("Cards").ToString());
+    var cards = JsonSerializer.Deserialize<List<GetCreatedCardDto>>(TempData.Peek("Cards").ToString());
     //var cards = new SelectList(cardService.GetAll(@Model.User));
 }
 
@@ -91,7 +87,7 @@
                             <label for="paymentMethod" class="form-label">Select Card</label>
                             <select asp-for="CreateTransferDto.CardNumber" id="cardType" class="form-select" required="">
                                 <option value="">My Cards</option>
-                                @foreach (var card in Model.Cards)
+                                @foreach (var card in cards)
                                 {
                                     <option data-subtext="@card.CurrencyCode" value="@card.CardNumber"> @card.CardType - @card.CardNumber - @card.CurrencyCode </option>
                                 }

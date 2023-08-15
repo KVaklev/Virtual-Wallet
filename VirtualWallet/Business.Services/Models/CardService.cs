@@ -27,7 +27,7 @@ namespace Business.Services.Models
             this.currencyService = currencyService;
             this.mapper = mapper;
         }
-        private Response<IQueryable<Card>> GetAll(User loggedUser)
+        public Response<IQueryable<Card>> GetAll(User loggedUser)
         {
             var result = new Response<IQueryable<Card>>();
             var cards = this.cardRepository.GetAll();
@@ -41,7 +41,7 @@ namespace Business.Services.Models
                         .AsQueryable();
                 }
                 result.Data = cards;
-                
+
                 return result;
             }
             else
@@ -51,6 +51,7 @@ namespace Business.Services.Models
                 return result;
             }
         }
+
         public async Task<Response<PaginatedList<GetCreatedCardDto>>> FilterByAsync(CardQueryParameters filterParameters, User loggedUser)
         {
             var result = new Response<PaginatedList<GetCreatedCardDto>>();

@@ -32,10 +32,12 @@ namespace Business.Mappers
             CreateMap<GetUpdatedCardDto, Card>();
             CreateMap<Card, GetUpdatedCardDto>();
             CreateMap<Card, GetCreatedCardDto>();
+            
             CreateMap<GetCreatedCardDto, Card>()
                 .ForPath(c => c.Currency.CurrencyCode, c => c.MapFrom(c => c.CurrencyCode))
                 .ReverseMap();
-        }
+
+                   }
 
         public static Task<Card> MapCreateDtoToCardAsync(int accountId, Card cardToCreate, Currency currency, CreateCardDto card)
         {
