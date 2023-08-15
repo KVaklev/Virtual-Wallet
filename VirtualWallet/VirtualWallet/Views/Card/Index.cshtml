@@ -85,11 +85,14 @@
                         <div class="modal-body p-4">
                             <form asp-controller="Card" asp-action="Create" id="addCard" method="post">
                                 <div class="btn-group d-flex mb-3" role="group">
-                                    <input asp-for="CreateCardDto.CardType" type="radio" value ="Debit" class="btn-check" name="options" id="option1" autocomplete="off" checked>
-                                    <label class="btn btn-outline-secondary btn-sm shadow-none w-100" for="option1">Debit</label>
-
-                                    <input asp-for="CreateCardDto.CardType" type="radio" value ="Credit" class="btn-check" name="options" id="option2" autocomplete="off">
-                                    <label class="btn btn-outline-secondary btn-sm shadow-none w-100" for="option2">Credit</label>
+                                   <span class="form-check mr-5">
+                                    <input asp-for="CreateCardDto.CardType" type="radio" value="Debit" class="form-check-input"/>
+                                    <label class="form-check-label">Debit</label>
+                                </span>
+                                <span class="form-check" style="margin-left: 30px;">
+                                    <input asp-for="CreateCardDto.CardType" type="radio" value="Credit" class="form-check-input"/>
+                                    <label class="form-check-label">Credit</label>
+                                </span>
                                 </div>
                                 <div class="row g-3">
                                     <div class="col-12">
@@ -99,7 +102,7 @@
                                     </div>
                                     <div class="col-lg-6">
                                         <label for="expiryDate" class="form-label">Expiration Date</label>
-                                        <input asp-for="CreateCardDto.ExpirationDate" id="expiryDate" type="date" class="form-control" data-bv-field="expiryDate" value="" placeholder="MM/YY">
+                                        <input asp-for="CreateCardDto.ExpirationDate" id="expiryDate" type="date" class="form-control" data-bv-field="expiryDate" value="">
                                         <span asp-validation-for="CreateCardDto.ExpirationDate" class="form-error"></span>
                                     </div>
                                     <div class="col-lg-6">

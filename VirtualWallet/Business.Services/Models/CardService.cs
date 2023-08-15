@@ -316,7 +316,7 @@ namespace Business.Services.Models
                     return await Task.FromResult(result.OrderBy(card => card.Account.Balance));
                 }
             }
-            return result;
+            return await Task.FromResult(result);
         }
         private async Task<IQueryable<Card>> SortOrderAsync(IQueryable<Card> result, string sortOrder)
         {
