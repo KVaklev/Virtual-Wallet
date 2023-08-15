@@ -1,4 +1,5 @@
 ﻿using DataAccess.Models.ValidationAttributes;
+using Microsoft.AspNetCore.Http;
 using System.ComponentModel.DataAnnotations;
 
 namespace DataAccess.Models.Models
@@ -21,8 +22,8 @@ namespace DataAccess.Models.Models
         [MaxLength(Constants.CurrencyNameMaxLength, ErrorMessage = Constants.MaxLengthErrorMessage)]
         public string Country { get; set; }
 
+       
 
-       // public byte[] FlagImage { get; set; }
 
 
         public List<Account> Accounts { get; set; } = new List<Account>();

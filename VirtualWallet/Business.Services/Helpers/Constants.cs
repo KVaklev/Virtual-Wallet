@@ -115,8 +115,7 @@ namespace Business.Services.Helpers
         public const string ModifyNoRecordsFound = "No records found";
 
         //Constant messages for curencies
-
-        public const string ModifyCurrencyDeleteMessage = "The currency has been successfully deleted.";
+                
         public const string CurrencyNotFoundErrorMessage = "This currency does not exist.";
 
         //Constant messages for Authorized
@@ -152,11 +151,10 @@ namespace Business.Services.Helpers
 
         //Other Constant messages 
 
-        public const string NoFoundResulte = "No result is found.";
-        public const string NoHostError= "No such host is known.";
-        public const string JsonDeserializationError = "JSON Deserialization Error";
-        public const string ArgumentOutOfRangeError = "Index and length must refer to a location within the string.";
-
+        public const string NoRecordsFound = "No records found.";
+        public const string NoRecordsFoundByFilter = "No records found for now. You can try adjusting your search filters or check back later.";
+        public const string NoHostError= "An error occurred while fetching exchange rate data. Please try again later.";
+       
         public static class PropertyName
         {
             public const string Username = "Username";

@@ -26,7 +26,7 @@
                     <hr class="mx-n3 mx-sm-n5 mb-4">
                     <!-- Send Money Form
                     ============================ -->
-                    <form asp-controller="Currency" asp-action="Create" id="form-send-money" method="post">
+                    <form asp-controller="Currency" asp-action="Create" id="form-send-money" method="post" enctype="multipart/form-data">
                         <div class="mb-3">
                             <label for="emailID" class="form-label">Currency Code</label>
                             <input asp-for="CurrencyCode" type="text" required value="" class="form-control" data-bv-field="emailid" id="emailID" required placeholder="">

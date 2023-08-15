@@ -10,13 +10,15 @@ using System.Threading.Tasks;
 
 namespace Business.ViewModels
 {
-    public class CreateTransferDepositViewModel
+    public class CreateTransferViewModel
     {
         public CreateTransferDto CreateTransferDto { get; set; }
 
        // public User User { get; set; }
 
-        public PaginatedList<GetCreatedCardDto> Cards { get; set; }
+        public List<GetCreatedCardDto> Cards { get; set; }
+
+        public string CurrencyCode { get; set; }
 
         public TransferDirection TransferDirection { get; set; }
     }

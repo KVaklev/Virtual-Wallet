@@ -58,5 +58,17 @@ namespace Business.Mappers
             transfer.CurrencyId = transfer.Currency.Id;
             return transfer;
         }
+
+        public static async Task<CreateTransferDto> MapGetDtoToCreateDto(GetTransferDto getTransferDto)
+        {
+            var createTransferDto = new CreateTransferDto();
+            createTransferDto.CurrencyCode = getTransferDto.CurrencyCode;
+            createTransferDto.Amount = getTransferDto.Amount;
+            createTransferDto.CardNumber = getTransferDto.CardNumber;
+
+            return createTransferDto;
+
+
+        }
     }
 }

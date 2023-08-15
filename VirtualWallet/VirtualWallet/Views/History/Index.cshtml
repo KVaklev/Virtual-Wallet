@@ -11,7 +11,7 @@
  };
     var loggedUserId = User.FindFirst(ClaimTypes.NameIdentifier);
     var isAdmin = User.FindFirst("IsAdmin");
-    var isBlocked = User.FindFirst("IsBlocked");
+   
     var username = User.FindFirst(ClaimTypes.Name);
     var imagePath = @Url.Content("~/UploadedImages/" + username.Value + ".png");
 }
@@ -88,14 +88,19 @@
                         ========================= -->
                         <div class="row g-3">
                             <div class="col-6 col-md-3">
-                                <input type="date" name="FromDate" value="FromDate" class="form-control" placeholder="From Date">
+                                <input type="date" name="FromDate"  class="form-control" placeholder="From Date">
                             </div>
                             <div class="col-6 col-md-3">
-                                <input type="date" name="ToDate" value="ToDate" class="form-control" placeholder="To Da">
+                                <input type="date" name="ToDate"  class="form-control" placeholder="To Date">
                             </div>
+                                        @if (Model.LoggedUser.IsAdmin)
+                                        {
+                                            
                             <div class="col-6 col-md-3">
                                 <input type="text" name="RecipientUsername" class="form-control" placeholder="Username">
                             </div>
+                                        }  
+
                             <div class="col-6 col-md-3">
                                 <button type="submit" class="btn btn-primary shadow-none">Filter</button>
                             </div>
@@ -140,14 +145,14 @@
                                             {
                                                 <div class="col col-sm-7">
                                                     <span class="d-block text-4">Account: @operation.AccountUsername</span>
-                                                    <span class="d-block text-4"></span> <span class="text-muted">@operation.NameOperation @operation.Direction</span>
+                                                    <span class="d-block text-4"></span> <span class="text-muted">@operation.EventTime.ToString("hh:mm")  @operation.NameOperation @operation.Direction  </span>
                                                 </div>
 
                                             }
                                             else
                                             {
                                                 <div class="col col-sm-7">
-                                                    <span class="d-block text-4">@operation.Direction</span>
+                                                    <span class="d-block text-4">@operation.EventTime.ToString("hh:mm")  @operation.Direction </span>
                                                     <span class="d-block text-4"></span> <span class="text-muted">@operation.NameOperation</span>
                                                 </div>
 

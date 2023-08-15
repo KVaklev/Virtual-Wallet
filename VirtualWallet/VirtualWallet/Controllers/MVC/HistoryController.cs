@@ -39,7 +39,8 @@ namespace VirtualWallet.Controllers.MVC
             var result = await this.historyService.FilterByAsync(parameters, loggedUserResponse.Data);
             if (!result.IsSuccessful)
             {
-                return await EntityErrorViewAsync(result.Message);
+                this.ViewData["Controller"] = "History";
+                return View("ErrorMessage", result.Message);
             }
             var indexHistoryViewModel = new IndexHistoryViewModel();
             indexHistoryViewModel.GetHistoryDtos = result.Data;
@@ -66,14 +67,6 @@ namespace VirtualWallet.Controllers.MVC
                 return result;
             }
             return loggedUserResult;
-        }
-
-        private async Task<IActionResult> EntityErrorViewAsync(string message)
-        {
-           this.HttpContext.Response.StatusCode = StatusCodes.Status404NotFound;
-            this.ViewData["ErrorMessage"] = message;
-
-            return this.View("Error");
         }
 
     }

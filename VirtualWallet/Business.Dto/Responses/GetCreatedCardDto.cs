@@ -13,5 +13,6 @@ namespace Business.DTOs.Responses
         public string Username { get; set; }
         public decimal Balance { get; set; }
         public decimal CreditLimit { get; set; }
+        public string CurrencyCode { get; set; }
     }
 }

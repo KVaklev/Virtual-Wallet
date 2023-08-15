@@ -12,6 +12,8 @@ using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
 using Org.BouncyCastle.Security;
 using System.Security.Claims;
+using Business.Mappers;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace VirtualWallet.Controllers.MVC
 {
@@ -22,13 +24,15 @@ namespace VirtualWallet.Controllers.MVC
         private readonly IUserService userService;
         private readonly ICurrencyService currencyService;
         private readonly ICardService cardService;
+        private readonly IAccountService accountService;
+
         private readonly IExchangeRateService exchangeRateService;
         private readonly IMapper mapper;
 
         public TransferController(ITransferService transferService, IUserService userService,
             ICurrencyService currencyService,
             IExchangeRateService exchangeRateService,
-            ICardService cardService,
+            ICardService cardService, IAccountService accountService,
         IMapper mapper)
         {
             this.transferService = transferService;
@@ -37,42 +41,60 @@ namespace VirtualWallet.Controllers.MVC
             this.exchangeRateService = exchangeRateService;
             this.cardService = cardService;
             this.mapper = mapper;
-
-
+            this.accountService = accountService;
         }
 
         [HttpGet]
 
         public async Task<IActionResult> Index([FromQuery] TransferQueryParameters parameters)
         {
-            try
-            {
-                var loggedUser = await FindLoggedUserAsync();
-                //var model = transferService.GetAll(loggedUser).Select(m => new GetTransferDto { Username = m.Account.User.Username, DateCreated = m.DateCreated }).ToList();
-                var result = await transferService.FilterByAsync(parameters, loggedUser.Data);
-                return View(result.Data);
 
-            }
-            catch (EntityNotFoundException ex)
+            var loggedUser = await FindLoggedUserAsync();
+
+            if (!loggedUser.IsSuccessful)
             {
-                return await EntityNotFoundErrorViewAsync(ex.Message);
+                return this.RedirectToAction("Login", "Account");
             }
 
+            var result = await transferService.FilterByAsync(parameters, loggedUser.Data);
+
+
+            if (!result.IsSuccessful)
+            {
+                return await EntityNotFoundErrorViewAsync(result.Message);
+            }
+
+            var indexTransferViewModel = new IndexTransferViewModel();
+
+            indexTransferViewModel.TransferDtos = result.Data;
+            indexTransferViewModel.TransferQueryParameters= parameters;
+            indexTransferViewModel.User = loggedUser.Data;
+
+            return View(indexTransferViewModel);
         }
+                
 
         [HttpGet]
-        public async Task<IActionResult> Details(int id)
+        public async Task<IActionResult> Details([FromRoute] int id)
         {
-            try
+            var loggedUser = await FindLoggedUserAsync();
+            if (!loggedUser.IsSuccessful)
             {
-                var loggedUser = await FindLoggedUserAsync();
-                var transfer = await this.transferService.GetByIdAsync(id, loggedUser.Data);
-                return View(transfer);
+                return this.RedirectToAction("Login", "Account");
             }
-            catch (EntityNotFoundException ex)
+
+            var result = await this.transferService.GetByIdAsync(id, loggedUser.Data);
+
+            if (!result.IsSuccessful)
             {
-                return await EntityNotFoundErrorViewAsync(ex.Message);
+                return await EntityNotFoundErrorViewAsync(result.Message);
             }
+
+            var detailsTransferViewModel = new DetailsTransferViewModel();
+            detailsTransferViewModel.GetTransferDto = result.Data;
+            detailsTransferViewModel.LoggedUser = loggedUser.Data;
+
+            return this.View(detailsTransferViewModel);
         }
 
         [HttpGet]
@@ -84,31 +106,45 @@ namespace VirtualWallet.Controllers.MVC
 
             if (!loggedUser.IsSuccessful)
             {
-                return StatusCode(StatusCodes.Status404NotFound, loggedUser.Message);
+                return this.RedirectToAction("Login", "Account");
             }
-            var createTransferDepositViewModel = new CreateTransferDepositViewModel();
-                       
-            var currencies = await this.currencyService.GetAllAsync();
+            var createTransferViewModel = new CreateTransferViewModel();
+
+            var resultAccount = await this.accountService.GetByIdAsync((int)loggedUser.Data.AccountId, loggedUser.Data);
+
+            if (!resultAccount.IsSuccessful)
+            {
+                return await EntityNotFoundErrorViewAsync(resultAccount.Message);
+            }
+
+            //createTransferViewModel.CurrencyCode = resultAccount.Data.CurrencyCode;
+
+            //var currencies = this.currencyService.GetAll();
+
+            //if (!currencies.IsSuccessful)
+            //{
+            //    return await EntityNotFoundErrorViewAsync(currencies.Message);
+            //}
 
             var cards = await this.cardService.FilterByAsync(query, loggedUser.Data);
 
-            if (!currencies.IsSuccessful)
+            if (!cards.IsSuccessful)
             {
-                return await EntityNotFoundErrorViewAsync(currencies.Message);
+                return await EntityNotFoundErrorViewAsync(cards.Message);
             }
 
-            createTransferDepositViewModel.Cards = cards.Data;
+            createTransferViewModel.Cards = cards.Data;
 
-            TempData["Currencies"] = JsonSerializer.Serialize(currencies.Data);
-            TempData["Cards"] = JsonSerializer.Serialize(cards.Data);
+            //TempData["Currencies"] = JsonSerializer.Serialize(currencies.Data);
+            //TempData["Cards"] = JsonSerializer.Serialize(cards.Data);
 
-            return View(createTransferDepositViewModel);
+            return View(createTransferViewModel);
 
         }
 
         [HttpPost]
 
-        public async Task<IActionResult> Create(CreateTransferDepositViewModel transferDto)
+        public async Task<IActionResult> Create(CreateTransferViewModel transferDto)
         {
             //if (!this.ModelState.IsValid)
             //{
@@ -118,8 +154,11 @@ namespace VirtualWallet.Controllers.MVC
 
             if (!loggedUser.IsSuccessful)
             {
-                return await EntityNotFoundErrorViewAsync(loggedUser.Message);
+                return this.RedirectToAction("Login", "Account");
             }
+
+            //transferDto.CreateTransferDto.CurrencyCode = "USD";
+            //transferDto.CreateTransferDto.CardNumber = "5554567891011121";
 
             var result = await this.transferService.CreateAsync(transferDto.CreateTransferDto, loggedUser.Data);
             if (!result.IsSuccessful)
@@ -127,124 +166,259 @@ namespace VirtualWallet.Controllers.MVC
                 return await EntityNotFoundErrorViewAsync(result.Message);
             }
 
-            return this.RedirectToAction("Execute", "Transfer", new { id = result.Data.Id });
+            return this.RedirectToAction("Confirm", "Transfer", new { id = result.Data.Id });
 
         }
 
         [HttpGet]
-
-        public async Task<IActionResult> Edit([FromRoute] int id)
+        public async Task<IActionResult> Update([FromRoute] int id)
         {
-            try
-            {
-                var loggedUser = await FindLoggedUserAsync();
-                var result = await this.transferService.GetByIdAsync(id, loggedUser.Data);
+            var query = new CardQueryParameters();
 
-                if (!result.IsSuccessful)
-                {
-                    return await EntityNotFoundErrorViewAsync(result.Message);
-                }
-                return View(result.Data);
-            }
-            catch (EntityNotFoundException ex)
+            var loggedUser = await FindLoggedUserAsync();
+
+            if (!loggedUser.IsSuccessful)
             {
-                return await EntityNotFoundErrorViewAsync(ex.Message);
+                return this.RedirectToAction("Login", "Account");
             }
+            var result = await this.transferService.GetByIdAsync(id, loggedUser.Data);
+
+            if (!result.IsSuccessful)
+            {
+                return await EntityNotFoundErrorViewAsync(result.Message);
+            }
+
+            var createTransferViewModel = new CreateTransferViewModel();
+
+
+            createTransferViewModel.CreateTransferDto = await TransfersMapper.MapGetDtoToCreateDto(result.Data);
+
+
+            var cards = await this.cardService.FilterByAsync(query, loggedUser.Data);
+
+            createTransferViewModel.Cards = cards.Data;
+
+            //var currencies = this.currencyService.GetAll();
+
+            //if (!currencies.IsSuccessful)
+            //{
+            //    return await EntityNotFoundErrorViewAsync(currencies.Message);
+            //}
+
+            //TempData["Currencies"] = JsonSerializer.Serialize(currencies.Data);
+            //TempData["Cards"] = JsonSerializer.Serialize(cards.Data);
+
+            return View(createTransferViewModel);
+
         }
 
         [HttpPost]
-
-        public async Task<IActionResult> Edit(int id, UpdateTransferDto transferDto)
+        public async Task<IActionResult> Update(int id, UpdateTransferDto transferDto)
         {
-            try
+            //if (!this.ModelState.IsValid)
+            //{
+            //    return View(transferDto);
+            //}
+
+            var loggedUser = await FindLoggedUserAsync();
+            if (!loggedUser.IsSuccessful)
             {
-                if (!this.ModelState.IsValid)
-                {
-                    return View(transferDto);
-                }
-
-                var loggedUser = await FindLoggedUserAsync();
-                var result = await this.transferService.UpdateAsync(id, transferDto, loggedUser.Data);
-
-                if (!result.IsSuccessful)
-                {
-                    return await EntityNotFoundErrorViewAsync(result.Message);
-                }
-
-                return this.RedirectToAction("Index", "Transfer", new { Username = loggedUser.Data.Username });
+                return this.RedirectToAction("Login", "Account");
+            }
+            var result = await this.transferService.UpdateAsync(id, transferDto, loggedUser.Data);
+            if (!result.IsSuccessful)
+            {
+                return await EntityNotFoundErrorViewAsync(result.Message);
             }
 
+            return this.RedirectToAction("Confirm", "Transfer", new { Username = loggedUser.Data.Username });
 
-            catch (EntityNotFoundException ex)
-            {
-                return await EntityNotFoundErrorViewAsync(ex.Message);
-            }
         }
 
         [HttpGet]
 
         public async Task<IActionResult> Delete([FromRoute] int id)
         {
-            try
-            {
-                var loggedUser = await FindLoggedUserAsync();
-                var result = await this.transferService.GetByIdAsync(id, loggedUser.Data);
-                if (!result.IsSuccessful)
-                {
-                    return await EntityNotFoundErrorViewAsync(result.Message);
-                }
 
-                return this.View(result.Data);
-            }
-            catch (EntityNotFoundException ex)
+            var loggedUserresult = await FindLoggedUserAsync();
+
+            if (!loggedUserresult.IsSuccessful)
             {
-                return await EntityNotFoundErrorViewAsync(ex.Message);
+                return this.RedirectToAction("Login", "Account");
             }
+
+            var transferResult = await this.transferService.GetByIdAsync(id, loggedUserresult.Data);
+
+            if (!transferResult.IsSuccessful)
+            {
+                return await EntityNotFoundErrorViewAsync(transferResult.Message);
+            }
+
+            var result = await ExecuteTransferAsync(transferResult.Data);
+            if (!result.IsSuccessful)
+            {
+                return await EntityNotFoundErrorViewAsync(result.Message);
+            }
+
+            ConfirmTransferViewModel confirmTransferViewModel = result.Data;
+
+            return this.View(confirmTransferViewModel);
         }
 
-        [HttpPost, ActionName("Delete")]
+        [HttpPost]
 
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> Delete([FromRoute] int id,
+            ConfirmTransferViewModel confirmTransferViewModel)
         {
-            try
+
+            var loggedUser = await FindLoggedUserAsync();
+
+            if (!loggedUser.IsSuccessful)
             {
-                var loggedUser = await FindLoggedUserAsync();
-                var result = await this.transferService.DeleteAsync(id, loggedUser.Data);
-
-                if (!result.IsSuccessful)
-                {
-                    return await EntityNotFoundErrorViewAsync(result.Message);
-                }
-
-                return RedirectToAction("Index", "Transaction", new { Username = loggedUser.Data.Username });
-
+                return this.RedirectToAction("Login", "Account");
             }
-            catch (EntityNotFoundException ex)
+
+            var result = await this.transferService.DeleteAsync(id, loggedUser.Data);
+
+            if (!result.IsSuccessful)
             {
-                return await EntityNotFoundErrorViewAsync(ex.Message);
+                return await EntityNotFoundErrorViewAsync(result.Message);
             }
+
+            return RedirectToAction("SuccessfulCancellation", "Transfer");
         }
 
         [HttpGet]
-        public async Task<IActionResult> Execute(int id)
+        public async Task<IActionResult> SuccessfulCancellation()
         {
-            try
-            {
-                var loggedUser = await FindLoggedUserAsync();
-                var result = await this.transferService.ExecuteAsync(id, loggedUser.Data);
-                if (!result.IsSuccessful)
-                {
-                    return await EntityNotFoundErrorViewAsync(result.Message);
-                }
-
-                return RedirectToAction("Index", "Transfer", new { Username = loggedUser.Data.Username });
-            }
-            catch (EntityNotFoundException ex)
-            {
-                return await EntityNotFoundErrorViewAsync(ex.Message);
-            }
+            return this.View();
         }
 
+        [HttpGet]
+        public async Task<IActionResult> Confirm([FromRoute] int id)
+        {
+            var loggedUser = await FindLoggedUserAsync();
+
+            if (!loggedUser.IsSuccessful)
+            {
+                return this.RedirectToAction("Login", "Account");
+            }
+
+            var transferResult = await this.transferService.GetByIdAsync(id, loggedUser.Data);
+
+            if (!transferResult.IsSuccessful)
+            {
+                return await EntityNotFoundErrorViewAsync(transferResult.Message);
+            }
+
+            var result = await ExecuteTransferAsync(transferResult.Data);
+
+            if (!result.IsSuccessful)
+            {
+                return await EntityNotFoundErrorViewAsync(result.Message);
+            }
+
+            ConfirmTransferViewModel confirmTransferViewModel = result.Data;
+
+            return this.View(confirmTransferViewModel);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Confirm([FromRoute] int id, ConfirmTransferViewModel confirmViewModel)
+        {
+
+            var loggedUser = await FindLoggedUserAsync();
+
+            if (!loggedUser.IsSuccessful)
+            {
+                return this.RedirectToAction("Login", "Account");
+            }
+
+            var transferResult = await this.transferService.GetByIdAsync(id, loggedUser.Data);
+
+            if (!transferResult.IsSuccessful)
+            {
+                return await EntityNotFoundErrorViewAsync(transferResult.Message);
+            }
+
+            confirmViewModel.GetTransferDto = transferResult.Data;
+
+            var userResult = await this.userService.GetLoggedUserByUsernameAsync(transferResult.Data.Username);
+
+            if (!userResult.IsSuccessful)
+            {
+                return await EntityNotFoundErrorViewAsync(userResult.Message);
+            }
+
+            confirmViewModel.UserDetails = userResult.Data;
+
+            var result = await this.transferService.ConfirmAsync(id, loggedUser.Data);
+
+            if (!result.IsSuccessful)
+            {
+                return await EntityNotFoundErrorViewAsync(result.Message);
+            }
+
+            return RedirectToAction("SuccessfulConfirmation", "Transfer", new { id = transferResult.Data.Id });
+
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> SuccessfulConfirmation([FromRoute] int id)
+        {
+            var loggedUser = await FindLoggedUserAsync();
+
+            if (!loggedUser.IsSuccessful)
+            {
+                return this.RedirectToAction("Login", "Account");
+            }
+            var transferResult = await this.transferService.GetByIdAsync(id, loggedUser.Data);
+
+            if (!transferResult.IsSuccessful)
+            {
+                return await EntityNotFoundErrorViewAsync(transferResult.Message);
+            }
+            return View(transferResult.Data);
+
+        }
+
+        private async Task<Response<ConfirmTransferViewModel>> ExecuteTransferAsync(GetTransferDto transferDto)
+        {
+            var result = new Response<ConfirmTransferViewModel>();
+
+            ConfirmTransferViewModel transferViewModel = new ConfirmTransferViewModel();
+
+            transferViewModel.GetTransferDto = transferDto;
+
+            var user = await this.userService.GetLoggedUserByUsernameAsync(transferDto.Username);
+
+            if (!user.IsSuccessful)
+            {
+                result.IsSuccessful = false;
+                result.Message = user.Message;
+                return result;
+            }
+
+            transferViewModel.UserDetails = user.Data;
+
+            var exchangeAmount = await this.exchangeRateService.ExchangeAsync(
+                transferDto.Amount,
+                transferDto.Card.Currency.CurrencyCode,
+                user.Data.Account.Currency.CurrencyCode);
+
+            if (!exchangeAmount.IsSuccessful)
+            {
+                result.IsSuccessful = false;
+                result.Message = exchangeAmount.Message;
+                return result;
+            }
+
+            transferViewModel.GetTransferDto.Amount = exchangeAmount.Data;
+
+            result.Data = transferViewModel;
+
+            return result;
+        }
 
         private async Task<Response<User>> FindLoggedUserAsync()
         {
@@ -259,16 +433,8 @@ namespace VirtualWallet.Controllers.MVC
         {
             this.HttpContext.Response.StatusCode = StatusCodes.Status404NotFound;
             this.ViewData["ErrorMessage"] = message;
-            return View("Error404 - Not Found");
+            return View("Error");
 
-        }
-
-
-        private async Task<IActionResult> BlockedUserErrorViewAsync()
-        {
-            this.HttpContext.Response.StatusCode = StatusCodes.Status401Unauthorized;
-            this.ViewData["BlockedUser"] = "You are a BLOCKED USER!";
-            return View("Error401 - Not Authorized");
         }
     }
 }

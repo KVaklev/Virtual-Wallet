@@ -43,7 +43,7 @@ namespace VirtualWallet.Controllers.API
 
             if (!result.IsSuccessful)
             {
-                if (result.Message == Constants.NoFoundResulte)
+                if (result.Message == Constants.NoRecordsFound)
                 {
                     return StatusCode(StatusCodes.Status404NotFound, result.Message);
                 }
@@ -86,7 +86,7 @@ namespace VirtualWallet.Controllers.API
 
             if (!result.IsSuccessful)
             {
-                if (result.Message == Constants.NoFoundResulte)
+                if (result.Message == Constants.NoRecordsFound)
                 {
                     return StatusCode(StatusCodes.Status404NotFound, result.Message);
                 }
@@ -113,7 +113,7 @@ namespace VirtualWallet.Controllers.API
 
             if (!result.IsSuccessful)
             {
-                if (result.Message == Constants.NoFoundResulte)
+                if (result.Message == Constants.NoRecordsFound)
                 {
                     return StatusCode(StatusCodes.Status404NotFound, result.Message);
                 }
@@ -139,7 +139,7 @@ namespace VirtualWallet.Controllers.API
 
             if (!result.IsSuccessful)
             {
-                if (result.Message == Constants.NoFoundResulte)
+                if (result.Message == Constants.NoRecordsFound)
                 {
                     return StatusCode(StatusCodes.Status404NotFound, result.Message);
                 }
@@ -159,11 +159,11 @@ namespace VirtualWallet.Controllers.API
                 return StatusCode(StatusCodes.Status404NotFound, loggedUser.Message);
             }
 
-            var result = await this.transferService.ExecuteAsync(id, loggedUser.Data);
+            var result = await this.transferService.ConfirmAsync(id, loggedUser.Data);
 
             if (!result.IsSuccessful)
             {
-                if (result.Message == Constants.NoFoundResulte)
+                if (result.Message == Constants.NoRecordsFound)
                 {
                     return StatusCode(StatusCodes.Status404NotFound, result.Message);
                 }

@@ -102,7 +102,7 @@
                             <label for="youSend">Amount</label>
                             <div class="input-group">
                                 <span class="input-group-text">$</span>
-                                <input asp-for="CreateTransferDto.Amount" type="number" class="form-control" data-bv-field="youSend" id="youSend" value="" placeholder="">
+                                <input asp-for="CreateTransferDto.Amount" type="text" class="form-control" data-bv-field="youSend" id="youSend">
 
                                 <span asp-for="CreateTransferDto.CurrencyCode" value="" id="amountCurrency" class="input-group-text">USD</span>
 
@@ -116,9 +116,10 @@
                         <div class="d-grid"><button type="submit" class="btn btn-primary">Continue</button></div>*@
 
                         <hr>
-                        <p class="text-4 fw-500">You'll transfer 
+                        <p class="text-4 fw-500">
+                            You'll transfer
                             <span id="depositAmountCurrency" class="float-end">USD</span>
-                            <span id="depositAmount" class="float-end">0.00</span> 
+                            <span id="depositAmount" class="float-end">0.00</span>
                         </p>
                         <div class="d-grid"><button type="submit" class="btn btn-primary">Continue</button></div>
 

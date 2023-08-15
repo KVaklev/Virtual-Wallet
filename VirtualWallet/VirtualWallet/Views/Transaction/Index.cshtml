@@ -39,141 +39,141 @@
         <div class="container">
             <div class="row">
                 <!-- Left Panel
-       ============================================= -->
-    <aside class="col-lg-3">
+                ============================================= -->
+                <aside class="col-lg-3">
 
-        <!-- Profile Details
-        =============================== -->
-        <div class="bg-white shadow-sm rounded text-center p-3 mb-4">
-            <form  enctype="multipart/form-data">
-                <div class="profile-thumb mt-3 mb-4">
-                    <img class="rounded-circle" src="@imagePath" height="110" width="110" alt="" id="ProductImage">
-                    
-                </div>
-                <p class="text-3 fw-500 mb-2">Hello, @this.Model.User.Username<br />@DateTime.Now.DayOfWeek, @DateTime.Now.Date.ToShortDateString()</p>
+                    <!-- Profile Details
+                    =============================== -->
+                    <div class="bg-white shadow-sm rounded text-center p-3 mb-4">
+                        <form enctype="multipart/form-data">
+                            <div class="profile-thumb mt-3 mb-4">
+                                <img class="rounded-circle" src="@imagePath" height="110" width="110" alt="" id="ProductImage">
+
+                            </div>
+                            <p class="text-3 fw-500 mb-2">Hello, @this.Model.User.Username<br />@DateTime.Now.DayOfWeek, @DateTime.Now.Date.ToShortDateString()</p>
                             <p class="mb-2"><a asp-action="Profile" asp-controller="User" asp-route-id="@Model.User.Id" class="text-5 text-light" data-bs-toggle="tooltip" title="Edit Profile"><i class="fas fa-edit"></i></a></p>
-            </form>
-        </div>
-        <!-- Profile Details End -->
-        <!-- Available Balance
-        =============================== -->
-        <div class="bg-white shadow-sm rounded text-center p-3 mb-4">
-            <div class="text-17 text-light my-3"><i class="fas fa-wallet text-primary"></i></div>
-            <h3 class="text-9 fw-400">@Model.User.Account.Balance @Model.User.Account.Currency.CurrencyCode</h3>
-            <p class="mb-2 text-muted opacity-8">Available Balance</p>
-            <hr class="mx-n3">
-            <div class="d-flex">
-                <a asp-controller="Transfer" asp-action="Create" class="btn-link me-auto">Withdraw</a>
-                <a asp-controller="Transfer" asp-action="Create" class="btn-link ms-auto">Deposit</a>
-            </div>
-        </div>
-        <!-- Available Balance End -->
-    </aside>
-    <!-- Left Panel End -->
-    <!-- Middle Panel
-            ============================================= -->
-    <div class="col-lg-9">
-        <h2 class="fw-400 mb-3">Transaction</h2>
-
-        <!-- Filter
-        ============================================= -->
-        <div class="row">
-            <div class="col mb-2">
-                <form asp-controller="Transaction" asp-action="Index" method="get" id="filterTransactions">
-                    <div >
-                        <!-- Date Range
-                        ========================= -->
-                        
-
-                        <div class="row g-3">
-                            <div class="col-6 col-md-3">
-                                <input type="date" name="FromDate" value="FromDate" class="form-control" placeholder="">
-                            </div>
-                            <div class="col-6 col-md-3">
-                                <input type="date" name="ToDate" value="ToDate" class="form-control" placeholder="">
-                            </div>
-                            <div class="col-6 col-md-3">
-                                <input type="text" name="RecipientUsername" class="form-control" placeholder="Username">
-                            </div>
-                            <div class="col-6 col-md-3">
-                                <button type="submit" class="btn btn-primary shadow-none">Filter</button>
-                            </div>
-                        </div>
-                        
-
-                        <!-- All Filters Link
-                        ========================= -->
-                        <div><span style="margin-right:15%"></div>
-                        <div class="col-auto d-flex align-items-center me-auto form-group" data-bs-toggle="collapse"> <a class="btn-link" data-bs-toggle="collapse" href="#allFilters" aria-expanded="false" aria-controls="allFilters">All Filters<i class="fas fa-sliders-h text-3 ms-1"></i></a> </div>
-
-                       
-
-                        <!-- All Filters collapse
-                        ================================ -->
-                        <div class="col-12 collapse" id="allFilters">
-                           
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" value="@DirectionType.Out" id="paymentsSend" name="Direction">
-                                <label class="form-check-label" for="paymentsSend">Payments Send</label>
-                            </div>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" value="@DirectionType.In" id="paymentsReceived" name="Direction">
-                                <label class="form-check-label" for="paymentsReceived">Payments Received</label>
-                            </div>
-                            <label class="form-check-label" for="paymentsReceived">
-                                &nbsp; &nbsp; Sort by (Asc):  &nbsp;</label>
-                            <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" value="@SortCriteria.Date" id="paymentsReceived" name="SortBy">
-                                <label class="form-check-label" for="paymentsReceived">Date</label>
-                            </div>
-                            <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" value="@SortCriteria.Amount" id="paymentsReceived" name="SortBy">
-                                <label class="form-check-label" for="paymentsReceived">Amount</label>
-                            </div>
-                        </div>
-                        <!-- All Filters collapse End -->
+                        </form>
                     </div>
-                    
-                </form>
-            </div>
-        </div>
-        <!-- Filter End -->
-        <!-- All Transactions
-        ============================================= -->
-        <div class="bg-white shadow-sm rounded py-4 mb-4">
-            <h3 class="text-5 fw-400 d-flex align-items-center px-4 mb-4">All Money Operations</h3>
-            <!-- Title
-            =============================== -->
-            <div class="transaction-title py-2 px-4">
-                <div class="row">
-                    <div class="col-2 col-sm-1 text-center"><span class="">Date</span></div>
-                    <div class="col col-sm-7">Description</div>
-                    <div class="col-auto col-sm-2 d-none d-sm-block text-center">Status</div>
-                    <div class="col-3 col-sm-2 text-end">Amount</div>
-                </div>
-            </div>
-            <!-- Title End -->
-            <!-- Transaction List
-            =============================== -->
-            @foreach (var transaction in Model.TransactionDtos)
-            {
-            <div class="transaction-list">
-               
-                    <div class="transaction-item px-4 py-3" data-bs-toggle="modal" data-bs-target="#transaction-detail">
-                        <div class="row align-items-center flex-row">
-                            @{
-                                
-                                var day = transaction.Date.Day.ToString();
-                                var month = transaction.Date.ToString("MMM").ToUpper(); 
+                    <!-- Profile Details End -->
+                    <!-- Available Balance
+                    =============================== -->
+                    <div class="bg-white shadow-sm rounded text-center p-3 mb-4">
+                        <div class="text-17 text-light my-3"><i class="fas fa-wallet text-primary"></i></div>
+                        <h3 class="text-9 fw-400">@Model.User.Account.Balance @Model.User.Account.Currency.CurrencyCode</h3>
+                        <p class="mb-2 text-muted opacity-8">Available Balance</p>
+                        <hr class="mx-n3">
+                        <div class="d-flex">
+                            <a asp-controller="Transfer" asp-action="Create" class="btn-link me-auto">Withdraw</a>
+                            <a asp-controller="Transfer" asp-action="Create" class="btn-link ms-auto">Deposit</a>
+                        </div>
+                    </div>
+                    <!-- Available Balance End -->
+                </aside>
+                <!-- Left Panel End -->
+                <!-- Middle Panel
+                        ============================================= -->
+                <div class="col-lg-9">
+                    <h2 class="fw-400 mb-3">Transaction</h2>
+
+                    <!-- Filter
+                    ============================================= -->
+                    <div class="row">
+                        <div class="col mb-2">
+                            <form asp-controller="Transaction" asp-action="Index" method="get" id="filterTransactions">
+                                <div>
+                                    <!-- Date Range
+                                    ========================= -->
+
+
+                                    <div class="row g-3">
+                                        <div class="col-6 col-md-3">
+                                            <input type="date" name="FromDate" value="FromDate" class="form-control" placeholder="">
+                                        </div>
+                                        <div class="col-6 col-md-3">
+                                            <input type="date" name="ToDate" value="ToDate" class="form-control" placeholder="">
+                                        </div>
+                                        <div class="col-6 col-md-3">
+                                            <input type="text" name="RecipientUsername" class="form-control" placeholder="Username">
+                                        </div>
+                                        <div class="col-6 col-md-3">
+                                            <button type="submit" class="btn btn-primary shadow-none">Filter</button>
+                                        </div>
+                                    </div>
+
+
+                                    <!-- All Filters Link
+                                    ========================= -->
+                                    <div><span style="margin-right:15%"></div>
+                                    <div class="col-auto d-flex align-items-center me-auto form-group" data-bs-toggle="collapse"> <a class="btn-link" data-bs-toggle="collapse" href="#allFilters" aria-expanded="false" aria-controls="allFilters">All Filters<i class="fas fa-sliders-h text-3 ms-1"></i></a> </div>
+
+
+
+                                    <!-- All Filters collapse
+                                    ================================ -->
+                                    <div class="col-12 collapse" id="allFilters">
+
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" value="@DirectionType.Out" id="paymentsSend" name="Direction">
+                                            <label class="form-check-label" for="paymentsSend">Payments Send</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" value="@DirectionType.In" id="paymentsReceived" name="Direction">
+                                            <label class="form-check-label" for="paymentsReceived">Payments Received</label>
+                                        </div>
+                                        <label class="form-check-label" for="paymentsReceived">
+                                            &nbsp; &nbsp; Sort by (Asc):  &nbsp;</lable>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" value="@SortCriteria.Date" id="paymentsReceived" name="SortBy">
+                                                <label class="form-check-label" for="paymentsReceived">Date</label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" value="@SortCriteria.Amount" id="paymentsReceived" name="SortBy">
+                                                <label class="form-check-label" for="paymentsReceived">Amount</label>
+                                            </div>
+                                    </div>
+                                    <!-- All Filters collapse End -->
+                                </div>
+
+                            </form>
+                        </div>
+                    </div>
+                    <!-- Filter End -->
+                    <!-- All Transactions
+                    ============================================= -->
+                    <div class="bg-white shadow-sm rounded py-4 mb-4">
+                        <h3 class="text-5 fw-400 d-flex align-items-center px-4 mb-4">All Money Operations</h3>
+                        <!-- Title
+                        =============================== -->
+                        <div class="transaction-title py-2 px-4">
+                            <div class="row">
+                                <div class="col-2 col-sm-1 text-center"><span class="">Date</span></div>
+                                <div class="col col-sm-7">Description</div>
+                                <div class="col-auto col-sm-2 d-none d-sm-block text-center">Status</div>
+                                <div class="col-3 col-sm-2 text-end">Amount</div>
+                            </div>
+                        </div>
+                        <!-- Title End -->
+                        <!-- Transaction List
+                        =============================== -->
+                        @foreach (var transaction in Model.TransactionDtos)
+                        {
+                            <div class="transaction-list">
+
+                                <div class="transaction-item px-4 py-3" data-bs-toggle="modal" data-bs-target="#transaction-detail">
+                                    <div class="row align-items-center flex-row">
+                                        @{
+
+                                            var day = transaction.Date.Day.ToString();
+                                            var month = transaction.Date.ToString("MMM").ToUpper();
 
                                             <div class="col-2 col-sm-1 text-center"> <span class="d-block text-4 fw-300">@day</span> <span class="d-block text-1 fw-300 text-uppercase">@month</span> </div>
                                             if (Model.User.IsAdmin)
                                             {
 
-                                                <div class="col col-sm-7"> 
-                                              <span class="d-block text-4">From Account: @transaction.SenderUsername</span>
-                                              <span class="d-block text-4">To Account: @transaction.RecipientUsername</span>
-                                                <span class="text-muted">@transaction.Direction  <a class="btn-link" asp-controller="Transaction" asp-action="Details" asp-route-id="@transaction.Id">Details</a></span>
+                                                <div class="col col-sm-7">
+                                                    <span class="d-block text-4">From Account: @transaction.SenderUsername</span>
+                                                    <span class="d-block text-4">To Account: @transaction.RecipientUsername</span>
+                                                    <span class="text-muted">@transaction.Direction  <a class="btn-link" asp-controller="Transaction" asp-action="Details" asp-route-id="@transaction.Id">Details</a></span>
                                                 </div>
                                             }
                                             else
@@ -183,7 +183,7 @@
                                                 @if (transaction.Direction == DirectionType.Out.ToString())
                                                 {
                                                     <div class="col col-sm-7">
-                                                        <span class="d-block text-4">@transaction.RecipientUsername </span>
+                                                        <span class="d-block text-4"><a asp-action="CreateWithUsername" asp-controller="Transaction" asp-route-username="@transaction.RecipientUsername">@transaction.RecipientUsername</a> </span>
                                                         <span class="text-muted">Payment Sent  <a class="btn-link" asp-controller="Transaction" asp-action="Details" asp-route-id="@transaction.Id">Details</a></span>
                                                     </div>
                                                 }
@@ -198,98 +198,104 @@
                                             }
 
 
-                                @if (transaction.IsConfirmed)
-                                {
-                                    <div class="col-auto col-sm-2 d-none d-sm-block text-center text-3"> <span class="text-success" data-bs-toggle="tooltip" title="Completed"><i class="fas fa-check-circle"></i></span> </div>
-                                }
-                                else if (transaction.IsDeleted)
-                                {
+                                            @if (transaction.IsConfirmed)
+                                            {
+                                                <div class="col-auto col-sm-2 d-none d-sm-block text-center text-3"> <span class="text-success" data-bs-toggle="tooltip" title="Completed"><i class="fas fa-check-circle"></i></span> </div>
+                                            }
+                                            else if (transaction.IsDeleted)
+                                            {
 
-                                    <div class="col-auto col-sm-2 d-none d-sm-block text-center text-3"> <span class="text-danger" data-bs-toggle="tooltip" title="Cancelled"><i class="fas fa-times-circle"></i></span> </div>
-                                }
-                                else
+                                                <div class="col-auto col-sm-2 d-none d-sm-block text-center text-3"> <span class="text-danger" data-bs-toggle="tooltip" title="Cancelled"><i class="fas fa-times-circle"></i></span> </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="col-auto col-sm-2 d-none d-sm-block text-center text-3">
+
+                                                    <span style="margin-right:5%"></span>
+                                                    <span class="text-warning" data-bs-toggle="tooltip" title="In Progress">
+                                                        <i class="fas fa-ellipsis-h"></i>
+                                                    </span>
+                                                </div>
+                                            }
+                                            @if (transaction.Direction == DirectionType.In.ToString())
+                                            {
+                                                <div class="col-3 col-sm-2 text-end text-4"> <span class="text-nowrap">+ @transaction.Amount</span> <span class="text-2 text-uppercase">(@transaction.CurrencyCode)</span> </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="col-3 col-sm-2 text-end text-4"> <span class="text-nowrap">- @transaction.Amount</span> <span class="text-2 text-uppercase">(@transaction.CurrencyCode)</span> </div>
+                                            }
+                                        }
+                                    </div>
+                                </div>
+
+                            </div>
+                            <!-- Transaction List End -->
+                        }
+                        <!-- Transaction Item Details Modal End -->
+                        <!-- Pagination
+                        ============================================= -->
+                        @{
+                            string prevButtonState = this.Model.TransactionDtos.HasPrevPage ? "" : "disabled";
+                            string nextButtonState = this.Model.TransactionDtos.HasNextPage ? "" : "disabled";
+                        }
+                        <ul class="pagination justify-content-center mt-4 mb-0">
+                            <li class="page-item @prevButtonState">
+                                <a class="page-link"
+                                   asp-controller="Transaction"
+                                   asp-action="Index"
+                                   asp-all-route-data="@parameters"
+                                   asp-route-PageNumber="@(this.Model.TransactionDtos.PageNumber-1)"
+                                   class="btn btn-link @prevButtonState">
+                                    <i class="fas fa-angle-left"></i>
+                                </a>
+                            </li>
+
+                            @{
+                                int currentPageNumber = this.Model.TransactionDtos.PageNumber;
+                                for (int i = 1; i <= this.Model.TransactionDtos.TotalPages; i++)
                                 {
-                                    <div class="col-auto col-sm-2 d-none d-sm-block text-center text-3">
-                                   
-                                    <span style="margin-right:5%"></span>
-                                    <span class="text-warning" data-bs-toggle="tooltip" title="In Progress">
-                                    <i class="fas fa-ellipsis-h"></i></span> </div>
-                                }
-                                @if (transaction.Direction == DirectionType.In.ToString())
-                                {
-                                    <div class="col-3 col-sm-2 text-end text-4"> <span class="text-nowrap">+ @transaction.Amount</span> <span class="text-2 text-uppercase">(@transaction.CurrencyCode)</span> </div>
-                                }
-                                else
-                                {
-                                    <div class="col-3 col-sm-2 text-end text-4"> <span class="text-nowrap">- @transaction.Amount</span> <span class="text-2 text-uppercase">(@transaction.CurrencyCode)</span> </div>
+                                    if (i == currentPageNumber)
+                                    {
+                                        <li class="page-item active"><a class="page-link">@i</a></li>
+                                    }
+                                    else
+                                    {
+                                        <li class="page-item">
+                                            <a class="page-link"
+                                   asp-controller="Transaction"
+                                   asp-all-route-data="@parameters"
+                                   asp-action="Index"
+                                   asp-route-PageNumber="@i">@i</a>
+                                        </li>
+                                    }
                                 }
                             }
-                        </div>
+
+                            <li class="page-item @nextButtonState">
+                                <a class="page-link"
+                                   asp-controller="Transaction"
+                                   asp-action="Index"
+                                   asp-all-route-data="@parameters"
+                                   asp-route-PageNumber="@(this.Model.TransactionDtos.PageNumber+1)"
+                                   class="btn btn-link @nextButtonState">
+                                    <i class="fas fa-angle-right"></i>
+                                </a>
+                            </li>
+                        </ul>
+                        <!-- Paginations end -->
+
                     </div>
-                
+
+
+                    <!-- All Transactions End -->
+                </div>
+                <!-- Middle End -->
             </div>
-            <!-- Transaction List End -->
-            
-            }
-            <!-- Transaction Item Details Modal End -->
-            <!-- Pagination
-            ============================================= -->
-            @{
-                string prevButtonState = this.Model.TransactionDtos.HasPrevPage ? "" : "disabled";
-                string nextButtonState = this.Model.TransactionDtos.HasNextPage ? "" : "disabled";
-           }
-            <ul class="pagination justify-content-center mt-4 mb-0">
-                <li class="page-item @prevButtonState"> 
-                    <a class="page-link" 
-                    asp-controller="Transaction" 
-                    asp-action="Index" 
-                    asp-all-route-data="@parameters" 
-                    asp-route-PageNumber="@(this.Model.TransactionDtos.PageNumber-1)" 
-                    class="btn btn-link @prevButtonState">
-                    <i class="fas fa-angle-left"></i></a> </li>
-               
-                @{
-                    int currentPageNumber = this.Model.TransactionDtos.PageNumber;
-                    for (int i = 1; i <= this.Model.TransactionDtos.TotalPages; i++)
-                    {
-                        if (i == currentPageNumber)
-                        {
-                            <li class="page-item active"><a class="page-link">@i</a></li>
-                        }
-                        else
-                        {
-                            <li class="page-item">
-                            <a class="page-link" 
-                            asp-controller="Transaction" 
-                            asp-all-route-data="@parameters" 
-                            asp-action="Index" 
-                            asp-route-PageNumber="@i">@i</a></li>
-                        }
-                    }
-                }
-
-                <li class="page-item @nextButtonState"> 
-                    <a class="page-link" 
-                    asp-controller="Transaction" 
-                    asp-action="Index" 
-                    asp-all-route-data="@parameters" 
-                    asp-route-PageNumber="@(this.Model.TransactionDtos.PageNumber+1)" 
-                    class="btn btn-link @nextButtonState">
-                    <i class="fas fa-angle-right"></i></a></li>
-            </ul>
-            <!-- Paginations end -->
-
         </div>
-        
-        
-            <!-- All Transactions End -->
-    </div>
-    <!-- Middle End -->
-    </div>
-    </div>
     </div>
     <!-- Content end -->
     </div>
-    
-    
+
+
 </body>

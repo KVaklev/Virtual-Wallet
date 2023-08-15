@@ -33,7 +33,8 @@ namespace VirtualWallet.Controllers.MVC
             var result = await this.currencyService.GetAllAsync();
             if (!result.IsSuccessful)
             {
-                return View("Error");
+                this.ViewData["Controller"] = "Transaction";
+                return View("ErrorMessage", result.Message);
             }
             var currencyViwModel = new CurrencyViewModel();
             currencyViwModel.Currencies = result.Data;
@@ -52,7 +53,8 @@ namespace VirtualWallet.Controllers.MVC
             var result = await this.currencyService.GetCurrencyByIdAsync(id);
             if (!result.IsSuccessful)
             {
-                return View("Error");
+                this.ViewData["Controller"] = "Transaction";
+                return View("ErrorMessage", result.Message);
             }
             
             return View(result.Data);
@@ -68,7 +70,8 @@ namespace VirtualWallet.Controllers.MVC
             var result = await this.currencyService.DeleteAsync(currency.Id, loggedUser.Data);
             if (!result.IsSuccessful)
             {
-                return View("Error");
+                this.ViewData["Controller"] = "Transaction";
+                return View("ErrorMessage", result.Message);
             }
 
             return this.RedirectToAction("Index", "Currency");
@@ -85,6 +88,7 @@ namespace VirtualWallet.Controllers.MVC
             var currency = new CreateCurrencyDto();
             return View(currency);
         }
+
         [HttpPost]
         public async Task<IActionResult> Create(CreateCurrencyDto currencyDto)
         {
@@ -93,10 +97,12 @@ namespace VirtualWallet.Controllers.MVC
             {
                 return this.RedirectToAction("Login", "Account");
             }
+
             var result = await this.currencyService.CreateAsync(currencyDto, loggedUser.Data);
             if (!result.IsSuccessful)
             {
-                return View("Error");
+                this.ViewData["Controller"] = "Transaction";
+                return View("ErrorMessage", result.Message);
             }
 
             return this.RedirectToAction("Index", "Currency");
