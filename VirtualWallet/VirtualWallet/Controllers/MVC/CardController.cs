@@ -1,5 +1,4 @@
 ﻿using Business.DTOs.Requests;
-using Business.DTOs.Responses;
 using Business.QueryParameters;
 using Business.Services.Contracts;
 using Business.ViewModels.CardViewModels;
@@ -35,7 +34,8 @@ namespace VirtualWallet.Controllers.MVC
             var cardsResult = await this.cardService.FilterByAsync(cardQueryParameters, loggedUserResult.Data);
             if (!cardsResult.IsSuccessful)
             {
-                return View("HandleErrorNotFound");
+                this.ViewData["Controller"] = "Card";
+                return View("ErrorMessage", cardsResult.Message);
             }
             
             var cardSearchModel = new CardViewModel
@@ -46,6 +46,31 @@ namespace VirtualWallet.Controllers.MVC
             };
 
             return this.View(cardSearchModel);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Details(CardQueryParameters cardQueryParameters)
+        {
+            var loggedUserResult = await FindLoggedUserAsync();
+            if (!loggedUserResult.IsSuccessful)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            var cardsResult = await this.cardService.FilterByAsync(cardQueryParameters, loggedUserResult.Data);
+            if (!cardsResult.IsSuccessful)
+            {
+                this.ViewData["Controller"] = "Card";
+                return View("ErrorMessage", cardsResult.Message);
+            }
+
+            var cardsAllUsersViewModel = new CardsAllUsersViewModel
+            {
+                Cards = cardsResult,
+                CardQueryParameters = cardQueryParameters,
+            };
+
+            return this.View(cardsAllUsersViewModel);
         }
 
         [HttpGet]
@@ -76,7 +101,8 @@ namespace VirtualWallet.Controllers.MVC
             var result = await cardService.CreateAsync(loggedUserResult.Data.Id, cardSearchViewModel.CreateCardDto);
             if (!result.IsSuccessful)
             {
-                return View("HandleErrorNotFound", result.Message);
+                this.ViewData["Controller"] = "Card";
+                return View("ErrorMessage", result.Message);
             }
 
             return RedirectToAction("Index", "Card");
@@ -94,7 +120,8 @@ namespace VirtualWallet.Controllers.MVC
             var getCardDtoResult = await this.cardService.GetByIdAsync(id, loggedUserResult.Data);
             if (!getCardDtoResult.IsSuccessful)
             {
-                return View("HandleErrorNotFound", getCardDtoResult.Message);
+                this.ViewData["Controller"] = "Card";
+                return View("ErrorMessage", getCardDtoResult.Message);
             }
             var cardViewModel = new CardViewModel()
             {
@@ -117,7 +144,8 @@ namespace VirtualWallet.Controllers.MVC
             var result = await cardService.UpdateAsync(id, loggedUserResult.Data, cardViewModel.UpdateCardDto);
             if (!result.IsSuccessful)
             {
-                return View("HandleErrorNotFound", result.Message);
+                this.ViewData["Controller"] = "Card";
+                return View("ErrorMessage", result.Message);
             }
 
             return RedirectToAction("Index", "Card");
@@ -135,7 +163,8 @@ namespace VirtualWallet.Controllers.MVC
             var cardResult = await this.cardService.GetByIdAsync(id, loggedUserResult.Data);
             if (!cardResult.IsSuccessful)
             {
-                return View("HandleErrorNotFound", cardResult.Message);
+                this.ViewData["Controller"] = "Card";
+                return View("ErrorMessage", cardResult.Message);
             }
 
             var cardViewModel = new CardViewModel();
@@ -155,7 +184,8 @@ namespace VirtualWallet.Controllers.MVC
             var cardResult = await this.cardService.GetByIdAsync(id, loggedUserResult.Data);
             if (!cardResult.IsSuccessful)
             {
-                return View("HandleErrorNotFound", cardResult.Message);
+                this.ViewData["Controller"] = "Card";
+                return View("ErrorMessage", cardResult.Message);
             }
 
             var result = await this.cardService.DeleteAsync(id, loggedUserResult.Data);

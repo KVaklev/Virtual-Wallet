@@ -8,6 +8,7 @@ using Business.Services.Helpers;
 using DataAccess.Models.Enums;
 using DataAccess.Models.Models;
 using DataAccess.Repositories.Contracts;
+using Microsoft.EntityFrameworkCore;
 using static Business.Services.Helpers.Constants;
 
 namespace Business.Services.Models
@@ -57,6 +58,7 @@ namespace Business.Services.Models
             var cardsResult = this.GetAll(loggedUser);
             IQueryable<Card> cards = cardsResult.Data;
 
+            cards = await FilterByUsernameAsync(cards, filterParameters.Username);
             cards = await FilterByExpirationDateAsync(cards, filterParameters.ExpirationDate);
             cards = await FilterByCardTypeAsync(cards, filterParameters.CardType);
             cards = await FilterByBalanceAsync(cards, filterParameters.Balance);
@@ -262,19 +264,19 @@ namespace Business.Services.Models
             return await this.cardRepository.CardNumberExistsAsync(cardNumber);
         }
 
-        //private async Task<IQueryable<Card>> FilterByUsernameAsync(IQueryable<Card> result, string username)
-        //{
-        //    result = result
-        //        .Include(c => c.Account)
-        //        .ThenInclude(a => a.User);
+        private async Task<IQueryable<Card>> FilterByUsernameAsync(IQueryable<Card> result, string username)
+        {
+            result = result
+                .Include(c => c.Account)
+                .ThenInclude(a => a.User);
 
-        //    if (!string.IsNullOrEmpty(username))
-        //    {
-        //        return await Task.FromResult(result.Where(card => card.Account.User.Username.Contains(username.ToUpper())));
-        //    }
+            if (!string.IsNullOrEmpty(username))
+            {
+                return await Task.FromResult(result.Where(card => card.Account.User.Username.Contains(username.ToUpper())));
+            }
 
-        //    return await Task.FromResult(result);
-        //}
+            return await Task.FromResult(result);
+        }
         private async Task<IQueryable<Card>> FilterByExpirationDateAsync(IQueryable<Card> result, string expirationDate)
         {
             DateTime? date = !string.IsNullOrEmpty(expirationDate) ? DateTime.Parse(expirationDate) : null;

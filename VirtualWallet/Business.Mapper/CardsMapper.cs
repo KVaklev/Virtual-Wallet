@@ -34,6 +34,7 @@ namespace Business.Mappers
             CreateMap<Card, GetCreatedCardDto>();
             CreateMap<GetCreatedCardDto, Card>()
                 .ForPath(c => c.Currency.CurrencyCode, c => c.MapFrom(c => c.CurrencyCode))
+                .ForPath(c=>c.Account.User.Username, c =>c.MapFrom(c=>c.Username))
                 .ReverseMap();
         }
 

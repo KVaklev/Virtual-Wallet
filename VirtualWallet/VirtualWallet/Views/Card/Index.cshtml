@@ -94,32 +94,32 @@
                                 <div class="row g-3">
                                     <div class="col-12">
                                         <label for="cardNumber" class="form-label">Card Number</label>
-                                        <input asp-for = "CreateCardDto.CardNumber" type="password" class="form-control" data-bv-field="cardnumber" id="cardNumber" required value="" placeholder="Card Number">
+                                        <input asp-for = "CreateCardDto.CardNumber" type="password" class="form-control" data-bv-field="cardnumber" id="cardNumber" value="" placeholder="Card Number">
                                         <span asp-validation-for="CreateCardDto.CardNumber" class="form-error"></span>
                                     </div>
                                     <div class="col-lg-6">
                                         <label for="expiryDate" class="form-label">Expiration Date</label>
-                                        <input asp-for="CreateCardDto.ExpirationDate" id="expiryDate" type="date" class="form-control" data-bv-field="expiryDate" required value="" placeholder="MM/YY">
+                                        <input asp-for="CreateCardDto.ExpirationDate" id="expiryDate" type="date" class="form-control" data-bv-field="expiryDate" value="" placeholder="MM/YY">
                                         <span asp-validation-for="CreateCardDto.ExpirationDate" class="form-error"></span>
                                     </div>
                                     <div class="col-lg-6">
                                         <label for="cvvNumber" class="form-label">CVV <span class="text-info ms-1" data-bs-toggle="tooltip" title="For Visa/Mastercard, the three-digit CVV number is printed on the signature panel on the back of the card immediately after the card's account number. For American Express, the four-digit CVV number is printed on the front of the card above the card account number."><i class="fas fa-question-circle"></i></span></label>
-                                        <input asp-for="CreateCardDto.CheckNumber"id="cvvNumber" type="password" class="form-control" data-bv-field="cvvnumber" required value="" placeholder="CVV (3 digits)">
+                                        <input asp-for="CreateCardDto.CheckNumber"id="cvvNumber" type="password" class="form-control" data-bv-field="cvvnumber" value="" placeholder="CVV (3 digits)">
                                         <span asp-validation-for="CreateCardDto.CheckNumber" class="form-error"></span>
                                     </div>
                                     <div class="col-12">
                                         <label for="cardHolderName" class="form-label">Card Holder Name</label>
-                                        <input asp-for="CreateCardDto.CardHolder" type="text" class="form-control" data-bv-field="cardholdername" id="cardHolderName" required value="" placeholder="Card Holder Name">
+                                        <input asp-for="CreateCardDto.CardHolder" type="text" class="form-control" data-bv-field="cardholdername" id="cardHolderName" value="" placeholder="Card Holder Name">
                                         <span asp-validation-for="CreateCardDto.CardHolder" class="form-error"></span>
                                     </div>
                                     <div class="col-12">
                                         <label for="balance" class="form-label">Balance</label>
-                                        <input asp-for="CreateCardDto.Balance" type="number" class="form-control" data-bv-field="balance" id="cardHolderName" required value="" placeholder="Card Holder Name">
+                                        <input asp-for="CreateCardDto.Balance" type="number" class="form-control" data-bv-field="balance" id="cardHolderName" value="" placeholder="Card Holder Name">
                                         <span asp-validation-for="CreateCardDto.Balance" class="form-error"></span>
                                     </div>
                                      <div class="col-12">
                                         <label for="balance" class="form-label">Credit Card Limit</label>
-                                        <input asp-for="CreateCardDto.CreditLimit" type="number" class="form-control" data-bv-field="creditCardLimit" id="cardHolderName" required value="" placeholder="Credit Card Limit">
+                                        <input asp-for="CreateCardDto.CreditLimit" type="number" class="form-control" data-bv-field="creditCardLimit" id="cardHolderName" value="" placeholder="Credit Card Limit">
                                         <span asp-validation-for="CreateCardDto.CreditLimit" class="form-error"></span>
                                     </div>
                                   
