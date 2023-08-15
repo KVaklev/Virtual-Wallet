@@ -112,6 +112,8 @@
             </div>
         </div>
         <!-- Filter End -->
+
+
         <!-- All Transactions
         ============================================= -->
         <div class="bg-white shadow-sm rounded py-4 mb-4">
@@ -127,6 +129,21 @@
                 </div>
             </div>
             <!-- Title End -->
+
+                    @if (ViewData["ErrorMessage"] != null)
+                        {
+                            <div class="row">
+                                <div class="col text-center">
+                                    <p>&nbsp;</p>
+                                    <p>@ViewData["ErrorMessage"]</p>
+                                </div>
+                            </div>
+
+                        }
+                        else
+                        {
+
+
             <!-- History List
             =============================== -->
             <div class="transaction-list">
@@ -178,10 +195,10 @@
             
             <!-- Pagination
             ============================================= -->
-            @{
+            
                 string prevButtonState = this.Model.GetHistoryDtos.HasPrevPage ? "" : "disabled";
                 string nextButtonState = this.Model.GetHistoryDtos.HasNextPage ? "" : "disabled";
-            }
+           
             <ul class="pagination justify-content-center mt-4 mb-0">
                 <li class="page-item @prevButtonState">
                     <a class="page-link"
@@ -227,7 +244,7 @@
                 </li>
             </ul>
             <!-- Paginations end -->
-
+}
         </div>
         <!-- All Transactions End -->
     </div>

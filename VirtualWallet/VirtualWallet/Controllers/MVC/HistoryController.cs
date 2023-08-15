@@ -1,6 +1,7 @@
 ﻿
 using Business.QueryParameters;
 using Business.Services.Contracts;
+using Business.Services.Helpers;
 using Business.ViewModels;
 using DataAccess.Models.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -37,15 +38,23 @@ namespace VirtualWallet.Controllers.MVC
             }
 
             var result = await this.historyService.FilterByAsync(parameters, loggedUserResponse.Data);
-            if (!result.IsSuccessful)
-            {
-                this.ViewData["Controller"] = "History";
-                return View("ErrorMessage", result.Message);
-            }
             var indexHistoryViewModel = new IndexHistoryViewModel();
-            indexHistoryViewModel.GetHistoryDtos = result.Data;
             indexHistoryViewModel.HistoryQueryParameters = parameters;
             indexHistoryViewModel.LoggedUser = loggedUserResponse.Data;
+            if (!result.IsSuccessful)
+            {
+                if(result.Message == Constants.NoRecordsFoundByFilter)
+                {
+                    this.ViewData["ErrorMessage"] = result.Message;
+                    return View(indexHistoryViewModel);
+                }
+                else
+                {
+                    this.ViewData["Controller"] = "Transaction";
+                    return View("ErrorMessage", result.Message);
+                }
+            }
+            indexHistoryViewModel.GetHistoryDtos = result.Data;
 
 
                 return this.View(indexHistoryViewModel);
