@@ -93,7 +93,7 @@ namespace Business.Services.Models
                 result.Message = NoCardsErrorMessage;
             }
             
-            if (!await Security.IsUserAuthorized(id, loggedUser))
+            if (!await Security.IsUserAuthorized(card.Account.Id, loggedUser))
             {
                 result.IsSuccessful = false;
                 result.Message = ModifyCardErrorMessage;

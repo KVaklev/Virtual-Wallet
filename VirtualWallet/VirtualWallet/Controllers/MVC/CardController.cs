@@ -1,4 +1,5 @@
 ﻿using Business.DTOs.Requests;
+using Business.DTOs.Responses;
 using Business.QueryParameters;
 using Business.Services.Contracts;
 using Business.ViewModels.CardViewModels;
@@ -82,7 +83,7 @@ namespace VirtualWallet.Controllers.MVC
         }
 
         [HttpGet]
-        public async Task<IActionResult> Edit()
+        public async Task<IActionResult> Edit(int id)
         {
             var loggedUserResult = await FindLoggedUserAsync();
             if (!loggedUserResult.IsSuccessful)
@@ -90,24 +91,30 @@ namespace VirtualWallet.Controllers.MVC
                 return RedirectToAction("Login", "Account");
             }
 
-            var cardViewModel = new CardViewModel();
-
+            var getCardDtoResult = await this.cardService.GetByIdAsync(id, loggedUserResult.Data);
+            if (!getCardDtoResult.IsSuccessful)
+            {
+                return View("HandleErrorNotFound", getCardDtoResult.Message);
+            }
+            var cardViewModel = new CardViewModel()
+            {
+                GetCardDto=getCardDtoResult.Data,
+                UpdateCardDto = new UpdateCardDto(),
+            };
+            
             return this.View(cardViewModel);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Edit(CardViewModel cardViewModel)
+        public async Task<IActionResult> Edit(int id, CardViewModel cardViewModel)
         {
             var loggedUserResult = await FindLoggedUserAsync();
             if (!loggedUserResult.IsSuccessful)
             {
                 return RedirectToAction("Login", "Account");
-            }
+            }          
 
-            cardViewModel.CreateCardDto.AccountUsername = loggedUserResult.Data.Username;
-            cardViewModel.CreateCardDto.CurrencyCode = loggedUserResult.Data.Account.Currency.CurrencyCode;
-
-            var result = await cardService.UpdateAsync(loggedUserResult.Data.Id, loggedUserResult.Data, cardViewModel.UpdateCardDto);
+            var result = await cardService.UpdateAsync(id, loggedUserResult.Data, cardViewModel.UpdateCardDto);
             if (!result.IsSuccessful)
             {
                 return View("HandleErrorNotFound", result.Message);

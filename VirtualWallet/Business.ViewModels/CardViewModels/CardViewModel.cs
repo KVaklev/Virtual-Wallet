@@ -16,6 +16,7 @@ namespace Business.ViewModels.CardViewModels
         public CreateCardDto CreateCardDto { get; set; }
 
         public UpdateCardDto UpdateCardDto { get; set; }
+        public GetCardDto GetCardDto { get; set; }
 
     }
 }
