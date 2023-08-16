@@ -82,7 +82,7 @@ namespace DataAccess.Models.Models
         public async Task<Response<decimal>> GetExchangeRateAsync(string fromCurrencyCode, string toCurrencyCode)
         {
             var result = new Response<decimal>();
-            decimal exchangeRate = 1;
+            decimal exchangeRate = Constants.ExchangeRateDefault;
             if (fromCurrencyCode != toCurrencyCode)
             {
                 var exchangeRateResult = await this.GetExchangeRateDataAsync(fromCurrencyCode, toCurrencyCode);

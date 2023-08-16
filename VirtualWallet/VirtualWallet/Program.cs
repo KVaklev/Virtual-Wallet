@@ -11,6 +11,8 @@ using Business.Services.Contracts;
 using Business.Services.Models;
 using Business.Services.Additional;
 using Business.Services.Helpers;
+using Business.Mappers;
+using Business.Mappers.Contracts;
 
 namespace VirtualWallet
 {

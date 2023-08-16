@@ -32,6 +32,12 @@ namespace Business.Services.Models
 
             IQueryable<History> historyRecords = this.historyRepository.GetAll();
 
+            if (!historyRecords.Any())
+            {
+                result.IsSuccessful = false;
+                result.Message = Constants.NoRecordsFound;
+                return result;
+            }
             if (!loggedUser.IsAdmin)
             {
                 historyRecords = historyRecords

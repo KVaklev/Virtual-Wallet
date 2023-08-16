@@ -1,4 +1,5 @@
-﻿using Business.DTOs.Requests;
+﻿using AutoMapper;
+using Business.DTOs.Requests;
 using Business.DTOs.Responses;
 using Business.Mappers;
 using Business.QueryParameters;
@@ -21,17 +22,20 @@ namespace VirtualWallet.Controllers.MVC
         private readonly IUserService userService;
         private readonly ICurrencyService currencyService;
         private readonly IExchangeRateService exchangeRateService;
+        private readonly IMapper mapper;
        
         public TransactionController(
             ITransactionService transactionService,
             IUserService userService,
             ICurrencyService currencyService,
-            IExchangeRateService exchangeRateService)
+            IExchangeRateService exchangeRateService,
+            IMapper mapper)
         {
             this.transactionService = transactionService;
             this.userService = userService;
             this.currencyService = currencyService;
             this.exchangeRateService = exchangeRateService;
+            this.mapper = mapper;
         }
 
 
@@ -198,8 +202,7 @@ namespace VirtualWallet.Controllers.MVC
             }
 
             var createTransactionViewModel = new CreateTransactionViewModel();
-            createTransactionViewModel.CreateTransactionDto = await TransactionsMapper
-                                                              .MapGetDtoToCreateDto(transactionResult.Data);
+            createTransactionViewModel.CreateTransactionDto = this.mapper.Map<CreateTransactionDto>(transactionResult.Data);
 
             var currencyResult = await this.currencyService.GetAllAsync();
             if (!currencyResult.IsSuccessful)
