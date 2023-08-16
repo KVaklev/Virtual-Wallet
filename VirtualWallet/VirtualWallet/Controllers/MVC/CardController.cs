@@ -9,6 +9,7 @@ using DataAccess.Models.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using System.Text.Json;
 
 namespace VirtualWallet.Controllers.MVC
 {
@@ -17,12 +18,15 @@ namespace VirtualWallet.Controllers.MVC
     {
         private readonly ICardService cardService;
         private readonly IUserService userService;
+        private readonly ICurrencyService currencyService;
         public CardController(ICardService cardService,
-            IUserService userService)
+            IUserService userService,
+            ICurrencyService currencyService)
             
         {
             this.cardService = cardService;
             this.userService = userService;
+            this.currencyService = currencyService;
         }
         [HttpGet]
         public async Task<IActionResult> Index(CardQueryParameters cardQueryParameters)
@@ -32,6 +36,14 @@ namespace VirtualWallet.Controllers.MVC
             {
                 return RedirectToAction("Login", "Account");
             }
+
+            var currencyResult = await this.currencyService.GetAllAsync();
+            if (!currencyResult.IsSuccessful)
+            {
+                this.ViewData["Controller"] = "Account";
+                return View("ErrorMessage", currencyResult.Message);
+            }
+            TempData["Currencies"] = JsonSerializer.Serialize(currencyResult.Data);
 
             var cardSearchModel = new CardViewModel
             {
@@ -91,7 +103,6 @@ namespace VirtualWallet.Controllers.MVC
             {
                 return RedirectToAction("Login", "Account");
             }
-
             var cardViewModel = new CardViewModel();
 
             return this.View(cardViewModel);
@@ -105,8 +116,8 @@ namespace VirtualWallet.Controllers.MVC
                 return RedirectToAction("Login", "Account");
             }
 
-            cardSearchViewModel.CreateCardDto.AccountUsername = loggedUserResult.Data.Username;
-            cardSearchViewModel.CreateCardDto.CurrencyCode = loggedUserResult.Data.Account.Currency.CurrencyCode;
+             cardSearchViewModel.CreateCardDto.AccountUsername = loggedUserResult.Data.Username;
+            //  cardSearchViewModel.CreateCardDto.CurrencyCode = loggedUserResult.Data.Account.Currency.CurrencyCode;
 
             var result = await cardService.CreateAsync(loggedUserResult.Data.Id, cardSearchViewModel.CreateCardDto);
             if (!result.IsSuccessful)
