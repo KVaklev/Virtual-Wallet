@@ -15,16 +15,19 @@ namespace VirtualWallet.Controllers.API
         private readonly IUserService userService;
         private readonly IEmailService emailService;
         private readonly IAccountService accountService;
+        private readonly ISecurityService security;
 
         public AccountApiController( 
             IUserService userService,
             IEmailService emailService,
-            IAccountService accountService
+            IAccountService accountService,
+            ISecurityService security
             )
         {
             this.userService = userService;
             this.emailService = emailService;
             this.accountService = accountService;
+            this.security = security;
         }
 
         [HttpPost("login")]
@@ -37,7 +40,7 @@ namespace VirtualWallet.Controllers.API
                 return BadRequest(loggedUser.Message);
             }
 
-            var result = await Security.CreateApiTokenAsync(loggedUser.Data);
+            var result = await this.security.CreateApiTokenAsync(loggedUser.Data);
             if (!result.IsSuccessful)
             {
                 return BadRequest(result.Message);

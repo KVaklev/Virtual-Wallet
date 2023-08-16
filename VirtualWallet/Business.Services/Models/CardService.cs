@@ -18,15 +18,17 @@ namespace Business.Services.Models
         private readonly ICardRepository cardRepository;
         private readonly ICurrencyService currencyService;
         private readonly IMapper mapper;
-
+        private readonly ISecurityService security;
         public CardService(
             ICardRepository repository,
             ICurrencyService currencyService,
-            IMapper mapper)
+            IMapper mapper,
+            ISecurityService security)
         {
             this.cardRepository = repository;
             this.currencyService = currencyService;
             this.mapper = mapper;
+            this.security = security;
         }
         public Response<IQueryable<Card>> GetAll(User loggedUser)
         {
@@ -95,7 +97,7 @@ namespace Business.Services.Models
                 result.Message = NoCardsErrorMessage;
             }
             
-            if (!await Security.IsUserAuthorized(card.Account.Id, loggedUser))
+            if (!await this.security.IsUserAuthorized(card.Account.Id, loggedUser))
             {
                 result.IsSuccessful = false;
                 result.Message = ModifyCardErrorMessage;
@@ -166,7 +168,7 @@ namespace Business.Services.Models
                 return result;
             }
 
-            if (!await Security.IsAuthorizedAsync(cardToUpdate, loggedUser))
+            if (!await this.security.IsAuthorizedAsync(cardToUpdate, loggedUser))
             {
                 result.IsSuccessful = false;
                 result.Message = ModifyCardErrorMessage;
@@ -194,7 +196,7 @@ namespace Business.Services.Models
             }
 
             var accountId = cardResult.Data.AccountId;
-            if (!await Security.IsUserAuthorized(accountId,loggedUser))
+            if (!await this.security.IsUserAuthorized(accountId,loggedUser))
             {
                 result.IsSuccessful = false;
                 result.Message = ModifyUserErrorMessage;

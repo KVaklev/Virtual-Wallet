@@ -21,6 +21,7 @@ namespace Business.Services.Models
         private readonly IHistoryRepository historyRepository;
         private readonly ITransactionCheckerService transactionChecker;
         private readonly IMapper mapper;
+        private readonly ISecurityService security;
 
         public TransactionService(
             ITransactionRepository transactionRepository,
@@ -41,6 +42,7 @@ namespace Business.Services.Models
             this.historyRepository= historyRepository;
             this.transactionChecker = transactionChecker;
             this.mapper = mapper;
+            this.security = security;
         }
         public async Task<Response<GetTransactionDto>> GetByIdAsync(int id, User loggedUser)
         {
