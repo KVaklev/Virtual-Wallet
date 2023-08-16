@@ -6,7 +6,15 @@ using DataAccess.Models.Models;
 namespace Business.Services.Helpers
 {
     public class TransactionChecker : ITransactionCheckerService
+
     {
+        private readonly ISecurityService security;
+
+        public TransactionChecker(ISecurityService security)
+        {
+        this.security=security;
+        }
+
         public async Task<Response<GetTransactionDto>> ChecksGetByIdAsync(Transaction transaction, User loggedUser)
         {
             var result = new Response<GetTransactionDto>();
@@ -17,7 +25,7 @@ namespace Business.Services.Helpers
                 result.Message = Constants.NoRecordsFound;
                 return result;
             }
-            if (!await Security.IsTransactionSenderAsync(transaction, loggedUser))
+            if (!await security.IsTransactionSenderAsync(transaction, loggedUser))
             {
                 result.IsSuccessful = false;
                 result.Message = Constants.ModifyAuthorizedErrorMessage;
@@ -88,13 +96,13 @@ namespace Business.Services.Helpers
                 result.Message = Constants.NoRecordsFound;
                 return result;
             }
-            if (!await Security.IsTransactionSenderAsync(transactionToUpdate, loggedUser))
+            if (!await security.IsTransactionSenderAsync(transactionToUpdate, loggedUser))
             {
                 result.IsSuccessful = false;
                 result.Message = Constants.ModifyAuthorizedErrorMessage;
                 return result;
             }
-            if (!await Security.CanModifyTransactionAsync(transactionToUpdate))
+            if (!await security.CanModifyTransactionAsync(transactionToUpdate))
             {
                 result.IsSuccessful = false;
                 result.Message = Constants.ModifyTransactionNotExecuteErrorMessage;
@@ -135,14 +143,14 @@ namespace Business.Services.Helpers
                 result.Message = Constants.NoRecordsFound;
                 return result;
             }
-            if (!await Security.IsTransactionSenderAsync(transaction, loggedUser))
+            if (!await security.IsTransactionSenderAsync(transaction, loggedUser))
             {
                 result.IsSuccessful = false;
                 result.Message = Constants.ModifyAuthorizedErrorMessage;
                 return result;
             }
 
-            if (!await Security.CanModifyTransactionAsync(transaction))
+            if (!await security.CanModifyTransactionAsync(transaction))
             {
                 result.IsSuccessful = false;
                 result.Message = Constants.ModifyTransactionNotExecuteErrorMessage;
@@ -160,13 +168,13 @@ namespace Business.Services.Helpers
                 result.Message = Constants.NoRecordsFound;
                 return result;
             }
-            if (!await Security.IsTransactionSenderAsync(transaction, loggedUser))
+            if (!await security.IsTransactionSenderAsync(transaction, loggedUser))
             {
                 result.IsSuccessful = false;
                 result.Message = Constants.ModifyAuthorizedErrorMessage;
                 return result;
             }
-            if (!await Security.CanModifyTransactionAsync(transaction))
+            if (!await security.CanModifyTransactionAsync(transaction))
             {
                 result.IsSuccessful = false;
                 result.Message = Constants.ModifyTransactionNotExecuteErrorMessage;

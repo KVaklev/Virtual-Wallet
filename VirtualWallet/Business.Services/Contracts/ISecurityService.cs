@@ -10,7 +10,7 @@ namespace Business.Services.Contracts
         Task<User> ComputePasswordHashAsync<T>(object dto, User user);
         Task<bool> CanModifyTransactionAsync(Transaction transaction);
         Task<bool> IsHistoryOwnerAsync(History history, User user);
-        Task<bool> IsTransactionSenderAsync(Transaction transaction, int userId);
+        Task<bool> IsTransactionSenderAsync(Transaction transaction, User user);
         Task<bool> IsUserAuthorizedAsync(Transfer transfer, User user);
         Task<bool> IsAuthorizedAsync(User user, User loggedUser);
         Task<bool> IsAuthorizedAsync(Card card, User loggedUser);

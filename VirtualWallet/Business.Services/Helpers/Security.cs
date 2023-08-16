@@ -140,7 +140,7 @@ namespace Business.Services.Helpers
             return await Task.FromResult(isHistoryOwner);
         }
 
-        public async Task<bool> IsTransactionSenderAsync(Transaction transaction, int userId)
+        public async Task<bool> IsTransactionSenderAsync(Transaction transaction, User loggedUser)
         {
             bool isTransactionSender = true;
             if (loggedUser.IsAdmin)
