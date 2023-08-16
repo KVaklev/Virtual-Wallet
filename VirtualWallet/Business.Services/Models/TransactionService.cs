@@ -20,6 +20,7 @@ namespace Business.Services.Models
         private readonly IAccountService accountService;
         private readonly IHistoryRepository historyRepository;
         private readonly IMapper mapper;
+        private readonly ISecurityService security;
 
         public TransactionService(
             ITransactionRepository transactionRepository,
@@ -28,7 +29,8 @@ namespace Business.Services.Models
             IExchangeRateService exchangeRateService,
             IAccountService accountService,
             IHistoryRepository historyRepository,
-            IMapper mapper)
+            IMapper mapper,
+            ISecurityService security)
 
         {
             this.transactionRepository = transactionRepository;
@@ -38,6 +40,7 @@ namespace Business.Services.Models
             this.accountService = accountService;
             this.historyRepository= historyRepository;
             this.mapper = mapper;
+            this.security = security;
         }
         public async Task<Response<GetTransactionDto>> GetByIdAsync(int id, User loggedUser)
         {
@@ -50,7 +53,7 @@ namespace Business.Services.Models
                 return result;
             }
 
-            if (!await Security.IsTransactionSenderAsync(transaction, loggedUser.Id))
+            if (!await this.security.IsTransactionSenderAsync(transaction, loggedUser.Id))
             {
                 result.IsSuccessful = false;
                 result.Message = Constants.ModifyAuthorizedErrorMessage;
@@ -172,14 +175,14 @@ namespace Business.Services.Models
                 return result;
             }
 
-            if (!await Security.IsTransactionSenderAsync(transactionToUpdate, loggedUser.Id))
+            if (!await this.security.IsTransactionSenderAsync(transactionToUpdate, loggedUser.Id))
             {
                 result.IsSuccessful = false;
                 result.Message = Constants.ModifyAuthorizedErrorMessage;
                 return result;
             }
 
-            if (!await Security.CanModifyTransactionAsync(transactionToUpdate))
+            if (!await this.security.CanModifyTransactionAsync(transactionToUpdate))
             {
                 result.IsSuccessful = false;
                 result.Message = Constants.ModifyTransactionNotExecuteErrorMessage;
@@ -250,14 +253,14 @@ namespace Business.Services.Models
                 result.Message = Constants.NoRecordsFound;
                 return result;
             }
-            if (!await Security.IsTransactionSenderAsync(transaction, loggedUser.Id))
+            if (!await this.security.IsTransactionSenderAsync(transaction, loggedUser.Id))
             {
                 result.IsSuccessful = false;
                 result.Message = Constants.ModifyAuthorizedErrorMessage;
                 return result;
             }
 
-            if (!await Security.CanModifyTransactionAsync(transaction))
+            if (!await this.security.CanModifyTransactionAsync(transaction))
             {
                 result.IsSuccessful = false;
                 result.Message = Constants.ModifyTransactionNotExecuteErrorMessage;
@@ -279,14 +282,14 @@ namespace Business.Services.Models
                 return result;
             }
 
-            if (!await Security.IsTransactionSenderAsync(transactionOut, loggedUser.Id))
+            if (!await this.security.IsTransactionSenderAsync(transactionOut, loggedUser.Id))
             {
                 result.IsSuccessful = false;
                 result.Message = Constants.ModifyAuthorizedErrorMessage;
                 return result;
             }
 
-            if (!await Security.CanModifyTransactionAsync(transactionOut))
+            if (!await this.security.CanModifyTransactionAsync(transactionOut))
             {
                 result.IsSuccessful = false;
                 result.Message = Constants.ModifyTransactionNotExecuteErrorMessage;

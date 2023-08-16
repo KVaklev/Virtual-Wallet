@@ -20,18 +20,21 @@ namespace Business.Services.Models
         private readonly IAccountService accountService;
         private readonly IMapper mapper;
         private readonly IWebHostEnvironment webHostEnvironment;
+        private readonly ISecurityService security;
 
         public UserService(
             IUserRepository userRepository,
             IAccountService accountService,
             IMapper mapper,
-            IWebHostEnvironment webHostEnvironment
+            IWebHostEnvironment webHostEnvironment,
+            ISecurityService security
             )
         {
             this.userRepository = userRepository;
             this.accountService = accountService;
             this.mapper = mapper;
             this.webHostEnvironment = webHostEnvironment;
+            this.security = security;
         }
 
         public Response<IQueryable<User>> GetAll()
@@ -99,7 +102,7 @@ namespace Business.Services.Models
                 return result;
             }
 
-            if (!await Security.IsAuthorizedAsync(user, loggedUser))
+            if (!await this.security.IsAuthorizedAsync(user, loggedUser))
             {
                 result.IsSuccessful = false;
                 result.Message = ModifyAuthorizedErrorMessage;
@@ -160,7 +163,7 @@ namespace Business.Services.Models
             }
             
             User userToCreate = await UsersMapper.MapCreateDtoToUserAsync(createUserDto);
-            userToCreate = await Security.ComputePasswordHashAsync<CreateUserModel>(createUserDto, userToCreate);
+            userToCreate = await this.security.ComputePasswordHashAsync<CreateUserModel>(createUserDto, userToCreate);
             userToCreate = await this.userRepository.CreateAsync(userToCreate);
             await this.accountService.CreateAsync(createUserDto.CurrencyCode, userToCreate);
  
@@ -181,7 +184,7 @@ namespace Business.Services.Models
                 return result;
             }
 
-            if (!await Security.IsAuthorizedAsync(userToUpdate, loggedUser))
+            if (!await this.security.IsAuthorizedAsync(userToUpdate, loggedUser))
             {
                 result.IsSuccessful = false;
                 result.Message = UpdateStatusUserErrorMessage;
@@ -211,7 +214,7 @@ namespace Business.Services.Models
             }
 
             userToUpdate = await UsersMapper.MapUpdateDtoToUserAsync(userToUpdate, updateUserDto);
-            userToUpdate = await Security.ComputePasswordHashAsync<UpdateUserDto>(updateUserDto, userToUpdate);
+            userToUpdate = await this.security.ComputePasswordHashAsync<UpdateUserDto>(updateUserDto, userToUpdate);
             userToUpdate = await this.userRepository.UpdateAsync(userToUpdate);
 
             result.Data = mapper.Map<GetUpdatedUserDto>(userToUpdate);
@@ -223,7 +226,7 @@ namespace Business.Services.Models
         {
             var result = new Response<bool>();
 
-            if (!await Security.IsAdminAsync(loggedUser))
+            if (!await this.security.IsAdminAsync(loggedUser))
             {
                 result.IsSuccessful = false;
                 result.Message = ModifyUserErrorMessage;
@@ -276,7 +279,7 @@ namespace Business.Services.Models
         {
             var result = new Response<bool>();
 
-            if (!await Security.IsAdminAsync(loggedUser))
+            if (!await this.security.IsAdminAsync(loggedUser))
             {
                 result.IsSuccessful = false;
                 result.Message = ModifyUserErrorMessage;
@@ -301,7 +304,7 @@ namespace Business.Services.Models
         {
             var result = new Response<GetUserDto>();
 
-            if (!await Security.IsAdminAsync(loggedUser))
+            if (!await this.security.IsAdminAsync(loggedUser))
             {
                 result.IsSuccessful = false;
                 result.Message = ModifyUserErrorMessage;
@@ -331,7 +334,7 @@ namespace Business.Services.Models
         {
             var result = new Response<GetUserDto>();
 
-            if (!await Security.IsAdminAsync(loggedUser))
+            if (!await this.security.IsAdminAsync(loggedUser))
             {
                 result.IsSuccessful = false;
                 result.Message = ModifyUserErrorMessage;
@@ -361,7 +364,7 @@ namespace Business.Services.Models
         {
             var result = new Response<GetUserDto>();
 
-            if (!await Security.IsAdminAsync(loggedUser))
+            if (!await this.security.IsAdminAsync(loggedUser))
             {
                 result.IsSuccessful = false;
                 result.Message = ModifyUserErrorMessage;
@@ -401,7 +404,7 @@ namespace Business.Services.Models
                 return result;
             }
 
-            var authenticatedUser = await Security.AuthenticateAsync(loggedUser, password);
+            var authenticatedUser = await this.security.AuthenticateAsync(loggedUser, password);
            return authenticatedUser;
 
         }

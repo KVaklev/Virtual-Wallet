@@ -18,14 +18,15 @@ namespace Business.Services.Models
         private readonly ICurrencyService currencyService;
         private readonly IMapper mapper;
         private readonly ICardRepository cardRepository;
-
+        private readonly ISecurityService security;
         public AccountService(
             IAccountRepository accountRepository,  
             IUserRepository userRepository,
             ICardService cardService,
             ICurrencyService currencyService,
             IMapper mapper,
-            ICardRepository cardRepository
+            ICardRepository cardRepository,
+            ISecurityService security
           )
         {
             this.accountRepository = accountRepository;
@@ -33,7 +34,8 @@ namespace Business.Services.Models
             this.cardService = cardService;
             this.currencyService = currencyService;
             this.mapper = mapper;
-            this.cardRepository = cardRepository;           
+            this.cardRepository = cardRepository;  
+            this.security = security;
         }
         public Response<IQueryable<GetAccountDto>> GetAll()
         {
@@ -65,7 +67,7 @@ namespace Business.Services.Models
                 return result;
             }
             
-            if (!await Security.IsUserAuthorized(id, user))
+            if (!await this.security.IsUserAuthorized(id, user))
             {
                 result.IsSuccessful = false;
                 result.Message = ModifyAccountErrorMessage;
@@ -89,7 +91,7 @@ namespace Business.Services.Models
                 return result;
             }
 
-            if (!await Security.IsUserAuthorized(id, user))
+            if (!await this.security.IsUserAuthorized(id, user))
             {
                 result.IsSuccessful = false;
                 result.Message = ModifyAccountErrorMessage;
@@ -137,7 +139,7 @@ namespace Business.Services.Models
             }
 
 
-            if (!await Security.IsAdminAsync(loggedUser))
+            if (!await this.security.IsAdminAsync(loggedUser))
             {
                 result.IsSuccessful = false;
                 result.Message = ModifyUserErrorMessage;
@@ -159,7 +161,7 @@ namespace Business.Services.Models
         {
             var result = new Response<bool>();
 
-            if (!await Security.IsUserAuthorized(id, user))
+            if (!await this.security.IsUserAuthorized(id, user))
             {
                 result.IsSuccessful = false;
                 result.Message = ModifyAccountCardErrorMessage;
@@ -180,7 +182,7 @@ namespace Business.Services.Models
         {
             var result = new Response<bool>();
 
-            if (!await Security.IsUserAuthorized(id, user))
+            if (!await this.security.IsUserAuthorized(id, user))
             {
                 result.IsSuccessful = false;
                 result.Message = ModifyAccountCardErrorMessage;
