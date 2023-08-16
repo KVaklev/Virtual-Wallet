@@ -80,6 +80,26 @@ namespace VirtualWalletTests.TestHelpers
                 Country = "Bulgaria",
             };
         }
+
+        public static CreateUserModel GetCreateUserModel()
+        {
+            return new CreateUserModel
+            {
+
+                //FirstName = "Dimitar",
+                //LastName = "Peev",
+                Email = "dim@gmail.com",
+                Username = "dimitarDimitrov",
+                PhoneNumber = "0887885778",
+
+                //Email = "m.petrova@gmail.com",
+                //Username = "mariicheto",
+                //PhoneNumber = "0898568569",
+                //Password = "pa^3ddwp;z",
+                //CurrencyCode = "BGN", 
+               
+            };
+        }
         public static GetCreatedUserDto GetTestCreatedUserDto()
         {
             return new GetCreatedUserDto
