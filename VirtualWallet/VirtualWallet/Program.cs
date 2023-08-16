@@ -27,14 +27,6 @@ namespace VirtualWallet
                 options.EnableSensitiveDataLogging();
             });
 
-
-            builder.Services.AddSession(options =>
-            {
-                options.IdleTimeout = TimeSpan.FromSeconds(1000);
-                options.Cookie.HttpOnly = true;
-                options.Cookie.IsEssential = true;
-            });
-
             builder.Services.AddControllersWithViews();
             builder.Services.AddHttpContextAccessor();
 
@@ -100,7 +92,6 @@ namespace VirtualWallet
 
             app.UseDeveloperExceptionPage();
             app.UseRouting();
-            app.UseSession();
 
             app.UseAuthentication();
             app.UseAuthorization();
