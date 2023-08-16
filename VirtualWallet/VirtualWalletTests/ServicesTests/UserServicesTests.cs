@@ -11,6 +11,7 @@ using Business.QueryParameters;
 using Business.DTOs.Requests;
 using static Business.Services.Helpers.Constants;
 using Business.ViewModels.UserViewModels;
+using Microsoft.AspNetCore.Http;
 
 namespace VirtualWalletTests.ServicesTests
 {
@@ -747,9 +748,8 @@ namespace VirtualWalletTests.ServicesTests
         public async Task ChangeStatus_Should_ReturnMessage_WhenLoggedUserIsNotAdmin()
         {
             // Arrange
-            var createdUserDto = GetTestCreatedUserDto();
-            var createdUser = GetCreateUserModel();
-            var user = GetTestCreateUser();
+            var userToUpdate = GetTestCreateUser();
+            User loggedUser = GetTestUserAdmin();
             var userDetailsViewModel = new UserDetailsViewModel
             {
                 User = new GetUserDto
@@ -758,8 +758,6 @@ namespace VirtualWalletTests.ServicesTests
                     Blocked = true
                 }
             };
-
-            User loggedUser = GetTestUserAdmin();
 
             var userRepositoryMock = new Mock<IUserRepository>();
             var accountServiceMock = new Mock<IAccountService>();
@@ -774,8 +772,8 @@ namespace VirtualWalletTests.ServicesTests
 
             userRepositoryMock
                 .Setup(repo => repo
-                .GetByIdAsync(user.Id))
-                .ReturnsAsync(user);
+                .GetByIdAsync(userToUpdate.Id))
+                .ReturnsAsync(userToUpdate);
 
             userRepositoryMock
                 .Setup(repo => repo.SaveChangesAsync())
@@ -789,10 +787,52 @@ namespace VirtualWalletTests.ServicesTests
                 securityWrapperMock.Object);
 
             // Act
-            var actualResponse = await sut.ChangeStatusAsync(user.Id, userDetailsViewModel, loggedUser);
+            var actualResponse = await sut.ChangeStatusAsync(userToUpdate.Id, userDetailsViewModel, loggedUser);
 
             // Assert
             Assert.IsNotNull(actualResponse.IsSuccessful);
+        }
+
+        [TestMethod]
+        public async Task ChangeProfilePicture_Should_When_ParametersAreValid()
+        {
+            // Arrange
+            var userToUpdate = GetTestCreateUser();
+            var loggedUser = GetTestCreateUser();
+            UserDetailsViewModel userDetailsViewModel = new UserDetailsViewModel
+            {
+                User = new GetUserDto
+                {
+                    ImageFile = new FormFile(new MemoryStream(new byte[0]), 0, 0, "ImageFile", "image.png"),
+                }
+            };
+
+            var userRepositoryMock = new Mock<IUserRepository>();
+            var accountServiceMock = new Mock<IAccountService>();
+            var webHostEnvironmentMock = new Mock<IWebHostEnvironment>();
+            var mapperMock = new Mock<IMapper>();
+            var securityWrapperMock = new Mock<ISecurityService>();
+
+            userRepositoryMock
+                .Setup(repo => repo.GetByIdAsync(userToUpdate.Id))
+                .ReturnsAsync(userToUpdate);
+            webHostEnvironmentMock
+           .Setup(env => env.WebRootPath)
+           .Returns("D:\\Virtual Wallet\\VirtualWallet\\VirtualWallet\\wwwroot");
+
+            var sut = new UserService(
+                 userRepositoryMock.Object,
+                 accountServiceMock.Object,
+                 mapperMock.Object,
+                 webHostEnvironmentMock.Object,
+                 securityWrapperMock.Object);
+
+            // Act
+            var actualResponse = await sut.ChangeProfilePictureAsync(userToUpdate.Id, userDetailsViewModel, loggedUser);
+
+            // Assert
+
+            Assert.IsTrue(actualResponse.IsSuccessful);
         }
     }
 }

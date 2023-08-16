@@ -261,8 +261,8 @@ namespace Business.Services.Models
                 result.Message = NoUsersErrorMessage;
                 return result;
             }
-           
-            if (userDetailsViewModel.User.ImageFile != null)
+
+                if (userDetailsViewModel.User.ImageFile != null)
             {
                 string imageUploadedFolder = Path.Combine(webHostEnvironment.WebRootPath, "UploadedImages");
                 string username = userToUpdate.Username;
