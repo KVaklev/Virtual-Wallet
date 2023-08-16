@@ -34,11 +34,23 @@
                             </h5>
                             <hr>
                             <div class="px-3">
+                                 @if (Model.GetTransactionDto.Direction==DirectionType.Out.ToString())
+                                {
+
                                 <ul class="list-unstyled">
                                     <li class="mb-2">Payment Amount <span class="float-end text-3">@Model.GetTransactionDto.Amount @Model.GetTransactionDto.CurrencyCode</span></li>
-                                    <li class="mb-2">Balance Change Amount <span class="float-end text-3">@Model.GetTransactionDto.AmountExchange @Model.LoggedUser.Account.Currency.CurrencyCode</span></li>
-                                    <li class="mb-2">Exchange Rate<span class="float-end text-3">@Model.GetTransactionDto.ExchangeRate @Model.LoggedUser.Account.Currency.CurrencyCode/@Model.GetTransactionDto.CurrencyCode</span></li>
-                                </ul>
+                                    <li class="mb-2">Balance Change Amount <span class="float-end text-3">@Model.GetTransactionDto.AmountExchange @Model.SenderUser.Account.Currency.CurrencyCode</span></li>
+                                        <li class="mb-2">Exchange Rate<span class="float-end text-3">@Model.GetTransactionDto.ExchangeRate @Model.SenderUser.Account.Currency.CurrencyCode/@Model.GetTransactionDto.CurrencyCode</span></li>
+                                        </ul>
+                                }
+                                else
+                                {
+                                    <ul class="list-unstyled">
+                                        <li class="mb-2">Payment Amount <span class="float-end text-3">@Model.GetTransactionDto.Amount @Model.GetTransactionDto.CurrencyCode</span></li>
+                                        <li class="mb-2">Balance Change Amount <span class="float-end text-3">@Model.GetTransactionDto.AmountExchange @Model.RecipientUser.Account.Currency.CurrencyCode</span></li>
+                                        <li class="mb-2">Exchange Rate<span class="float-end text-3">@Model.GetTransactionDto.ExchangeRate @Model.RecipientUser.Account.Currency.CurrencyCode/@Model.GetTransactionDto.CurrencyCode</span></li>
+                                    </ul>
+                                }
                                 <hr class="mb-2">
 
                                 <ul class="list-unstyled">

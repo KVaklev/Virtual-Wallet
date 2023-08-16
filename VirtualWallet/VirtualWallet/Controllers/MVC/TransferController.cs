@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
 using System.Security.Claims;
 using Business.Mappers;
+using Business.Services.Helpers;
 
 namespace VirtualWallet.Controllers.MVC
 {
@@ -47,17 +48,25 @@ namespace VirtualWallet.Controllers.MVC
             }
 
             var result = await transferService.FilterByAsync(parameters, loggedUser.Data);
-            if (!result.IsSuccessful)
-            {
-                return await EntityNotFoundErrorViewAsync(result.Message);
-            }
-
             var indexTransferViewModel = new IndexTransferViewModel();
 
-            indexTransferViewModel.TransferDtos = result.Data;
             indexTransferViewModel.TransferQueryParameters = parameters;
             indexTransferViewModel.User = loggedUser.Data;
+            if (!result.IsSuccessful)
+            {
+                if (result.Message == Constants.ModifyNoRecordsFound)
+                {
+                    this.ViewData["ErrorMessage"] = result.Message;
+                    return View(indexTransferViewModel);
+                }
+                else
+                {
+                    this.ViewData["Controller"] = "Transfer";
+                    return View("ErrorMessage", result.Message);
+                }
+            }
 
+            indexTransferViewModel.TransferDtos = result.Data;
             return View(indexTransferViewModel);
         }
 

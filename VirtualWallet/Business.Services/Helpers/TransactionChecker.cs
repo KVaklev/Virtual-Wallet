@@ -1,16 +1,16 @@
-﻿
-using Business.DTOs.Requests;
+﻿using Business.DTOs.Requests;
 using Business.DTOs.Responses;
+using Business.Services.Contracts;
 using DataAccess.Models.Models;
 
 namespace Business.Services.Helpers
 {
-    public static class TransactionChecker
+    public class TransactionChecker : ITransactionCheckerService
     {
-        public static async Task<Response<GetTransactionDto>> ChecksGetByIdAsync(Transaction transaction, User loggedUser)
+        public async Task<Response<GetTransactionDto>> ChecksGetByIdAsync(Transaction transaction, User loggedUser)
         {
             var result = new Response<GetTransactionDto>();
-            
+
             if (transaction == null)
             {
                 result.IsSuccessful = false;
@@ -26,11 +26,11 @@ namespace Business.Services.Helpers
             return result;
         }
 
-        public static async Task<Response<GetTransactionDto>> ChecksCreateOutTransactionAsync(
-            CreateTransactionDto transactionDto, 
-            User loggedUser, 
-            Account recipient, 
-            Currency currency, 
+        public async Task<Response<GetTransactionDto>> ChecksCreateOutTransactionAsync(
+            CreateTransactionDto transactionDto,
+            User loggedUser,
+            Account recipient,
+            Currency currency,
             Response<decimal> exchangeRate)
         {
             var result = new Response<GetTransactionDto>();
@@ -73,7 +73,7 @@ namespace Business.Services.Helpers
         }
 
 
-        public static async Task<Response<GetTransactionDto>> ChecksUpdateAsync(
+        public async Task<Response<GetTransactionDto>> ChecksUpdateAsync(
             Transaction transactionToUpdate,
             User loggedUser,
             CreateTransactionDto transactionDto,
@@ -126,7 +126,7 @@ namespace Business.Services.Helpers
             }
             return result;
         }
-        public static async Task<Response<bool>> ChecksDeleteAsync(Transaction transaction, User loggedUser)
+        public async Task<Response<bool>> ChecksDeleteAsync(Transaction transaction, User loggedUser)
         {
             var result = new Response<bool>();
             if (transaction == null)
@@ -151,7 +151,7 @@ namespace Business.Services.Helpers
             return result;
         }
 
-        public static async Task<Response<bool>> ChecksConfirmAsync(Transaction transaction, User loggedUser)
+        public async Task<Response<bool>> ChecksConfirmAsync(Transaction transaction, User loggedUser)
         {
             var result = new Response<bool>();
             if (transaction == null)

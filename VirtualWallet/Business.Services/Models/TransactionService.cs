@@ -19,6 +19,7 @@ namespace Business.Services.Models
         private readonly IExchangeRateService exchangeRateService;
         private readonly IAccountService accountService;
         private readonly IHistoryRepository historyRepository;
+        private readonly ITransactionCheckerService transactionChecker;
         private readonly IMapper mapper;
 
         public TransactionService(
@@ -28,6 +29,7 @@ namespace Business.Services.Models
             IExchangeRateService exchangeRateService,
             IAccountService accountService,
             IHistoryRepository historyRepository,
+            ITransactionCheckerService transactionChecker,
             IMapper mapper)
 
         {
@@ -37,13 +39,14 @@ namespace Business.Services.Models
             this.exchangeRateService = exchangeRateService;
             this.accountService = accountService;
             this.historyRepository= historyRepository;
+            this.transactionChecker = transactionChecker;
             this.mapper = mapper;
         }
         public async Task<Response<GetTransactionDto>> GetByIdAsync(int id, User loggedUser)
         {
             var result = new Response<GetTransactionDto>();
             var transaction = await this.transactionRepository.GetByIdAsync(id);
-            var checksResult = await TransactionChecker.ChecksGetByIdAsync(transaction, loggedUser);
+            var checksResult = await this.transactionChecker.ChecksGetByIdAsync(transaction, loggedUser);
             if (!checksResult.IsSuccessful)
             {
                 result.IsSuccessful = false;
@@ -96,7 +99,7 @@ namespace Business.Services.Models
             var currency = await currencyRepository.GetByCurrencyCodeAsync(transactionDto.CurrencyCode);
             var exchangeRate = await this.exchangeRateService
                                .GetExchangeRateAsync(transactionDto.CurrencyCode, loggedUser.Account.Currency.CurrencyCode);
-            var checksResult = await TransactionChecker
+            var checksResult = await this.transactionChecker
                                .ChecksCreateOutTransactionAsync(transactionDto, loggedUser, recipient, currency, exchangeRate);
             if (!checksResult.IsSuccessful)
             {
@@ -125,7 +128,7 @@ namespace Business.Services.Models
             var currency = await currencyRepository.GetByCurrencyCodeAsync(transactionDto.CurrencyCode);
             var exchangeRate = await this.exchangeRateService
                        .GetExchangeRateAsync(transactionDto.CurrencyCode, loggedUser.Account.Currency.CurrencyCode);
-            var checksResult = await TransactionChecker
+            var checksResult = await this.transactionChecker
                        .ChecksUpdateAsync(transactionToUpdate, loggedUser, transactionDto, recipient, currency, exchangeRate);
             if (!checksResult.IsSuccessful)
             {
@@ -145,7 +148,7 @@ namespace Business.Services.Models
         {
             var result = new Response<bool>();
             var transaction = await this.transactionRepository.GetByIdAsync(id);
-            var checksResult = await TransactionChecker.ChecksDeleteAsync(transaction, loggedUser);
+            var checksResult = await this.transactionChecker.ChecksDeleteAsync(transaction, loggedUser);
             if (!checksResult.IsSuccessful)
             {
                 result.IsSuccessful = false;
@@ -161,7 +164,7 @@ namespace Business.Services.Models
         {
             var result = new Response<bool>();
             var transactionOut = await this.transactionRepository.GetByIdAsync(transactionId);
-            var checksResult = await TransactionChecker.ChecksConfirmAsync(transactionOut, loggedUser);
+            var checksResult = await this.transactionChecker.ChecksConfirmAsync(transactionOut, loggedUser);
             if (!checksResult.IsSuccessful)
             {
                 result.IsSuccessful = false;
