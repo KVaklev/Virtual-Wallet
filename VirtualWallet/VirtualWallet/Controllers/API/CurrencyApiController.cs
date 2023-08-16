@@ -32,7 +32,6 @@ namespace VirtualWallet.Controllers.API
             {
                 return StatusCode(StatusCodes.Status401Unauthorized, loggedUser.Message);
             }
-
             var result = await this.currencyService.CreateAsync(currencyDto, loggedUser.Data);
             if (!result.IsSuccessful)
             {

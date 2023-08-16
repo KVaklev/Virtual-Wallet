@@ -116,6 +116,12 @@ namespace Business.Services.Models
             var result = new Response<GetTransactionDto>();
             var transactionToUpdate = await this.transactionRepository.GetByIdAsync(id);  
             var recipient = await accountRepository.GetByUsernameAsync(transactionDto.RecipientUsername);
+            if (recipient==null)
+            {
+                result.IsSuccessful = false;
+                result.Message = Constants.NoRecordsFound;
+                return result;
+            }
             var currency = await currencyRepository.GetByCurrencyCodeAsync(transactionDto.CurrencyCode);
             var exchangeRate = await this.exchangeRateService
                        .GetExchangeRateAsync(transactionDto.CurrencyCode, loggedUser.Account.Currency.CurrencyCode);
@@ -150,7 +156,6 @@ namespace Business.Services.Models
             result.Data = await this.transactionRepository.DeleteAsync(transaction);
             return result;
         }
-
 
         public async Task<Response<bool>> ConfirmAsync(int transactionId, User loggedUser)
         {
@@ -197,6 +202,7 @@ namespace Business.Services.Models
 
             result.Message = Constants.ModifyTransactionConfirmMessage;
             result.Data = transactionOut.IsConfirmed;
+
             return result;
         }
 
@@ -344,7 +350,6 @@ namespace Business.Services.Models
             }
             return result;
         }
-
         private async Task<IQueryable<Transaction>> GetLoogedUserTransactionsAsync(IQueryable<Transaction> userTransactions, User loggedUser)
         {
              

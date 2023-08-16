@@ -34,6 +34,5 @@ namespace DataAccess.Models.Models
         public bool IsConfirmed { get; set; }
         public bool IsCancelled { get; set; }
 
-
     }
 }

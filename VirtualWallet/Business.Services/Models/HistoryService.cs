@@ -70,7 +70,6 @@ namespace Business.Services.Models
             }
             return await Task.FromResult(result);
         }
-
         private async Task<IQueryable<History>> FilterByFromDataAsync(IQueryable<History> result, string? fromData)
         {
             if (!string.IsNullOrEmpty(fromData))
@@ -81,7 +80,6 @@ namespace Business.Services.Models
             }
             return await Task.FromResult(result);
         }
-
         private async Task<IQueryable<History>> FilterByToDataAsync(IQueryable<History> result, string? toData)
         {
             if (!string.IsNullOrEmpty(toData))

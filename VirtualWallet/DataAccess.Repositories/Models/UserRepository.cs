@@ -52,14 +52,15 @@ namespace DataAccess.Repositories.Models
         public async Task<User> CreateAsync(User user)
         {
             context.Users.Add(user);
-
             await context.SaveChangesAsync();
+
             return user;
         }
 
         public async Task<User> UpdateAsync(User updatedUser)
         {
             await context.SaveChangesAsync();
+
             return updatedUser;
         }
 
@@ -67,32 +68,32 @@ namespace DataAccess.Repositories.Models
         {
             User userToDelete = await this.GetByIdAsync(id);
             userToDelete.IsDeleted = true;
-
             await context.SaveChangesAsync();
+
             return userToDelete.IsDeleted;
         }
 
         public async Task<User> PromoteAsync(int id)
         {
             User userToPromote = await this.GetByIdAsync(id);
-
             await context.SaveChangesAsync();
+
             return userToPromote;
         }
 
         public async Task<User> BlockUserAsync(int id)
         {
-            User userToBlock = await this.GetByIdAsync(id);
-          
+            User userToBlock = await this.GetByIdAsync(id);        
             await context.SaveChangesAsync();
+
             return userToBlock;
         }
 
         public async Task<User> UnblockUserAsync(int id)
         {
             User userToUnblock = await this.GetByIdAsync(id);
-
             await context.SaveChangesAsync();
+            
             return userToUnblock;
         }
 
@@ -107,10 +108,12 @@ namespace DataAccess.Repositories.Models
         {
             return await context.Users.AnyAsync(u => u.PhoneNumber == phoneNumber);
         }
+
         public async Task<bool> EmailExistsAsync(string email)
         {
             return await context.Users.AnyAsync(u => u.Email == email);
         }
+
         public async Task<bool> UsernameExistsAsync(string username)
         {
             return await context.Users.AnyAsync(u => u.Username == username);

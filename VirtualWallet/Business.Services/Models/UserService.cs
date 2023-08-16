@@ -9,7 +9,6 @@ using Business.DTOs.Requests;
 using Business.DTOs.Responses;
 using static Business.Services.Helpers.Constants;
 using DataAccess.Models.Enums;
-using Business.ViewModels;
 using Business.ViewModels.UserViewModels;
 using Microsoft.AspNetCore.Hosting;
 
@@ -33,7 +32,26 @@ namespace Business.Services.Models
             this.accountService = accountService;
             this.mapper = mapper;
             this.webHostEnvironment = webHostEnvironment;
-    }
+        }
+
+        public Response<IQueryable<User>> GetAll()
+        {
+            var result = new Response<IQueryable<User>>();
+            var users = this.userRepository.GetAll();
+
+            if (users.Any())
+            {
+                result.IsSuccessful = true;
+                result.Data = users;
+            }
+            else
+            {
+                result.IsSuccessful = false;
+                result.Message = NoUsersErrorMessage;
+            }
+
+            return result;
+        }
 
         public async Task<Response<PaginatedList<GetCreatedUserDto>>> FilterByAsync(UserQueryParameters filterParameters)
         {
@@ -57,7 +75,7 @@ namespace Business.Services.Models
             if (!users.Any())
             {
                 result.IsSuccessful = false;
-                result.Message= NoUsersErrorMessage;
+                result.Message= NoRecordsFoundByFilter;
                 return result;
             }
 
@@ -273,8 +291,7 @@ namespace Business.Services.Models
                 return result;
             }
 
-            await this.accountService.DeleteAsync((int)userToDelete.AccountId, loggedUser);
-    
+            await this.accountService.DeleteAsync((int)userToDelete.AccountId, loggedUser);  
             result.Data = await this.userRepository.DeleteAsync(id);
             
             return result;
@@ -422,24 +439,6 @@ namespace Business.Services.Models
             return result;
         }
        
-        public Response<IQueryable<User>> GetAll()
-        {
-            var result = new Response<IQueryable<User>>();
-            var users = this.userRepository.GetAll();
-
-            if (users.Any())
-            {
-                result.IsSuccessful = true;
-                result.Data = users;
-            }
-            else
-            {
-                result.IsSuccessful = false;
-                result.Message = NoUsersErrorMessage;
-            }
-
-            return result;
-        }
         private async Task<bool> EmailExistsAsync(string email)
         {
             return await this.userRepository.EmailExistsAsync(email);

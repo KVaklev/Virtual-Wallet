@@ -35,14 +35,12 @@ namespace Business.Services.Helpers
                 );
 
             string resultToken = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
-
             if (resultToken == null)
             {
                 result.IsSuccessful = false;
                 result.Message = GenerateTokenErrorMessage;
                 return result;
             }
-
             result.Data = resultToken;
 
             return await Task.FromResult(result);
@@ -76,26 +74,9 @@ namespace Business.Services.Helpers
                 result.Error = new Error(PropertyName.NotConfirmedEmail);
                 return result;
             }
-
             result.Data = loggedUser;
 
             return result;
-        }
-
-        private static async Task<bool> IsPasswordHashMatchedAsync(string passwordFilled, byte[] password, byte[]? passwordKey)
-        {
-            using (var hmac = new HMACSHA512(passwordKey))
-            {
-                var passwordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(passwordFilled));
-                for (var i = 0; i < passwordHash.Length; i++)
-                {
-                    if (passwordHash[i] != password[i])
-                    {
-                        return await Task.FromResult(false);
-                    }
-                }
-              return await Task.FromResult(true);
-            }
         }
 
         private static async Task<bool> IsEmailConfirmedAsync(User loggedUser)
@@ -135,7 +116,6 @@ namespace Business.Services.Helpers
                         passwordKey = hmac.Key;
                         passwordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
                     }
-
                     user.Password = passwordHash;
                     user.PasswordKey = passwordKey;
                 }  
@@ -191,7 +171,6 @@ namespace Business.Services.Helpers
             return isTransactionSender;
         }
 
-        //ToDo-Check if we can combine and use only one with generic
         public static async Task<bool> IsUserAuthorizedAsync(Transfer transfer, User user)
         {
             bool IsUserAuthorized = true;
@@ -235,6 +214,22 @@ namespace Business.Services.Helpers
                 isUserAccountOwnerOrAdminId = true;
             }
             return await Task.FromResult(isUserAccountOwnerOrAdminId);
+        }
+
+        private static async Task<bool> IsPasswordHashMatchedAsync(string passwordFilled, byte[] password, byte[]? passwordKey)
+        {
+            using (var hmac = new HMACSHA512(passwordKey))
+            {
+                var passwordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(passwordFilled));
+                for (var i = 0; i < passwordHash.Length; i++)
+                {
+                    if (passwordHash[i] != password[i])
+                    {
+                        return await Task.FromResult(false);
+                    }
+                }
+              return await Task.FromResult(true);
+            }
         }
     }
 }

@@ -69,12 +69,14 @@ namespace VirtualWallet.Controllers.MVC
                 result.IsSuccessful = false;
                 return result;
             }
+
             var loggedUserResult = await this.userService.GetLoggedUserByUsernameAsync(loggedUsersUsername.Value);
             if (loggedUserResult == null)
             {
                 result.IsSuccessful = false;
                 return result;
             }
+
             return loggedUserResult;
         }
 

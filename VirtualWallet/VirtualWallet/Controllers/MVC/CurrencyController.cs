@@ -39,6 +39,7 @@ namespace VirtualWallet.Controllers.MVC
             var currencyViwModel = new CurrencyViewModel();
             currencyViwModel.Currencies = result.Data;
             currencyViwModel.User = loggedUser.Data;
+
             return View(currencyViwModel);
         }
 
@@ -50,6 +51,7 @@ namespace VirtualWallet.Controllers.MVC
             {
                 return this.RedirectToAction("Login", "Account");
             }
+
             var result = await this.currencyService.GetCurrencyByIdAsync(id);
             if (!result.IsSuccessful)
             {
@@ -67,6 +69,7 @@ namespace VirtualWallet.Controllers.MVC
             {
                 return this.RedirectToAction("Login", "Account");
             }
+
             var result = await this.currencyService.DeleteAsync(currency.Id, loggedUser.Data);
             if (!result.IsSuccessful)
             {
@@ -85,6 +88,7 @@ namespace VirtualWallet.Controllers.MVC
                 return this.RedirectToAction("Login", "Account");
             }
             var currency = new CreateCurrencyDto();
+
             return View(currency);
         }
 
@@ -113,6 +117,7 @@ namespace VirtualWallet.Controllers.MVC
             {
                 return this.RedirectToAction("Login", "Account");
             }
+
             var result = await this.currencyService.UpdateAsync(id, loggedUser.Data);
             if (!result.IsSuccessful)
             {
@@ -120,6 +125,7 @@ namespace VirtualWallet.Controllers.MVC
                 return View("ErrorMessage", result.Message);
             }
             this.ViewData["Controller"] = "Currency";
+
             return View("ErrorMessage", result.Message);
         }
 

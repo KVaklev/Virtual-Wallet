@@ -57,8 +57,7 @@ namespace Business.Mappers
                 historyDto.Amount = history.Transfer.Amount;
                 historyDto.CurrencyCode = history.Transfer.Currency.CurrencyCode;
                 historyDto.Direction = history.Transfer.TransferType.ToString();
-                historyDto.AccountUsername = history.Account.User.Username;
-                    
+                historyDto.AccountUsername = history.Account.User.Username;         
             }
             return historyDto;
         }

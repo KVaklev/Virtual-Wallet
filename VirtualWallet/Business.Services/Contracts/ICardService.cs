@@ -11,7 +11,6 @@ namespace Business.Services.Contracts
         Task<Response<PaginatedList<GetCreatedCardDto>>> FilterByAsync(CardQueryParameters queryParameters, User loggedUser);
         Task<Response<GetCardDto>> GetByIdAsync(int id, User loggedUser);
         Response<IQueryable<Card>> GetAll(User loggedUser);
-        //Response<List<GetCreatedCardDto>> GetCards(User loggedUser);
         Response<List<GetCardDto>> GetByAccountId(int accountId);
         Task<Response<GetCreatedCardDto>> CreateAsync(int accountId, CreateCardDto card);
         Task<Response<GetUpdatedCardDto>> UpdateAsync(int id, User loggedUser, UpdateCardDto card);

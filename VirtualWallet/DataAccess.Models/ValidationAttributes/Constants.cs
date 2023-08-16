@@ -1,7 +1,6 @@
-﻿
-namespace DataAccess.Models.ValidationAttributes
+﻿namespace DataAccess.Models.ValidationAttributes
 {
-    public static class Constants //ToDo - check for repeting messages
+    public static class Constants 
     {
         //Constants for users
 
@@ -12,7 +11,7 @@ namespace DataAccess.Models.ValidationAttributes
         public const int PhoneNumberLength = 10;
         public const int AddressMaxLength = 150;
         public const int CountryMaxLength = 25;
-        public const int CityMaxLength = 85;
+        public const int CityMaxLength = 25;
 
         //Constants for cards
 

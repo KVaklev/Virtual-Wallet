@@ -22,11 +22,11 @@ namespace DataAccess.Repositories.Models
                 .AsQueryable();
 
             return currencies;
-
         }
+
         public async Task<Currency> CreateAsync(Currency currency)
         {
-            context.AddAsync(currency);
+            await context.AddAsync(currency);
             await context.SaveChangesAsync();
 
             return currency;
@@ -53,6 +53,7 @@ namespace DataAccess.Repositories.Models
         public async Task<bool> SaveChangesAsync()
         {
             await context.SaveChangesAsync();
+
             return true;
         }
     }

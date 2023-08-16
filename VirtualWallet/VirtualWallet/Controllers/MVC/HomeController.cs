@@ -11,11 +11,5 @@ namespace VirtualWallet.Controllers.MVC
         {
             return View();
         }
-
-        [HttpGet]
-        public IActionResult Error()
-        {
-            return View();
-        }
     }
 }

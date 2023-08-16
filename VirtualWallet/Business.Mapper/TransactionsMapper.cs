@@ -23,9 +23,6 @@ namespace Business.Mappers
                 .ForPath(t => t.Currency.CurrencyCode, t => t.MapFrom(t => t.CurrencyCode))
                 .ForPath(t => t.Direction, t => t.MapFrom(t => t.Direction))
                 .ReverseMap();
-
-            
-                
         }
 
         public static async Task<Transaction> MapOutToInTransactionAsync(

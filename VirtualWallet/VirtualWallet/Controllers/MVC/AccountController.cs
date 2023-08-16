@@ -93,6 +93,7 @@ namespace VirtualWallet.Controllers.MVC
                 return View("ErrorMessage", currencyResult.Message);
             }
             TempData["Currencies"] = JsonSerializer.Serialize(currencyResult.Data);
+
             return this.View(createUserModel);
         }
 
@@ -133,7 +134,6 @@ namespace VirtualWallet.Controllers.MVC
             try
             {
                 await emailService.SendEMailAsync(message);
-
             }
             catch (InvalidOperationException ex)
             {
