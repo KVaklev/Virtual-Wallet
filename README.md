@@ -52,7 +52,7 @@ Documentation: Swagger
 
 ## Database Relations
 
-![Diagram](https://gitlab.com/forum-system-group-8/forum-system/-/blob/main/Diagram.jpg)
+See the additional Diagram file in our project folder -->Diagram.jpg
 
 # About the Project 
 
@@ -143,13 +143,13 @@ Documentation: Swagger
 - Transfer - ......................
 
 - Transaction - .......................
-
-
-> ### Currencies page (visible to ........)
-```sh
-> ................................
-
 ```
+
+> ### Currency page (visible to .........)
+```sh
+> ........................................
+```
+
 > ### You Refer Friends (visible to everyone)
 ```sh
 > Provides information about another functionality where a user can enter email of people, not yet registered for the application, and invite them to register. The application sends to that email a registration link. If a registration from that email is completed and verified, both users receive a certain amount in their virtual wallet. Invitations have an expiration time, and a user can take advantage of that feature a limited number of times. 
@@ -157,7 +157,7 @@ Documentation: Swagger
 > ### Terms of Use and Privacy Policy (visible to everyone)
 ```sh
 > Provides information about data and privacy.
-
+```
 
 ## Credits
 
