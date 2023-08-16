@@ -38,12 +38,13 @@ namespace VirtualWallet.Controllers.MVC
             }
 
             var result = await this.historyService.FilterByAsync(parameters, loggedUserResponse.Data);
+            
             var indexHistoryViewModel = new IndexHistoryViewModel();
             indexHistoryViewModel.HistoryQueryParameters = parameters;
             indexHistoryViewModel.LoggedUser = loggedUserResponse.Data;
             if (!result.IsSuccessful)
             {
-                if(result.Message == Constants.NoRecordsFoundByFilter)
+                if(result.Message == Constants.NoRecordsFound)
                 {
                     this.ViewData["ErrorMessage"] = result.Message;
                     return View(indexHistoryViewModel);
@@ -56,8 +57,7 @@ namespace VirtualWallet.Controllers.MVC
             }
             indexHistoryViewModel.GetHistoryDtos = result.Data;
 
-
-                return this.View(indexHistoryViewModel);
+            return this.View(indexHistoryViewModel);
         }
 
         private async Task<Response<User>> FindLoggedUserAsync()
@@ -69,12 +69,14 @@ namespace VirtualWallet.Controllers.MVC
                 result.IsSuccessful = false;
                 return result;
             }
+
             var loggedUserResult = await this.userService.GetLoggedUserByUsernameAsync(loggedUsersUsername.Value);
             if (loggedUserResult == null)
             {
                 result.IsSuccessful = false;
                 return result;
             }
+
             return loggedUserResult;
         }
 

@@ -17,19 +17,22 @@ namespace VirtualWallet.Controllers.MVC
         private readonly IUserRepository userRepository;
         private readonly IEmailService emailService;
         private readonly ICurrencyService currencyService;
+        private readonly ISecurityService security;
 
         public AccountController(
             IUserService userService,
             IAccountService accountService,
             IUserRepository userRepository,
             IEmailService emailService,
-            ICurrencyService currencyService)
+            ICurrencyService currencyService,
+            ISecurityService security)
         {
             this.userService = userService;
             this.accountService = accountService;
             this.userRepository = userRepository;
             this.emailService = emailService;
             this.currencyService = currencyService;
+            this.security = security;
         }
 
         [HttpGet("login")]
@@ -55,7 +58,7 @@ namespace VirtualWallet.Controllers.MVC
                 return View("ErrorMessage", loggedUser.Message);
             }
 
-            var result = await Security.CreateApiTokenAsync(loggedUser.Data);
+            var result = await this.security.CreateApiTokenAsync(loggedUser.Data);
             if (!result.IsSuccessful)
             {
                 this.ViewData["Controller"] = "Account";
@@ -93,6 +96,7 @@ namespace VirtualWallet.Controllers.MVC
                 return View("ErrorMessage", currencyResult.Message);
             }
             TempData["Currencies"] = JsonSerializer.Serialize(currencyResult.Data);
+
             return this.View(createUserModel);
         }
 
@@ -133,7 +137,6 @@ namespace VirtualWallet.Controllers.MVC
             try
             {
                 await emailService.SendEMailAsync(message);
-
             }
             catch (InvalidOperationException ex)
             {

@@ -31,19 +31,19 @@ namespace VirtualWallet.Controllers.API
            if (!loggedUserResult.IsSuccessful)
            {
                 return StatusCode(StatusCodes.Status401Unauthorized, loggedUserResult.Message);
-            }
+           }
 
            var result = await this.historyService.FilterByAsync(historyQueryParameters, loggedUserResult.Data);
-
-            if (!result.IsSuccessful)
-            {
+           if (!result.IsSuccessful)
+           {
                 if (result.Message == Constants.NoRecordsFound)
                 {
                     return StatusCode(StatusCodes.Status404NotFound, result.Message);
                 }
                 return BadRequest(result.Message);
-            }
-            return StatusCode(StatusCodes.Status200OK, result.Data);   
+           }
+
+           return StatusCode(StatusCodes.Status200OK, result.Data);   
         }
 
         private async Task<Response<User>> FindLoggedUserAsync()
@@ -55,12 +55,14 @@ namespace VirtualWallet.Controllers.API
                 result.IsSuccessful = false;
                 return result;
             }
+            
             var loggedUserResult = await this.userService.GetLoggedUserByUsernameAsync(loggedUsersUsername.Value);
             if (loggedUserResult == null)
             {
                 result.IsSuccessful = false;
                 return result;
             }
+            
             return loggedUserResult;
         }
     }

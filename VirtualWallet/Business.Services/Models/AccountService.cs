@@ -18,14 +18,15 @@ namespace Business.Services.Models
         private readonly ICurrencyService currencyService;
         private readonly IMapper mapper;
         private readonly ICardRepository cardRepository;
-
+        private readonly ISecurityService security;
         public AccountService(
             IAccountRepository accountRepository,  
             IUserRepository userRepository,
             ICardService cardService,
             ICurrencyService currencyService,
             IMapper mapper,
-            ICardRepository cardRepository
+            ICardRepository cardRepository,
+            ISecurityService security
           )
         {
             this.accountRepository = accountRepository;
@@ -33,7 +34,8 @@ namespace Business.Services.Models
             this.cardService = cardService;
             this.currencyService = currencyService;
             this.mapper = mapper;
-            this.cardRepository = cardRepository;           
+            this.cardRepository = cardRepository;  
+            this.security = security;
         }
         public Response<IQueryable<GetAccountDto>> GetAll()
         {
@@ -50,7 +52,6 @@ namespace Business.Services.Models
                 result.IsSuccessful = false;
                 result.Message = NoAccountsErrorMessage;
             }
-
             return result;
         }
 
@@ -66,7 +67,7 @@ namespace Business.Services.Models
                 return result;
             }
             
-            if (!await Security.IsUserAuthorized(id, user))
+            if (!await this.security.IsUserAuthorized(id, user))
             {
                 result.IsSuccessful = false;
                 result.Message = ModifyAccountErrorMessage;
@@ -90,7 +91,7 @@ namespace Business.Services.Models
                 return result;
             }
 
-            if (!await Security.IsUserAuthorized(id, user))
+            if (!await this.security.IsUserAuthorized(id, user))
             {
                 result.IsSuccessful = false;
                 result.Message = ModifyAccountErrorMessage;
@@ -112,7 +113,7 @@ namespace Business.Services.Models
             if (currency == null)
             {
                 result.IsSuccessful = false;
-                result.Message = Constants.CurrencyNotFoundErrorMessage;
+                result.Message = CurrencyNotFoundErrorMessage;
                 return result;
             }
             accountToCreate = await AccountsMapper.MapCreateDtoToAccountAsync(accountToCreate, currency.Data, user);
@@ -133,12 +134,12 @@ namespace Business.Services.Models
             if (accountToDelete == null)
             {
                 result.IsSuccessful = false;
-                result.Message = Constants.NoAccountsErrorMessage;
+                result.Message = NoAccountsErrorMessage;
                 return result;
             }
 
 
-            if (!await Security.IsAdminAsync(loggedUser))
+            if (!await this.security.IsAdminAsync(loggedUser))
             {
                 result.IsSuccessful = false;
                 result.Message = ModifyUserErrorMessage;
@@ -152,7 +153,6 @@ namespace Business.Services.Models
                     await this.cardService.DeleteAsync(card.Id, loggedUser);
                 }
             }          
-
             result.Data = await this.accountRepository.DeleteAsync(id);
 
             return result;
@@ -161,7 +161,7 @@ namespace Business.Services.Models
         {
             var result = new Response<bool>();
 
-            if (!await Security.IsUserAuthorized(id, user))
+            if (!await this.security.IsUserAuthorized(id, user))
             {
                 result.IsSuccessful = false;
                 result.Message = ModifyAccountCardErrorMessage;
@@ -182,7 +182,7 @@ namespace Business.Services.Models
         {
             var result = new Response<bool>();
 
-            if (!await Security.IsUserAuthorized(id, user))
+            if (!await this.security.IsUserAuthorized(id, user))
             {
                 result.IsSuccessful = false;
                 result.Message = ModifyAccountCardErrorMessage;
@@ -195,7 +195,6 @@ namespace Business.Services.Models
                 result.Error = new Error(PropertyName.CardNumber);
                 return result;
             }
-
             return result;
         }
        
@@ -211,8 +210,7 @@ namespace Business.Services.Models
                 return result;
             }
 
-            result.Data = (DateTime.Now.ToString() + user.Username).ComputeSha256Hash();
-           
+            result.Data = (DateTime.Now.ToString() + user.Username).ComputeSha256Hash();        
             return result;
         }
 
@@ -241,8 +239,7 @@ namespace Business.Services.Models
             accountToDepositTo.Balance += amount;
             await this.accountRepository.SaveChangesAsync();
             result.Data = accountToDepositTo;
-            return result;
-            
+            return result;        
         }
 
         public async Task<Response<Account>> DecreaseBalanceAsync(int id, decimal amount, User loggedUser)

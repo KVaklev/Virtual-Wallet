@@ -1,10 +1,6 @@
 ﻿using DataAccess.Models.Models;
 using DataAccess.Repositories.Data;
 using Microsoft.EntityFrameworkCore;
-using Business.Exceptions;
-using Business.QueryParameters;
-using DataAccess.Models.Enums;
-using DataAccess.Repositories.Helpers;
 using DataAccess.Repositories.Contracts;
 
 namespace DataAccess.Repositories.Models
@@ -35,8 +31,8 @@ namespace DataAccess.Repositories.Models
 
         public async Task<History> CreateAsync(History history)
         {
-            await this.context.AddAsync(history);
-            await this.context.SaveChangesAsync();
+            await context.AddAsync(history);
+            await context.SaveChangesAsync();
             return history;
         }
 
@@ -57,6 +53,7 @@ namespace DataAccess.Repositories.Models
         public async Task<int> GetHistoryCountAsync()
         {
              var count = context.History.Count();
+
              return count;
         }
     }

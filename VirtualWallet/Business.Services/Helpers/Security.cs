@@ -1,4 +1,5 @@
 ﻿using Business.DTOs.Requests;
+using Business.Services.Contracts;
 using DataAccess.Models.Enums;
 using DataAccess.Models.Models;
 using Microsoft.IdentityModel.Tokens;
@@ -10,9 +11,9 @@ using static Business.Services.Helpers.Constants;
 
 namespace Business.Services.Helpers
 {
-    public static class Security
+    public class Security : ISecurityService
     {
-        public static async Task<Response<string>> CreateApiTokenAsync(User loggedUser)
+        public async Task<Response<string>> CreateApiTokenAsync(User loggedUser)
         {
             var result = new Response<string>();
 
@@ -35,20 +36,18 @@ namespace Business.Services.Helpers
                 );
 
             string resultToken = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
-
             if (resultToken == null)
             {
                 result.IsSuccessful = false;
                 result.Message = GenerateTokenErrorMessage;
                 return result;
             }
-
             result.Data = resultToken;
 
             return await Task.FromResult(result);
         }
 
-        public static async Task<bool> IsAdminAsync(User loggedUser)
+        public async Task<bool> IsAdminAsync(User loggedUser)
         {
             if (!loggedUser.IsAdmin)
             {
@@ -57,7 +56,7 @@ namespace Business.Services.Helpers
             return await Task.FromResult(true);
         }
 
-        public static async Task<Response<User>> AuthenticateAsync(User loggedUser, string password)
+        public async Task<Response<User>> AuthenticateAsync(User loggedUser, string password)
         {
             var result = new Response<User>();
 
@@ -76,38 +75,13 @@ namespace Business.Services.Helpers
                 result.Error = new Error(PropertyName.NotConfirmedEmail);
                 return result;
             }
-
             result.Data = loggedUser;
 
             return result;
         }
 
-        private static async Task<bool> IsPasswordHashMatchedAsync(string passwordFilled, byte[] password, byte[]? passwordKey)
-        {
-            using (var hmac = new HMACSHA512(passwordKey))
-            {
-                var passwordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(passwordFilled));
-                for (var i = 0; i < passwordHash.Length; i++)
-                {
-                    if (passwordHash[i] != password[i])
-                    {
-                        return await Task.FromResult(false);
-                    }
-                }
-              return await Task.FromResult(true);
-            }
-        }
 
-        private static async Task<bool> IsEmailConfirmedAsync(User loggedUser)
-        {
-            if (!loggedUser.IsVerified)
-            {
-                return await Task.FromResult(false);
-            }
-            return await Task.FromResult(true);
-        }
-
-        public static async Task<User> ComputePasswordHashAsync<T>(object dto, User user)
+        public async Task<User> ComputePasswordHashAsync<T>(object dto, User user)
         {
             byte[] passwordHash, passwordKey;
             string password = string.Empty;
@@ -135,7 +109,6 @@ namespace Business.Services.Helpers
                         passwordKey = hmac.Key;
                         passwordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
                     }
-
                     user.Password = passwordHash;
                     user.PasswordKey = passwordKey;
                 }  
@@ -144,7 +117,7 @@ namespace Business.Services.Helpers
             return await Task.FromResult(user);
         }
 
-        public static async Task<bool> CanModifyTransactionAsync(Transaction transaction)
+        public async Task<bool> CanModifyTransactionAsync(Transaction transaction)
         {
             var canExecuteTransaction = true;
             if (transaction.IsConfirmed
@@ -156,7 +129,7 @@ namespace Business.Services.Helpers
             return await Task.FromResult(canExecuteTransaction);
         }
 
-        public static async Task<bool> IsHistoryOwnerAsync(History history, User user)
+        public async Task<bool> IsHistoryOwnerAsync(History history, User user)
         {
             bool isHistoryOwner = true;
 
@@ -167,19 +140,31 @@ namespace Business.Services.Helpers
             return await Task.FromResult(isHistoryOwner);
         }
 
-        public static async Task<bool> IsTransactionSenderAsync(Transaction transaction, int userId)
+        public async Task<bool> IsTransactionSenderAsync(Transaction transaction, User loggedUser)
         {
             bool isTransactionSender = true;
-
-            if (transaction.AccountSenderId != userId)
+            if (loggedUser.IsAdmin)
             {
-                isTransactionSender = false;
+                return isTransactionSender;
             }
-            return await Task.FromResult(isTransactionSender);
+            if (transaction.Direction == DirectionType.In)
+            {
+                if (transaction.AccountRecipient.Id != loggedUser.AccountId)
+                {
+                    isTransactionSender = false;
+                }
+            }
+            else
+            {
+                if (transaction.AccountSenderId != loggedUser.AccountId)
+                {
+                    isTransactionSender = false;
+                }
+            }                    
+            return isTransactionSender;
         }
 
-        //ToDo-Check if we can combine and use only one with generic
-        public static async Task<bool> IsUserAuthorizedAsync(Transfer transfer, User user)
+        public async Task<bool> IsUserAuthorizedAsync(Transfer transfer, User user)
         {
             bool IsUserAuthorized = true;
 
@@ -191,7 +176,7 @@ namespace Business.Services.Helpers
             return await Task.FromResult(IsUserAuthorized);
         }
 
-        public static async Task<bool> IsAuthorizedAsync(User user, User loggedUser)
+        public async Task<bool> IsAuthorizedAsync(User user, User loggedUser)
         {
             bool isAuthorized = false;
 
@@ -202,7 +187,7 @@ namespace Business.Services.Helpers
             return await Task.FromResult(isAuthorized);
         }
 
-        public static async Task<bool> IsAuthorizedAsync(Card card, User loggedUser)
+        public async Task<bool> IsAuthorizedAsync(Card card, User loggedUser)
         {
             bool isAuthorized = false;
 
@@ -213,7 +198,7 @@ namespace Business.Services.Helpers
             return await Task.FromResult(isAuthorized);
         }
 
-        public static async Task<bool> IsUserAuthorized(int accountId, User user)
+        public async Task<bool> IsUserAuthorized(int accountId, User user)
         {
             bool isUserAccountOwnerOrAdminId = false;
 
@@ -223,5 +208,30 @@ namespace Business.Services.Helpers
             }
             return await Task.FromResult(isUserAccountOwnerOrAdminId);
         }
+        private async Task<bool> IsEmailConfirmedAsync(User loggedUser)
+        {
+            if (!loggedUser.IsVerified)
+            {
+                return await Task.FromResult(false);
+            }
+            return await Task.FromResult(true);
+        }
+        private async Task<bool> IsPasswordHashMatchedAsync(string passwordFilled, byte[] password, byte[]? passwordKey)
+        {
+            using (var hmac = new HMACSHA512(passwordKey))
+            {
+                var passwordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(passwordFilled));
+                for (var i = 0; i < passwordHash.Length; i++)
+                {
+                    if (passwordHash[i] != password[i])
+                    {
+                        return await Task.FromResult(false);
+                    }
+                }
+              return await Task.FromResult(true);
+            }
+        }
+
+     
     }
 }

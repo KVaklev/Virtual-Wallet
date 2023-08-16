@@ -27,6 +27,7 @@ namespace Business.Services.Models
         private readonly ICardService cardService;
         private readonly IExchangeRateService exchangeRateService;
         private readonly IHistoryRepository historyRepository;
+        private readonly ISecurityService security;
 
         public TransferService(
             ITransferRepository transferRepository,            
@@ -37,7 +38,8 @@ namespace Business.Services.Models
             ICurrencyRepository currencyRepository,
             IAccountService accountService,
             ICardService cardService,
-            IExchangeRateService exchangeRateService)
+            IExchangeRateService exchangeRateService,
+            ISecurityService security)
         {
             this.transferRepository = transferRepository;
             this.context = context;
@@ -48,6 +50,7 @@ namespace Business.Services.Models
             this.cardService = cardService;
             this.exchangeRateService = exchangeRateService;
             this.historyRepository = historyRepository;
+            this.security = security;
         }
 
         public async Task<Response<PaginatedList<GetTransferDto>>> FilterByAsync(TransferQueryParameters filterParameters, User loggedUser)
@@ -100,7 +103,7 @@ namespace Business.Services.Models
                 return result;
             }
 
-            if (!await Security.IsUserAuthorizedAsync(transferToGet, user) && !user.IsAdmin)
+            if (!await this.security.IsUserAuthorizedAsync(transferToGet, user) || user.IsAdmin)
             {
                 result.IsSuccessful = false;
                 result.Message = Constants.ModifyTransferGetByIdErrorMessage;
@@ -191,7 +194,7 @@ namespace Business.Services.Models
                 return result;
             }
 
-            if (!await Security.IsUserAuthorizedAsync(transferToDelete, user))
+            if (!await this.security.IsUserAuthorizedAsync(transferToDelete, user))
             {
                 result.IsSuccessful = false;
                 result.Message = Constants.ModifyTransferErrorMessage;
@@ -223,7 +226,7 @@ namespace Business.Services.Models
                 return result;
             }
 
-            if (!await Security.IsUserAuthorizedAsync(transfer, user))
+            if (!await this.security.IsUserAuthorizedAsync(transfer, user))
             {
                 result.IsSuccessful = false;
                 result.Message = Constants.ModifyTransferErrorMessage;
@@ -273,7 +276,7 @@ namespace Business.Services.Models
                 return result;
             }
 
-            if (!await Security.IsUserAuthorizedAsync(transferToExecute, user))
+            if (!await this.security.IsUserAuthorizedAsync(transferToExecute, user))
             {
                 result.IsSuccessful = false;
                 result.Message = Constants.ModifyTransferErrorMessage;
@@ -346,8 +349,6 @@ namespace Business.Services.Models
                 result.Data = amountResult.Data;
 
             }
-
-
 
             return result;
         }

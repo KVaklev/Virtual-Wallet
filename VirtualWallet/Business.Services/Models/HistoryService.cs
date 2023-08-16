@@ -49,7 +49,7 @@ namespace Business.Services.Models
             if (!historyRecords.Any())
             {
                result.IsSuccessful = false;
-               result.Message = Constants.NoRecordsFoundByFilter;
+               result.Message = Constants.NoRecordsFound;
                return result;
             }
             
@@ -70,7 +70,6 @@ namespace Business.Services.Models
             }
             return await Task.FromResult(result);
         }
-
         private async Task<IQueryable<History>> FilterByFromDataAsync(IQueryable<History> result, string? fromData)
         {
             if (!string.IsNullOrEmpty(fromData))
@@ -81,7 +80,6 @@ namespace Business.Services.Models
             }
             return await Task.FromResult(result);
         }
-
         private async Task<IQueryable<History>> FilterByToDataAsync(IQueryable<History> result, string? toData)
         {
             if (!string.IsNullOrEmpty(toData))

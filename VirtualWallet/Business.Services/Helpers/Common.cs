@@ -37,8 +37,6 @@ namespace Business.Services.Helpers
             return await Task.FromResult(true);
         }
 
-       
-
     }
     public static class Common<T>
     {
@@ -48,6 +46,7 @@ namespace Business.Services.Helpers
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize));
         }
-
     }
+
+    
 }

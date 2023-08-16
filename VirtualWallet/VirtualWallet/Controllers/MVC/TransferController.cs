@@ -23,8 +23,11 @@ namespace VirtualWallet.Controllers.MVC
         private readonly IExchangeRateService exchangeRateService;
         private readonly IMapper mapper;
 
-        public TransferController(ITransferService transferService, IUserService userService,IExchangeRateService exchangeRateService,
-            ICardService cardService, IMapper mapper)
+        public TransferController(ITransferService transferService, 
+            IUserService userService,
+            IExchangeRateService exchangeRateService,
+            ICardService cardService,
+            IMapper mapper)
         {
             this.transferService = transferService;
             this.userService = userService;
@@ -37,33 +40,34 @@ namespace VirtualWallet.Controllers.MVC
 
         public async Task<IActionResult> Index([FromQuery] TransferQueryParameters parameters)
         {
-
             var loggedUser = await FindLoggedUserAsync();
-
             if (!loggedUser.IsSuccessful)
             {
                 return this.RedirectToAction("Login", "Account");
             }
 
-            var transferResult = await transferService.FilterByAsync(parameters, loggedUser.Data);
-
+            var result = await transferService.FilterByAsync(parameters, loggedUser.Data);
             var indexTransferViewModel = new IndexTransferViewModel();
 
             indexTransferViewModel.TransferQueryParameters = parameters;
-
             indexTransferViewModel.User = loggedUser.Data;
-
-            if (!transferResult.IsSuccessful)
+            if (!result.IsSuccessful)
             {
-                if (transferResult.Message == Constants.NoRecordsFoundByFilter)
+                if (result.Message == Constants.ModifyNoRecordsFound)
                 {
-                    this.ViewData["ErrorMessage"] = transferResult.Message;
-
+                    this.ViewData["ErrorMessage"] = result.Message;
                     return View(indexTransferViewModel);
                 }
                 else
                 {
                     this.ViewData["Controller"] = "Transfer";
+                    return View("ErrorMessage", result.Message);
+                }
+            }
+
+            indexTransferViewModel.TransferDtos = result.Data;
+            return View(indexTransferViewModel);
+        }
 
                     return View("ErrorMessage", transferResult.Message);
                 }
@@ -78,15 +82,13 @@ namespace VirtualWallet.Controllers.MVC
         public async Task<IActionResult> Details([FromRoute] int id)
         {
             var loggedUser = await FindLoggedUserAsync();
-
             if (!loggedUser.IsSuccessful)
             {
                 return this.RedirectToAction("Login", "Account");
             }
 
-            var transferResult = await this.transferService.GetByIdAsync(id, loggedUser.Data);
-
-            if (!transferResult.IsSuccessful)
+            var result = await this.transferService.GetByIdAsync(id, loggedUser.Data);
+            if (!result.IsSuccessful)
             {
                 this.ViewData["Controller"] = "Transfer";
 
@@ -106,16 +108,14 @@ namespace VirtualWallet.Controllers.MVC
         public async Task<IActionResult> Create()
         {
             var loggedUser = await FindLoggedUserAsync();
-
             if (!loggedUser.IsSuccessful)
             {
                 return this.RedirectToAction("Login", "Account");
             }
+
             var createTransferViewModel = new CreateTransferViewModel();
-
-            var cardsResult = this.cardService.GetAll(loggedUser.Data);
-
-            if (!cardsResult.IsSuccessful)
+            var cards = this.cardService.GetAll(loggedUser.Data);
+            if (!cards.IsSuccessful)
             {
                 this.ViewData["Controller"] = "Transfer";
 
@@ -138,8 +138,8 @@ namespace VirtualWallet.Controllers.MVC
             {
                 return this.View(transferDto);
             }
-            var loggedUser = await FindLoggedUserAsync();
 
+            var loggedUser = await FindLoggedUserAsync();
             if (!loggedUser.IsSuccessful)
             {
                 return this.RedirectToAction("Login", "Account");

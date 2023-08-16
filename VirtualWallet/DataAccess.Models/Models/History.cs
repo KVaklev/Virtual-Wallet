@@ -5,11 +5,9 @@ using System.ComponentModel.DataAnnotations;
 namespace DataAccess.Models.Models
 {
     public class History 
-    {
-        
+    {  
         public int Id { get; set; } 
         public DateTime EventTime { get; set; }
-
        
         [Range(Constants.IdMin, Constants.IdMax, ErrorMessage = Constants.RangeFieldErrorMessage)]
         public int AccountId { get; set; }

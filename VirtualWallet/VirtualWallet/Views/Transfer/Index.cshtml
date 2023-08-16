@@ -148,6 +148,19 @@
                             </div>
                         </div>
                         <!-- Title End -->
+                         @if (ViewData["ErrorMessage"] != null)
+                        {
+                            <div class="row">
+                                <div class="col text-center">
+                                    <p>&nbsp;</p>
+                                    <p>@ViewData["ErrorMessage"]</p>
+                                </div>
+                            </div>
+
+                        }
+                        else
+                        {
+
                         <!-- Transfer List
                         =============================== -->
                         <div class="transaction-list">
@@ -241,11 +254,11 @@
                         <!-- Transaction Item Details Modal End -->
                         <!-- Pagination
                         ============================================= -->
-                        @{
+                       
                             string prevButtonState = this.Model.TransferDtos.HasPrevPage ? "" : "disable";
                             string nextButtonState = this.Model.TransferDtos.HasNextPage ? "" : "disable";
 
-                        }
+                       
                         <ul class="pagination justify-content-center mt-4 mb-0">
                             <li class="page-item @prevButtonState">
                                 <a class="page-link"
@@ -290,7 +303,7 @@
                             </li>
                         </ul>
                         <!-- Paginations end -->
-
+}
                     </div>
                     <!-- All Transactions End -->
                 </div>
