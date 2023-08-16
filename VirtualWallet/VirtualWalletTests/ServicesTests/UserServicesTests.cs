@@ -312,12 +312,12 @@ namespace VirtualWalletTests.ServicesTests
             userRepositoryMock
                 .Setup(repo => repo
                 .CreateAsync(It.IsAny<User>()))
-                .ReturnsAsync(new User()); 
+                .ReturnsAsync(new User());
 
             securityWrapperMock
                 .Setup(security => security
                 .ComputePasswordHashAsync<CreateUserModel>(createdUserDto, It.IsAny<User>()))
-                .ReturnsAsync(new User()); 
+                .ReturnsAsync(new User());
 
             mapperMock.Setup(mapper => mapper
                 .Map<GetCreatedUserDto>(It.IsAny<User>()))
@@ -384,7 +384,7 @@ namespace VirtualWalletTests.ServicesTests
         public async Task Create_Should_ReturnResult_When_EmailExists()
         {
             //Arrange
-            var createdUserDto = GetTestCreatedUserDto(); 
+            var createdUserDto = GetTestCreatedUserDto();
             var createdUser = GetCreateUserModel();
             var user = GetTestCreateUser();
 
@@ -398,7 +398,7 @@ namespace VirtualWalletTests.ServicesTests
                 .Setup(repo => repo
                 .EmailExistsAsync(createdUserDto.Email))
                 .ReturnsAsync(true);
-        
+
             userRepositoryMock
                  .Setup(repo => repo
                  .CreateAsync(It.IsAny<User>()))
@@ -427,7 +427,7 @@ namespace VirtualWalletTests.ServicesTests
         public async Task Create_Should_ReturnResult_When_PhoneNumberExists()
         {
             //Arrange
-            var createdUserDto = GetTestCreatedUserDto(); 
+            var createdUserDto = GetTestCreatedUserDto();
             var createdUser = GetCreateUserModel();
             var user = GetTestCreateUser();
 
@@ -510,6 +510,54 @@ namespace VirtualWalletTests.ServicesTests
 
             // Assert
             Assert.IsTrue(actualResponse.IsSuccessful);
+        }
+
+        [TestMethod]
+        public async Task Update_Should_ReturnResult_When_UserIsNotFound()
+        {
+            //Arrange
+            UpdateUserDto updateUserDto = GetTestUpdateUserDto();
+            var loggedUser = GetTestCreateUser();
+            var existingUser = GetTestCreateUser();
+
+            var userRepositoryMock = new Mock<IUserRepository>();
+            var accountServiceMock = new Mock<IAccountService>();
+            var webHostEnvironmentMock = new Mock<IWebHostEnvironment>();
+            var mapperMock = new Mock<IMapper>();
+            var securityWrapperMock = new Mock<ISecurityService>();
+
+            userRepositoryMock
+                .Setup(repo => repo
+                .GetByIdAsync(existingUser.Id))
+                .ReturnsAsync((User)null);
+
+            //securityWrapperMock
+            //    .Setup(security => security
+            //    .IsAuthorizedAsync(existingUser, It.IsAny<User>()))
+            //    .ReturnsAsync(true);
+
+
+            userRepositoryMock
+                .Setup(repo => repo.UpdateAsync(It.IsAny<User>()))
+                .ReturnsAsync(existingUser);
+
+            mapperMock.Setup(mapper => mapper
+                .Map<GetUpdatedUserDto>(It.IsAny<User>()))
+                .Returns(new GetUpdatedUserDto());
+
+            var sut = new UserService(
+                userRepositoryMock.Object,
+                accountServiceMock.Object,
+                mapperMock.Object,
+                webHostEnvironmentMock.Object,
+                securityWrapperMock.Object);
+
+            // Act
+            var actualResponse = await sut.UpdateAsync(existingUser.Id, updateUserDto, loggedUser);
+
+            // Assert
+            Assert.IsFalse(actualResponse.IsSuccessful);
+            Assert.AreEqual(NoUsersErrorMessage, actualResponse.Message);
         }
     }
 }
