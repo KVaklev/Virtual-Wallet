@@ -1,10 +1,6 @@
 ﻿using DataAccess.Models.Models;
 using DataAccess.Repositories.Data;
 using Microsoft.EntityFrameworkCore;
-using Business.Exceptions;
-using Business.QueryParameters;
-using DataAccess.Models.Enums;
-using DataAccess.Repositories.Helpers;
 using DataAccess.Repositories.Contracts;
 
 namespace DataAccess.Repositories.Models

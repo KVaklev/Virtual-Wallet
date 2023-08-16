@@ -75,7 +75,7 @@ namespace Business.Services.Models
             if (!users.Any())
             {
                 result.IsSuccessful = false;
-                result.Message= NoUsersErrorMessage;
+                result.Message= NoRecordsFoundByFilter;
                 return result;
             }
 

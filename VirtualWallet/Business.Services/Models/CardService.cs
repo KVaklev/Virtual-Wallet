@@ -72,7 +72,7 @@ namespace Business.Services.Models
             if (!cards.Any())
             {
                 result.IsSuccessful = false;
-                result.Message = NoCardsErrorMessage;
+                result.Message = NoRecordsFoundByFilter;
                 return result;
             }
 
