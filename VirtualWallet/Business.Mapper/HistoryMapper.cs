@@ -23,7 +23,7 @@ namespace Business.Mappers
         {
             var history = new History();
 
-            history.EventTime = DateTime.UtcNow;
+            history.EventTime = DateTime.Now;
             history.TransactionId = transaction.Id;
             history.Transaction = transaction;
             history.NameOperation = NameOperation.Transaction;

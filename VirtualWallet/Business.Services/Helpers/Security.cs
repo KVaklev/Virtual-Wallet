@@ -143,12 +143,25 @@ namespace Business.Services.Helpers
         public async Task<bool> IsTransactionSenderAsync(Transaction transaction, int userId)
         {
             bool isTransactionSender = true;
-
-            if (transaction.AccountSenderId != userId)
+            if (loggedUser.IsAdmin)
             {
-                isTransactionSender = false;
+                return isTransactionSender;
             }
-            return await Task.FromResult(isTransactionSender);
+            if (transaction.Direction == DirectionType.In)
+            {
+                if (transaction.AccountRecipient.Id != loggedUser.AccountId)
+                {
+                    isTransactionSender = false;
+                }
+            }
+            else
+            {
+                if (transaction.AccountSenderId != loggedUser.AccountId)
+                {
+                    isTransactionSender = false;
+                }
+            }                    
+            return isTransactionSender;
         }
 
         public async Task<bool> IsUserAuthorizedAsync(Transfer transfer, User user)

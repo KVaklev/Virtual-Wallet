@@ -57,8 +57,7 @@ namespace VirtualWallet.Controllers.MVC
             {
                 this.ViewData["Controller"] = "Currency";
                 return View("ErrorMessage", result.Message);
-            }
-            
+            }            
             return View(result.Data);
         }
 
@@ -77,7 +76,6 @@ namespace VirtualWallet.Controllers.MVC
                 this.ViewData["Controller"] = "Currency";
                 return View("ErrorMessage", result.Message);
             }
-
             return this.RedirectToAction("Index", "Currency");
         }
 
@@ -102,14 +100,12 @@ namespace VirtualWallet.Controllers.MVC
             {
                 return this.RedirectToAction("Login", "Account");
             }
-
             var result = await this.currencyService.CreateAsync(currencyDto, loggedUser.Data);
             if (!result.IsSuccessful)
             {
                 this.ViewData["Controller"] = "Currency";
                 return View("ErrorMessage", result.Message);
             }
-
             return this.RedirectToAction("Index", "Currency");
         }
 
@@ -128,7 +124,6 @@ namespace VirtualWallet.Controllers.MVC
                 this.ViewData["Controller"] = "Currency";
                 return View("ErrorMessage", result.Message);
             }
-
             this.ViewData["Controller"] = "Currency";
 
             return View("ErrorMessage", result.Message);

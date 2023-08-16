@@ -79,6 +79,24 @@ namespace DataAccess.Models.Models
             }
             return result;
         }
+        public async Task<Response<decimal>> GetExchangeRateAsync(string fromCurrencyCode, string toCurrencyCode)
+        {
+            var result = new Response<decimal>();
+            decimal exchangeRate = 1;
+            if (fromCurrencyCode != toCurrencyCode)
+            {
+                var exchangeRateResult = await this.GetExchangeRateDataAsync(fromCurrencyCode, toCurrencyCode);
+                if (!exchangeRateResult.IsSuccessful)
+                {
+                    result.IsSuccessful = false;
+                    result.Message = exchangeRateResult.Message;
+                    return result;
+                }
+                exchangeRate = exchangeRateResult.Data.CurrencyValue; 
+            }
+            result.Data = exchangeRate;
+            return result;
+        }
     }
 }
 

@@ -42,7 +42,7 @@ namespace VirtualWallet.Controllers.MVC
             var cardsResult = await this.cardService.FilterByAsync(cardQueryParameters, loggedUserResult.Data);   
             if (!cardsResult.IsSuccessful)
             {
-                if (cardsResult.Message==Constants.NoRecordsFoundByFilter)
+                if (cardsResult.Message==Constants.NoRecordsFound)
                 {
                     this.ViewData["ErrorMessage"] = cardsResult.Message;
                     return View(cardSearchModel);

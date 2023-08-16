@@ -2,7 +2,7 @@
 using Business.QueryParameters;
 using DataAccess.Models.Models;
 
-namespace Business.ViewModels
+namespace Business.ViewModels.TransactionViewModels
 {
     public class IndexTransactionViewModel
     {

@@ -38,12 +38,13 @@ namespace VirtualWallet.Controllers.MVC
             }
 
             var result = await this.historyService.FilterByAsync(parameters, loggedUserResponse.Data);
+            
             var indexHistoryViewModel = new IndexHistoryViewModel();
             indexHistoryViewModel.HistoryQueryParameters = parameters;
             indexHistoryViewModel.LoggedUser = loggedUserResponse.Data;
             if (!result.IsSuccessful)
             {
-                if(result.Message == Constants.NoRecordsFoundByFilter)
+                if(result.Message == Constants.NoRecordsFound)
                 {
                     this.ViewData["ErrorMessage"] = result.Message;
                     return View(indexHistoryViewModel);

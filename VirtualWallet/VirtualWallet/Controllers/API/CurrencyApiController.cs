@@ -33,7 +33,6 @@ namespace VirtualWallet.Controllers.API
                 return StatusCode(StatusCodes.Status401Unauthorized, loggedUser.Message);
             }
             var result = await this.currencyService.CreateAsync(currencyDto, loggedUser.Data);
-
             if (!result.IsSuccessful)
             {
                 if (result.Message == Constants.NoRecordsFound)
@@ -74,7 +73,6 @@ namespace VirtualWallet.Controllers.API
         public async Task<IActionResult> GetByIdAsync([FromRoute] int id)
         {
             var loggedUser = await FindLoggedUserAsync();
-
             if (!loggedUser.IsSuccessful)
             {
                 return StatusCode(StatusCodes.Status401Unauthorized, loggedUser.Message);
@@ -133,6 +131,7 @@ namespace VirtualWallet.Controllers.API
                 {
                     return StatusCode(StatusCodes.Status404NotFound, result.Message);
                 }
+
                 return BadRequest(result.Message);
             }
 
@@ -148,12 +147,14 @@ namespace VirtualWallet.Controllers.API
                 result.IsSuccessful = false;
                 return result;
             }
+
             var loggedUserResult = await this.userService.GetLoggedUserByUsernameAsync(loggedUsersUsername.Value);
             if (loggedUserResult == null)
             {
                 result.IsSuccessful = false;
                 return result;
             }
+
             return loggedUserResult;
         }
     }

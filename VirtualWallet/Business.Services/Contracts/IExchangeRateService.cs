@@ -7,5 +7,6 @@ namespace Business.Services.Contracts
     {
         Task<Response<ExchangeRate>> GetExchangeRateDataAsync(string senderAccountCurrencyCode, string recepientAccountCurrencyCode);
         Task<Response<decimal>> ExchangeAsync(decimal amount, string fromCurrencyCode, string toCurrencyCode);
+        Task<Response<decimal>> GetExchangeRateAsync(string fromCurrencyCode, string toCurrencyCode);
     }
 }

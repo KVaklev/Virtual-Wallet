@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Business.ViewModels
+namespace Business.ViewModels.TransactionViewModels
 {
     public class ConfirmTransactionViewModel
     {
