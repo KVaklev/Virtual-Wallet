@@ -12,6 +12,8 @@
     using Business.Mappers;
     using Business.Mappers.Contracts;
 
+namespace VirtualWalletTests.ServicesTests
+{
     [TestClass]
     public class TransactionServiceTests
     {

@@ -1,11 +1,11 @@
 ﻿@model CardViewModel
 
 @{
+    var currencies = JsonSerializer.Deserialize<List<Currency>>(TempData.Peek("Currencies").ToString());
     this.ViewData["Title"] = "Speed Pay - Payment Methods";
     var loggedUserId = User.FindFirst(ClaimTypes.NameIdentifier);
     var username = User.FindFirst(ClaimTypes.Name);
     var imagePath = @Url.Content("~/UploadedImages/" + username.Value + ".png");
-
 }
 @{
 
@@ -125,7 +125,24 @@
                                         <input asp-for="CreateCardDto.CreditLimit" type="number" class="form-control" data-bv-field="creditCardLimit" id="cardHolderName" value="" placeholder="Credit Card Limit">
                                         <span asp-validation-for="CreateCardDto.CreditLimit" class="form-error"></span>
                                     </div>
-                                  
+
+                                    <div class="mb-3">
+                                        <label asp-for="CreateCardDto.CurrencyCode" class="form-label">Currency</label>
+                                        <select asp-for="CreateCardDto.CurrencyCode" id="youSendCurrency" data-style="form-select bg-transparent border-0" data-container="body" data-live-search="true" class="selectpicker form-control bg-transparent" required="">
+                                            <optgroup label="Popular Currency">
+                                                @foreach (var currency in currencies)
+                                                {
+
+                                                    <option data-icon="currency-flag currency-flag-inr me-1" data-subtext="@currency.Name " value="@currency.CurrencyCode">@currency.CurrencyCode @currency.Name</option>
+
+                                                }
+                                            </optgroup>
+                                        </select>
+
+
+                                        <span asp-validation-for="CreateCardDto.CurrencyCode" class="form-error text-danger"></span>
+                                    </div>
+
                                     <div class="col-12 d-grid mt-4">
                                         <button class="btn btn-primary" type="submit">Add Card</button>
                                     </div>
@@ -204,7 +221,7 @@
                                                     <div class="col-4 col-sm-4">
                                                 <span class="d-block text-2 mt-2"><strong>@currentCard.CardType</strong></span>
                                                         <span class="d-block text-2">@MaskDigits(currentCard.CardNumber, 4) / @MaskDigits(currentCard.CheckNumber, 1)</span>
-                                                <span class="d-block text-2">@currentCard.Balance / @currentCard.ExpirationDate.ToString("yyyy-MM-dd")</span>
+                                                <span class="d-block text-2">@currentCard.Balance @currentCard.CurrencyCode / @currentCard.ExpirationDate.ToString("yyyy-MM-dd")</span>
                                                         @if (currentCard.CardType=="Credit")
                                                         {
                                                             <span class="d-block text-2">@currentCard.CreditLimit</span>                                                           

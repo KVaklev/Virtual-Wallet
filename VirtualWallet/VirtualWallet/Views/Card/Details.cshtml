@@ -109,11 +109,11 @@
                                 <td class="text-center" style="word-wrap: break-word;">@currentCard.Username</td>
                                 <td class="text-center" style="word-wrap: break-word;">@currentCard.CardType</td>
                                 <td class="text-center" style="word-wrap: break-word;">@MaskDigits(currentCard.CardNumber, 4) / @MaskDigits(currentCard.CheckNumber, 1) / @currentCard.ExpirationDate.ToString("yyyy-MM-dd")</td>
-                                <td class="text-center" style="word-wrap: break-word;">@currentCard.Balance / @currentCard.CurrencyCode</td>
+                                <td class="text-center" style="word-wrap: break-word;">@currentCard.Balance @currentCard.CurrencyCode</td>
                                 <td class="text-center" style="word-wrap: break-word;">
                                                         @if (currentCard.CardType.ToString() == "Credit")
                                                         {
-                                                            @currentCard.CreditLimit
+                                                         @currentCard.CreditLimit @Html.Raw("&nbsp;") @currentCard.CurrencyCode
                                                         }
                                                     </td>
                                                 </tr>

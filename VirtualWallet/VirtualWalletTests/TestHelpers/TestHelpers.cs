@@ -1,5 +1,6 @@
 ﻿using Business.DTOs.Requests;
 using Business.DTOs.Responses;
+using Business.QueryParameters;
 using DataAccess.Models.Models;
 using DataAccess.Models.Enums;
 using Business.Services.Helpers;
@@ -79,6 +80,25 @@ namespace VirtualWalletTests.TestHelpers
                 Address = "Kajmakchalan 1",
                 City = "Plovdiv",
                 Country = "Bulgaria",
+            };
+        }
+        public static CreateUserModel GetCreateUserModel()
+        {
+            return new CreateUserModel
+            {
+
+                //FirstName = "Dimitar",
+                //LastName = "Peev",
+                Email = "dim@gmail.com",
+                Username = "dimitarDimitrov",
+                PhoneNumber = "0887885778",
+
+                //Email = "m.petrova@gmail.com",
+                //Username = "mariicheto",
+                //PhoneNumber = "0898568569",
+                //Password = "pa^3ddwp;z",
+                //CurrencyCode = "BGN", 
+               
             };
         }
         public static GetCreatedUserDto GetTestCreatedUserDto()
