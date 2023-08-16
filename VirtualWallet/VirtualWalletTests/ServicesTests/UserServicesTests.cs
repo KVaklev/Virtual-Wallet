@@ -10,6 +10,7 @@ using Moq;
 using Business.QueryParameters;
 using Business.DTOs.Requests;
 using static Business.Services.Helpers.Constants;
+using Business.ViewModels.UserViewModels;
 
 namespace VirtualWalletTests.ServicesTests
 {
@@ -489,7 +490,6 @@ namespace VirtualWalletTests.ServicesTests
                 .IsAuthorizedAsync(existingUser, It.IsAny<User>()))
                 .ReturnsAsync(true);
 
-
             userRepositoryMock
                 .Setup(repo => repo.UpdateAsync(It.IsAny<User>()))
                 .ReturnsAsync(existingUser);
@@ -531,12 +531,6 @@ namespace VirtualWalletTests.ServicesTests
                 .GetByIdAsync(existingUser.Id))
                 .ReturnsAsync((User)null);
 
-            //securityWrapperMock
-            //    .Setup(security => security
-            //    .IsAuthorizedAsync(existingUser, It.IsAny<User>()))
-            //    .ReturnsAsync(true);
-
-
             userRepositoryMock
                 .Setup(repo => repo.UpdateAsync(It.IsAny<User>()))
                 .ReturnsAsync(existingUser);
@@ -558,6 +552,247 @@ namespace VirtualWalletTests.ServicesTests
             // Assert
             Assert.IsFalse(actualResponse.IsSuccessful);
             Assert.AreEqual(NoUsersErrorMessage, actualResponse.Message);
+        }
+
+        [TestMethod]
+        public async Task Update_Should_When_LoggedUserUpdatesHisProfile()
+        {
+            // Arrange
+            UpdateUserDto updateUserDto = GetTestUpdateUserDto();
+            var loggedUser = GetTestCreateUser();
+            var existingUser = GetTestCreateUser();
+
+            var userRepositoryMock = new Mock<IUserRepository>();
+            var accountServiceMock = new Mock<IAccountService>();
+            var webHostEnvironmentMock = new Mock<IWebHostEnvironment>();
+            var mapperMock = new Mock<IMapper>();
+            var securityWrapperMock = new Mock<ISecurityService>();
+
+            userRepositoryMock
+                .Setup(repo => repo
+                .GetByIdAsync(existingUser.Id))
+                .ReturnsAsync(existingUser);
+            userRepositoryMock
+                .Setup(repo => repo
+                .UpdateAsync(It.IsAny<User>()))
+                .ReturnsAsync(existingUser);
+           
+            mapperMock.Setup(mapper => mapper
+                .Map<GetUpdatedUserDto>(It.IsAny<User>()))
+                .Returns(new GetUpdatedUserDto());
+
+            var sut = new UserService(
+                userRepositoryMock.Object,
+                accountServiceMock.Object,
+                mapperMock.Object,
+                webHostEnvironmentMock.Object,
+                securityWrapperMock.Object);
+
+            // Act
+            var actualResponse = await sut.UpdateAsync(existingUser.Id, updateUserDto, loggedUser);
+
+            // Assert
+            Assert.IsFalse(actualResponse.IsSuccessful);
+        }
+
+        [TestMethod]
+        public async Task Update_Should_ReturnResult_When_PhoneNumberExists()
+        {
+            // Arrange
+            UpdateUserDto updateUserDto = GetTestUpdateUserDto();
+            var loggedUser = GetTestCreateUser();
+            var existingUser = GetTestCreateUser();
+
+            var userRepositoryMock = new Mock<IUserRepository>();
+            var accountServiceMock = new Mock<IAccountService>();
+            var webHostEnvironmentMock = new Mock<IWebHostEnvironment>();
+            var mapperMock = new Mock<IMapper>();
+            var securityWrapperMock = new Mock<ISecurityService>();
+
+            userRepositoryMock
+                .Setup(repo => repo
+                .GetByIdAsync(existingUser.Id))
+                .ReturnsAsync(existingUser);
+            userRepositoryMock
+                .Setup(repo => repo
+                .UpdateAsync(It.IsAny<User>()))
+                .ReturnsAsync(existingUser);
+            userRepositoryMock
+                .Setup(repo => repo.PhoneNumberExistsAsync(It.IsAny<string>()))
+                .ReturnsAsync(true);
+            mapperMock.Setup(mapper => mapper
+                .Map<GetUpdatedUserDto>(It.IsAny<User>()))
+                .Returns(new GetUpdatedUserDto());
+            securityWrapperMock
+                .Setup(security => security
+                .IsAuthorizedAsync(It.IsAny<User>(), It.IsAny<User>()))
+                .ReturnsAsync(true);
+
+            var sut = new UserService(
+                userRepositoryMock.Object,
+                accountServiceMock.Object,
+                mapperMock.Object,
+                webHostEnvironmentMock.Object,
+                securityWrapperMock.Object);
+
+            // Act
+            var actualResponse = await sut.UpdateAsync(existingUser.Id, updateUserDto, loggedUser);
+
+            // Assert
+             // Assert
+            Assert.AreEqual(PhoneNumberExistsErrorMessage, actualResponse.Message);
+            Assert.AreEqual(PropertyName.PhoneNumber, actualResponse.Error.InvalidPropertyName);
+        }
+
+        [TestMethod]
+        public async Task Update_Should_ReturnResult_When_EmailExists()
+        {
+            // Arrange
+            UpdateUserDto updateUserDto = GetTestUpdateUserDto();
+            var loggedUser = GetTestCreateUser();
+            var existingUser = GetTestCreateUser();
+
+            var userRepositoryMock = new Mock<IUserRepository>();
+            var accountServiceMock = new Mock<IAccountService>();
+            var webHostEnvironmentMock = new Mock<IWebHostEnvironment>();
+            var mapperMock = new Mock<IMapper>();
+            var securityWrapperMock = new Mock<ISecurityService>();
+
+            userRepositoryMock
+                .Setup(repo => repo
+                .GetByIdAsync(existingUser.Id))
+                .ReturnsAsync(existingUser);
+            userRepositoryMock
+                .Setup(repo => repo
+                .UpdateAsync(It.IsAny<User>()))
+                .ReturnsAsync(existingUser);
+            userRepositoryMock
+                .Setup(repo => repo.EmailExistsAsync(It.IsAny<string>()))
+                .ReturnsAsync(true);
+            mapperMock.Setup(mapper => mapper
+                .Map<GetUpdatedUserDto>(It.IsAny<User>()))
+                .Returns(new GetUpdatedUserDto());
+            securityWrapperMock
+                .Setup(security => security
+                .IsAuthorizedAsync(It.IsAny<User>(), It.IsAny<User>()))
+                .ReturnsAsync(true);
+
+            var sut = new UserService(
+                userRepositoryMock.Object,
+                accountServiceMock.Object,
+                mapperMock.Object,
+                webHostEnvironmentMock.Object,
+                securityWrapperMock.Object);
+
+            // Act
+            var actualResponse = await sut.UpdateAsync(existingUser.Id, updateUserDto, loggedUser);
+
+            // Assert
+            Assert.AreEqual(EmailExistsErrorMessage, actualResponse.Message);
+        }
+
+        [TestMethod]
+        public async Task ChangeStatus_Should_When_ParametersAreValid()
+        {
+            // Arrange
+            var createdUserDto = GetTestCreatedUserDto();
+            var createdUser = GetCreateUserModel();
+            var user = GetTestCreateUser();
+            var userDetailsViewModel = new UserDetailsViewModel
+            {
+                User = new GetUserDto
+                {
+                    Admin = true,
+                    Blocked = true
+                }
+            };
+
+            User loggedUser = GetTestUserAdmin();
+
+            var userRepositoryMock = new Mock<IUserRepository>();
+            var accountServiceMock = new Mock<IAccountService>();
+            var webHostEnvironmentMock = new Mock<IWebHostEnvironment>();
+            var mapperMock = new Mock<IMapper>();
+            var securityWrapperMock = new Mock<ISecurityService>();
+
+            securityWrapperMock
+                .Setup(security => security
+                .IsAdminAsync(loggedUser))
+                .ReturnsAsync(true);
+
+            userRepositoryMock
+                .Setup(repo => repo
+                .GetByIdAsync(user.Id))
+                .ReturnsAsync(user);
+
+            userRepositoryMock
+                .Setup(repo => repo.SaveChangesAsync())
+                .ReturnsAsync(true);
+
+            var sut = new UserService(
+                userRepositoryMock.Object,
+                accountServiceMock.Object,
+                mapperMock.Object,
+                webHostEnvironmentMock.Object,
+                securityWrapperMock.Object);
+
+            // Act
+            var actualResponse = await sut.ChangeStatusAsync(user.Id, userDetailsViewModel, loggedUser);
+
+            // Assert
+            Assert.IsNotNull(actualResponse.IsSuccessful);
+        }
+
+        [TestMethod]
+        public async Task ChangeStatus_Should_ReturnMessage_WhenLoggedUserIsNotAdmin()
+        {
+            // Arrange
+            var createdUserDto = GetTestCreatedUserDto();
+            var createdUser = GetCreateUserModel();
+            var user = GetTestCreateUser();
+            var userDetailsViewModel = new UserDetailsViewModel
+            {
+                User = new GetUserDto
+                {
+                    Admin = true,
+                    Blocked = true
+                }
+            };
+
+            User loggedUser = GetTestUserAdmin();
+
+            var userRepositoryMock = new Mock<IUserRepository>();
+            var accountServiceMock = new Mock<IAccountService>();
+            var webHostEnvironmentMock = new Mock<IWebHostEnvironment>();
+            var mapperMock = new Mock<IMapper>();
+            var securityWrapperMock = new Mock<ISecurityService>();
+
+            securityWrapperMock
+                .Setup(security => security
+                .IsAdminAsync(loggedUser))
+                .ReturnsAsync(false);
+
+            userRepositoryMock
+                .Setup(repo => repo
+                .GetByIdAsync(user.Id))
+                .ReturnsAsync(user);
+
+            userRepositoryMock
+                .Setup(repo => repo.SaveChangesAsync())
+                .ReturnsAsync(true);
+
+            var sut = new UserService(
+                userRepositoryMock.Object,
+                accountServiceMock.Object,
+                mapperMock.Object,
+                webHostEnvironmentMock.Object,
+                securityWrapperMock.Object);
+
+            // Act
+            var actualResponse = await sut.ChangeStatusAsync(user.Id, userDetailsViewModel, loggedUser);
+
+            // Assert
+            Assert.IsNotNull(actualResponse.IsSuccessful);
         }
     }
 }
