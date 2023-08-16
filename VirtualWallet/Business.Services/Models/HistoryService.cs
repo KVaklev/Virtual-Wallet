@@ -49,7 +49,7 @@ namespace Business.Services.Models
             if (!historyRecords.Any())
             {
                result.IsSuccessful = false;
-               result.Message = Constants.NoRecordsFoundByFilter;
+               result.Message = Constants.NoRecordsFound;
                return result;
             }
             

@@ -44,7 +44,7 @@ namespace VirtualWallet.Controllers.MVC
             indexHistoryViewModel.LoggedUser = loggedUserResponse.Data;
             if (!result.IsSuccessful)
             {
-                if(result.Message == Constants.NoRecordsFoundByFilter)
+                if(result.Message == Constants.NoRecordsFound)
                 {
                     this.ViewData["ErrorMessage"] = result.Message;
                     return View(indexHistoryViewModel);

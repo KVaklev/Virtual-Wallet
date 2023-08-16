@@ -76,7 +76,7 @@ namespace Business.Services.Models
             if (!transactions.Any())
             {
                 result.IsSuccessful = false;
-                result.Message = Constants.NoRecordsFoundByFilter;
+                result.Message = Constants.NoRecordsFound;
                 return result;
             }
             var transactionDtos = transactions
