@@ -1,12 +1,10 @@
-﻿using Business.QueryParameters;
-using DataAccess.Models.Models;
+﻿using DataAccess.Models.Models;
 
 namespace DataAccess.Repositories.Contracts
 {
     public interface ITransferRepository
     {
         IQueryable<Transfer> GetAll(User user);
-        //Task<PaginatedList<Transfer>> FilterByAsync(TransferQueryParameters filterParameters, User user);
 
         Task<Transfer> GetByIdAsync(int id);
 
@@ -19,14 +17,6 @@ namespace DataAccess.Repositories.Contracts
         Task<bool> DeleteAsync(int id);
 
         Task<bool> SaveChangesAsync();
-
-
-
-
-
-
-
-
 
     }
 }

@@ -7,7 +7,6 @@ using AutoMapper;
 using Business.DTOs.Requests;
 using Business.DTOs.Responses;
 using Business.Mappers;
-using Business.Mappers.Contracts;
 using DataAccess.Models.Enums;
 
 namespace Business.Services.Models
@@ -45,6 +44,7 @@ namespace Business.Services.Models
             this.mapper = mapper;
             this.security = security;
         }
+
         public async Task<Response<GetTransactionDto>> GetByIdAsync(int id, User loggedUser)
         {
             var result = new Response<GetTransactionDto>();
@@ -249,6 +249,7 @@ namespace Business.Services.Models
             result.Data = transactionIn;
             return result;
         }
+
         private async Task<Response<bool>> UpdateAccountsBalancesAsync(
             Transaction transactionOut, 
             Transaction transactionIn)
@@ -282,7 +283,6 @@ namespace Business.Services.Models
 
         private async Task<bool> AddTransactionToHistoryAsync(Transaction transaction)
         {
-
             int historyCount = await this.historyRepository.GetHistoryCountAsync();
             History history = await HistoryMapper.MapCreateWithTransactionAsync(transaction);
             await this.historyRepository.CreateAsync(history);
@@ -297,6 +297,7 @@ namespace Business.Services.Models
                 return false;
             }
         }
+
         private async Task<IQueryable<Transaction>> FilterByUsernameAsync(
             IQueryable<Transaction> result, 
             string? username)
@@ -311,6 +312,7 @@ namespace Business.Services.Models
             }
             return await Task.FromResult(result);
         }
+
         private async Task<IQueryable<Transaction>> FilterByFromDataAsync(
             IQueryable<Transaction> result, 
             string? fromData)
@@ -322,6 +324,7 @@ namespace Business.Services.Models
             }
             return result;
         }
+
         private async Task<IQueryable<Transaction>> FilterByToDataAsync(
             IQueryable<Transaction> result, 
             string? toData)
@@ -334,9 +337,10 @@ namespace Business.Services.Models
             }
             return result;
         }
+
         private async Task<IQueryable<Transaction>> FilterByDirectionAsync(
-            IQueryable<Transaction> result, 
-            string? direction)
+                      IQueryable<Transaction> result, 
+                      string? direction)
         {
             if (!string.IsNullOrEmpty(direction))
             {
@@ -348,6 +352,7 @@ namespace Business.Services.Models
             }
             return result;
         }
+
         private async Task<IQueryable<Transaction>> SortByAsync(IQueryable<Transaction> result, string sortCriteria)
         {
             if (Enum.TryParse<SortCriteria>(sortCriteria, true, out var sortEnum))
@@ -362,6 +367,7 @@ namespace Business.Services.Models
             }
             return result;
         }
+
         private async Task<IQueryable<Transaction>> GetLoogedUserTransactionsAsync(IQueryable<Transaction> userTransactions, User loggedUser)
         {
              

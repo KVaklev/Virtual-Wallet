@@ -10,10 +10,12 @@ namespace Business.Services.Models
     public class EmailService : IEmailService
     {
         private readonly EmailConfiguration emailConfiguration;
+
         public EmailService(EmailConfiguration emailConfiguration)
         {
             this.emailConfiguration = emailConfiguration;
         }
+
         public Task<Message> BuildEmailAsync(User user, string confirmationLink)
         {
             var message = new Message(new string[] { user.Email });
@@ -21,11 +23,13 @@ namespace Business.Services.Models
 
             return Task.FromResult(message);
         }
+
         public async Task SendEMailAsync(Message message)
         {
             var emailMessage = CreateEmailMessage(message);
             await SendAsync(emailMessage);
         }
+
         private async Task SendAsync(MimeMessage mailMessage)
         {
             using var client = new SmtpClient();
@@ -47,6 +51,7 @@ namespace Business.Services.Models
                       client.Dispose();
             }
         }
+
         private MimeMessage CreateEmailMessage(Message message)
         {
             var emailMessage = new MimeMessage();

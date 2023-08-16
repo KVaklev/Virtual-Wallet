@@ -12,7 +12,7 @@ namespace Business.Services.Helpers
 
         public TransactionChecker(ISecurityService security)
         {
-        this.security=security;
+            this.security=security;
         }
 
         public async Task<Response<GetTransactionDto>> ChecksGetByIdAsync(Transaction transaction, User loggedUser)
@@ -25,12 +25,14 @@ namespace Business.Services.Helpers
                 result.Message = Constants.NoRecordsFound;
                 return result;
             }
+
             if (!await security.IsTransactionSenderAsync(transaction, loggedUser))
             {
                 result.IsSuccessful = false;
                 result.Message = Constants.ModifyAuthorizedErrorMessage;
                 return result;
             }
+
             return result;
         }
 
@@ -90,6 +92,7 @@ namespace Business.Services.Helpers
             Response<decimal> exchangeRate)
         {
             var result = new Response<GetTransactionDto>();
+
             if (transactionToUpdate == null)
             {
                 result.IsSuccessful = false;
@@ -132,11 +135,13 @@ namespace Business.Services.Helpers
                 result.Message = Constants.NoRecordsFound;
                 return result;
             }
+
             return result;
         }
         public async Task<Response<bool>> ChecksDeleteAsync(Transaction transaction, User loggedUser)
         {
             var result = new Response<bool>();
+
             if (transaction == null)
             {
                 result.IsSuccessful = false;
@@ -149,19 +154,20 @@ namespace Business.Services.Helpers
                 result.Message = Constants.ModifyAuthorizedErrorMessage;
                 return result;
             }
-
             if (!await security.CanModifyTransactionAsync(transaction))
             {
                 result.IsSuccessful = false;
                 result.Message = Constants.ModifyTransactionNotExecuteErrorMessage;
                 return result;
             }
+
             return result;
         }
 
         public async Task<Response<bool>> ChecksConfirmAsync(Transaction transaction, User loggedUser)
         {
             var result = new Response<bool>();
+
             if (transaction == null)
             {
                 result.IsSuccessful = false;
@@ -180,6 +186,7 @@ namespace Business.Services.Helpers
                 result.Message = Constants.ModifyTransactionNotExecuteErrorMessage;
                 return result;
             }
+
             return result;
         }
     }

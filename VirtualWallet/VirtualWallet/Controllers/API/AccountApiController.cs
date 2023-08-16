@@ -21,8 +21,7 @@ namespace VirtualWallet.Controllers.API
             IUserService userService,
             IEmailService emailService,
             IAccountService accountService,
-            ISecurityService security
-            )
+            ISecurityService security)
         {
             this.userService = userService;
             this.emailService = emailService;

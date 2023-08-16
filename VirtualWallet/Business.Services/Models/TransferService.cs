@@ -20,7 +20,6 @@ namespace Business.Services.Models
     {
         private readonly ITransferRepository transferRepository;
         private readonly ICardRepository cardRepository;
-        private readonly ApplicationContext context;
         private readonly IMapper mapper;
         private readonly ICurrencyRepository currencyRepository;
         private readonly IAccountService accountService;
@@ -32,7 +31,6 @@ namespace Business.Services.Models
         public TransferService(
             ITransferRepository transferRepository,            
             ICardRepository cardRepository,
-            ApplicationContext context,
             IHistoryRepository historyRepository,
             IMapper mapper,
             ICurrencyRepository currencyRepository,
@@ -42,7 +40,6 @@ namespace Business.Services.Models
             ISecurityService security)
         {
             this.transferRepository = transferRepository;
-            this.context = context;
             this.mapper = mapper;
             this.currencyRepository = currencyRepository;
             this.cardRepository = cardRepository;
@@ -173,8 +170,7 @@ namespace Business.Services.Models
             transfer.IsConfirmed = false;
             transfer.IsCancelled = false;
 
-            var newTransfer =
-            await this.transferRepository.CreateAsync(transfer);
+            var newTransfer = await this.transferRepository.CreateAsync(transfer);
 
             result.Data = this.mapper.Map<GetTransferDto>(newTransfer);
 
@@ -262,7 +258,6 @@ namespace Business.Services.Models
             return result;
         }
 
-
         public async Task<Response<bool>> ConfirmAsync(int transferId, User user)
         {
             var result = new Response<bool>();
@@ -329,6 +324,7 @@ namespace Business.Services.Models
                 return result;
             }
         }
+
         private async Task<Response<decimal>> GetCorrectAmountAsync(string transferCurrencyCode, string accountCurrencyCode, decimal amount)
         {
             var result = new Response<decimal>();
@@ -352,6 +348,7 @@ namespace Business.Services.Models
 
             return result;
         }
+
         private async Task<Response<bool>> UpdateAccountsBalanceAsync(Transfer transfer, User user)
         {
             var accountAmount = await GetCorrectAmountAsync(transfer.Currency.CurrencyCode, transfer.Account.Currency.CurrencyCode, transfer.Amount);
@@ -395,9 +392,9 @@ namespace Business.Services.Models
 
             return result;
         }
+
         private async Task<bool> AddTransferToHistoryAsync(Transfer transfer)
         {
-            //var historyCount = await this.context.History.CountAsync();
 
             var historyCount = await this.historyRepository.GetHistoryCountAsync();
 
@@ -426,6 +423,7 @@ namespace Business.Services.Models
 
             return await Task.FromResult(transfers);
         }
+
         private async Task<IQueryable<Transfer>> FilterByFromDateAsync(IQueryable<Transfer> transfers, string? fromDate)
         {
             if (!string.IsNullOrEmpty(fromDate))
@@ -437,6 +435,7 @@ namespace Business.Services.Models
 
             return await Task.FromResult(transfers);
         }
+
         private async Task<IQueryable<Transfer>> FilterByToDateAsync(IQueryable<Transfer> transfers, string? toDate)
         {
             if (!string.IsNullOrEmpty(toDate))
@@ -448,6 +447,7 @@ namespace Business.Services.Models
 
             return await Task.FromResult(transfers);
         }
+
         private async Task<IQueryable<Transfer>> FilterByTransferTypeAsync(IQueryable<Transfer> transfers, string? transfer)
         {
             if (!string.IsNullOrEmpty(transfer))
@@ -467,6 +467,7 @@ namespace Business.Services.Models
 
             return await Task.FromResult(transfers);
         }
+
         private bool TryParseTransferTypeParameter(string value, out TransferDirection? result)
         {
             if (Enum.TryParse(value, true, out TransferDirection parsedResult))
@@ -478,6 +479,7 @@ namespace Business.Services.Models
             result = null;
             return false;
         }
+
         private static async Task<IQueryable<Transfer>> SortByAsync(IQueryable<Transfer> transfers, string? sortCriteria)
         {
             if (Enum.TryParse<SortCriteria>(sortCriteria, true, out var sortEnum))
@@ -500,6 +502,4 @@ namespace Business.Services.Models
             }
         }
     }
-
-
 }

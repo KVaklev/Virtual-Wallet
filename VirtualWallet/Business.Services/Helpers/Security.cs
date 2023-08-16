@@ -208,6 +208,7 @@ namespace Business.Services.Helpers
             }
             return await Task.FromResult(isUserAccountOwnerOrAdminId);
         }
+
         private async Task<bool> IsEmailConfirmedAsync(User loggedUser)
         {
             if (!loggedUser.IsVerified)
@@ -216,6 +217,7 @@ namespace Business.Services.Helpers
             }
             return await Task.FromResult(true);
         }
+
         private async Task<bool> IsPasswordHashMatchedAsync(string passwordFilled, byte[] password, byte[]? passwordKey)
         {
             using (var hmac = new HMACSHA512(passwordKey))
@@ -230,8 +232,6 @@ namespace Business.Services.Helpers
                 }
               return await Task.FromResult(true);
             }
-        }
-
-     
+        }    
     }
 }

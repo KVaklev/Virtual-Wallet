@@ -1,9 +1,7 @@
-﻿
-using Business.QueryParameters;
+﻿using Business.QueryParameters;
 using Business.Services.Contracts;
 using Business.Services.Helpers;
 using Business.ViewModels;
-using DataAccess.Models.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -26,12 +24,11 @@ namespace VirtualWallet.Controllers.MVC
             this.userService = userService;
         }
 
-
         [HttpGet]
         public async Task<IActionResult> IndexAsync([FromQuery] HistoryQueryParameters parameters)
         {
 
-            var loggedUserResponse = await FindLoggedUserAsync();
+            var loggedUserResponse = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value);
             if (!loggedUserResponse.IsSuccessful)
             {
                 return this.RedirectToAction("Login", "Account");
@@ -51,7 +48,6 @@ namespace VirtualWallet.Controllers.MVC
                 }
                 else
                 {
-                    this.ViewData["Controller"] = "Transaction";
                     return View("ErrorMessage", result.Message);
                 }
             }
@@ -59,26 +55,5 @@ namespace VirtualWallet.Controllers.MVC
 
             return this.View(indexHistoryViewModel);
         }
-
-        private async Task<Response<User>> FindLoggedUserAsync()
-        {
-            var result = new Response<User>();
-            var loggedUsersUsername = User.FindFirst(ClaimTypes.Name);
-            if (loggedUsersUsername == null)
-            {
-                result.IsSuccessful = false;
-                return result;
-            }
-
-            var loggedUserResult = await this.userService.GetLoggedUserByUsernameAsync(loggedUsersUsername.Value);
-            if (loggedUserResult == null)
-            {
-                result.IsSuccessful = false;
-                return result;
-            }
-
-            return loggedUserResult;
-        }
-
     }
 }

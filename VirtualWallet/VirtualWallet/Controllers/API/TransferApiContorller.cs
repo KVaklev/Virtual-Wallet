@@ -2,7 +2,6 @@
 using Business.QueryParameters;
 using Business.Services.Contracts;
 using Business.Services.Helpers;
-using DataAccess.Models.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -19,8 +18,7 @@ namespace VirtualWallet.Controllers.API
 
         public TransferApiContorller(
             ITransferService transferService,
-            IUserService userService
-            )
+            IUserService userService)
         {
 
             this.transferService = transferService;
@@ -32,7 +30,7 @@ namespace VirtualWallet.Controllers.API
         public async Task<IActionResult> CreateAsync([FromBody] CreateTransferDto createTransferDto)
 
         {
-            var loggedUser = await FindLoggedUserAsync();
+            var loggedUser = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value);
             if (!loggedUser.IsSuccessful)
             {
                 return StatusCode(StatusCodes.Status404NotFound, loggedUser.Message);
@@ -55,7 +53,7 @@ namespace VirtualWallet.Controllers.API
         [HttpGet, Authorize]
         public async Task<IActionResult> GetTransferAsync([FromQuery] TransferQueryParameters filterParameters)
         {
-            var loggedUser = await FindLoggedUserAsync();
+            var loggedUser = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value);
             if (!loggedUser.IsSuccessful)
             {
                 return StatusCode(StatusCodes.Status404NotFound, loggedUser.Message);
@@ -64,14 +62,12 @@ namespace VirtualWallet.Controllers.API
             var result = await this.transferService.FilterByAsync(filterParameters, loggedUser.Data);
 
             return StatusCode(StatusCodes.Status200OK, result.Data);
-
         }
 
         [HttpGet("{id}"), Authorize]
-
         public async Task<IActionResult> GetTransferByIdAsync(int id)
         {
-            var loggedUser = await FindLoggedUserAsync();
+            var loggedUser = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value);
             if (!loggedUser.IsSuccessful)
             {
                 return StatusCode(StatusCodes.Status404NotFound, loggedUser.Message);
@@ -97,7 +93,7 @@ namespace VirtualWallet.Controllers.API
         [HttpPut("{id}"), Authorize]
         public async Task<IActionResult> UpdateAsync(int id, [FromBody] UpdateTransferDto updateTransferDto)
         {
-            var loggedUser = await FindLoggedUserAsync();
+            var loggedUser = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value);
             if (!loggedUser.IsSuccessful)
             {
                 return StatusCode(StatusCodes.Status404NotFound, loggedUser.Message);
@@ -117,10 +113,9 @@ namespace VirtualWallet.Controllers.API
         }
 
         [HttpDelete("{id}"), Authorize]
-
         public async Task<IActionResult> DeleteAsync(int id)
         {
-            var loggeduser = await FindLoggedUserAsync();
+            var loggeduser = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value);
             if (!loggeduser.IsSuccessful)
             {
                 return StatusCode(StatusCodes.Status404NotFound, loggeduser.Message);
@@ -142,7 +137,7 @@ namespace VirtualWallet.Controllers.API
         [HttpPut("{id}/execute"), Authorize]
         public async Task<IActionResult> ExecuteAsync(int id)
         {
-            var loggedUser = await FindLoggedUserAsync();
+            var loggedUser = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value);
             if (!loggedUser.IsSuccessful)
             {
                 return StatusCode(StatusCodes.Status404NotFound, loggedUser.Message);
@@ -159,12 +154,6 @@ namespace VirtualWallet.Controllers.API
             }
 
             return StatusCode(StatusCodes.Status200OK, result.Data);
-        }
-        private async Task<Response<User>> FindLoggedUserAsync()
-        {
-            var loggedUsersUsername = User.FindFirst(ClaimTypes.Name);
-            var loggedUserResult = await this.userService.GetLoggedUserByUsernameAsync(loggedUsersUsername.Value);
-            return loggedUserResult;
         }
     }
 }

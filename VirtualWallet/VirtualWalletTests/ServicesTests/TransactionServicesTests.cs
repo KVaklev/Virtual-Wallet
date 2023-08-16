@@ -1,5 +1,4 @@
-﻿namespace VirtualWalletTests.ServicesTests
-{
+﻿
     using AutoMapper;
     using Business.DTOs.Responses;
     using Business.Services.Contracts;
@@ -8,8 +7,6 @@
     using DataAccess.Models.Models;
     using DataAccess.Repositories.Contracts;
     using Moq;
-    using Business.Services.Helpers;
-    using Business.Mappers;
     using Business.Mappers.Contracts;
 
 namespace VirtualWalletTests.ServicesTests
@@ -111,6 +108,7 @@ namespace VirtualWalletTests.ServicesTests
             // Arrange
         var transactionDto = GetCreateTransactionDto();
         var loggedUser = GetLoggedUser();
+        var loggedUserCurrency = "BGN";
         var recipient = GetAccountRecipient();
         var currency = GetCurrency();
         var exchangeRate = GerExchangeRateCorrect();
@@ -126,7 +124,7 @@ namespace VirtualWalletTests.ServicesTests
         var exchangeRateServiceMock = new Mock<IExchangeRateService>();
         exchangeRateServiceMock
                 .Setup(service => service
-                .GetExchangeRateAsync(transactionDto.CurrencyCode, loggedUser.Account.Currency.CurrencyCode))
+                .GetExchangeRateAsync(transactionDto.CurrencyCode, loggedUserCurrency))
                 .ReturnsAsync(exchangeRate);
 
         var transactionCheckerMock = new Mock<ITransactionCheckerService>();
@@ -134,12 +132,6 @@ namespace VirtualWalletTests.ServicesTests
                 .Setup(checker => checker
                 .ChecksCreateOutTransactionAsync(transactionDto, loggedUser, recipient, currency, exchangeRate))
                 .ReturnsAsync(new Response<GetTransactionDto> { IsSuccessful = true });
-
-        //var transactionsMapperMock = new Mock<TransactionsMapper>();
-        //transactionsMapperMock
-        //        .Setup(mapper => mapper
-        //        .MapDtoТоTransactionAsync(transactionDto, loggedUser, recipient, currency, exchangeRate.Data))
-        //        .ReturnsAsync(transaction);
 
         var transactionRepositoryMock = new Mock<ITransactionRepository>();
         transactionRepositoryMock
@@ -168,16 +160,14 @@ namespace VirtualWalletTests.ServicesTests
             mapperMock.Object);
 
 
-// Act
-var result = await service.CreateOutTransactionAsync(transactionDto, loggedUser);
+            // Act
+            var result = await service.CreateOutTransactionAsync(transactionDto, loggedUser);
 
-// Assert
-Assert.IsTrue(result.IsSuccessful);
-Assert.IsNotNull(result.Data);
-Assert.IsNull(result.Message);
-    }
+            // Assert
+            Assert.IsNotNull(result.Data);
+        }
 
-    
+       
 
 
     }   

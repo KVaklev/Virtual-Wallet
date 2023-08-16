@@ -27,14 +27,38 @@ namespace Business.Services.Models
             IAccountService accountService,
             IMapper mapper,
             IWebHostEnvironment webHostEnvironment,
-            ISecurityService security
-            )
+            ISecurityService security)
+            
         {
             this.userRepository = userRepository;
             this.accountService = accountService;
             this.mapper = mapper;
             this.webHostEnvironment = webHostEnvironment;
             this.security = security;
+        }
+
+        public async Task<Response<User>> FindLoggedUserAsync(string username)
+        {
+            var result = new Response<User>();
+
+            if (username == null)
+            {
+                result.IsSuccessful = false;
+                return result;
+            }
+
+            var user = await this.userRepository.GetByUsernameAsync(username);
+
+            if (user == null)
+            {
+                result.IsSuccessful = false;
+                result.Message = NoUsersErrorMessage;
+                return result;
+            }
+
+            result.Data = user;
+
+            return result;
         }
 
         public Response<IQueryable<User>> GetAll()
@@ -250,6 +274,7 @@ namespace Business.Services.Models
 
             return result;
         }
+
         public async Task<Response<GetUpdatedUserDto>> ChangeProfilePictureAsync(int id, UserDetailsViewModel userDetailsViewModel, User loggedUser)
         {
             var result = new Response<GetUpdatedUserDto>();
@@ -454,14 +479,17 @@ namespace Business.Services.Models
         {
             return await this.userRepository.EmailExistsAsync(email);
         }
+
         private async Task<bool> UsernameExistsAsync(string username)
         {
             return await this.userRepository.UsernameExistsAsync(username);
         }
+
         private async Task<bool> PhoneNumberExistsAsync(string phoneNumber)
         {
             return await this.userRepository.PhoneNumberExistsAsync(phoneNumber);
         }
+
         private async Task<IQueryable<User>> FilterByFirstNameAsync(IQueryable<User> result, string? firstName)
         {
             if (!string.IsNullOrEmpty(firstName))
@@ -470,6 +498,7 @@ namespace Business.Services.Models
             }
             return await Task.FromResult(result);
         }
+
         private async Task<IQueryable<User>> FilterByLastNameAsync(IQueryable<User> result, string? lastName)
         {
             if (!string.IsNullOrEmpty(lastName))
@@ -478,6 +507,7 @@ namespace Business.Services.Models
             }
             return await Task.FromResult(result);
         }
+
         private async Task<IQueryable<User>> FilterByUsernameAsync(IQueryable<User> result, string? username)
         {
             if (!string.IsNullOrEmpty(username))
@@ -486,6 +516,7 @@ namespace Business.Services.Models
             }
             return await Task.FromResult(result);
         }
+
         private async Task<IQueryable<User>> FilterByEmailAsync(IQueryable<User> result, string? email)
         {
             if (!string.IsNullOrEmpty(email))
@@ -494,6 +525,7 @@ namespace Business.Services.Models
             }
             return await Task.FromResult(result);
         }
+
         private async Task<IQueryable<User>> FilterByPhoneNumberAsync(IQueryable<User> result, string? phoneNumber)
         {
             if (!string.IsNullOrEmpty(phoneNumber))
@@ -502,6 +534,7 @@ namespace Business.Services.Models
             }
             return await Task.FromResult(result);
         }
+
         private async Task<IQueryable<User>> FilterByAdminStatusAsync(IQueryable<User> result, bool? isAdmin)
         {
             if (isAdmin.HasValue)
@@ -510,6 +543,7 @@ namespace Business.Services.Models
             }
             return await Task.FromResult(result);
         }
+
         private async Task<IQueryable<User>> FilterByBlockedStatusAsync(IQueryable<User> result, bool? isBlocked)
         {
             if (isBlocked.HasValue)
@@ -518,6 +552,7 @@ namespace Business.Services.Models
             }
             return await Task.FromResult(result);
         }
+
         private async Task<IQueryable<User>> SortByAsync(IQueryable<User> result, string? sortCriteria)
         {
             if (Enum.TryParse<SortCriteria>(sortCriteria, true, out var sortEnum))
@@ -534,6 +569,7 @@ namespace Business.Services.Models
             }
             return result;
         }
+
         private async Task<IQueryable<User>> SortOrderAsync(IQueryable<User> result, string? sortOrder)
         {
             if (Enum.TryParse<SortCriteria>(sortOrder, true, out var sortEnum))
@@ -544,8 +580,9 @@ namespace Business.Services.Models
                         return await Task.FromResult(result.Reverse());
                 }
             }
-         return await Task.FromResult(result);
-        }
 
+         return await Task.FromResult(result);
+        
+        }
     }
 }

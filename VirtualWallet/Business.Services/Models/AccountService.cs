@@ -19,6 +19,7 @@ namespace Business.Services.Models
         private readonly IMapper mapper;
         private readonly ICardRepository cardRepository;
         private readonly ISecurityService security;
+        
         public AccountService(
             IAccountRepository accountRepository,  
             IUserRepository userRepository,
@@ -26,8 +27,8 @@ namespace Business.Services.Models
             ICurrencyService currencyService,
             IMapper mapper,
             ICardRepository cardRepository,
-            ISecurityService security
-          )
+            ISecurityService security)
+          
         {
             this.accountRepository = accountRepository;
             this.userRepository = userRepository;
@@ -37,6 +38,7 @@ namespace Business.Services.Models
             this.cardRepository = cardRepository;  
             this.security = security;
         }
+
         public Response<IQueryable<GetAccountDto>> GetAll()
         {
             var result = new Response<IQueryable<GetAccountDto>>();
@@ -126,6 +128,7 @@ namespace Business.Services.Models
 
             return result;
         }
+
         public async Task<Response<bool>> DeleteAsync(int id, User loggedUser)
         {
             var result = new Response<bool>();
@@ -157,6 +160,7 @@ namespace Business.Services.Models
 
             return result;
         }
+
         public async Task<Response<bool>> AddCardAsync(int id, Card card, User user)
         {
             var result = new Response<bool>();
@@ -178,6 +182,7 @@ namespace Business.Services.Models
 
             return result;
         }
+
         public async Task<Response<bool>> RemoveCardAsync(int id, Card card, User user)
         {
             var result = new Response<bool>();
@@ -226,7 +231,7 @@ namespace Business.Services.Models
             return result;
         }
 
-        public async Task <Response<Account>> IncreaseBalanceAsync(int id, decimal amount, User loggedUser)//Todo - why have loogedUser
+        public async Task <Response<Account>> IncreaseBalanceAsync(int id, decimal amount, User loggedUser)
         {
             var result = new Response<Account>();
             Account accountToDepositTo = await this.accountRepository.GetByIdAsync(id);

@@ -19,6 +19,7 @@ namespace Business.Services.Models
         private readonly ICurrencyService currencyService;
         private readonly IMapper mapper;
         private readonly ISecurityService security;
+       
         public CardService(
             ICardRepository repository,
             ICurrencyService currencyService,
@@ -30,6 +31,7 @@ namespace Business.Services.Models
             this.mapper = mapper;
             this.security = security;
         }
+
         public Response<IQueryable<Card>> GetAll(User loggedUser)
         {
             var result = new Response<IQueryable<Card>>();
@@ -183,6 +185,7 @@ namespace Business.Services.Models
 
             return result;
         }
+
         public async Task<Response<bool>> DeleteAsync(int id, User loggedUser)
         {
             var result = new Response<bool>();
@@ -259,6 +262,7 @@ namespace Business.Services.Models
         {
             return await this.cardRepository.CardNumberExistsAsync(cardNumber);
         }
+
         private async Task<IQueryable<Card>> FilterByUsernameAsync(IQueryable<Card> result, string username)
         {
             result = result
@@ -272,11 +276,13 @@ namespace Business.Services.Models
 
             return await Task.FromResult(result);
         }
+
         private async Task<IQueryable<Card>> FilterByExpirationDateAsync(IQueryable<Card> result, string expirationDate)
         {
             DateTime? date = !string.IsNullOrEmpty(expirationDate) ? DateTime.Parse(expirationDate) : null;
             return await Task.FromResult(result.Where(t => !date.HasValue || t.ExpirationDate <= date));
         }
+
         private async Task<IQueryable<Card>> FilterByCardTypeAsync(IQueryable<Card> result, string cardTypeString)
         {
             if (!string.IsNullOrEmpty(cardTypeString) && Enum.TryParse(cardTypeString, true, out CardType cardType))
@@ -286,6 +292,7 @@ namespace Business.Services.Models
 
             return await Task.FromResult(result);
         }
+
         private async Task<IQueryable<Card>> FilterByBalanceAsync(IQueryable<Card> result, decimal? balance)
         {
             if (balance.HasValue)
@@ -295,6 +302,7 @@ namespace Business.Services.Models
 
             return await Task.FromResult(result);
         }
+
         private async Task<IQueryable<Card>> SortByAsync(IQueryable<Card> result, string sortCriteria)
         {
             if (Enum.TryParse<SortCriteria>(sortCriteria, true, out var sortEnum))
@@ -313,6 +321,7 @@ namespace Business.Services.Models
             }
             return await Task.FromResult(result);
         }
+
         private async Task<IQueryable<Card>> SortOrderAsync(IQueryable<Card> result, string sortOrder)
         {
             if (Enum.TryParse<SortCriteria>(sortOrder, true, out var sortEnum))

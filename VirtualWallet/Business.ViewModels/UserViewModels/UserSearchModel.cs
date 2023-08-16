@@ -7,7 +7,6 @@ namespace Business.ViewModels.UserViewModels
     public class UserSearchModel
     {
         public UserQueryParameters UserQueryParameters { get; set; }
-
         public Response<PaginatedList<GetCreatedUserDto>> Users { get; set; }
 
     }
