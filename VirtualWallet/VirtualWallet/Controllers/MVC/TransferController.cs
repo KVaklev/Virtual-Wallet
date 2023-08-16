@@ -23,7 +23,7 @@ namespace VirtualWallet.Controllers.MVC
         private readonly IExchangeRateService exchangeRateService;
         private readonly IMapper mapper;
 
-        public TransferController(ITransferService transferService, 
+        public TransferController(ITransferService transferService,
             IUserService userService,
             IExchangeRateService exchangeRateService,
             ICardService cardService,
@@ -41,26 +41,32 @@ namespace VirtualWallet.Controllers.MVC
         public async Task<IActionResult> Index([FromQuery] TransferQueryParameters parameters)
         {
             var loggedUser = await FindLoggedUserAsync();
+
             if (!loggedUser.IsSuccessful)
             {
                 return this.RedirectToAction("Login", "Account");
             }
 
             var result = await transferService.FilterByAsync(parameters, loggedUser.Data);
+
             var indexTransferViewModel = new IndexTransferViewModel();
 
             indexTransferViewModel.TransferQueryParameters = parameters;
+
             indexTransferViewModel.User = loggedUser.Data;
+
             if (!result.IsSuccessful)
             {
                 if (result.Message == Constants.ModifyNoRecordsFound)
                 {
                     this.ViewData["ErrorMessage"] = result.Message;
+
                     return View(indexTransferViewModel);
                 }
                 else
                 {
                     this.ViewData["Controller"] = "Transfer";
+
                     return View("ErrorMessage", result.Message);
                 }
             }
@@ -69,26 +75,21 @@ namespace VirtualWallet.Controllers.MVC
             return View(indexTransferViewModel);
         }
 
-                    return View("ErrorMessage", transferResult.Message);
-                }
-            }
 
-            indexTransferViewModel.TransferDtos = transferResult.Data;
-
-            return View(indexTransferViewModel);
-        }
 
         [HttpGet]
         public async Task<IActionResult> Details([FromRoute] int id)
         {
             var loggedUser = await FindLoggedUserAsync();
+
             if (!loggedUser.IsSuccessful)
             {
                 return this.RedirectToAction("Login", "Account");
             }
 
-            var result = await this.transferService.GetByIdAsync(id, loggedUser.Data);
-            if (!result.IsSuccessful)
+            var transferResult = await this.transferService.GetByIdAsync(id, loggedUser.Data);
+
+            if (!transferResult.IsSuccessful)
             {
                 this.ViewData["Controller"] = "Transfer";
 
@@ -114,8 +115,8 @@ namespace VirtualWallet.Controllers.MVC
             }
 
             var createTransferViewModel = new CreateTransferViewModel();
-            var cards = this.cardService.GetAll(loggedUser.Data);
-            if (!cards.IsSuccessful)
+            var cardsResult = this.cardService.GetAll(loggedUser.Data);
+            if (!cardsResult.IsSuccessful)
             {
                 this.ViewData["Controller"] = "Transfer";
 

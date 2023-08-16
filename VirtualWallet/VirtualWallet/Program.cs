@@ -62,6 +62,7 @@ namespace VirtualWallet
             builder.Services.AddScoped<IEmailService, EmailService>();
             builder.Services.AddScoped<IExchangeRateService, ExchangeRateService>();
             builder.Services.AddScoped<ITransactionCheckerService, TransactionChecker>();
+            builder.Services.AddScoped<ISecurityService, Security>();
 
             //Helpers
             builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
