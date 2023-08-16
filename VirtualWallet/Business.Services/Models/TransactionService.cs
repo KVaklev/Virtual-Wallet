@@ -7,6 +7,7 @@ using AutoMapper;
 using Business.DTOs.Requests;
 using Business.DTOs.Responses;
 using Business.Mappers;
+using Business.Mappers.Contracts;
 using DataAccess.Models.Enums;
 
 namespace Business.Services.Models
@@ -67,6 +68,12 @@ namespace Business.Services.Models
         {
             var result = new Response<PaginatedList<GetTransactionDto>>();
             IQueryable<Transaction> transactions = this.transactionRepository.GetAll();
+            if (!transactions.Any())
+            {
+                result.IsSuccessful = false;
+                result.Message = Constants.NoRecordsFound;
+                return result;
+            }
 
             transactions = await FilterByUsernameAsync(transactions, filterParameters.Username);
             transactions = await FilterByDirectionAsync(transactions, filterParameters.Direction);

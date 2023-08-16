@@ -11,6 +11,8 @@ using Business.Services.Contracts;
 using Business.Services.Models;
 using Business.Services.Additional;
 using Business.Services.Helpers;
+using Business.Mappers;
+using Business.Mappers.Contracts;
 
 namespace VirtualWallet
 {
@@ -62,6 +64,8 @@ namespace VirtualWallet
             builder.Services.AddScoped<IEmailService, EmailService>();
             builder.Services.AddScoped<IExchangeRateService, ExchangeRateService>();
             builder.Services.AddScoped<ITransactionCheckerService, TransactionChecker>();
+            builder.Services.AddScoped<ISecurityService, Security>();
+
 
             //Helpers
             builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
