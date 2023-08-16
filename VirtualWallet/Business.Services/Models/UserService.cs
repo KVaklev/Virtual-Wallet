@@ -60,6 +60,14 @@ namespace Business.Services.Models
         {
             var result = new Response<PaginatedList<GetCreatedUserDto>>();
             var usersResult = this.GetAll();
+
+            if (!usersResult.IsSuccessful)
+            {
+                result.IsSuccessful = false;
+                result.Message = NoRecordsFound;
+                return result;
+            }
+
             IQueryable<User> users = usersResult.Data;
 
             users = await FilterByFirstNameAsync(users, filterParameters.FirstName);

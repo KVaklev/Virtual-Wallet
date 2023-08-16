@@ -1,7 +1,9 @@
 ﻿using Business.DTOs.Requests;
 using Business.DTOs.Responses;
+using Business.QueryParameters;
 using DataAccess.Models.Models;
-using Microsoft.Extensions.Hosting;
+using DataAccess.Models.Enums;
+using Business.Services.Helpers;
 
 namespace VirtualWalletTests.TestHelpers
 {
@@ -78,6 +80,25 @@ namespace VirtualWalletTests.TestHelpers
                 Address = "Kajmakchalan 1",
                 City = "Plovdiv",
                 Country = "Bulgaria",
+            };
+        }
+        public static CreateUserModel GetCreateUserModel()
+        {
+            return new CreateUserModel
+            {
+
+                //FirstName = "Dimitar",
+                //LastName = "Peev",
+                Email = "dim@gmail.com",
+                Username = "dimitarDimitrov",
+                PhoneNumber = "0887885778",
+
+                //Email = "m.petrova@gmail.com",
+                //Username = "mariicheto",
+                //PhoneNumber = "0898568569",
+                //Password = "pa^3ddwp;z",
+                //CurrencyCode = "BGN", 
+               
             };
         }
         public static GetCreatedUserDto GetTestCreatedUserDto()
@@ -262,27 +283,124 @@ namespace VirtualWalletTests.TestHelpers
             };
         }
 
-        //Helpers for TransferServices Tests
+        public static User GetLoggedUser()
+        {
+            return new User
+            {
+                Id = 1,
+                FirstName = "Ivan",
+                LastName = "Draganov",
+                Email = "i.draganov@gmail.com",
+                Username = "ivanchoDraganchov",
+                Password = new byte[] { 0x65, 0x23, 0x25, 0x55 },
+                PhoneNumber = "0878558547",
+                AccountId = 1,
+                IsAdmin = false,
+                IsBlocked = false,
+                Address = "Blvd Patriarh Evtimii 72",
+                City = "Sofia",
+                Country = "Bulgaria",
+            };
+        }
 
-        //public static Transfer  GetTestTransferDtos()
-        //{
-        //    return new Transfer
-            
-        //        {
-        //             Id = 123,
-        //        Username = "john_doe",
-        //        DateCreated = DateTime.Now,
-        //        CurrencyCode = "USD",
-        //        CardNumber = "1234-5678-9012-3456",
-        //        AmountExchange = 1000.00m,
-        //        ExchangeRate = 1.25m,
-        //        TransferType = "Deposit",
-        //        Amount = 250.00m,
-        //        IsConfirmed = true,
-        //        IsCancelled = false
-                
-        //    };
-        //}
+        //Helpers for AccountServices Tests
+        public static Account GetAccountSender()
+        {
+            return new Account()
+            {
+                Id = 1,
+                Balance = 1000,
+                CurrencyId = 1,
+                IsDeleted = false,
+                DateCreated = DateTime.Now,
+                UserId = 1
+            };
+
+        }
+
+        public static Account GetAccountRecipient()
+        {
+            return new Account()
+            {
+                Id = 2,
+                Balance = 1000,
+                CurrencyId = 2,
+                IsDeleted = false,
+                DateCreated = DateTime.Now,
+                UserId = 2
+            };
+        }
+        //Helpers for CurrencyServices Tests
+        public static Currency GetCurrency()
+        {
+            return new Currency()
+            {
+                Id = 1,
+                Name = "Bulgarian Lev",
+                CurrencyCode = "BGN",
+                IsDeleted = false
+            };
+        }
+
+        //Helpers for TransactionServices Tests
+        public static Transaction GetTransaction()
+        {
+            return new Transaction()
+            {
+                Id=1,
+                AccountSenderId = 1,
+                AccountRecepientId = 2,
+                Amount = 10,
+                CurrencyId = 1,
+                Description = "Test transaction.",
+                IsConfirmed = false,
+                IsDeleted = false,
+                Date = DateTime.Now,
+                Direction = DirectionType.Out,
+                ExchangeRate = Constants.ExchangeRateDefault,
+                AmountExchange=10
+            };
+        }
+
+        public static GetTransactionDto GetTransactionDto()
+        {
+            return new GetTransactionDto()
+            {
+                Id = 1,
+                SenderUsername = "ivanchoDraganchov",
+                RecipientUsername = "mariicheto",
+                Amount = 10,
+                CurrencyCode = "BGN",
+                Description = "Test transaction.",
+                IsConfirmed = false,
+                IsDeleted = false,
+                Date = DateTime.Now,
+                Direction = DirectionType.Out.ToString(),
+                ExchangeRate = 1,
+                AmountExchange = 10 * 1
+            };
+        }
+
+        public static CreateTransactionDto GetCreateTransactionDto()
+        {
+            return new CreateTransactionDto()
+            {
+                RecipientUsername = "mariicheto",
+                Description = "Test transaction.",
+                Amount = 10,
+                CurrencyCode = "BGN"
+            };    
+        }
+
+        public static Response<decimal> GerExchangeRateCorrect()
+        {
+            return new Response<decimal>()
+            {
+                IsSuccessful = true,
+                Data = Constants.ExchangeRateDefault
+            };
+        
+        }
 
     }
 }
