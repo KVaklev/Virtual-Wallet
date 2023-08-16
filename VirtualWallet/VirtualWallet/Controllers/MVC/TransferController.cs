@@ -47,7 +47,7 @@ namespace VirtualWallet.Controllers.MVC
                 return this.RedirectToAction("Login", "Account");
             }
 
-            var result = await transferService.FilterByAsync(parameters, loggedUser.Data);
+            var transferResult = await transferService.FilterByAsync(parameters, loggedUser.Data);
 
             var indexTransferViewModel = new IndexTransferViewModel();
 
@@ -55,11 +55,11 @@ namespace VirtualWallet.Controllers.MVC
 
             indexTransferViewModel.User = loggedUser.Data;
 
-            if (!result.IsSuccessful)
+            if (!transferResult.IsSuccessful)
             {
-                if (result.Message == Constants.ModifyNoRecordsFound)
+                if (transferResult.Message == Constants.ModifyNoRecordsFound)
                 {
-                    this.ViewData["ErrorMessage"] = result.Message;
+                    this.ViewData["ErrorMessage"] = transferResult.Message;
 
                     return View(indexTransferViewModel);
                 }
@@ -67,15 +67,13 @@ namespace VirtualWallet.Controllers.MVC
                 {
                     this.ViewData["Controller"] = "Transfer";
 
-                    return View("ErrorMessage", result.Message);
+                    return View("ErrorMessage", transferResult.Message);
                 }
             }
 
-            indexTransferViewModel.TransferDtos = result.Data;
+            indexTransferViewModel.TransferDtos = transferResult.Data;
             return View(indexTransferViewModel);
         }
-
-
 
         [HttpGet]
         public async Task<IActionResult> Details([FromRoute] int id)
@@ -109,13 +107,16 @@ namespace VirtualWallet.Controllers.MVC
         public async Task<IActionResult> Create()
         {
             var loggedUser = await FindLoggedUserAsync();
+
             if (!loggedUser.IsSuccessful)
             {
                 return this.RedirectToAction("Login", "Account");
             }
 
             var createTransferViewModel = new CreateTransferViewModel();
+
             var cardsResult = this.cardService.GetAll(loggedUser.Data);
+
             if (!cardsResult.IsSuccessful)
             {
                 this.ViewData["Controller"] = "Transfer";
@@ -141,6 +142,7 @@ namespace VirtualWallet.Controllers.MVC
             }
 
             var loggedUser = await FindLoggedUserAsync();
+
             if (!loggedUser.IsSuccessful)
             {
                 return this.RedirectToAction("Login", "Account");
@@ -206,6 +208,7 @@ namespace VirtualWallet.Controllers.MVC
             }
 
             var loggedUser = await FindLoggedUserAsync();
+
             if (!loggedUser.IsSuccessful)
             {
                 return this.RedirectToAction("Login", "Account");
@@ -214,7 +217,7 @@ namespace VirtualWallet.Controllers.MVC
 
             if (!transferResult.IsSuccessful)
             {
-                this.ViewData["Controller"] = "Transaction";
+                this.ViewData["Controller"] = "Transfer";
 
                 return View("ErrorMessage", transferResult.Message);
             }
@@ -270,13 +273,13 @@ namespace VirtualWallet.Controllers.MVC
                 return this.RedirectToAction("Login", "Account");
             }
 
-            var result = await this.transferService.DeleteAsync(id, loggedUser.Data);
+            var transferResult = await this.transferService.DeleteAsync(id, loggedUser.Data);
 
-            if (!result.IsSuccessful)
+            if (!transferResult.IsSuccessful)
             {
                 this.ViewData["Controller"] = "Transfer";
 
-                return View("ErrorMessage", result.Message);
+                return View("ErrorMessage", transferResult.Message);
             }
 
             return this.View("SuccessfulCancellation");
@@ -297,7 +300,7 @@ namespace VirtualWallet.Controllers.MVC
 
             if (!transferResult.IsSuccessful)
             {
-                this.ViewData["Controller"] = "Transaction";
+                this.ViewData["Controller"] = "Transfer";
 
                 return View("ErrorMessage", transferResult.Message);
             }
