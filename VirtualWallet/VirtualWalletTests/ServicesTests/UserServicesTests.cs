@@ -3,30 +3,30 @@
     [TestClass]
     public class UserServicesTests
     {
-        //[TestMethod]
-        //public void GetById_Should_ReturnCorrectUser_When_ParametersAreValid()
-        //{
-        //    //Arrange
+        [TestMethod]
+        public void GetById_Should_ReturnCorrectUser_When_ParametersAreValid()
+        {
+            ////Arrange
 
-        //    User expectedUser = TestHelpers.GetTestUser();
+            //User expectedUser = TestHelpers.GetTestUser();
 
-        //    var userRepositoryMock = new Mock<IUserRepository>();
-        //    var likeCommentRepositoryMock = new Mock<ILikeCommentRepository>();
+            //var userRepositoryMock = new Mock<IUserRepository>();
+            //var likeCommentRepositoryMock = new Mock<ILikeCommentRepository>();
 
-        //    userRepositoryMock
-        //        .Setup(repo => repo.GetById(1))
-        //        .Returns(expectedUser);
+            //userRepositoryMock
+            //    .Setup(repo => repo.GetById(1))
+            //    .Returns(expectedUser);
 
-        //    var sut = new UserService(userRepositoryMock.Object, likeCommentRepositoryMock.Object);
+            //var sut = new UserService(userRepositoryMock.Object, likeCommentRepositoryMock.Object);
 
-        //    //Act
+            ////Act
 
-        //    User actualUser = sut.GetById(expectedUser.Id);
+            //User actualUser = sut.GetById(expectedUser.Id);
 
-        //    //Assert
+            ////Assert
 
-        //    Assert.AreEqual(expectedUser, actualUser);
+            //Assert.AreEqual(expectedUser, actualUser);
 
-        //}
+        }
     }
 }
