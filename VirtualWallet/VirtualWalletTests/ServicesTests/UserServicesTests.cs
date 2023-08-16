@@ -8,6 +8,7 @@ using Business.Services.Contracts;
 using Business.DTOs.Responses;
 using Business.Services.Helpers;
 using Moq;
+using Business.QueryParameters;
 
 namespace VirtualWalletTests.ServicesTests
 {
@@ -181,10 +182,142 @@ namespace VirtualWalletTests.ServicesTests
             Assert.IsFalse(actualResponse.IsSuccessful);
         }
 
+        [TestMethod]
+        public async Task FilterBy_Should_ReturnCorrectList_When_ParametersAreValid()
+        {
+            //Arrange
+            var expectedUsers = GetTestListUsers();
+            var filterParameters = new UserQueryParameters { Username = "ivanchoDraganchov", };
 
+            var userRepositoryMock = new Mock<IUserRepository>();
+            var accountServiceMock = new Mock<IAccountService>();
+            var webHostEnvironmentMock = new Mock<IWebHostEnvironment>();
+            var mapperMock = new Mock<IMapper>();
+            var securityWrapperMock = new Mock<ISecurityService>();
 
+            userRepositoryMock
+                .Setup(repo => repo
+                .GetAll())
+                .Returns(expectedUsers
+                .AsQueryable());
 
+            var sut = new UserService(userRepositoryMock.Object,
+               accountServiceMock.Object,
+               mapperMock.Object,
+               webHostEnvironmentMock.Object,
+               securityWrapperMock.Object);
 
+            // Act
+            var actualResponse = await sut.FilterByAsync(filterParameters);
+
+            //Assert
+            Assert.IsTrue(actualResponse.IsSuccessful);
+        }
+
+        //[TestMethod]
+        //public async Task FilterBy_Should_ReturnMessageResult_When_NoUsersExist()
+        //{
+        //    // Arrange
+        //    var expectedUsers = GetTestListUsers();
+        //    var filterParameters = new UserQueryParameters { Username = "anatolssssss" };
+        //    var expectedMessage = Constants.NoRecordsFound;
+
+        //    var userRepositoryMock = new Mock<IUserRepository>();
+        //    var accountServiceMock = new Mock<IAccountService>();
+        //    var webHostEnvironmentMock = new Mock<IWebHostEnvironment>();
+        //    var mapperMock = new Mock<IMapper>();
+        //    var securityWrapperMock = new Mock<ISecurityService>();
+
+        //    userRepositoryMock
+        //        .Setup(repo => repo
+        //        .GetAll())
+        //        .Returns(new List<User>()
+        //        .AsQueryable());
+
+        //    var sut = new UserService(
+        //        userRepositoryMock.Object,
+        //        accountServiceMock.Object,
+        //        mapperMock.Object,
+        //        webHostEnvironmentMock.Object,
+        //        securityWrapperMock.Object);
+
+        //    // Act
+        //    var actualResponse = await sut.FilterByAsync(filterParameters);
+
+        //    // Assert
+        //    //Assert.IsFalse(actualResponse.IsSuccessful);
+        //    //Assert.AreEqual(expectedMessage, actualResponse.Message);
+        //    Assert.Fail(expectedMessage);
+        //}
+
+        [TestMethod]
+        public async Task GetByUsername_Should_ReturnUser_ParametersAreValid()
+        {
+            // Arrange
+            var expectedUser = GetTestUser();
+            var expectedUserDto = GetTestUserDto();
+
+            var userRepositoryMock = new Mock<IUserRepository>();
+            var accountServiceMock = new Mock<IAccountService>();
+            var webHostEnvironmentMock = new Mock<IWebHostEnvironment>();
+            var mapperMock = new Mock<IMapper>();
+            var securityWrapperMock = new Mock<ISecurityService>();
+
+            userRepositoryMock
+                .Setup(repo => repo
+                .GetByUsernameAsync(expectedUser.Username))
+                .ReturnsAsync(expectedUser);
+            mapperMock
+                .Setup(mapper => mapper
+                .Map<GetUserDto>(expectedUser))
+                .Returns(expectedUserDto);
+
+            var sut = new UserService(
+                userRepositoryMock.Object,
+                accountServiceMock.Object,
+                mapperMock.Object,
+                webHostEnvironmentMock.Object,
+                securityWrapperMock.Object);
+
+            // Act
+            var actualResponse = await sut.GetByUsernameAsync(expectedUser.Username);
+
+            // Assert
+            Assert.IsTrue(actualResponse.IsSuccessful);
+        }
+
+        [TestMethod]
+        public async Task GetByUsername_Should_ReturnUnsuccessfulResult_When_UserDoesNotExist()
+        {
+            // Arrange
+            var nonExistingUsername = "nonexistingusername";
+
+            var userRepositoryMock = new Mock<IUserRepository>();
+            var accountServiceMock = new Mock<IAccountService>();
+            var webHostEnvironmentMock = new Mock<IWebHostEnvironment>();
+            var mapperMock = new Mock<IMapper>();
+            var securityWrapperMock = new Mock<ISecurityService>();
+
+            userRepositoryMock
+                .Setup(repo => repo
+                .GetByUsernameAsync(nonExistingUsername))
+                .ReturnsAsync((User)null);
+
+            var sut = new UserService(
+                userRepositoryMock.Object,
+                accountServiceMock.Object,
+                mapperMock.Object,
+                webHostEnvironmentMock.Object,
+                securityWrapperMock.Object);
+
+            // Act
+            var actualResponse = await sut.GetByUsernameAsync(nonExistingUsername);
+
+            // Assert
+            Assert.IsFalse(actualResponse.IsSuccessful);
+            Assert.IsNull(actualResponse.Data);
+            Assert.AreEqual(Constants.NoUsersErrorMessage, actualResponse.Message);
+        }
 
     }
 }
