@@ -80,7 +80,6 @@ namespace VirtualWalletTests.TestHelpers
                 Country = "Bulgaria",
             };
         }
-
         public static CreateUserModel GetCreateUserModel()
         {
             return new CreateUserModel

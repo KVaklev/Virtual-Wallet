@@ -6,11 +6,9 @@ using Microsoft.AspNetCore.Hosting;
 using AutoMapper;
 using Business.Services.Contracts;
 using Business.DTOs.Responses;
-using Business.Services.Helpers;
 using Moq;
 using Business.QueryParameters;
 using Business.DTOs.Requests;
-using Business.Mappers;
 using static Business.Services.Helpers.Constants;
 
 namespace VirtualWalletTests.ServicesTests
@@ -467,5 +465,51 @@ namespace VirtualWalletTests.ServicesTests
             Assert.AreEqual(PropertyName.PhoneNumber, actualResponse.Error.InvalidPropertyName);
         }
 
+        [TestMethod]
+        public async Task Update_Should_When_ParametersAreValid()
+        {
+            //Arrange
+            UpdateUserDto updateUserDto = GetTestUpdateUserDto();
+            var loggedUser = GetTestCreateUser();
+            var existingUser = GetTestCreateUser();
+
+            var userRepositoryMock = new Mock<IUserRepository>();
+            var accountServiceMock = new Mock<IAccountService>();
+            var webHostEnvironmentMock = new Mock<IWebHostEnvironment>();
+            var mapperMock = new Mock<IMapper>();
+            var securityWrapperMock = new Mock<ISecurityService>();
+
+            userRepositoryMock
+                .Setup(repo => repo
+                .GetByIdAsync(existingUser.Id))
+                .ReturnsAsync(existingUser);
+
+            securityWrapperMock
+                .Setup(security => security
+                .IsAuthorizedAsync(existingUser, It.IsAny<User>()))
+                .ReturnsAsync(true);
+
+
+            userRepositoryMock
+                .Setup(repo => repo.UpdateAsync(It.IsAny<User>()))
+                .ReturnsAsync(existingUser);
+
+            mapperMock.Setup(mapper => mapper
+                .Map<GetUpdatedUserDto>(It.IsAny<User>()))
+                .Returns(new GetUpdatedUserDto());
+
+            var sut = new UserService(
+                userRepositoryMock.Object,
+                accountServiceMock.Object,
+                mapperMock.Object,
+                webHostEnvironmentMock.Object,
+                securityWrapperMock.Object);
+
+            // Act
+            var actualResponse = await sut.UpdateAsync(existingUser.Id, updateUserDto, loggedUser);
+
+            // Assert
+            Assert.IsTrue(actualResponse.IsSuccessful);
+        }
     }
 }
