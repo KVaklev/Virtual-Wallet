@@ -1,6 +1,7 @@
 ﻿using Business.DTOs.Requests;
 using Business.DTOs.Responses;
 using DataAccess.Models.Models;
+using Microsoft.Extensions.Hosting;
 
 namespace VirtualWalletTests.TestHelpers
 {
@@ -260,5 +261,28 @@ namespace VirtualWalletTests.TestHelpers
                 }
             };
         }
+
+        //Helpers for TransferServices Tests
+
+        //public static Transfer  GetTestTransferDtos()
+        //{
+        //    return new Transfer
+            
+        //        {
+        //             Id = 123,
+        //        Username = "john_doe",
+        //        DateCreated = DateTime.Now,
+        //        CurrencyCode = "USD",
+        //        CardNumber = "1234-5678-9012-3456",
+        //        AmountExchange = 1000.00m,
+        //        ExchangeRate = 1.25m,
+        //        TransferType = "Deposit",
+        //        Amount = 250.00m,
+        //        IsConfirmed = true,
+        //        IsCancelled = false
+                
+        //    };
+        //}
+
     }
 }
