@@ -12,12 +12,101 @@ using Business.DTOs.Requests;
 using static Business.Services.Helpers.Constants;
 using Business.ViewModels.UserViewModels;
 using Microsoft.AspNetCore.Http;
+using Business.Services.Helpers;
 
 namespace VirtualWalletTests.ServicesTests
 {
     [TestClass]
     public class UserServicesTests
     {
+        [TestMethod]
+        public async Task FindLoggedUser_Should_Return_When_ParametersAreValid()
+        {
+            // Arrange
+            var userToFind = GetTestUser();
+
+            var userRepositoryMock = new Mock<IUserRepository>();
+            var accountServiceMock = new Mock<IAccountService>();
+            var webHostEnvironmentMock = new Mock<IWebHostEnvironment>();
+            var mapperMock = new Mock<IMapper>();
+            var securityWrapperMock = new Mock<ISecurityService>();
+
+            userRepositoryMock
+                .Setup(repo => repo
+                .GetByUsernameAsync(userToFind.Username))
+                .ReturnsAsync(userToFind);
+
+            var sut = new UserService(userRepositoryMock.Object,
+                accountServiceMock.Object,
+                mapperMock.Object,
+                webHostEnvironmentMock.Object,
+                securityWrapperMock.Object);
+
+            // Act
+            var result = await sut.FindLoggedUserAsync(userToFind.Username);
+
+            // Assert
+            Assert.IsTrue(result.IsSuccessful);
+            Assert.AreEqual(userToFind, result.Data);
+        }
+
+        [TestMethod]
+        public async Task FindLoggedUser_Should_ReturnMessage_When_UsernameIsNull()
+        {
+            // Arrange
+            string username = null;
+
+            var userRepositoryMock = new Mock<IUserRepository>();
+            var accountServiceMock = new Mock<IAccountService>();
+            var webHostEnvironmentMock = new Mock<IWebHostEnvironment>();
+            var mapperMock = new Mock<IMapper>();
+            var securityWrapperMock = new Mock<ISecurityService>();
+
+            var sut = new UserService(userRepositoryMock.Object,
+                accountServiceMock.Object,
+                mapperMock.Object,
+                webHostEnvironmentMock.Object,
+                securityWrapperMock.Object);
+
+            // Act
+            var result = await sut.FindLoggedUserAsync(username);
+
+            // Assert
+            Assert.IsFalse(result.IsSuccessful);
+            Assert.IsNull(result.Data);
+        }
+
+        [TestMethod]
+        public async Task FindLoggedUser_Should_ReturnMessage_When_UserDoesNotExist()
+        {
+            // Arrange
+            string username = "randomName";
+
+            var userRepositoryMock = new Mock<IUserRepository>();
+            var accountServiceMock = new Mock<IAccountService>();
+            var webHostEnvironmentMock = new Mock<IWebHostEnvironment>();
+            var mapperMock = new Mock<IMapper>();
+            var securityWrapperMock = new Mock<ISecurityService>();
+
+            userRepositoryMock
+                .Setup(repo => repo
+                .GetByUsernameAsync(username))
+                .ReturnsAsync((User?)null!);
+
+            var sut = new UserService(userRepositoryMock.Object,
+                 accountServiceMock.Object,
+                 mapperMock.Object,
+                 webHostEnvironmentMock.Object,
+                 securityWrapperMock.Object);
+
+            // Act
+            var result = await sut.FindLoggedUserAsync(username);
+
+            // Assert
+            Assert.IsFalse(result.IsSuccessful);
+            Assert.AreEqual(NoUsersErrorMessage, result.Message);
+        }
+
         [TestMethod]
         public async Task GetById_Should_ReturnCorrectUser_When_ParametersAreValidAsync()
         {
@@ -257,7 +346,7 @@ namespace VirtualWalletTests.ServicesTests
         public async Task GetByUsername_Should_ReturnUnsuccessfulResult_When_UserDoesNotExist()
         {
             // Arrange
-            var nonExistingUsername = "nonexistingusername";
+            var nonExistingUsername = RandomUsername;
 
             var userRepositoryMock = new Mock<IUserRepository>();
             var accountServiceMock = new Mock<IAccountService>();
@@ -268,7 +357,7 @@ namespace VirtualWalletTests.ServicesTests
             userRepositoryMock
                 .Setup(repo => repo
                 .GetByUsernameAsync(nonExistingUsername))
-                .ReturnsAsync((User)null);
+                .ReturnsAsync((User?)null!);
 
             var sut = new UserService(
                 userRepositoryMock.Object,
@@ -530,7 +619,7 @@ namespace VirtualWalletTests.ServicesTests
             userRepositoryMock
                 .Setup(repo => repo
                 .GetByIdAsync(existingUser.Id))
-                .ReturnsAsync((User)null);
+                .ReturnsAsync((User?)null!);
 
             userRepositoryMock
                 .Setup(repo => repo.UpdateAsync(It.IsAny<User>()))
@@ -834,5 +923,599 @@ namespace VirtualWalletTests.ServicesTests
 
             Assert.IsTrue(actualResponse.IsSuccessful);
         }
+
+        [TestMethod]
+        public async Task ChangeProfilePicture_Should_ReturnMessage_When_UserDoesNotExist()
+        {
+            // Arrange
+            var nonExistingUserId = NonExistingUserId; 
+            UserDetailsViewModel userDetailsViewModel = new UserDetailsViewModel
+            {
+                User = new GetUserDto
+                {
+                    ImageFile = new FormFile(new MemoryStream(new byte[0]), 0, 0, "ImageFile", "image.png"),
+                }
+            };
+
+            var userRepositoryMock = new Mock<IUserRepository>();
+            var accountServiceMock = new Mock<IAccountService>();
+            var webHostEnvironmentMock = new Mock<IWebHostEnvironment>();
+            var mapperMock = new Mock<IMapper>();
+            var securityWrapperMock = new Mock<ISecurityService>();
+
+            userRepositoryMock
+                .Setup(repo => repo.GetByIdAsync(nonExistingUserId))
+                .ReturnsAsync((User?)null!);
+            webHostEnvironmentMock
+                .Setup(env => env.WebRootPath)
+                .Returns("D:\\Virtual Wallet\\VirtualWallet\\VirtualWallet\\wwwroot");
+
+            var sut = new UserService(
+                userRepositoryMock.Object,
+                accountServiceMock.Object,
+                mapperMock.Object,
+                webHostEnvironmentMock.Object,
+                securityWrapperMock.Object);
+
+            // Act
+            var actualResponse = await sut.ChangeProfilePictureAsync(nonExistingUserId, userDetailsViewModel, null);
+
+            // Assert
+            Assert.IsFalse(actualResponse.IsSuccessful);
+            Assert.AreEqual(NoUsersErrorMessage, actualResponse.Message);
+        }
+
+        [TestMethod]
+        public async Task Delete_Should__When_ParametersAreValid()
+        {
+            // Arrange
+            var userToDelete = GetTestUser(); 
+            var loggedUser = GetTestUserAdmin();
+
+            var userRepositoryMock = new Mock<IUserRepository>();
+            var accountServiceMock = new Mock<IAccountService>();
+            var webHostEnvironmentMock = new Mock<IWebHostEnvironment>();
+            var mapperMock = new Mock<IMapper>();
+            var securityWrapperMock = new Mock<ISecurityService>();
+
+            securityWrapperMock
+                .Setup(security => security
+                .IsAdminAsync(loggedUser))
+                .ReturnsAsync(true);
+            userRepositoryMock
+                .Setup(repo => repo
+                .GetByIdAsync(userToDelete.Id))
+                .ReturnsAsync(userToDelete);
+            userRepositoryMock
+                .Setup(repo => repo.DeleteAsync(userToDelete.Id))
+                .ReturnsAsync(true);
+
+            var sut = new UserService(
+               userRepositoryMock.Object,
+               accountServiceMock.Object,
+               mapperMock.Object,
+               webHostEnvironmentMock.Object,
+               securityWrapperMock.Object);
+
+            // Act
+            var result = await sut.DeleteAsync(userToDelete.Id, loggedUser);
+
+            // Assert
+            Assert.IsTrue(result.IsSuccessful);
+            Assert.IsTrue(result.Data);
+        }
+
+        [TestMethod]
+        public async Task Delete_Should_ReturnMessage_When_UserToDeleteDoesNotExist()
+        {
+            // Arrange
+            var nonExistingUserId = NonExistingUserId; 
+            var loggedUser = GetTestUserAdmin();
+
+            var userRepositoryMock = new Mock<IUserRepository>();
+            var accountServiceMock = new Mock<IAccountService>();
+            var webHostEnvironmentMock = new Mock<IWebHostEnvironment>();
+            var mapperMock = new Mock<IMapper>();
+            var securityWrapperMock = new Mock<ISecurityService>();
+
+            securityWrapperMock
+                .Setup(security => security
+                .IsAdminAsync(loggedUser))
+                .ReturnsAsync(true);
+            userRepositoryMock
+                .Setup(repo => repo.GetByIdAsync(nonExistingUserId))
+                .ReturnsAsync((User?)null!);
+
+            var sut = new UserService(
+                 userRepositoryMock.Object,
+                 accountServiceMock.Object,
+                 mapperMock.Object,
+                 webHostEnvironmentMock.Object,
+                 securityWrapperMock.Object);
+
+            // Act
+            var result = await sut.DeleteAsync(nonExistingUserId, loggedUser);
+
+            // Assert
+            Assert.IsFalse(result.IsSuccessful);
+            Assert.AreEqual(NoUsersErrorMessage, result.Message);
+        }
+
+        [TestMethod]
+        public async Task Delete_Should_ReturnMessage_When_UserIsNotAdmin()
+        {
+            // Arrange
+            var userToDelete = GetTestUser();
+            var loggedUser = GetTestUser();
+
+            var userRepositoryMock = new Mock<IUserRepository>();
+            var accountServiceMock = new Mock<IAccountService>();
+            var webHostEnvironmentMock = new Mock<IWebHostEnvironment>();
+            var mapperMock = new Mock<IMapper>();
+            var securityWrapperMock = new Mock<ISecurityService>();
+
+            securityWrapperMock
+                .Setup(security => security
+                .IsAdminAsync(loggedUser))
+                .ReturnsAsync(false);
+
+            var sut = new UserService(
+                userRepositoryMock.Object,
+                accountServiceMock.Object,
+                mapperMock.Object,
+                webHostEnvironmentMock.Object,
+                securityWrapperMock.Object);
+
+            // Act
+            var result = await sut.DeleteAsync(userToDelete.Id, loggedUser);
+
+            // Assert
+            Assert.IsFalse(result.IsSuccessful);
+            Assert.AreEqual(ModifyUserErrorMessage, result.Message);
+        }
+
+        [TestMethod]
+        public async Task Promote_Should__When_ParametersAreValid()
+        {
+            // Arrange
+            var loggedUser = GetTestUserAdmin(); 
+            var userToPromote = GetTestUser();
+
+            var userRepositoryMock = new Mock<IUserRepository>();
+            var accountServiceMock = new Mock<IAccountService>();
+            var webHostEnvironmentMock = new Mock<IWebHostEnvironment>();
+            var mapperMock = new Mock<IMapper>();
+            var securityWrapperMock = new Mock<ISecurityService>();
+
+            securityWrapperMock
+                .Setup(security => security
+                .IsAdminAsync(loggedUser))
+                .ReturnsAsync(true);
+            userRepositoryMock
+                .Setup(repo => repo.GetByIdAsync(userToPromote.Id))
+                .ReturnsAsync(userToPromote);
+            userRepositoryMock
+                .Setup(repo => repo.PromoteAsync(userToPromote.Id))
+                .ReturnsAsync(userToPromote); 
+            mapperMock
+                .Setup(mapper => mapper.Map<GetUserDto>(userToPromote))
+                .Returns(new GetUserDto());
+
+            var sut = new UserService(
+               userRepositoryMock.Object,
+               accountServiceMock.Object,
+               mapperMock.Object,
+               webHostEnvironmentMock.Object,
+               securityWrapperMock.Object);
+
+            // Act
+            var result = await sut.PromoteAsync(userToPromote.Id, loggedUser);
+
+            // Assert
+            Assert.IsTrue(result.IsSuccessful);
+            Assert.IsNotNull(result.Data);
+        }
+
+        [TestMethod]
+        public async Task Promote_Should_ReturnMessage_When_UserIsNotAdmin()
+        {
+            // Arrange
+            var loggedUser = GetTestUser(); 
+            var userToPromote = GetTestUser();
+
+            var userRepositoryMock = new Mock<IUserRepository>();
+            var accountServiceMock = new Mock<IAccountService>();
+            var webHostEnvironmentMock = new Mock<IWebHostEnvironment>();
+            var mapperMock = new Mock<IMapper>();
+            var securityWrapperMock = new Mock<ISecurityService>();
+
+            securityWrapperMock
+                .Setup(security => security
+                .IsAdminAsync(loggedUser))
+                .ReturnsAsync(false);
+
+            var sut = new UserService(
+               userRepositoryMock.Object,
+               accountServiceMock.Object,
+               mapperMock.Object,
+               webHostEnvironmentMock.Object,
+               securityWrapperMock.Object);
+
+            // Act
+            var result = await sut.PromoteAsync(userToPromote.Id, loggedUser);
+
+            // Assert
+            Assert.IsFalse(result.IsSuccessful);
+            Assert.AreEqual(ModifyUserErrorMessage, result.Message);
+        }
+
+        [TestMethod]
+        public async Task Promote_Should_ReturnMessage_When_UserToPromoteDoesNotExist()
+        {
+            // Arrange
+            var nonExistingUserId = NonExistingUserId;
+            var loggedUser = GetTestUserAdmin();
+
+            var userRepositoryMock = new Mock<IUserRepository>();
+            var accountServiceMock = new Mock<IAccountService>();
+            var webHostEnvironmentMock = new Mock<IWebHostEnvironment>();
+            var mapperMock = new Mock<IMapper>();
+            var securityWrapperMock = new Mock<ISecurityService>();
+
+            securityWrapperMock
+                .Setup(security => security.IsAdminAsync(loggedUser))
+                .ReturnsAsync(true); 
+            userRepositoryMock
+                .Setup(repo => repo.GetByIdAsync(nonExistingUserId))
+                .ReturnsAsync((User?)null!);
+
+            var sut = new UserService(
+                userRepositoryMock.Object,
+                accountServiceMock.Object,
+                mapperMock.Object,
+                webHostEnvironmentMock.Object,
+                securityWrapperMock.Object);
+
+            // Act
+            var result = await sut.PromoteAsync(nonExistingUserId, loggedUser);
+
+            // Assert
+            Assert.IsFalse(result.IsSuccessful);
+            Assert.AreEqual(NoUsersErrorMessage, result.Message);
+        }
+
+        [TestMethod]
+        public async Task Block_Should__When_ParametersAreValid()
+        {
+            // Arrange
+            var loggedUser = GetTestUserAdmin();
+            var userToBlock = GetTestUser();
+
+            var userRepositoryMock = new Mock<IUserRepository>();
+            var accountServiceMock = new Mock<IAccountService>();
+            var webHostEnvironmentMock = new Mock<IWebHostEnvironment>();
+            var mapperMock = new Mock<IMapper>();
+            var securityWrapperMock = new Mock<ISecurityService>();
+
+            securityWrapperMock
+                .Setup(security => security
+                .IsAdminAsync(loggedUser))
+                .ReturnsAsync(true);
+            userRepositoryMock
+                .Setup(repo => repo.GetByIdAsync(userToBlock.Id))
+                .ReturnsAsync(userToBlock);
+            userRepositoryMock
+                .Setup(repo => repo.BlockUserAsync(userToBlock.Id))
+                .ReturnsAsync(userToBlock);
+            mapperMock
+                .Setup(mapper => mapper.Map<GetUserDto>(userToBlock))
+                .Returns(new GetUserDto());
+
+            var sut = new UserService(
+               userRepositoryMock.Object,
+               accountServiceMock.Object,
+               mapperMock.Object,
+               webHostEnvironmentMock.Object,
+               securityWrapperMock.Object);
+
+            // Act
+            var result = await sut.BlockUserAsync(userToBlock.Id, loggedUser);
+
+            // Assert
+            Assert.IsTrue(result.IsSuccessful);
+        }
+
+        [TestMethod]
+        public async Task Block_Should_ReturnMessage_When_UserIsNotAdmin()
+        {
+            // Arrange
+            var loggedUser = GetTestUser();
+            var userToBlock = GetTestUser();
+
+            var userRepositoryMock = new Mock<IUserRepository>();
+            var accountServiceMock = new Mock<IAccountService>();
+            var webHostEnvironmentMock = new Mock<IWebHostEnvironment>();
+            var mapperMock = new Mock<IMapper>();
+            var securityWrapperMock = new Mock<ISecurityService>();
+
+            securityWrapperMock
+                .Setup(security => security
+                .IsAdminAsync(loggedUser))
+                .ReturnsAsync(false);
+
+            var sut = new UserService(
+               userRepositoryMock.Object,
+               accountServiceMock.Object,
+               mapperMock.Object,
+               webHostEnvironmentMock.Object,
+               securityWrapperMock.Object);
+
+            // Act
+            var result = await sut.BlockUserAsync(userToBlock.Id, loggedUser);
+
+            // Assert
+            Assert.IsFalse(result.IsSuccessful);
+            Assert.AreEqual(ModifyUserErrorMessage, result.Message);
+        }
+
+        [TestMethod]
+        public async Task Block_Should_ReturnMessage_When_UserToBlockDoesNotExist()
+        {
+            // Arrange
+            var nonExistingUserId = NonExistingUserId;
+            var loggedUser = GetTestUserAdmin();
+
+            var userRepositoryMock = new Mock<IUserRepository>();
+            var accountServiceMock = new Mock<IAccountService>();
+            var webHostEnvironmentMock = new Mock<IWebHostEnvironment>();
+            var mapperMock = new Mock<IMapper>();
+            var securityWrapperMock = new Mock<ISecurityService>();
+
+            securityWrapperMock
+                .Setup(security => security.IsAdminAsync(loggedUser))
+                .ReturnsAsync(true);
+            userRepositoryMock
+                .Setup(repo => repo.GetByIdAsync(nonExistingUserId))
+                .ReturnsAsync((User?)null!);
+
+            var sut = new UserService(
+                userRepositoryMock.Object,
+                accountServiceMock.Object,
+                mapperMock.Object,
+                webHostEnvironmentMock.Object,
+                securityWrapperMock.Object);
+
+            // Act
+            var result = await sut.BlockUserAsync(nonExistingUserId, loggedUser);
+
+            // Assert
+            Assert.IsFalse(result.IsSuccessful);
+            Assert.AreEqual(NoUsersErrorMessage, result.Message);
+        }
+
+        [TestMethod]
+        public async Task Unblock_Should__When_ParametersAreValid()
+        {
+            // Arrange
+            var loggedUser = GetTestUserAdmin();
+            var userToUnblock = GetTestExpectedUserAsBlocked();
+
+            var userRepositoryMock = new Mock<IUserRepository>();
+            var accountServiceMock = new Mock<IAccountService>();
+            var webHostEnvironmentMock = new Mock<IWebHostEnvironment>();
+            var mapperMock = new Mock<IMapper>();
+            var securityWrapperMock = new Mock<ISecurityService>();
+
+            securityWrapperMock
+                .Setup(security => security
+                .IsAdminAsync(loggedUser))
+                .ReturnsAsync(true);
+            userRepositoryMock
+                .Setup(repo => repo.GetByIdAsync(userToUnblock.Id))
+                .ReturnsAsync(userToUnblock);
+            userRepositoryMock
+                .Setup(repo => repo.UnblockUserAsync(userToUnblock.Id))
+                .ReturnsAsync(userToUnblock);
+            mapperMock
+                .Setup(mapper => mapper.Map<GetUserDto>(userToUnblock))
+                .Returns(new GetUserDto());
+
+            var sut = new UserService(
+               userRepositoryMock.Object,
+               accountServiceMock.Object,
+               mapperMock.Object,
+               webHostEnvironmentMock.Object,
+               securityWrapperMock.Object);
+
+            // Act
+            var result = await sut.UnblockUserAsync(userToUnblock.Id, loggedUser);
+
+            // Assert
+            Assert.IsTrue(result.IsSuccessful);
+        }
+
+        [TestMethod]
+        public async Task Unblock_Should_ReturnMessage_When_UserIsNotAdmin()
+        {
+            // Arrange
+            var loggedUser = GetTestUser();
+            var userToUnblock = GetTestExpectedUserAsBlocked();
+
+            var userRepositoryMock = new Mock<IUserRepository>();
+            var accountServiceMock = new Mock<IAccountService>();
+            var webHostEnvironmentMock = new Mock<IWebHostEnvironment>();
+            var mapperMock = new Mock<IMapper>();
+            var securityWrapperMock = new Mock<ISecurityService>();
+
+            securityWrapperMock
+                .Setup(security => security
+                .IsAdminAsync(loggedUser))
+                .ReturnsAsync(false);
+
+            var sut = new UserService(
+               userRepositoryMock.Object,
+               accountServiceMock.Object,
+               mapperMock.Object,
+               webHostEnvironmentMock.Object,
+               securityWrapperMock.Object);
+
+            // Act
+            var result = await sut.UnblockUserAsync(userToUnblock.Id, loggedUser);
+
+            // Assert
+            Assert.IsFalse(result.IsSuccessful);
+            Assert.AreEqual(ModifyUserErrorMessage, result.Message);
+        }
+
+        [TestMethod]
+        public async Task Unblock_Should_ReturnMessage_When_UserToBlockDoesNotExist()
+        {
+            // Arrange
+            var nonExistingUserId = NonExistingUserId;
+            var loggedUser = GetTestUserAdmin();
+
+            var userRepositoryMock = new Mock<IUserRepository>();
+            var accountServiceMock = new Mock<IAccountService>();
+            var webHostEnvironmentMock = new Mock<IWebHostEnvironment>();
+            var mapperMock = new Mock<IMapper>();
+            var securityWrapperMock = new Mock<ISecurityService>();
+
+            securityWrapperMock
+                .Setup(security => security.IsAdminAsync(loggedUser))
+                .ReturnsAsync(true);
+            userRepositoryMock
+                .Setup(repo => repo.GetByIdAsync(nonExistingUserId))
+                .ReturnsAsync((User?)null!);
+
+            var sut = new UserService(
+                userRepositoryMock.Object,
+                accountServiceMock.Object,
+                mapperMock.Object,
+                webHostEnvironmentMock.Object,
+                securityWrapperMock.Object);
+
+            // Act
+            var result = await sut.UnblockUserAsync(nonExistingUserId, loggedUser);
+
+            // Assert
+            Assert.IsFalse(result.IsSuccessful);
+            Assert.AreEqual(NoUsersErrorMessage, result.Message);
+        }
+
+        //[TestMethod]
+        //public async Task Login_Should_When_ParametersAreValid()
+        //{
+        //    // Arrange
+        //    string username = RandomUsername;
+        //    string password = "correctpassword";
+        //    var existingUser = new User();
+
+        //    var userRepositoryMock = new Mock<IUserRepository>();
+        //    userRepositoryMock
+        //        .Setup(repo => repo.GetByUsernameAsync(username))
+        //        .ReturnsAsync(existingUser);
+        //    var securityServiceMock = new Mock<ISecurityService>();
+        //    securityServiceMock
+        //        .Setup(security => security.AuthenticateAsync(existingUser, password))
+        //        .ReturnsAsync(new Response<User> { IsSuccessful = true, Data = existingUser }); // Simulate authentication success
+
+        //    var sut = new UserService(
+        //        userRepositoryMock.Object,
+        //        null, // You can pass null for other parameters since we're not using them in this test
+        //        null,
+        //        null,
+        //        securityServiceMock.Object);
+
+        //    // Act
+        //    var result = await sut.LoginAsync(username, password);
+
+        //    // Assert
+        //    Assert.IsTrue(result.IsSuccessful);
+        //    Assert.AreEqual(existingUser, result.Data);
+        //}
+        //[TestMethod]
+        //public async Task Login_Should_ReturnMessage_When_UsernameAndPasswordAreNull()
+        //{
+        //    // Arrange
+        //    string username = null;
+        //    string password = null;
+
+        //    var userRepositoryMock = new Mock<IUserRepository>();
+        //    var securityServiceMock = new Mock<ISecurityService>();
+        //    var commonMock = new Mock<Common>();
+
+        //    var sut = new UserService(
+        //        userRepositoryMock.Object,
+        //        null, // You can pass null for other parameters since we're not using them in this test
+        //        null,
+        //        null,
+        //        securityServiceMock.Object);
+
+        //    // Act
+        //    var result = await sut.LoginAsync(username, password);
+
+        //    // Assert
+        //    Assert.IsFalse(result.IsSuccessful);
+        //    // Check for appropriate error response, depending on your implementation
+        //}
+
+        //[TestMethod]
+        //public async Task Login_Should_ReturnMessage_When_UsernameDoesNotExist()
+        //{
+        //    // Arrange
+        //    string username = "nonexistentuser";
+        //    string password = "password";
+
+        //    var userRepositoryMock = new Mock<IUserRepository>();
+        //    userRepositoryMock
+        //        .Setup(repo => repo.GetByUsernameAsync(username))
+        //        .ReturnsAsync((User)null); // Simulate user not found
+
+        //    var sut = new UserService(
+        //        userRepositoryMock.Object,
+        //        null, // You can pass null for other parameters since we're not using them in this test
+        //        null,
+        //        null,
+        //        null);
+
+        //    // Act
+        //    var result = await sut.LoginAsync(username, password);
+
+        //    // Assert
+        //    Assert.IsFalse(result.IsSuccessful);
+        //    Assert.AreEqual(UsernameDoesntExistErrorMessage, result.Message);
+        //}
+
+        //[TestMethod]
+        //public async Task Login_Should_ReturnMessage_When_PasswordIsIncorrect()
+        //{
+        //    // Arrange
+        //    string username = "existinguser";
+        //    string password = "incorrectpassword";
+        //    var existingUser = new User();
+
+        //    var userRepositoryMock = new Mock<IUserRepository>();
+        //    userRepositoryMock
+        //        .Setup(repo => repo.GetByUsernameAsync(username))
+        //        .ReturnsAsync(existingUser);
+        //    var securityServiceMock = new Mock<ISecurityService>();
+        //    securityServiceMock
+        //        .Setup(security => security.AuthenticateAsync(existingUser, password))
+        //        .ReturnsAsync((Response<User>)null); // Simulate authentication failure
+
+        //    var sut = new UserService(
+        //        userRepositoryMock.Object,
+        //        null, // You can pass null for other parameters since we're not using them in this test
+        //        null,
+        //        null,
+        //        securityServiceMock.Object);
+
+        //    // Act
+        //    var result = await sut.LoginAsync(username, password);
+
+        //    // Assert
+        //    Assert.IsFalse(result.IsSuccessful);
+        //    // Check for appropriate error response, depending on your implementation
+        //}
     }
 }

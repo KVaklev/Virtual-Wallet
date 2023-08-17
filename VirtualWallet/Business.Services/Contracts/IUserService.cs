@@ -22,8 +22,7 @@ namespace Business.Services.Contracts
         
         Task<Response<bool>> ChangeStatusAsync(int id, UserDetailsViewModel userDetailsViewModel, User loggedUser);
         
-        Task<Response<GetUpdatedUserDto>> ChangeProfilePictureAsync(int id, UserDetailsViewModel userDetailsViewModel, User 
-loggedUser);
+        Task<Response<GetUpdatedUserDto>> ChangeProfilePictureAsync(int id, UserDetailsViewModel userDetailsViewModel, User loggedUser);
 
         Task<Response<bool>> DeleteAsync(int id, User loggedUser);
         
@@ -36,9 +35,7 @@ loggedUser);
         Task<Response<User>> LoginAsync(string username, string password);
         
         Task<Response<User>> GetLoggedUserByUsernameAsync(string username);
-        
-        Task<Response<User>> GetLoggedUserByIdAsync(int id);
-        
+                
         Task<Response<User>> FindLoggedUserAsync(string username);
     }
 }
