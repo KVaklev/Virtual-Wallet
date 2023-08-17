@@ -16,19 +16,17 @@ _Welcome to Speed Pay, your all-in-one solution which manages your budget with e
 
 4. Security measures taken in mind to safeguard sensitive information and ensure a worry-free financial experience. Advanced **Password Hashing** - login credentials are securely stored, providing a strong defense against unauthorized access. Enhanced **Card Number Protection** - hiding mechanism that displays only the last three digits of your credit or debit card. We successfully maintain the confidentiality of your card information, minimizing the risk of exposure.
 
-5. Register **Multiple Credit/Debit Cards**: When adding funds to your wallet, enjoy the convenience of choosing your funding source.Speed Pay allows users to add multiple cards operating with different currencies.
+5. Register **Multiple Credit/Debit Cards**: When adding funds to your wallet, enjoy the convenience of choosing your funding source. Speed Pay allows users to add multiple cards operating with different currencies.
 
-6. **Initial funding of a digital wallet** -  during the registration process each user can easily opt for the currency of his/her own account. Eqach account can be set in a single currency.
+6. **Initial funding of a digital wallet** -  during the registration process each user can easily opt for the currency of his/her own account. Each account can be set in a single currency.
 
 7. **Transfers and Transactions** - these are the money movement operations that Speed Pay maintains as follows:
 
-- Transfers - these could be either deposit or withdrawal respectively when a particular user would like to send funds to his account from a selected card or to withdraw funds back to the desired card of       his list with cards. Currency field is dinamically mapped based on selected card's currency. Each transfer amount is exchanged into its destination's currency in case the currencies between the selected card and the account differ.
+- Transfers - these could be either deposit or withdrawal respectively when a particular user would like to send funds to his account from a selected card or to withdraw funds back to the desired card of       his list with cards. Currency field is dynamically mapped based on the selected card's currency. Each transfer amount is exchanged into its destination's currency in case the currencies between the selected card and the account differ.
 
 - Transactions - these cound be either "In" or "Out" transasactions depending on money movement direction. In case a user wants to send money to another user this will be "Out" transaction for the sender and "In" transaction for the receiver of the funds. Here again each transaction is exchanged into the currency of receiver's account.
 
 Crud operations for money transfers and transactions are all covered and each user can easily - create, read, edit and delete those. NB: Once a particular transfer or transaction is either processed or cancelled it can no longer be updated.
-
-All completed transactions and transfers are stored in the history whereas in the dashbo
 
 8. **External API** - when it comes to exchanging funds described above, Speed Pay uses an external API - https://cdn.jsdelivr.net/gh/fawazahmed0/currency-api@1/latest/currencies/ - to get real data exchange rates.
 
