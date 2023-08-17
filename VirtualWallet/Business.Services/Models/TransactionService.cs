@@ -116,6 +116,12 @@ namespace Business.Services.Models
                 result.Message = checksResult.Message;
                 return result;
             }
+            if (recipient.User.Username==loggedUser.Username)
+            {
+                result.IsSuccessful = false;
+                result.Message = Constants.ModifyTransactionUsernameMessage;
+                return result;
+            }
             var transaction = await TransactionsMapper.MapDtoТоTransactionAsync(transactionDto, loggedUser, recipient, currency, exchangeRate.Data);
             var newTransaction = await this.transactionRepository.CreateTransactionAsync(transaction);
             result.Data = this.mapper.Map<GetTransactionDto>(newTransaction);
