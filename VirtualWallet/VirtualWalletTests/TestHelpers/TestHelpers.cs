@@ -9,6 +9,11 @@ namespace VirtualWalletTests.TestHelpers
 {
     public static class TestHelpers
     {
+        //Constants for Tests
+
+        public const int NonExistingUserId = 666;
+        public const string RandomUsername = "Username";
+
         //Helpers for UserServices Tests
         public static User GetTestUser()
         {

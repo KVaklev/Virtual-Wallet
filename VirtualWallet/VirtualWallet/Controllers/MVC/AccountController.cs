@@ -68,7 +68,7 @@ namespace VirtualWallet.Controllers.MVC
                 SameSite = SameSiteMode.Strict
             });
 
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("Index", "History");
         }
 
         [HttpGet("logout")]

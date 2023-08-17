@@ -438,8 +438,7 @@ namespace Business.Services.Models
             }
 
             var authenticatedUser = await this.security.AuthenticateAsync(loggedUser, password);
-           return authenticatedUser;
-
+            return authenticatedUser;
         }
 
         public async Task<Response<User>> GetLoggedUserByUsernameAsync(string username)
@@ -451,23 +450,6 @@ namespace Business.Services.Models
             {
                 result.IsSuccessful = false;
                 result.Message = NoUsersErrorMessage;
-                return result;
-            }
-            result.Data = user;
-
-            return result;
-        }
-
-        public async Task<Response<User>> GetLoggedUserByIdAsync(int id)
-        {
-            var result = new Response<User>();
-
-            var user = await this.userRepository.GetByIdAsync(id);
-
-            if (user == null)
-            {
-                result.IsSuccessful = false;
-                result.Message = NoUserFoundErrorMessage;
                 return result;
             }
             result.Data = user;
