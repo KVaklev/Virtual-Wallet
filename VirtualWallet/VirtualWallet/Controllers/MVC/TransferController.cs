@@ -15,7 +15,7 @@ using System.Security.Claims;
 namespace VirtualWallet.Controllers.MVC
 {
     [Authorize]
-    public class TransferController : Microsoft.AspNetCore.Mvc.Controller
+    public class TransferController : Controller
     {
         private readonly ITransferService transferService;
         private readonly IUserService userService;
@@ -39,7 +39,7 @@ namespace VirtualWallet.Controllers.MVC
         [HttpGet]
         public async Task<IActionResult> Index([FromQuery] TransferQueryParameters parameters)
         {
-            var loggedUser = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value);
+            var loggedUser = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value!);
 
             if (!loggedUser.IsSuccessful)
             {
@@ -76,7 +76,7 @@ namespace VirtualWallet.Controllers.MVC
         [HttpGet]
         public async Task<IActionResult> Details([FromRoute] int id)
         {
-            var loggedUser = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value);
+            var loggedUser = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value!);
 
             if (!loggedUser.IsSuccessful)
             {
@@ -102,7 +102,7 @@ namespace VirtualWallet.Controllers.MVC
         [HttpGet]
         public async Task<IActionResult> Create()
         {
-            var loggedUser = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value);
+            var loggedUser = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value!);
 
             if (!loggedUser.IsSuccessful)
             {
@@ -134,7 +134,7 @@ namespace VirtualWallet.Controllers.MVC
                 return this.View(transferDto);
             }
 
-            var loggedUser = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value);
+            var loggedUser = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value!);
 
             if (!loggedUser.IsSuccessful)
             {
@@ -155,7 +155,7 @@ namespace VirtualWallet.Controllers.MVC
         [HttpGet]
         public async Task<IActionResult> Update([FromRoute] int id)
         {
-            var loggedUser = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value);
+            var loggedUser = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value!);
 
             if (!loggedUser.IsSuccessful)
             {
@@ -194,7 +194,7 @@ namespace VirtualWallet.Controllers.MVC
                 return View(transferDto);
             }
 
-            var loggedUser = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value);
+            var loggedUser = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value!);
 
             if (!loggedUser.IsSuccessful)
             {
@@ -215,7 +215,7 @@ namespace VirtualWallet.Controllers.MVC
         public async Task<IActionResult> Delete([FromRoute] int id)
         {
 
-            var loggedUserresult = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value);
+            var loggedUserresult = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value!);
 
             if (!loggedUserresult.IsSuccessful)
             {
@@ -246,7 +246,7 @@ namespace VirtualWallet.Controllers.MVC
             [FromRoute] int id,
             ConfirmTransferViewModel confirmTransferViewModel)
         {
-            var loggedUser = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value);
+            var loggedUser = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value!);
 
             if (!loggedUser.IsSuccessful)
             {
@@ -267,7 +267,7 @@ namespace VirtualWallet.Controllers.MVC
         [HttpGet]
         public async Task<IActionResult> Confirm([FromRoute] int id)
         {
-            var loggedUser = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value);
+            var loggedUser = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value!);
 
             if (!loggedUser.IsSuccessful)
             {
@@ -296,7 +296,7 @@ namespace VirtualWallet.Controllers.MVC
         [HttpPost]
         public async Task<IActionResult> Confirm([FromRoute] int id, ConfirmTransferViewModel confirmViewModel)
         {
-            var loggedUser = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value);
+            var loggedUser = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value!);
 
             if (!loggedUser.IsSuccessful)
             {
@@ -335,7 +335,7 @@ namespace VirtualWallet.Controllers.MVC
         [HttpGet]
         public async Task<IActionResult> SuccessfulConfirmation([FromRoute] int id)
         {
-            var loggedUser = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value);
+            var loggedUser = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value!);
 
             if (!loggedUser.IsSuccessful)
             {
@@ -374,8 +374,8 @@ namespace VirtualWallet.Controllers.MVC
 
             var exchangeAmount = await this.exchangeRateService.ExchangeAsync(
                 transferDto.Amount,
-                transferDto.Card.Currency.CurrencyCode,
-                user.Data.Account.Currency.CurrencyCode);
+                transferDto.Card.Currency?.CurrencyCode!,
+                user.Data.Account?.Currency?.CurrencyCode!);
 
             if (!exchangeAmount.IsSuccessful)
             {

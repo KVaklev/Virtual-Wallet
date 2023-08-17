@@ -139,7 +139,7 @@ namespace VirtualWallet.Controllers.MVC
                 return View(Constant.View.ErrorMessage, isDeleted.Message);
             }
 
-            return View("SuccessfulDelete");
+            return View(Constant.View.SuccessfulDelete);
         }
 
         [HttpGet]

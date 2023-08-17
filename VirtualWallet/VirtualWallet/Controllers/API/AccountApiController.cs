@@ -45,7 +45,7 @@ namespace VirtualWallet.Controllers.API
                 return BadRequest(result.Message);
             }
 
-            Response.Cookies.Append("Cookie_JWT", result.Data.ToString(), new CookieOptions()
+            Response.Cookies.Append(Constant.View.JWTCookie, result.Data.ToString(), new CookieOptions()
             {
                 HttpOnly = false,
                 SameSite = SameSiteMode.Strict
@@ -77,8 +77,8 @@ namespace VirtualWallet.Controllers.API
             Response<User> user = await this.userService.GetLoggedUserByUsernameAsync(username);
            
             var token = this.accountService.GenerateTokenAsync(user.Data.Id);
-            var confirmationLink = Url.Action("confirm-registration", "api", new { userId = user.Data.Id, token = token.Result }, Request.Scheme);
-            var message = await this.emailService.BuildEmailAsync(user.Data, confirmationLink);
+            var confirmationLink = Url.Action(Constant.View.ConfirmRegistration, Constant.View.Api, new { userId = user.Data.Id, token = token.Result }, Request.Scheme);
+            var message = await this.emailService.BuildEmailAsync(user.Data, confirmationLink!);
             
             await emailService.SendEMailAsync(message);
 

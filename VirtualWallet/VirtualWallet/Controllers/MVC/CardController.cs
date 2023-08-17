@@ -3,7 +3,6 @@ using Business.QueryParameters;
 using Business.Services.Contracts;
 using Business.Services.Helpers;
 using Business.ViewModels.CardViewModels;
-using DataAccess.Models.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -32,18 +31,18 @@ namespace VirtualWallet.Controllers.MVC
         [HttpGet]
         public async Task<IActionResult> Index(CardQueryParameters cardQueryParameters)
         {
-            var loggedUserResult = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value);
+            var loggedUserResult = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value!);
             if (!loggedUserResult.IsSuccessful)
             {
-                return RedirectToAction("Login", "Account");
+                return RedirectToAction(Constant.Action.Login, Constant.Controller.Account);
             }
 
             var currencyResult = await this.currencyService.GetAllAsync();
             if (!currencyResult.IsSuccessful)
             {
-                return View("ErrorMessage", currencyResult.Message);
+                return View(Constant.View.ErrorMessage, currencyResult.Message);
             }
-            TempData["Currencies"] = JsonSerializer.Serialize(currencyResult.Data);
+            TempData[Constant.TempData.Currencies] = JsonSerializer.Serialize(currencyResult.Data);
 
             var cardSearchModel = new CardViewModel
             {
@@ -56,12 +55,12 @@ namespace VirtualWallet.Controllers.MVC
             {
                 if (cardsResult.Message==Constants.NoRecordsFound)
                 {
-                    this.ViewData["ErrorMessage"] = cardsResult.Message;
+                    this.ViewData[Constant.View.ErrorMessage] = cardsResult.Message;
                     return View(cardSearchModel);
                 }
                 else
                 {
-                    return View("ErrorMessage", cardsResult.Message);
+                    return View(Constant.View.ErrorMessage, cardsResult.Message);
                 }  
             }
             cardSearchModel.Cards = cardsResult;
@@ -72,16 +71,16 @@ namespace VirtualWallet.Controllers.MVC
         [HttpGet]
         public async Task<IActionResult> Details(CardQueryParameters cardQueryParameters)
         {
-            var loggedUserResult = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value);
+            var loggedUserResult = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value!);
             if (!loggedUserResult.IsSuccessful)
             {
-                return RedirectToAction("Login", "Account");
+                return RedirectToAction(Constant.Action.Login, Constant.Controller.Account);
             }
 
             var cardsResult = await this.cardService.FilterByAsync(cardQueryParameters, loggedUserResult.Data);
             if (!cardsResult.IsSuccessful)
             {
-                return View("ErrorMessage", cardsResult.Message);
+                return View(Constant.View.ErrorMessage, cardsResult.Message);
             }
 
             var cardsAllUsersViewModel = new CardsAllUsersViewModel
@@ -96,10 +95,10 @@ namespace VirtualWallet.Controllers.MVC
         [HttpGet]
         public async Task<IActionResult> Create()
         {
-            var loggedUserResult = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value);
+            var loggedUserResult = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value!);
             if (!loggedUserResult.IsSuccessful)
             {
-                return RedirectToAction("Login", "Account");
+                return RedirectToAction(Constant.Action.Login, Constant.Controller.Account);
             }
             var cardViewModel = new CardViewModel();
 
@@ -109,10 +108,10 @@ namespace VirtualWallet.Controllers.MVC
         [HttpPost]
         public async Task<IActionResult> Create(CardViewModel cardSearchViewModel)
         {
-            var loggedUserResult = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value);
+            var loggedUserResult = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value!);
             if (!loggedUserResult.IsSuccessful)
             {
-                return RedirectToAction("Login", "Account");
+                return RedirectToAction(Constant.Action.Login, Constant.Controller.Account);
             }
 
             cardSearchViewModel.CreateCardDto.AccountUsername = loggedUserResult.Data.Username;
@@ -120,25 +119,25 @@ namespace VirtualWallet.Controllers.MVC
             var result = await cardService.CreateAsync(loggedUserResult.Data.Id, cardSearchViewModel.CreateCardDto);
             if (!result.IsSuccessful)
             {        
-                return View("ErrorMessage", result.Message);
+                return View(Constant.View.ErrorMessage, result.Message);
             }
 
-            return RedirectToAction("Index", "Card");
+            return RedirectToAction(Constant.Action.Index, Constant.Controller.Card);
         }
 
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
-            var loggedUserResult = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value);
+            var loggedUserResult = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value!);
             if (!loggedUserResult.IsSuccessful)
             {
-                return RedirectToAction("Login", "Account");
+                return RedirectToAction(Constant.Action.Login, Constant.Controller.Account);
             }
 
             var getCardDtoResult = await this.cardService.GetByIdAsync(id, loggedUserResult.Data);
             if (!getCardDtoResult.IsSuccessful)
             {
-                return View("ErrorMessage", getCardDtoResult.Message);
+                return View(Constant.View.ErrorMessage, getCardDtoResult.Message);
             }
             var cardViewModel = new CardViewModel()
             {
@@ -152,34 +151,34 @@ namespace VirtualWallet.Controllers.MVC
         [HttpPost]
         public async Task<IActionResult> Edit(int id, CardViewModel cardViewModel)
         {
-            var loggedUserResult = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value);
+            var loggedUserResult = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value!);
             if (!loggedUserResult.IsSuccessful)
             {
-                return RedirectToAction("Login", "Account");
+                return RedirectToAction(Constant.Action.Login, Constant.Controller.Account);
             }          
 
             var result = await cardService.UpdateAsync(id, loggedUserResult.Data, cardViewModel.UpdateCardDto);
             if (!result.IsSuccessful)
             {
-                return View("ErrorMessage", result.Message);
+                return View(Constant.View.ErrorMessage, result.Message);
             }
 
-            return RedirectToAction("Index", "Card");
+            return RedirectToAction(Constant.Action.Index, Constant.Controller.Card);
         }
 
         [HttpGet]
         public async Task<IActionResult> Delete(int id)
         {
-            var loggedUserResult = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value);
+            var loggedUserResult = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value!);
             if (!loggedUserResult.IsSuccessful)
             {
-                return RedirectToAction("Login", "Account");
+                return RedirectToAction(Constant.Action.Login, Constant.Controller.Account);
             }
 
             var cardResult = await this.cardService.GetByIdAsync(id, loggedUserResult.Data);
             if (!cardResult.IsSuccessful)
             {
-                return View("ErrorMessage", cardResult.Message);
+                return View(Constant.View.ErrorMessage, cardResult.Message);
             }
 
             var cardViewModel = new CardViewModel();
@@ -187,29 +186,29 @@ namespace VirtualWallet.Controllers.MVC
             return this.View(cardViewModel);
         }
 
-        [HttpPost,ActionName("Delete")]
+        [HttpPost,ActionName(Constant.Action.Delete)]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var loggedUserResult = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value);
+            var loggedUserResult = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value!);
             if (!loggedUserResult.IsSuccessful)
             {
-                return RedirectToAction("Login", "Account");
+                return RedirectToAction(Constant.Action.Login, Constant.Controller.Account);
             }
 
             var cardResult = await this.cardService.GetByIdAsync(id, loggedUserResult.Data);
             if (!cardResult.IsSuccessful)
             {
-                return View("ErrorMessage", cardResult.Message);
+                return View(Constant.View.ErrorMessage, cardResult.Message);
             }
 
             var result = await this.cardService.DeleteAsync(id, loggedUserResult.Data);
 
             if (!result.IsSuccessful)
             {
-                return View("ErrorMessage", result.Message);
+                return View(Constant.View.ErrorMessage, result.Message);
             }
 
-            return View("SuccessfulDelete");
+            return View(Constant.View.SuccessfulDelete);
         }
     }
 }

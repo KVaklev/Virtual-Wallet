@@ -53,33 +53,33 @@ namespace VirtualWallet.Controllers.MVC
             var loggedUser = await this.userService.LoginAsync(loginUserModel.Username, loginUserModel.Password); 
             if (!loggedUser.IsSuccessful)
             {
-                return View("ErrorMessage", loggedUser.Message);
+                return View(Constant.View.ErrorMessage, loggedUser.Message);
             }
 
             var result = await this.security.CreateApiTokenAsync(loggedUser.Data);
             if (!result.IsSuccessful)
             {
-                return View("ErrorMessage", result.Message);
+                return View(Constant.View.ErrorMessage, result.Message);
             }
 
-            Response.Cookies.Append("Cookie_JWT", result.Data, new CookieOptions()
+            Response.Cookies.Append(Constant.View.JWTCookie, result.Data, new CookieOptions()
             {
                 HttpOnly = false,
                 SameSite = SameSiteMode.Strict
             });
 
-            return RedirectToAction("Index", "History");
+            return RedirectToAction(Constant.Action.Index, Constant.Controller.History);
         }
 
         [HttpGet("logout")]
         public IActionResult Logout()
         {
-            if (Request.Cookies["Cookie_JWT"] != null)
+            if (Request.Cookies[Constant.View.JWTCookie] != null)
             {
-                Response.Cookies.Delete("Cookie_JWT");
+                Response.Cookies.Delete(Constant.View.JWTCookie);
             }
 
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction(Constant.Action.Index, Constant.Controller.Home);
         }
 
         [HttpGet("register")]
@@ -89,9 +89,9 @@ namespace VirtualWallet.Controllers.MVC
             var currencyResult = await this.currencyService.GetAllAsync();
             if (!currencyResult.IsSuccessful)
             {
-                return View("ErrorMessage", currencyResult.Message);
+                return View(Constant.View.ErrorMessage, currencyResult.Message);
             }
-            TempData["Currencies"] = JsonSerializer.Serialize(currencyResult.Data);
+            TempData[Constant.TempData.Currencies] = JsonSerializer.Serialize(currencyResult.Data);
 
             return this.View(createUserModel);
         }
@@ -108,7 +108,7 @@ namespace VirtualWallet.Controllers.MVC
             var result = await this.userService.CreateAsync(createUserModel);
             if (!result.IsSuccessful)
             {
-                return View("ErrorMessage", result.Message);
+                return View(Constant.View.ErrorMessage, result.Message);
             }
 
             return await SendConfirmationEmailAsync(result.Data.Username);
@@ -122,11 +122,11 @@ namespace VirtualWallet.Controllers.MVC
 
             if (!generatedToken.IsSuccessful)
             {
-                return View("ErrorMessage", generatedToken.Message);
+                return View(Constant.View.ErrorMessage, generatedToken.Message);
             }
 
-            var confirmationLink = Url.Action("confirmed-registration", "Account", new { userId = user.Id, token = generatedToken }, Request.Scheme);
-            var message = await this.emailService.BuildEmailAsync(user, confirmationLink);
+            var confirmationLink = Url.Action(Constant.View.ConfirmedRegistration, Constant.Controller.Account, new { userId = user.Id, token = generatedToken }, Request.Scheme);
+            var message = await this.emailService.BuildEmailAsync(user, confirmationLink!);
 
             try
             {
@@ -134,10 +134,10 @@ namespace VirtualWallet.Controllers.MVC
             }
             catch (InvalidOperationException ex)
             {
-                return View("ErrorMessage", ex.Message);
+                return View(Constant.View.ErrorMessage, ex.Message);
             }
                 
-            return RedirectToAction("SuccessfulEmailSent", "Account");
+            return RedirectToAction(Constant.Action.SuccessfulEmailSent, Constant.Controller.Account);
         }
 
         [HttpGet("successful-email-sent")]
@@ -152,10 +152,10 @@ namespace VirtualWallet.Controllers.MVC
 			var result = await this.accountService.ConfirmRegistrationAsync(userId, token);
             if (!result.IsSuccessful)
             {
-                return View("ErrorMessage", result.Message);
+                return View(Constant.View.ErrorMessage, result.Message);
             }
 
-          return View("SuccessfulRegistration");
+          return View(Constant.View.SuccessfulRegistration);
         }
     }
 }

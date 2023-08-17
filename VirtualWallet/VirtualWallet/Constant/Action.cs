@@ -17,5 +17,7 @@
         public const string Delete = "Delete";
 
         public const string Update = "Update";
+
+        public const string SuccessfulEmailSent = "SuccessfulEmailSent";
     }
 }
