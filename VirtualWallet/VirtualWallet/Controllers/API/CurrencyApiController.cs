@@ -1,6 +1,5 @@
 ﻿using Business.DTOs.Requests;
 using Business.Services.Contracts;
-using DataAccess.Models.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Business.Services.Helpers;
@@ -26,7 +25,7 @@ namespace VirtualWallet.Controllers.API
         [HttpPost, Authorize]
         public async Task<IActionResult> CreateAsync([FromBody] CreateCurrencyDto currencyDto)
         {
-            var loggedUser = await FindLoggedUserAsync();
+            var loggedUser = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value);
 
             if (!loggedUser.IsSuccessful)
             {
@@ -48,7 +47,7 @@ namespace VirtualWallet.Controllers.API
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            var loggedUser = await this.FindLoggedUserAsync();
+            var loggedUser = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value);
 
             if (!loggedUser.IsSuccessful)
             {
@@ -56,7 +55,7 @@ namespace VirtualWallet.Controllers.API
 
             }
 
-            var result = await this.currencyService.GetAllAndDeletedAsync(loggedUser.Data);
+            var result = await this.currencyService.GetAllAsync();
             if (!result.IsSuccessful)
             {
                 if (result.Message == Constants.NoRecordsFound)
@@ -72,7 +71,7 @@ namespace VirtualWallet.Controllers.API
         [HttpGet("{id}"), Authorize]
         public async Task<IActionResult> GetByIdAsync([FromRoute] int id)
         {
-            var loggedUser = await FindLoggedUserAsync();
+            var loggedUser = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value);
             if (!loggedUser.IsSuccessful)
             {
                 return StatusCode(StatusCodes.Status401Unauthorized, loggedUser.Message);
@@ -94,8 +93,7 @@ namespace VirtualWallet.Controllers.API
         [HttpPut("{id}"), Authorize]
         public async Task<IActionResult> UpdateAsync([FromRoute] int id, [FromBody] CreateCurrencyDto currencyDto)
         {
-
-            var loggedUser = await FindLoggedUserAsync();
+            var loggedUser = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value);
             if (!loggedUser.IsSuccessful)
             {
                 return StatusCode(StatusCodes.Status401Unauthorized, loggedUser.Message);
@@ -118,7 +116,7 @@ namespace VirtualWallet.Controllers.API
         [HttpDelete("{id}"), Authorize]
         public async Task<IActionResult> DeleteAsync([FromRoute] int id)
         {
-            var loggedUser = await FindLoggedUserAsync();
+            var loggedUser = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value);
             if (!loggedUser.IsSuccessful)
             {
                 return StatusCode(StatusCodes.Status404NotFound, loggedUser.Message);
@@ -137,25 +135,6 @@ namespace VirtualWallet.Controllers.API
 
             return StatusCode(StatusCodes.Status200OK, result.Data);
 
-        }
-        private async Task<Response<User>> FindLoggedUserAsync()
-        {
-            var result = new Response<User>();
-            var loggedUsersUsername = User.FindFirst(ClaimTypes.Name);
-            if (loggedUsersUsername == null)
-            {
-                result.IsSuccessful = false;
-                return result;
-            }
-
-            var loggedUserResult = await this.userService.GetLoggedUserByUsernameAsync(loggedUsersUsername.Value);
-            if (loggedUserResult == null)
-            {
-                result.IsSuccessful = false;
-                return result;
-            }
-
-            return loggedUserResult;
         }
     }
 }

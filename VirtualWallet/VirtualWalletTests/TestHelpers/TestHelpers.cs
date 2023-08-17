@@ -338,10 +338,56 @@ namespace VirtualWalletTests.TestHelpers
                 Id = 1,
                 Name = "Bulgarian Lev",
                 CurrencyCode = "BGN",
-                IsDeleted = false
+                IsDeleted = false,
+                Country="Bulgaria"
             };
         }
 
+        public static List<Currency> GetListCurrency()
+        {
+            return new List<Currency>()
+            {
+                new Currency
+                {
+                Id = 1,
+                Name = "Bulgarian Lev",
+                CurrencyCode = "BGN",
+                IsDeleted = false,
+                Country = "Bulgaria"
+                }
+            };
+        }
+
+        public static CreateCurrencyDto GetCurrencyDto()
+        {
+            return new CreateCurrencyDto()
+            {
+                Name = "Bulgarian Lev",
+                CurrencyCode = "BGN",
+                Country = "Bulgaria"
+            };
+        }
+
+        public static Currency GetNewCurrency()
+        {
+            return new Currency()
+            {
+                Id = 4,
+                Name = "Bahamian Dollar",
+                CurrencyCode = "BSD",
+                Country = "BAHAMAS(THE)"
+            };
+        }
+
+        public static List<Currency> GetListDelete()
+        {
+           return   new List<Currency>
+            {
+                new Currency { IsDeleted = true },
+                new Currency { IsDeleted = false},
+                new Currency { IsDeleted = true }
+            };
+        }
         //Helpers for TransactionServices Tests
         public static Transaction GetTransaction()
         {

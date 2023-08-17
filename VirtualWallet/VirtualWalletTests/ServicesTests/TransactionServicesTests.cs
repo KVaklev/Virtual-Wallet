@@ -168,6 +168,8 @@ namespace VirtualWalletTests.ServicesTests
             //  transactionsMapperMock.Object,
             mapperMock.Object);
 
+            //// Act
+            //var result = await service.CreateOutTransactionAsync(transactionDto, loggedUser);
 
             // Act
             var result = await service.CreateOutTransactionAsync(transactionDto, loggedUser);

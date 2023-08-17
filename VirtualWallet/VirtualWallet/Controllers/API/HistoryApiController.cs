@@ -1,7 +1,6 @@
 ﻿using Business.QueryParameters;
 using Business.Services.Contracts;
 using Business.Services.Helpers;
-using DataAccess.Models.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -27,8 +26,8 @@ namespace VirtualWallet.Controllers.API
         public async Task<IActionResult> GetHistoryAsync([FromQuery] HistoryQueryParameters historyQueryParameters) 
         {
            
-           var loggedUserResult = await FindLoggedUserAsync();
-           if (!loggedUserResult.IsSuccessful)
+           var loggedUserResult = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value);
+            if (!loggedUserResult.IsSuccessful)
            {
                 return StatusCode(StatusCodes.Status401Unauthorized, loggedUserResult.Message);
            }
@@ -44,26 +43,6 @@ namespace VirtualWallet.Controllers.API
            }
 
            return StatusCode(StatusCodes.Status200OK, result.Data);   
-        }
-
-        private async Task<Response<User>> FindLoggedUserAsync()
-        {
-            var result = new Response<User>();
-            var loggedUsersUsername = User.FindFirst(ClaimTypes.Name);
-            if (loggedUsersUsername == null)
-            {
-                result.IsSuccessful = false;
-                return result;
-            }
-            
-            var loggedUserResult = await this.userService.GetLoggedUserByUsernameAsync(loggedUsersUsername.Value);
-            if (loggedUserResult == null)
-            {
-                result.IsSuccessful = false;
-                return result;
-            }
-            
-            return loggedUserResult;
         }
     }
 }

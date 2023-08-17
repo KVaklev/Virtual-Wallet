@@ -11,8 +11,7 @@ using Business.Services.Contracts;
 using Business.Services.Models;
 using Business.Services.Additional;
 using Business.Services.Helpers;
-using Business.Mappers;
-using Business.Mappers.Contracts;
+
 
 namespace VirtualWallet
 {
@@ -26,14 +25,6 @@ namespace VirtualWallet
             {
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
                 options.EnableSensitiveDataLogging();
-            });
-
-
-            builder.Services.AddSession(options =>
-            {
-                options.IdleTimeout = TimeSpan.FromSeconds(1000);
-                options.Cookie.HttpOnly = true;
-                options.Cookie.IsEssential = true;
             });
 
             builder.Services.AddControllersWithViews();
@@ -101,7 +92,6 @@ namespace VirtualWallet
 
             app.UseDeveloperExceptionPage();
             app.UseRouting();
-            app.UseSession();
 
             app.UseAuthentication();
             app.UseAuthorization();

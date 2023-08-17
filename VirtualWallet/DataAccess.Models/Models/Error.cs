@@ -6,6 +6,7 @@
         {
             this.InvalidPropertyName = invalidPropertyName;
         }
+        
         public string InvalidPropertyName { get; set; }
 
     }

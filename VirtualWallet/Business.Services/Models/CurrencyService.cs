@@ -1,7 +1,5 @@
 ﻿using AutoMapper;
-using Business.DTOs;
 using Business.DTOs.Requests;
-using Business.Mappers;
 using Business.Services.Contracts;
 using Business.Services.Helpers;
 using DataAccess.Models.Models;
@@ -16,7 +14,7 @@ namespace Business.Services.Models
 
         public CurrencyService(
             ICurrencyRepository currencyRepository,
-            IMapper mapper )
+            IMapper mapper)
         {
             this.currencyRepository = currencyRepository;
             this.mapper = mapper;
@@ -31,6 +29,14 @@ namespace Business.Services.Models
                 result.Message = Constants.ModifyUserErrorMessage;
                 return result;
             }
+            var currencies = this.currencyRepository.GetAll().ToList();
+            if (currencies.Any(c=>c.CurrencyCode==currencyDto.CurrencyCode.ToUpper()))
+            {
+                result.IsSuccessful = false;
+                result.Message = Constants.CurrencyExist;
+                return result;
+            }
+            
             var currency = this.mapper.Map<Currency>(currencyDto);
             var newCurrency = await this.currencyRepository.CreateAsync(currency); 
             result.Data = newCurrency;

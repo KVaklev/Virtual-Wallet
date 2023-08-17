@@ -1,4 +1,4 @@
-﻿using DataAccess.Models.Models;
+﻿
 
 namespace Business.QueryParameters
 {

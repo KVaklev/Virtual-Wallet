@@ -1,5 +1,4 @@
-﻿using DataAccess.Models.Models;
-using DataAccess.Models.ValidationAttributes;
+﻿using DataAccess.Models.ValidationAttributes;
 using System.ComponentModel.DataAnnotations;
 
 namespace Business.DTOs.Requests
