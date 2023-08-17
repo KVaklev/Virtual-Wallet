@@ -49,7 +49,9 @@ namespace VirtualWallet.Controllers.MVC
 
             var transferResult = await transferService.FilterByAsync(parameters, loggedUser.Data);
             var indexTransferViewModel = new IndexTransferViewModel();
+
             indexTransferViewModel.TransferQueryParameters = parameters;
+
             indexTransferViewModel.User = loggedUser.Data;
 
             if (!transferResult.IsSuccessful)
