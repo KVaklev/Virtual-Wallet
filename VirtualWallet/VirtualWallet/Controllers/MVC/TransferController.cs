@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
 using Business.Mappers;
 using Business.Services.Helpers;
+using System.Security.Claims;
 
 namespace VirtualWallet.Controllers.MVC
 {
@@ -47,7 +48,6 @@ namespace VirtualWallet.Controllers.MVC
             }
 
             var transferResult = await transferService.FilterByAsync(parameters, loggedUser.Data);
-            //ToDO
             var indexTransferViewModel = new IndexTransferViewModel();
             indexTransferViewModel.TransferQueryParameters = parameters;
             indexTransferViewModel.User = loggedUser.Data;
@@ -72,7 +72,6 @@ namespace VirtualWallet.Controllers.MVC
         }
 
         [HttpGet]
-
         public async Task<IActionResult> Details([FromRoute] int id)
         {
             var loggedUser = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value);
@@ -99,7 +98,6 @@ namespace VirtualWallet.Controllers.MVC
         }
 
         [HttpGet]
-
         public async Task<IActionResult> Create()
         {
             var loggedUser = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value);
@@ -153,7 +151,6 @@ namespace VirtualWallet.Controllers.MVC
         }
 
         [HttpGet]
-
         public async Task<IActionResult> Update([FromRoute] int id)
         {
             var loggedUser = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value);
@@ -188,7 +185,6 @@ namespace VirtualWallet.Controllers.MVC
         }
 
         [HttpPost]
-
         public async Task<IActionResult> Update(int id, UpdateTransferDto transferDto)
         {
             if (!this.ModelState.IsValid)
@@ -267,7 +263,6 @@ namespace VirtualWallet.Controllers.MVC
 
 
         [HttpGet]
-
         public async Task<IActionResult> Confirm([FromRoute] int id)
         {
             var loggedUser = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value);
@@ -297,7 +292,6 @@ namespace VirtualWallet.Controllers.MVC
         }
 
         [HttpPost]
-
         public async Task<IActionResult> Confirm([FromRoute] int id, ConfirmTransferViewModel confirmViewModel)
         {
             var loggedUser = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value);
@@ -337,7 +331,6 @@ namespace VirtualWallet.Controllers.MVC
         }
 
         [HttpGet]
-
         public async Task<IActionResult> SuccessfulConfirmation([FromRoute] int id)
         {
             var loggedUser = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value);

@@ -6,8 +6,6 @@ using Business.Services.Models;
 using DataAccess.Models.Models;
 using DataAccess.Repositories.Contracts;
 using Moq;
-using Business.Services.Helpers;
-using Business.Mappers;
 using Business.Mappers.Contracts;
 
 namespace VirtualWalletTests.ServicesTests
@@ -136,12 +134,6 @@ namespace VirtualWalletTests.ServicesTests
                     .ChecksCreateOutTransactionAsync(transactionDto, loggedUser, recipient, currency, exchangeRate))
                     .ReturnsAsync(new Response<GetTransactionDto> { IsSuccessful = true });
 
-            //var transactionsMapperMock = new Mock<TransactionsMapper>();
-            //transactionsMapperMock
-            //        .Setup(mapper => mapper
-            //        .MapDtoТоTransactionAsync(transactionDto, loggedUser, recipient, currency, exchangeRate.Data))
-            //        .ReturnsAsync(transaction);
-
             var transactionRepositoryMock = new Mock<ITransactionRepository>();
             transactionRepositoryMock
                     .Setup(repo => repo
@@ -165,14 +157,13 @@ namespace VirtualWalletTests.ServicesTests
             accountServiceMock.Object,
             historyRepositoryMock.Object,
             transactionCheckerServiceMock.Object,
-            //  transactionsMapperMock.Object,
             mapperMock.Object);
 
-//            //// Act
-//            //var result = await service.CreateOutTransactionAsync(transactionDto, loggedUser);
+            //// Act
+            var result = await service.CreateOutTransactionAsync(transactionDto, loggedUser);
 
-//            // Act
-//            var result = await service.CreateOutTransactionAsync(transactionDto, loggedUser);
+            // Act
+            var result = await service.CreateOutTransactionAsync(transactionDto, loggedUser);
 
             // Assert
             Assert.IsTrue(result.IsSuccessful);
