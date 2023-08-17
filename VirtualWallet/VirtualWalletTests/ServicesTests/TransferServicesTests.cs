@@ -25,7 +25,7 @@ namespace VirtualWalletTests.ServicesTests
         {
             // Arrange
             var filterParameters = new TransferQueryParameters();
-            var loggedUser = new User { /* Setup user properties as needed */ };
+            var loggedUser = new User { };
 
             var transferService = CreateTransferServiceWithMocks();
 
@@ -41,21 +41,20 @@ namespace VirtualWalletTests.ServicesTests
         private TransferService CreateTransferServiceWithMocks()
         {
             var transferRepositoryMock = new Mock<ITransferRepository>();
-           
+
 
             var currencyRepositoryMock = new Mock<ICurrencyRepository>();
-            
+
 
             var mapperMock = new Mock<IMapper>();
-            
+
 
             var securityMock = new Mock<ISecurityService>();
-            
+
 
             var transferService = new TransferService(
                 transferRepositoryMock.Object,
-                new Mock<ICardRepository>().Object,
-                new Mock<ApplicationContext>().Object,
+                new Mock<ICardRepository>().Object,                
                 new Mock<IHistoryRepository>().Object,
                 mapperMock.Object,
                 currencyRepositoryMock.Object,
@@ -73,39 +72,21 @@ namespace VirtualWalletTests.ServicesTests
             // Arrange
             int id = 1;
             User user = new User { IsAdmin = false };
+            var transfer = GetTransferTest();
 
             var transferRepositoryMock = new Mock<ITransferRepository>();
             transferRepositoryMock.Setup(repo => repo.GetByIdAsync(id))
-                                 .ReturnsAsync(new Transfer
-                                 {
-                                     Id = 1,
-                                     AccountId = 1,
-                                     CurrencyId = 2,
-                                     Amount = 10,
-                                     CardId = 1,
-                                     IsConfirmed = false,
-                                     IsCancelled = false,
-                                     DateCreated = DateTime.Now,
-                                     TransferType = TransferDirection.Deposit,
-                                 });
-
+                                 .ReturnsAsync(transfer);
+                                 
             var securityMock = new Mock<ISecurityService>();
             securityMock.Setup(security => security.IsUserAuthorizedAsync(It.IsAny<Transfer>(), user))
                         .ReturnsAsync(true);
 
+            var getTransferDto = GetTransferDtoTest();
+
             var mapperMock = new Mock<IMapper>();
             mapperMock.Setup(mapper => mapper.Map<GetTransferDto>(It.IsAny<Transfer>()))
-                      .Returns(new GetTransferDto
-                      {
-                          Id = 1,
-                          Username = "mariicheto",
-                          Amount = 10,
-                          CurrencyCode = "BGN",
-                          CardNumber = "1234567899875642",
-                          TransferType = TransferDirection.Deposit.ToString(),
-                          IsConfirmed = false,
-                          IsCancelled = false
-                      });
+                      .Returns(getTransferDto);
 
             var cardRepositoryMock = new Mock<ICardRepository>();
             var contextMock = new Mock<ApplicationContext>();
@@ -117,8 +98,7 @@ namespace VirtualWalletTests.ServicesTests
 
             var transferService = new TransferService(
                 transferRepositoryMock.Object,
-                cardRepositoryMock.Object,
-                contextMock.Object,
+                cardRepositoryMock.Object,               
                 historyRepositoryMock.Object,
                 mapperMock.Object,
                 currencyRepositoryMock.Object,
@@ -141,13 +121,9 @@ namespace VirtualWalletTests.ServicesTests
         public async Task CreateAsync_UserIsBlocked_ReturnsErrorResponse()
         {
             // Arrange
-            var transferDto = new CreateTransferDto
-            {
-                Amount = 10,
-                CurrencyCode = "BGN",
-                CardNumber = "1234567899875642",
-                TransferType = TransferDirection.Deposit.ToString(),
-            };
+            var createTransferDto = CreateTransferDtoTest();
+
+            var transferDto = createTransferDto;
             var user = new User { IsBlocked = true };
 
             var transferRepositoryMock = new Mock<ITransferRepository>();
@@ -162,7 +138,6 @@ namespace VirtualWalletTests.ServicesTests
             var transferService = new TransferService(
                 transferRepositoryMock.Object,
                 cardRepositoryMock.Object,
-                new Mock<ApplicationContext>().Object,
                 new Mock<IHistoryRepository>().Object,
                 mapperMock.Object,
                 currencyRepositoryMock.Object,
@@ -176,13 +151,13 @@ namespace VirtualWalletTests.ServicesTests
 
             // Assert
             Assert.IsFalse(result.IsSuccessful);
-            Assert.AreEqual("You are not authorized to create, delete or modify the transfer.", result.Message);
+            Assert.AreEqual(Constants.ModifyTransferErrorMessage, result.Message);
             Assert.IsNull(result.Data);
 
         }
 
-        
-       
+
+
         [TestMethod]
         public async Task GetByIdAsync_UserNotAuthorizedAndNotAdmin_ReturnsErrorResponse()
         {
@@ -190,18 +165,9 @@ namespace VirtualWalletTests.ServicesTests
             int id = 1;
             User user = new User { IsAdmin = false };
 
-            var transferToGet = new Transfer
-            {
-                Id = 1,
-                AccountId = 1,
-                CurrencyId = 2,
-                Amount = 10,
-                CardId = 1,
-                IsConfirmed = false,
-                IsCancelled = false,
-                DateCreated = DateTime.Now,
-                TransferType = TransferDirection.Deposit,
-            };
+            var transfer = GetTransferTest();
+
+            var transferToGet = transfer;
 
             var transferRepositoryMock = new Mock<ITransferRepository>();
             transferRepositoryMock.Setup(repo => repo.GetByIdAsync(id))
@@ -209,14 +175,13 @@ namespace VirtualWalletTests.ServicesTests
 
             var securityMock = new Mock<ISecurityService>();
             securityMock.Setup(security => security.IsUserAuthorizedAsync(transferToGet, user))
-                        .ReturnsAsync(false); // User is not authorized
+                        .ReturnsAsync(false); 
 
             var mapperMock = new Mock<IMapper>();
 
             var transferService = new TransferService(
                 transferRepositoryMock.Object,
-                new Mock<ICardRepository>().Object,
-                new Mock<ApplicationContext>().Object,
+                new Mock<ICardRepository>().Object,                
                 new Mock<IHistoryRepository>().Object,
                 mapperMock.Object,
                 new Mock<ICurrencyRepository>().Object,
@@ -229,10 +194,10 @@ namespace VirtualWalletTests.ServicesTests
             var result = await transferService.GetByIdAsync(id, user);
 
             // Assert
-            Assert.IsTrue(result.IsSuccessful); // Changed to Assert.IsTrue
-            Assert.AreEqual("You are not authorized for the specified action.", result.Message);
+            Assert.IsTrue(result.IsSuccessful); 
+            Assert.AreEqual(Constants.ModifyTransferGetByIdErrorMessage, result.Message);
             Assert.IsNull(result.Data);
-            // Additional assertions can be added based on your specific requirements
+            
         }
 
         [TestMethod]
@@ -244,15 +209,14 @@ namespace VirtualWalletTests.ServicesTests
 
             var transferRepositoryMock = new Mock<ITransferRepository>();
             transferRepositoryMock.Setup(repo => repo.GetByIdAsync(id))
-                                 .ReturnsAsync((Transfer)null); 
+                                 .ReturnsAsync((Transfer)null);
 
             var securityMock = new Mock<ISecurityService>();
             var mapperMock = new Mock<IMapper>();
 
             var transferService = new TransferService(
                 transferRepositoryMock.Object,
-                new Mock<ICardRepository>().Object,
-                new Mock<ApplicationContext>().Object,
+                new Mock<ICardRepository>().Object,                
                 new Mock<IHistoryRepository>().Object,
                 mapperMock.Object,
                 new Mock<ICurrencyRepository>().Object,
@@ -266,7 +230,7 @@ namespace VirtualWalletTests.ServicesTests
 
             // Assert
             Assert.IsFalse(result.IsSuccessful);
-            Assert.AreEqual("No records found", result.Message);
+            Assert.AreEqual(Constants.NoRecordsFound, result.Message);
             Assert.IsNull(result.Data);
         }
 
@@ -275,20 +239,12 @@ namespace VirtualWalletTests.ServicesTests
         {
             // Arrange
             int id = 1;
+
             User user = new User { IsAdmin = false };
 
-            var transferToGet = new Transfer
-            {
-                Id = 1,
-                AccountId = 1,
-                CurrencyId = 2,
-                Amount = 10,
-                CardId = 1,
-                IsConfirmed = false,
-                IsCancelled = false,
-                DateCreated = DateTime.Now,
-                TransferType = TransferDirection.Deposit,
-            };
+            var transfer = GetTransferTest();
+
+            var transferToGet = transfer;
 
             var transferRepositoryMock = new Mock<ITransferRepository>();
             transferRepositoryMock.Setup(repo => repo.GetByIdAsync(id))
@@ -302,8 +258,7 @@ namespace VirtualWalletTests.ServicesTests
 
             var transferService = new TransferService(
                 transferRepositoryMock.Object,
-                new Mock<ICardRepository>().Object,
-                new Mock<ApplicationContext>().Object,
+                new Mock<ICardRepository>().Object,                
                 new Mock<IHistoryRepository>().Object,
                 mapperMock.Object,
                 new Mock<ICurrencyRepository>().Object,
@@ -317,7 +272,7 @@ namespace VirtualWalletTests.ServicesTests
 
             // Assert
             Assert.IsFalse(result.IsSuccessful);
-            Assert.AreEqual("You are not authorized for the specified action.", result.Message);
+            Assert.AreEqual(Constants.ModifyTransferGetByIdErrorMessage, result.Message);
             Assert.IsNull(result.Data);
         }
 
@@ -325,13 +280,9 @@ namespace VirtualWalletTests.ServicesTests
         public async Task CreateAsync_CurrencyNotFound_ReturnsErrorResponse()
         {
             // Arrange
-            var transferDto = new CreateTransferDto
-            {
-                Amount = 10,
-                CurrencyCode = null,
-                CardNumber = "1234567899875642",
-                TransferType = TransferDirection.Deposit.ToString(),
-            };
+            var createTransferDto = CreateTransferDtoTest();
+
+            var transferDto = createTransferDto;
 
             var user = new User { IsBlocked = false, AccountId = 1 };
 
@@ -341,7 +292,7 @@ namespace VirtualWalletTests.ServicesTests
 
             var currencyRepositoryMock = new Mock<ICurrencyRepository>();
             currencyRepositoryMock.Setup(repo => repo.GetByCurrencyCodeAsync(transferDto.CurrencyCode))
-                                  .ReturnsAsync((Currency)null); // Simulate currency not found
+                                  .ReturnsAsync((Currency)null); 
 
             var transferRepositoryMock = new Mock<ITransferRepository>();
             var mapperMock = new Mock<IMapper>();
@@ -352,8 +303,7 @@ namespace VirtualWalletTests.ServicesTests
 
             var transferService = new TransferService(
                 transferRepositoryMock.Object,
-                cardRepositoryMock.Object,
-                new Mock<ApplicationContext>().Object,
+                cardRepositoryMock.Object,                
                 new Mock<IHistoryRepository>().Object,
                 mapperMock.Object,
                 currencyRepositoryMock.Object,
@@ -367,7 +317,7 @@ namespace VirtualWalletTests.ServicesTests
 
             // Assert
             Assert.IsFalse(result.IsSuccessful);
-            Assert.AreEqual("No records found", result.Message);
+            Assert.AreEqual(Constants.NoRecordsFound, result.Message);
             Assert.IsNull(result.Data);
 
         }
@@ -376,44 +326,23 @@ namespace VirtualWalletTests.ServicesTests
         public async Task CreateAsync_InsufficientBalance_ReturnsErrorResponse()
         {
             // Arrange
-            var transferDto = new CreateTransferDto
-            {
-                Amount = 100,
-                CurrencyCode = "USD",
-                CardNumber = "1234567899875642",
-                TransferType = TransferDirection.Deposit.ToString(),
-            };
+            var createTransferDto = CreateTransferDtoTest();
+
+            var transferDto = createTransferDto;
+
+            var cardToGet = GetCardTest();
 
             var user = new User { IsBlocked = false, AccountId = 1 };
 
-            var card = new Card
-            {
-                CardNumber = transferDto.CardNumber,
-                Balance = 50,
-            };
+            var card = cardToGet;
 
-            var account = new Account
-            {
-                Id = 2,
-                Balance = 1000,
-                CurrencyId = 2,
-                IsDeleted = false,
-                DateCreated = DateTime.Now,
-                UserId = 2
-            };
+            var accountToGet = GetAccountRecipient();
 
-            var transfer = new Transfer
-            {
-                Id = 1,
-                AccountId = 1,
-                CurrencyId = 2,
-                Amount = 10,
-                CardId = 1,
-                IsConfirmed = false,
-                IsCancelled = false,
-                DateCreated = DateTime.Now,
-                TransferType = TransferDirection.Deposit
-            };
+            var account = accountToGet;
+
+            var transferToGet = GetTransferTest();
+
+            var transfer = transferToGet;
 
             var cardRepositoryMock = new Mock<ICardRepository>();
             cardRepositoryMock.Setup(repo => repo.GetByAccountId(It.IsAny<int>()))
@@ -433,8 +362,7 @@ namespace VirtualWalletTests.ServicesTests
             var transferService = new TransferService(
                 transferRepositoryMock.Object,
                 cardRepositoryMock.Object,
-                new Mock<ApplicationContext>().Object,
-                new Mock<IHistoryRepository>().Object,
+                                new Mock<IHistoryRepository>().Object,
                 mapperMock.Object,
                 currencyRepositoryMock.Object,
                 accountServiceMock.Object,
@@ -447,58 +375,33 @@ namespace VirtualWalletTests.ServicesTests
 
             // Assert
             Assert.IsFalse(result.IsSuccessful);
-            Assert.AreEqual("Insufficient balance.", result.Message);
+            Assert.AreEqual(Constants.ModifyAccountBalancetErrorMessage, result.Message);
             Assert.IsNull(result.Data);
-            // Additional assertions can be added based on your specific requirements
+            
         }
 
         [TestMethod]
         public async Task CreateAsync_TransferCreation_ReturnsSuccessResponse()
         {
             // Arrange
-            var transferDto = new CreateTransferDto
-            {
-                Amount = 10,
-                CurrencyCode = "BGN",
-                CardNumber = "1234567899875642",
-                TransferType = TransferDirection.Deposit.ToString(),
-            };
+
+            var transferDtoToGet = CreateTransferDtoTest();
+
+            var transferDto = transferDtoToGet;
 
             var user = new User { IsBlocked = false, AccountId = 1 };
 
-            var card = new Card
-            {
-                Id = 1,
-                CardNumber = "1234567891011121",
-                ExpirationDate = DateTime.MaxValue,
-                CardHolder = "Ivancho Draganchov",
-                CheckNumber = "005",
-                AccountId = 1,
-                Balance = 750,
-                CurrencyId = 1,
-                IsDeleted = false,
-            };
+            var cardToGet = GetCardTest();
 
-            var currency = new Currency
-            {
-                Id = 1,
-                Name = "Bulgarian Lev",
-                CurrencyCode = "BGN",
-                IsDeleted = false
-            };
+            var card = cardToGet;
 
-            var transfer = new Transfer
-            {
-                Id = 1,
-                AccountId = 1,
-                CurrencyId = 2,
-                Amount = 10,
-                CardId = 1,
-                IsConfirmed = false,
-                IsCancelled = false,
-                DateCreated = DateTime.Now,
-                TransferType = TransferDirection.Deposit,
-            };
+            var currencyToGet = GetCurrency();
+
+            var currency = currencyToGet;
+
+            var transferToGet = GetTransferTest();
+
+            var transfer = transferToGet;
 
             var transferRepositoryMock = new Mock<ITransferRepository>();
             transferRepositoryMock.Setup(repo => repo.CreateAsync(It.IsAny<Transfer>()))
@@ -513,8 +416,7 @@ namespace VirtualWalletTests.ServicesTests
 
             var transferService = new TransferService(
                 transferRepositoryMock.Object,
-                new Mock<ICardRepository>().Object,
-                new Mock<ApplicationContext>().Object,
+                new Mock<ICardRepository>().Object,                
                 new Mock<IHistoryRepository>().Object,
                 mapperMock.Object,
                 currencyRepositoryMock.Object,

@@ -16,17 +16,24 @@ _Welcome to Speed Pay, your all-in-one solution which manages your budget with e
 
 4. Security measures taken in mind to safeguard sensitive information and ensure a worry-free financial experience. Advanced **Password Hashing** - login credentials are securely stored, providing a strong defense against unauthorized access. Enhanced **Card Number Protection** - hiding mechanism that displays only the last three digits of your credit or debit card. We successfully maintain the confidentiality of your card information, minimizing the risk of exposure.
 
-5. Register **Multiple Credit/Debit Cards**: When adding funds to your wallet, enjoy the convenience of choosing your funding source.
+5. Register **Multiple Credit/Debit Cards**: When adding funds to your wallet, enjoy the convenience of choosing your funding source.Speed Pay allows users to add multiple cards operating with different currencies.
 
-Maintain various currencies.
-Initial deposit to account. Account maintains single currency.
-Funds are transfered into accounts currency.
-Create, edit, delete transfers and transactions.
-Currency is dinamically mapped based on selected cards currencies.
-External API to get real data /Currency Exchange Public APIs./
-Withdraw money to selected card.
-Transaction In and Out functionality (all money movements are transfered either to sender or receivers currency).
-All transfers and transactions are reflected into the history.
+6. **Initial funding of a digital wallet** -  during the registration process each user can easily opt for the currency of his/her own account. Eqach account can be set in a single currency.
+
+7. **Transfers and Transactions** - these are the money movement operations that Speed Pay maintains as follows:
+
+- Transfers - these could be either deposit or withdrawal respectively when a particular user would like to send funds to his account from a selected card or to withdraw funds back to the desired card of       his list with cards. Currency field is dinamically mapped based on selected card's currency. Each transfer amount is exchanged into its destination's currency in case the currencies between the selected card and the account differ.
+
+- Transactions - these cound be either "In" or "Out" transasactions depending on money movement direction. In case a user wants to send money to another user this will be "Out" transaction for the sender and "In" transaction for the receiver of the funds. Here again each transaction is exchanged into the currency of receiver's account.
+
+Crud operations for money transfers and transactions are all covered and each user can easily - create, read, edit and delete those. NB: Once a particular transfer or transaction is either processed or cancelled it can no longer be updated.
+
+All completed transactions and transfers are stored in the history whereas in the dashbo
+
+8. **External API** - when it comes to exchanging funds described above, Speed Pay uses an external API - https://cdn.jsdelivr.net/gh/fawazahmed0/currency-api@1/latest/currencies/ - to get real data exchange rates.
+
+
+9. **Dashboard** - all transfers and transactions that are successfully completed are stored into the history whereas the transfer and transaction views display on top of the completed those that are either deleted or in progress.
 
 ## Technologies Used
 
@@ -150,20 +157,19 @@ See the additional Diagram file in our project folder -->Diagram.jpg
 
 > ### History page (visible to )
 ```sh
-> ........................................
+> Each user could see a list of his/her own successfully completed transactions and transfers and if the user is admin he could see such a list for each and every user where records are found.
 ```
 
 > ### Transfer/Transaction page (visible to .........)
 ```sh
 
-- Transfer - ......................
-
-- Transaction - .......................
+- Each user could see a list of all his/her transactions and transfers with their status, e.g. completed/cancelled/in progress. On the left hand side each user can also see his/her balance.
+Each transfer or transcation has a "details" button that displays a summary with the details for a particular operation. If the user is admin he could see such a list for each and every user where records are found.
 ```
 
 > ### Currency page (visible to .........)
 ```sh
-> ........................................
+> Currency section is maintained by the admin and he can easily add/remove/update the status of each currency being used in the application.
 ```
 
 > ### You Refer Friends (visible to everyone)
