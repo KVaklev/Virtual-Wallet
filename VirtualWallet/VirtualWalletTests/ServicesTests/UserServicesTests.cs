@@ -827,7 +827,7 @@ namespace VirtualWalletTests.ServicesTests
                  webHostEnvironmentMock.Object,
                  securityWrapperMock.Object);
 
-            // Act
+            // Actt
             var actualResponse = await sut.ChangeProfilePictureAsync(userToUpdate.Id, userDetailsViewModel, loggedUser);
 
             // Assert
