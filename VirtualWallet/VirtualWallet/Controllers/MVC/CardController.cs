@@ -115,8 +115,7 @@ namespace VirtualWallet.Controllers.MVC
                 return RedirectToAction("Login", "Account");
             }
 
-             cardSearchViewModel.CreateCardDto.AccountUsername = loggedUserResult.Data.Username;
-            //  cardSearchViewModel.CreateCardDto.CurrencyCode = loggedUserResult.Data.Account.Currency.CurrencyCode;
+            cardSearchViewModel.CreateCardDto.AccountUsername = loggedUserResult.Data.Username;
 
             var result = await cardService.CreateAsync(loggedUserResult.Data.Id, cardSearchViewModel.CreateCardDto);
             if (!result.IsSuccessful)

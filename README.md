@@ -84,35 +84,50 @@ See the additional Diagram file in our project folder -->Diagram.jpg
 
 ![N|Solid](https://drive.google.com/file/d/1901jsy49Xp8qay3T79JY9k020M1b9qND/view?usp=drive_link)
 
-### Login/Sign Up Page
+### Sign In Page
 
+![N|Solid](https://i.postimg.cc/ZqLWHxmL/SignIn.jpg)
 
-### Email Confirmation
+### Email received Inbox
 
+![N|Solid](https://i.postimg.cc/VN5N9Q7z/Email-Link.jpg)
 
-### Users Search Page
+### Successful Registration
 
+![N|Solid](https://i.postimg.cc/MKjbDNFb/Successful-Registration.jpg)
+
+### Users Filter Page 
+
+![N|Solid](https://i.postimg.cc/FsYKMQy8/User-Filter.jpg)
 
 ### Payment Methods Page
 
+![N|Solid](https://i.postimg.cc/rwLLf6QS/CardList.jpg)
 
-### History Page
+### Transfer
 
+![N|Solid](https://i.postimg.cc/63jwWwFD/Transfer.jpg)
 
-### Transfer/Transaction Page
+### Transactions Information
 
+![N|Solid](https://i.postimg.cc/bv6NJQtC/Transactions-List.jpg)
+
+### History
+
+![N|Solid](https://i.postimg.cc/bwyhtZ8K/History.jpg)
 
 ### Currencies
 
-
-### You Refer Friends
-
+![N|Solid](https://i.postimg.cc/rFhrWkcw/Currencies.jpg)
 
 ### Terms of Use and Privacy Policy 
 
+![N|Solid](https://i.postimg.cc/FRxZXS4r/Terms-Of-Use.jpg)
 
 #### Leadership/Contact us
 
+![N|Solid](https://i.postimg.cc/hvdt7Ltg/Leadership.jpg)
+![N|Solid](https://i.postimg.cc/1Rq6LTpW/Get-In-Touch.jpg)
 
 ## Features - MVC
 
