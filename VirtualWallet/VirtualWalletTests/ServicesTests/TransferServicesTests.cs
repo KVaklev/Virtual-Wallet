@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using Business.DTOs.Requests;
 using Business.DTOs.Responses;
-using Business.Mappers;
 using Business.QueryParameters;
 using Business.Services.Contracts;
 using Business.Services.Helpers;
@@ -9,10 +8,7 @@ using Business.Services.Models;
 using DataAccess.Models.Enums;
 using DataAccess.Models.Models;
 using DataAccess.Repositories.Contracts;
-using DataAccess.Repositories.Data;
 using Moq;
-using static Business.Services.Helpers.Constants;
-using static VirtualWalletTests.TestHelpers.TestHelpers;
 
 namespace VirtualWalletTests.ServicesTests
 {
@@ -24,7 +20,7 @@ namespace VirtualWalletTests.ServicesTests
         {
             // Arrange
             var filterParameters = new TransferQueryParameters();
-            var loggedUser = new User {  };
+            var loggedUser = new User { };
 
             var transferService = CreateTransferServiceWithMocks();
 
@@ -40,16 +36,16 @@ namespace VirtualWalletTests.ServicesTests
         private TransferService CreateTransferServiceWithMocks()
         {
             var transferRepositoryMock = new Mock<ITransferRepository>();
-           
+
 
             var currencyRepositoryMock = new Mock<ICurrencyRepository>();
-            
+
 
             var mapperMock = new Mock<IMapper>();
-            
+
 
             var securityMock = new Mock<ISecurityService>();
-            
+
 
             var transferService = new TransferService(
                 transferRepositoryMock.Object,
@@ -176,8 +172,8 @@ namespace VirtualWalletTests.ServicesTests
 
         }
 
-        
-       
+
+
         [TestMethod]
         public async Task GetByIdAsync_UserNotAuthorizedAndNotAdmin_ReturnsErrorResponse()
         {
@@ -204,7 +200,7 @@ namespace VirtualWalletTests.ServicesTests
 
             var securityMock = new Mock<ISecurityService>();
             securityMock.Setup(security => security.IsUserAuthorizedAsync(transferToGet, user))
-                        .ReturnsAsync(false); 
+                        .ReturnsAsync(false);
 
             var mapperMock = new Mock<IMapper>();
 
@@ -223,10 +219,10 @@ namespace VirtualWalletTests.ServicesTests
             var result = await transferService.GetByIdAsync(id, user);
 
             // Assert
-            Assert.IsTrue(result.IsSuccessful); 
+            Assert.IsTrue(result.IsSuccessful);
             Assert.AreEqual("You are not authorized for the specified action.", result.Message);
             Assert.IsNull(result.Data);
-            
+
         }
 
         [TestMethod]
@@ -238,7 +234,7 @@ namespace VirtualWalletTests.ServicesTests
 
             var transferRepositoryMock = new Mock<ITransferRepository>();
             transferRepositoryMock.Setup(repo => repo.GetByIdAsync(id))
-                                 .ReturnsAsync((Transfer)null); 
+                                 .ReturnsAsync((Transfer)null);
 
             var securityMock = new Mock<ISecurityService>();
             var mapperMock = new Mock<IMapper>();
@@ -439,7 +435,7 @@ namespace VirtualWalletTests.ServicesTests
             Assert.IsFalse(result.IsSuccessful);
             Assert.AreEqual("Insufficient balance.", result.Message);
             Assert.IsNull(result.Data);
-  
+
         }
 
         [TestMethod]
