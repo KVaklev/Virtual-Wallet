@@ -28,12 +28,12 @@ namespace VirtualWallet.Controllers.MVC
             var loggedUser = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value!);
             if (!loggedUser.IsSuccessful)
             {
-                return this.RedirectToAction("Login", "Account");
+                return this.RedirectToAction(Constant.Action.Login, Constant.Controller.Account);
             }
             var result = await this.currencyService.GetAllAndDeletedAsync(loggedUser.Data);
             if (!result.IsSuccessful)
             {
-                return View("ErrorMessage", result.Message);
+                return View(Constant.View.ErrorMessage, result.Message);
             }
             var currencyViwModel = new CurrencyViewModel();
             currencyViwModel.Currencies = result.Data;
@@ -48,13 +48,13 @@ namespace VirtualWallet.Controllers.MVC
             var loggedUser = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value!);
             if (!loggedUser.IsSuccessful)
             {
-                return this.RedirectToAction("Login", "Account");
+                return this.RedirectToAction(Constant.Action.Login, Constant.Controller.Account);
             }
 
             var result = await this.currencyService.GetCurrencyByIdAsync(id);
             if (!result.IsSuccessful)
             {
-                return View("ErrorMessage", result.Message);
+                return View(Constant.View.ErrorMessage, result.Message);
             }            
             return View(result.Data);
         }
@@ -65,15 +65,15 @@ namespace VirtualWallet.Controllers.MVC
             var loggedUser = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value!);
             if (!loggedUser.IsSuccessful)
             {
-                return this.RedirectToAction("Login", "Account");
+                return this.RedirectToAction(Constant.Action.Login, Constant.Controller.Account);
             }
 
             var result = await this.currencyService.DeleteAsync(currency.Id, loggedUser.Data);
             if (!result.IsSuccessful)
             {
-                return View("ErrorMessage", result.Message);
+                return View(Constant.View.ErrorMessage, result.Message);
             }
-            return this.RedirectToAction("Index", "Currency");
+            return this.RedirectToAction(Constant.Action.Index, Constant.Controller.Currency);
         }
 
         [HttpGet]
@@ -82,7 +82,7 @@ namespace VirtualWallet.Controllers.MVC
             var loggedUser = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value!);
             if (!loggedUser.IsSuccessful)
             {
-                return this.RedirectToAction("Login", "Account");
+                return this.RedirectToAction(Constant.Action.Login, Constant.Controller.Account);
             }
             var currency = new CreateCurrencyDto();
 
@@ -95,14 +95,14 @@ namespace VirtualWallet.Controllers.MVC
             var loggedUser = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value!);
             if (!loggedUser.IsSuccessful)
             {
-                return this.RedirectToAction("Login", "Account");
+                return this.RedirectToAction(Constant.Action.Login, Constant.Controller.Account);
             }
             var result = await this.currencyService.CreateAsync(currencyDto, loggedUser.Data);
             if (!result.IsSuccessful)
             {
-                return View("ErrorMessage", result.Message);
+                return View(Constant.View.ErrorMessage, result.Message);
             }
-            return this.RedirectToAction("Index", "Currency");
+            return this.RedirectToAction(Constant.Action.Index, Constant.Controller.Currency);
         }
 
         [HttpGet]
@@ -111,16 +111,16 @@ namespace VirtualWallet.Controllers.MVC
             var loggedUser = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value!);
             if (!loggedUser.IsSuccessful)
             {
-                return this.RedirectToAction("Login", "Account");
+                return this.RedirectToAction(Constant.Action.Login, Constant.Controller.Account);
             }
 
             var result = await this.currencyService.UpdateAsync(id, loggedUser.Data);
             if (!result.IsSuccessful)
             {        
-                return View("ErrorMessage", result.Message);
+                return View(Constant.View.ErrorMessage, result.Message);
             }
             
-            return View("Update",result.Message);
+            return View(Constant.View.Update,result.Message);
         }
     }
 }

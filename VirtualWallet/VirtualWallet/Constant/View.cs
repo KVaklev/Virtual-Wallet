@@ -10,6 +10,9 @@ namespace VirtualWallet.Constant
 
         public const string Index = "Index";
 
+        public const string Update = "Update";
+
+
         public const string SuccessfulCancellation = "SuccessfulCancellation";
 
         public const string SuccessfulConfirmation = "SuccessfulConfirmation";
