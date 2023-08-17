@@ -79,6 +79,7 @@ namespace DataAccess.Models.Models
             }
             return result;
         }
+
         public async Task<Response<decimal>> GetExchangeRateAsync(string fromCurrencyCode, string toCurrencyCode)
         {
             var result = new Response<decimal>();

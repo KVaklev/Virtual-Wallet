@@ -24,8 +24,7 @@ namespace Business.Mappers
                 .ForPath(t => t.Currency.CurrencyCode, t => t.MapFrom(t => t.CurrencyCode))
                 .ForPath(t => t.Direction, t => t.MapFrom(t => t.Direction))
                 .ReverseMap();
-
-            CreateMap<CreateTransactionDto, GetTransactionDto>();
+                
         }
 
         public static async Task<Transaction> MapOutToInTransactionAsync(
@@ -89,15 +88,15 @@ namespace Business.Mappers
             return transaction;
         }
 
-        //public async Task<CreateTransactionDto> MapGetDtoToCreateDto(GetTransactionDto getTransactionDto)
-        //{
-        //    var createTransactionDto = new CreateTransactionDto();
-        //    createTransactionDto.CurrencyCode = getTransactionDto.CurrencyCode;
-        //    createTransactionDto.Amount = getTransactionDto.Amount;
-        //    createTransactionDto.Description = getTransactionDto.Description;
-        //    createTransactionDto.RecipientUsername = getTransactionDto.RecipientUsername;
+        public static async Task<CreateTransactionDto> MapGetDtoToCreateDto(GetTransactionDto getTransactionDto)
+        {
+            var createTransactionDto = new CreateTransactionDto();
+            createTransactionDto.CurrencyCode = getTransactionDto.CurrencyCode;
+            createTransactionDto.Amount = getTransactionDto.Amount;
+            createTransactionDto.Description = getTransactionDto.Description;
+            createTransactionDto.RecipientUsername = getTransactionDto.RecipientUsername;
 
-        //    return createTransactionDto;
-        //}
+            return createTransactionDto;
+        }
     }
 }

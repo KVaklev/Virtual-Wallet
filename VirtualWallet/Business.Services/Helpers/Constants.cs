@@ -60,6 +60,7 @@
                 
         public const string CurrencyNotFoundErrorMessage = "This currency does not exist.";
         public const string CurrencySuccessfulUpdateMessage = "Currency updated successfully!";
+        public const string CurrencyExist = "This currency already exist!";
 
         //Constant messages for Authorized
 

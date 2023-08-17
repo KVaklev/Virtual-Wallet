@@ -1,11 +1,9 @@
-﻿using AutoMapper;
-using Business.DTOs.Requests;
+﻿using Business.DTOs.Requests;
 using Business.DTOs.Responses;
 using Business.Mappers;
 using Business.QueryParameters;
 using Business.Services.Contracts;
 using Business.Services.Helpers;
-using Business.ViewModels;
 using Business.ViewModels.TransactionViewModels;
 using DataAccess.Models.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -22,28 +20,23 @@ namespace VirtualWallet.Controllers.MVC
         private readonly IUserService userService;
         private readonly ICurrencyService currencyService;
         private readonly IExchangeRateService exchangeRateService;
-        private readonly IMapper mapper;
        
         public TransactionController(
             ITransactionService transactionService,
             IUserService userService,
             ICurrencyService currencyService,
-            IExchangeRateService exchangeRateService,
-            IMapper mapper)
+            IExchangeRateService exchangeRateService)
         {
             this.transactionService = transactionService;
             this.userService = userService;
             this.currencyService = currencyService;
             this.exchangeRateService = exchangeRateService;
-            this.mapper = mapper;
         }
 
-
         [HttpGet]
-
         public async Task<IActionResult> Index([FromQuery] TransactionQueryParameters parameters)
         {
-            var loggedUser = await FindLoggedUserAsync();
+            var loggedUser = await this.userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value);
             if (!loggedUser.IsSuccessful)
             {
                 return this.RedirectToAction("Login", "Account");
@@ -63,11 +56,9 @@ namespace VirtualWallet.Controllers.MVC
                 }
                 else 
                 { 
-                    this.ViewData["Controller"] = "Transaction";
                     return View("ErrorMessage", result.Message);
                 }
             }
-
             indexTransactionViewModel.TransactionDtos = result.Data;
             return View(indexTransactionViewModel);
         }
@@ -75,7 +66,7 @@ namespace VirtualWallet.Controllers.MVC
         [HttpGet]
         public async Task<IActionResult> Details([FromRoute]int id)
         {
-            var loggedUser = await FindLoggedUserAsync();
+            var loggedUser = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value);
             if (!loggedUser.IsSuccessful)
             {
                 return this.RedirectToAction("Login", "Account");
@@ -84,7 +75,6 @@ namespace VirtualWallet.Controllers.MVC
             var result = await this.transactionService.GetByIdAsync(id, loggedUser.Data);
             if (!result.IsSuccessful)
             {
-                this.ViewData["Controller"] = "Transaction";
                 return View("ErrorMessage", result.Message);
             }
 
@@ -94,14 +84,12 @@ namespace VirtualWallet.Controllers.MVC
             var senderUserResult = await this.userService.GetLoggedUserByUsernameAsync(result.Data.SenderUsername);
             if (!senderUserResult.IsSuccessful)
             {
-                this.ViewData["Controller"] = "Transaction";
                 return View("ErrorMessage", result.Message);
             }
 
             var recipientUserResult = await this.userService.GetLoggedUserByUsernameAsync(result.Data.RecipientUsername);
             if (!recipientUserResult.IsSuccessful)
             {
-                this.ViewData["Controller"] = "Transaction";
                 return View("ErrorMessage", result.Message);
             }
 
@@ -112,11 +100,10 @@ namespace VirtualWallet.Controllers.MVC
             return this.View(detailsTransactionsViewModel);
         }
 
-
         [HttpGet]
         public async Task<IActionResult> Create()
         {
-            var loggedUser = await FindLoggedUserAsync();
+            var loggedUser = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value);
             if (!loggedUser.IsSuccessful)
             {
                 return this.RedirectToAction("Login", "Account");
@@ -126,7 +113,6 @@ namespace VirtualWallet.Controllers.MVC
             var result = await this.currencyService.GetAllAsync();
             if (!result.IsSuccessful)
             {
-                this.ViewData["Controller"] = "Transaction";
                 return View("ErrorMessage", result.Message);
             }
 
@@ -137,7 +123,7 @@ namespace VirtualWallet.Controllers.MVC
         [HttpGet]
         public async Task<IActionResult> CreateWithUsername(string username)
         {
-            var loggedUser = await FindLoggedUserAsync();
+            var loggedUser = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value);
             if (!loggedUser.IsSuccessful)
             {
                 return this.RedirectToAction("Login", "Account");
@@ -151,8 +137,7 @@ namespace VirtualWallet.Controllers.MVC
 
             var result = await this.currencyService.GetAllAsync();
             if (!result.IsSuccessful)
-            {
-                this.ViewData["Controller"] = "Transaction";
+            { 
                 return View("ErrorMessage", result.Message);
             }
 
@@ -168,7 +153,7 @@ namespace VirtualWallet.Controllers.MVC
                 return this.View(transactionDto);
             }
             
-            var loggedUserResult = await FindLoggedUserAsync();
+            var loggedUserResult = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value);
             if (!loggedUserResult.IsSuccessful)
             {
                 return this.RedirectToAction("Login", "Account");
@@ -178,7 +163,6 @@ namespace VirtualWallet.Controllers.MVC
                             .CreateOutTransactionAsync(transactionDto.CreateTransactionDto, loggedUserResult.Data);
             if (!result.IsSuccessful)
             {
-                this.ViewData["Controller"] = "Transaction";
                 return View("ErrorMessage", result.Message);
             }
             
@@ -188,7 +172,7 @@ namespace VirtualWallet.Controllers.MVC
         [HttpGet]
         public async Task<IActionResult> Update([FromRoute] int id)
         {
-            var loggedUser = await FindLoggedUserAsync();
+            var loggedUser = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value);
             if (!loggedUser.IsSuccessful)
             {
                 return this.RedirectToAction("Login", "Account");
@@ -197,17 +181,16 @@ namespace VirtualWallet.Controllers.MVC
             var transactionResult = await this.transactionService.GetByIdAsync(id, loggedUser.Data);
             if (!transactionResult.IsSuccessful)
             {
-                this.ViewData["Controller"] = "Transaction";
                 return View("ErrorMessage", transactionResult.Message);
             }
 
             var createTransactionViewModel = new CreateTransactionViewModel();
-            createTransactionViewModel.CreateTransactionDto = this.mapper.Map<CreateTransactionDto>(transactionResult.Data);
+            createTransactionViewModel.CreateTransactionDto = await TransactionsMapper
+                                      .MapGetDtoToCreateDto(transactionResult.Data);
 
             var currencyResult = await this.currencyService.GetAllAsync();
             if (!currencyResult.IsSuccessful)
             {
-                this.ViewData["Controller"] = "Transaction";
                 return View("ErrorMessage", transactionResult.Message);
             }
             TempData["Currencies"] = JsonSerializer.Serialize(currencyResult.Data);
@@ -225,8 +208,8 @@ namespace VirtualWallet.Controllers.MVC
                     return View(createTransactionViewModel);
                 }
 
-                var loggedUserResult = await FindLoggedUserAsync();
-                if (!loggedUserResult.IsSuccessful)
+                var loggedUserResult = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value);
+            if (!loggedUserResult.IsSuccessful)
                 {
                     return this.RedirectToAction("Login", "Account");
                 }
@@ -237,7 +220,6 @@ namespace VirtualWallet.Controllers.MVC
                             createTransactionViewModel.CreateTransactionDto);
                 if (!result.IsSuccessful)
                 {
-                    this.ViewData["Controller"] = "Transaction";
                     return View("ErrorMessage", result.Message);
                 }
                
@@ -247,7 +229,7 @@ namespace VirtualWallet.Controllers.MVC
         [HttpGet]
         public async Task<IActionResult> Delete([FromRoute] int id)
         {  
-                var loggedUserResult = await FindLoggedUserAsync();
+                var loggedUserResult = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value);
                 if (!loggedUserResult.IsSuccessful)
                 {
                     return this.RedirectToAction("Login", "Account");
@@ -256,14 +238,12 @@ namespace VirtualWallet.Controllers.MVC
                 var transactionResult = await this.transactionService.GetByIdAsync(id, loggedUserResult.Data);
                 if (!transactionResult.IsSuccessful)
                 {
-                    this.ViewData["Controller"] = "Transaction";
                     return View("ErrorMessage", transactionResult.Message);
                 }
 
                 var result = await InitializedExecuteTransactionViewModelAsync(transactionResult.Data);
                 if (!result.IsSuccessful)
                 {
-                    this.ViewData["Controller"] = "Transaction";
                     return View("ErrorMessage", result.Message);
                 }
                 ConfirmTransactionViewModel confirmTransactionViewModel=result.Data;
@@ -276,8 +256,8 @@ namespace VirtualWallet.Controllers.MVC
             [FromRoute] int id, 
             ConfirmTransactionViewModel executeTransactionViewModel)
         {
-             var loggedUserResult = await FindLoggedUserAsync();
-             if (!loggedUserResult.IsSuccessful)
+             var loggedUserResult = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value);
+            if (!loggedUserResult.IsSuccessful)
              {
                 return this.RedirectToAction("Login", "Account");
              }
@@ -285,7 +265,6 @@ namespace VirtualWallet.Controllers.MVC
              var result = await this.transactionService.DeleteAsync(id, loggedUserResult.Data);
              if (!result.IsSuccessful)
              {
-                this.ViewData["Controller"] = "Transaction";
                 return View("ErrorMessage", result.Message);
              }
 
@@ -296,7 +275,7 @@ namespace VirtualWallet.Controllers.MVC
         [HttpGet]
         public async Task<IActionResult> Confirm([FromRoute] int id)
         {
-            var loggedUserResult = await FindLoggedUserAsync();
+            var loggedUserResult = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value);
             if (!loggedUserResult.IsSuccessful)
             {
                 return this.RedirectToAction("Login", "Account");
@@ -305,14 +284,12 @@ namespace VirtualWallet.Controllers.MVC
             var transactionResult = await this.transactionService.GetByIdAsync(id, loggedUserResult.Data);
             if (!transactionResult.IsSuccessful)
             {
-                this.ViewData["Controller"] = "Transaction";
                 return View("ErrorMessage", transactionResult.Message);
             }
 
             var result = await InitializedExecuteTransactionViewModelAsync(transactionResult.Data);
             if (!result.IsSuccessful)
             {
-                this.ViewData["Controller"] = "Transaction";
                 return View("ErrorMessage", result.Message);
             }
             ConfirmTransactionViewModel confirmTransactionViewModel = result.Data;
@@ -325,7 +302,7 @@ namespace VirtualWallet.Controllers.MVC
             [FromRoute] int id,
             ConfirmTransactionViewModel executeTransactionViewModel)
         {
-            var loggedUserResult = await FindLoggedUserAsync();
+            var loggedUserResult = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value);
             if (!loggedUserResult.IsSuccessful)
             {
                 return this.RedirectToAction("Login", "Account");
@@ -334,7 +311,6 @@ namespace VirtualWallet.Controllers.MVC
             var transactionResult = await this.transactionService.GetByIdAsync(id, loggedUserResult.Data);
             if (!transactionResult.IsSuccessful)
             {
-                this.ViewData["Controller"] = "Transaction";
                 return View("ErrorMessage", transactionResult.Message);
             }
             executeTransactionViewModel.GetTransactionDto = transactionResult.Data;
@@ -342,7 +318,6 @@ namespace VirtualWallet.Controllers.MVC
             var userResult = await this.userService.GetLoggedUserByUsernameAsync(transactionResult.Data.RecipientUsername);
             if (!userResult.IsSuccessful)
             {
-                this.ViewData["Controller"] = "Transaction";
                 return View("ErrorMessage", userResult.Message);
             }
             executeTransactionViewModel.Recipient = userResult.Data;
@@ -350,7 +325,6 @@ namespace VirtualWallet.Controllers.MVC
             var result = await this.transactionService.ConfirmAsync(id, loggedUserResult.Data);
             if (!result.IsSuccessful)
             {
-                this.ViewData["Controller"] = "Transaction";
                 return View("ErrorMessage", result.Message);
             }
 
@@ -360,7 +334,7 @@ namespace VirtualWallet.Controllers.MVC
         [HttpGet]
         public async Task<IActionResult> SuccessfulConfirm([FromRoute] int id)
         {
-            var loggedUserResult = await FindLoggedUserAsync();       
+            var loggedUserResult = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name).Value);       
             if (!loggedUserResult.IsSuccessful)
             {
                 return this.RedirectToAction("Login", "Account");
@@ -369,31 +343,10 @@ namespace VirtualWallet.Controllers.MVC
             var transactionResult = await this.transactionService.GetByIdAsync(id, loggedUserResult.Data);
             if (!transactionResult.IsSuccessful)
             {
-                this.ViewData["Controller"] = "Transaction";
                 return View("ErrorMessage", transactionResult.Message);
             }
 
             return this.View(transactionResult.Data);
-        }
-
-        private async Task<Response<User>> FindLoggedUserAsync()
-        {
-            var result = new Response<User>();
-            var loggedUsersUsername = User.FindFirst(ClaimTypes.Name);
-            if (loggedUsersUsername==null)
-            {
-                result.IsSuccessful = false;
-                return result;
-            }
-
-            var loggedUserResult = await this.userService.GetLoggedUserByUsernameAsync(loggedUsersUsername.Value);
-            if (loggedUserResult==null)
-            {
-                result.IsSuccessful = false;
-                return result;
-            }
-
-            return loggedUserResult;
         }
 
         private async Task<Response<ConfirmTransactionViewModel>> InitializedExecuteTransactionViewModelAsync(GetTransactionDto transaction)

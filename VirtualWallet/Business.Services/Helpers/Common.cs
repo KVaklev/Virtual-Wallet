@@ -36,8 +36,8 @@ namespace Business.Services.Helpers
             }
             return await Task.FromResult(true);
         }
-
     }
+
     public static class Common<T>
     {
         public static async Task<IQueryable<T>> PaginateAsync(IQueryable<T> result, int pageNumber, int pageSize)
@@ -46,7 +46,5 @@ namespace Business.Services.Helpers
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize));
         }
-    }
-
-    
+    }  
 }

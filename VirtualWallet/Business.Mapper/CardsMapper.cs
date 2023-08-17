@@ -38,7 +38,7 @@ namespace Business.Mappers
                 .ForPath(c=>c.Account.User.Username, c =>c.MapFrom(c=>c.Username))
                 .ReverseMap();
 
-                   }
+        }
 
         public static Task<Card> MapCreateDtoToCardAsync(int accountId, Card cardToCreate, Currency currency, CreateCardDto card)
         {

@@ -15,6 +15,7 @@ namespace DataAccess.Repositories.Models
         {
             this.context = context;
         }
+
         public IQueryable<Currency> GetAll()
         {
             var currencies = this.context.Currencies

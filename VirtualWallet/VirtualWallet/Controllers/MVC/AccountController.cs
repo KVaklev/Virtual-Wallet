@@ -1,6 +1,5 @@
 ﻿using Business.DTOs.Requests;
 using Business.Services.Contracts;
-using Business.Services.Helpers;
 using DataAccess.Repositories.Contracts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -54,14 +53,12 @@ namespace VirtualWallet.Controllers.MVC
             var loggedUser = await this.userService.LoginAsync(loginUserModel.Username, loginUserModel.Password); 
             if (!loggedUser.IsSuccessful)
             {
-                this.ViewData["Controller"] = "Account";
                 return View("ErrorMessage", loggedUser.Message);
             }
 
             var result = await this.security.CreateApiTokenAsync(loggedUser.Data);
             if (!result.IsSuccessful)
             {
-                this.ViewData["Controller"] = "Account";
                 return View("ErrorMessage", result.Message);
             }
 
@@ -92,7 +89,6 @@ namespace VirtualWallet.Controllers.MVC
             var currencyResult = await this.currencyService.GetAllAsync();
             if (!currencyResult.IsSuccessful)
             {
-                this.ViewData["Controller"] = "Account";
                 return View("ErrorMessage", currencyResult.Message);
             }
             TempData["Currencies"] = JsonSerializer.Serialize(currencyResult.Data);
@@ -112,7 +108,6 @@ namespace VirtualWallet.Controllers.MVC
             var result = await this.userService.CreateAsync(createUserModel);
             if (!result.IsSuccessful)
             {
-                this.ViewData["Controller"] = "Account";
                 return View("ErrorMessage", result.Message);
             }
 
@@ -127,7 +122,6 @@ namespace VirtualWallet.Controllers.MVC
 
             if (!generatedToken.IsSuccessful)
             {
-                this.ViewData["Controller"] = "Account";
                 return View("ErrorMessage", generatedToken.Message);
             }
 
@@ -140,7 +134,6 @@ namespace VirtualWallet.Controllers.MVC
             }
             catch (InvalidOperationException ex)
             {
-                this.ViewData["Controller"] = "Account";
                 return View("ErrorMessage", ex.Message);
             }
                 
@@ -159,7 +152,6 @@ namespace VirtualWallet.Controllers.MVC
 			var result = await this.accountService.ConfirmRegistrationAsync(userId, token);
             if (!result.IsSuccessful)
             {
-                this.ViewData["Controller"] = "Account";
                 return View("ErrorMessage", result.Message);
             }
 

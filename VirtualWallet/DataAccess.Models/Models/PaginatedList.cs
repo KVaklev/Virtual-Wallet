@@ -1,7 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc.Infrastructure;
-using Microsoft.EntityFrameworkCore;
-using System.ComponentModel.DataAnnotations;
-
+﻿
 namespace DataAccess.Models.Models
 {
     public class PaginatedList<T> : List<T>
@@ -14,7 +11,9 @@ namespace DataAccess.Models.Models
         }
 
         public int TotalPages { get; set; }
+        
         public int PageNumber { get; set; }
+       
         public bool HasPrevPage
         {
             get
@@ -22,6 +21,7 @@ namespace DataAccess.Models.Models
                 return this.PageNumber > 1;
             }
         }
+        
         public bool HasNextPage
         {
             get

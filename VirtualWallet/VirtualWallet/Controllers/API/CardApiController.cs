@@ -1,11 +1,8 @@
-﻿using AutoMapper;
+﻿
 using Business.DTOs.Requests;
-using Business.DTOs.Responses;
-using Business.Exceptions;
 using Business.QueryParameters;
 using Business.Services.Contracts;
 using DataAccess.Models.Models;
-using DataAccess.Repositories.Contracts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -30,7 +27,7 @@ namespace VirtualWallet.Controllers.API
         [HttpGet, Authorize]
         public async Task<IActionResult> GetCardsAsync([FromQuery] CardQueryParameters cardQueryParameters)
         {
-            var loggedUserResponse = await FindLoggedUserAsync();
+            var loggedUserResponse = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value);
             if (!loggedUserResponse.IsSuccessful)
             {
                 return StatusCode(StatusCodes.Status404NotFound, loggedUserResponse.Message);
@@ -48,7 +45,7 @@ namespace VirtualWallet.Controllers.API
         [HttpGet("id"), Authorize]
         public async Task<IActionResult> GetByIdAsync(int id)
         {
-            var loggedUserResponse = await FindLoggedUserAsync();
+            var loggedUserResponse = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value);
             if (!loggedUserResponse.IsSuccessful)
             {
                 return StatusCode(StatusCodes.Status404NotFound, loggedUserResponse.Message);
@@ -85,7 +82,7 @@ namespace VirtualWallet.Controllers.API
         public async Task<IActionResult> UpdateCard(int id, [FromBody] UpdateCardDto updateCardDto)
         {
 
-            var loggedUserResponse = await FindLoggedUserAsync();
+            var loggedUserResponse = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value);
             if (!loggedUserResponse.IsSuccessful)
             {
                 return StatusCode(StatusCodes.Status404NotFound, loggedUserResponse.Message);
@@ -103,7 +100,7 @@ namespace VirtualWallet.Controllers.API
         [HttpDelete("{id}"), Authorize]
         public async Task<IActionResult> DeleteCardAsync(int id)
         {
-            var loggedUserResponse = await FindLoggedUserAsync();
+            var loggedUserResponse = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value);
             if (!loggedUserResponse.IsSuccessful)
             {
                 return StatusCode(StatusCodes.Status404NotFound, loggedUserResponse.Message);
@@ -118,20 +115,15 @@ namespace VirtualWallet.Controllers.API
             return StatusCode(StatusCodes.Status200OK, result.Message);
         }
 
-        private async Task<Response<User>> FindLoggedUserAsync()
-        {
-            var loggedUsersUsername = User.FindFirst(ClaimTypes.Name);
-            var loggedUserResult = await this.userService.GetLoggedUserByUsernameAsync(loggedUsersUsername.Value);
-            return loggedUserResult;
-        }
         private async Task<Response<int>> FindLoggedUsersAccountAsync()
         {
             var result = new Response<int>();
             var loggedUsersAccountIdAsString = User.Claims.FirstOrDefault(claim => claim.Type == "UsersAccountId").Value;
             var accountId = int.Parse(loggedUsersAccountIdAsString);
-            result.Data= accountId;
+            result.Data = accountId;
 
             return await Task.FromResult(result);
         }
+
     }
 }

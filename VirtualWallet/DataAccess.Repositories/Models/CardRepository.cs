@@ -21,7 +21,6 @@ namespace DataAccess.Repositories.Models
                .Include(c=>c.Currency)
                .Include(c=>c.Account)
                .ThenInclude(c=>c.User)
-               
                .AsQueryable();
 
             return cards;

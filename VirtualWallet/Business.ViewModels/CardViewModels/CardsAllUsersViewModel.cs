@@ -8,6 +8,5 @@ namespace Business.ViewModels.CardViewModels
     {
         public CardQueryParameters CardQueryParameters { get; set; }
         public Response<PaginatedList<GetCreatedCardDto>> Cards { get; set; }
-
     }
 }
