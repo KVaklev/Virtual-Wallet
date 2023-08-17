@@ -55,7 +55,6 @@ namespace VirtualWalletTests.ServicesTests
             var transferService = new TransferService(
                 transferRepositoryMock.Object,
                 new Mock<ICardRepository>().Object,
-                new Mock<ApplicationContext>().Object,
                 new Mock<IHistoryRepository>().Object,
                 mapperMock.Object,
                 currencyRepositoryMock.Object,
@@ -118,7 +117,6 @@ namespace VirtualWalletTests.ServicesTests
             var transferService = new TransferService(
                 transferRepositoryMock.Object,
                 cardRepositoryMock.Object,
-                contextMock.Object,
                 historyRepositoryMock.Object,
                 mapperMock.Object,
                 currencyRepositoryMock.Object,
@@ -162,7 +160,6 @@ namespace VirtualWalletTests.ServicesTests
             var transferService = new TransferService(
                 transferRepositoryMock.Object,
                 cardRepositoryMock.Object,
-                new Mock<ApplicationContext>().Object,
                 new Mock<IHistoryRepository>().Object,
                 mapperMock.Object,
                 currencyRepositoryMock.Object,
@@ -216,7 +213,6 @@ namespace VirtualWalletTests.ServicesTests
             var transferService = new TransferService(
                 transferRepositoryMock.Object,
                 new Mock<ICardRepository>().Object,
-                new Mock<ApplicationContext>().Object,
                 new Mock<IHistoryRepository>().Object,
                 mapperMock.Object,
                 new Mock<ICurrencyRepository>().Object,
@@ -252,7 +248,6 @@ namespace VirtualWalletTests.ServicesTests
             var transferService = new TransferService(
                 transferRepositoryMock.Object,
                 new Mock<ICardRepository>().Object,
-                new Mock<ApplicationContext>().Object,
                 new Mock<IHistoryRepository>().Object,
                 mapperMock.Object,
                 new Mock<ICurrencyRepository>().Object,
@@ -303,7 +298,6 @@ namespace VirtualWalletTests.ServicesTests
             var transferService = new TransferService(
                 transferRepositoryMock.Object,
                 new Mock<ICardRepository>().Object,
-                new Mock<ApplicationContext>().Object,
                 new Mock<IHistoryRepository>().Object,
                 mapperMock.Object,
                 new Mock<ICurrencyRepository>().Object,
@@ -353,7 +347,6 @@ namespace VirtualWalletTests.ServicesTests
             var transferService = new TransferService(
                 transferRepositoryMock.Object,
                 cardRepositoryMock.Object,
-                new Mock<ApplicationContext>().Object,
                 new Mock<IHistoryRepository>().Object,
                 mapperMock.Object,
                 currencyRepositoryMock.Object,
@@ -433,7 +426,6 @@ namespace VirtualWalletTests.ServicesTests
             var transferService = new TransferService(
                 transferRepositoryMock.Object,
                 cardRepositoryMock.Object,
-                new Mock<ApplicationContext>().Object,
                 new Mock<IHistoryRepository>().Object,
                 mapperMock.Object,
                 currencyRepositoryMock.Object,
@@ -514,7 +506,6 @@ namespace VirtualWalletTests.ServicesTests
             var transferService = new TransferService(
                 transferRepositoryMock.Object,
                 new Mock<ICardRepository>().Object,
-                new Mock<ApplicationContext>().Object,
                 new Mock<IHistoryRepository>().Object,
                 mapperMock.Object,
                 currencyRepositoryMock.Object,

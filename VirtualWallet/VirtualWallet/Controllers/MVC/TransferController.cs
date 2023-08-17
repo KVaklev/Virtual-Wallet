@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
 using Business.Mappers;
 using Business.Services.Helpers;
+using System.Security.Claims;
 
 namespace VirtualWallet.Controllers.MVC
 {
