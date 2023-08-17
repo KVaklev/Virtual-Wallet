@@ -1,6 +1,7 @@
 ﻿@{
     var username = User.FindFirst(ClaimTypes.Name);
     var isAdmin = User.FindFirst("IsAdmin");
+    var isBlocked = User.FindFirst("IsBlocked");
 }
 
 <!DOCTYPE html>
@@ -60,9 +61,14 @@
 
                                     @if (User.Claims.Any())
                                     {
-                                        <li><a asp-controller="Transfer" asp-action="Create">Deposit/Withdraw</a></li>
-                                        @*<li><a asp-controller="Transfer" asp-action="Create">Withdraw</a></li>*@
-                                        <li><a asp-controller="Transaction" asp-action="Create">Send</a></li>
+                                        if (isAdmin.Value == "False" || isBlocked.Value == "True")
+                                       
+                                        {
+                                            <li><a asp-controller="Transfer" asp-action="Create">Deposit/Withdraw</a></li>
+
+                                            <li><a asp-controller="Transaction" asp-action="Create">Send</a></li>
+                                        }
+
                                         <li><a asp-controller="User" asp-action="Index">Users</a></li>
                                         <li class="dropdown active">
                                             <a class="dropdown-toggle" href="#">Account</a>
@@ -84,7 +90,7 @@
                                                     <li class="dropdown"><a class="dropdown-item" asp-controller="Currency" asp-action="Index">Currenies</a></li>
                                                     <li class="dropdown"><a class="dropdown-item" asp-controller="Card" asp-action="Details">All Users' Payment Methods</a></li>
                                                 }
-                                                else
+                                                else if(isBlocked.Value == "False")
                                                 {
                                                     <li class="dropdown">
                                                         <a class="dropdown-item dropdown-toggle" href="#">Money Operations</a>
