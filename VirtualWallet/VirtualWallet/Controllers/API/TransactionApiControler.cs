@@ -26,7 +26,7 @@ namespace VirtualWallet.Controllers.API
         [HttpPost, Authorize]
         public async Task<IActionResult> CreateAsync([FromBody] CreateTransactionDto transactionDto)
         {
-            var loggedUserResult = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value);
+            var loggedUserResult = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value!);
             if (!loggedUserResult.IsSuccessful)
             {
                 return StatusCode(StatusCodes.Status401Unauthorized, loggedUserResult.Message);
@@ -49,7 +49,7 @@ namespace VirtualWallet.Controllers.API
         [HttpDelete("{id}"), Authorize]
         public async Task<IActionResult> DeleteAsync(int id)
         {
-            var loggedUserResult = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value);
+            var loggedUserResult = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value!);
             if (!loggedUserResult.IsSuccessful)
             {
                 return StatusCode(StatusCodes.Status401Unauthorized, loggedUserResult.Message);
@@ -71,7 +71,7 @@ namespace VirtualWallet.Controllers.API
         [HttpPut("{id}"), Authorize]
         public async Task<IActionResult> UpdateAsync(int id, [FromBody] CreateTransactionDto transactionDto)
         {
-            var loggedUserResult = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value);
+            var loggedUserResult = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value!);
             if (!loggedUserResult.IsSuccessful)
             {
                 return StatusCode(StatusCodes.Status401Unauthorized, loggedUserResult.Message);
@@ -98,7 +98,7 @@ namespace VirtualWallet.Controllers.API
         [HttpGet("{id}"), Authorize]
         public async Task<IActionResult> GetByIdAsync(int id)
         {
-            var loggedUserResult = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value);
+            var loggedUserResult = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value!);
             if (!loggedUserResult.IsSuccessful)
             {
                 return StatusCode(StatusCodes.Status401Unauthorized, loggedUserResult.Message);
@@ -120,7 +120,7 @@ namespace VirtualWallet.Controllers.API
         [HttpGet, Authorize]
         public async Task<IActionResult> GetTransactionsAsync([FromQuery] TransactionQueryParameters filterParameters)
         {
-            var loggedUserResult = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value);
+            var loggedUserResult = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value!);
             if (!loggedUserResult.IsSuccessful)
             {
                 return StatusCode(StatusCodes.Status401Unauthorized, loggedUserResult.Message);
@@ -142,7 +142,7 @@ namespace VirtualWallet.Controllers.API
         [HttpPut("{id}/execute"), Authorize]
         public async Task<IActionResult> ExecuteAsync(int id)
         {
-            var loggedUserResult = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value);
+            var loggedUserResult = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value!);
             if (!loggedUserResult.IsSuccessful)
             {
                 return StatusCode(StatusCodes.Status401Unauthorized, loggedUserResult.Message);

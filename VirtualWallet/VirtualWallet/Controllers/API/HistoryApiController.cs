@@ -26,7 +26,7 @@ namespace VirtualWallet.Controllers.API
         public async Task<IActionResult> GetHistoryAsync([FromQuery] HistoryQueryParameters historyQueryParameters) 
         {
            
-           var loggedUserResult = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value);
+           var loggedUserResult = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value!);
             if (!loggedUserResult.IsSuccessful)
            {
                 return StatusCode(StatusCodes.Status401Unauthorized, loggedUserResult.Message);

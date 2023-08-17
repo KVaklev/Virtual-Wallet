@@ -2,6 +2,8 @@
 {
     public static class Action
     {
+        public const string Index = "Index";
+
         public const string Login = "Login";
 
         public const string Create = "Create";
@@ -16,13 +18,6 @@
 
         public const string Update = "Update";
 
-
-
-
-
-
-
-
-
+        public const string SuccessfulEmailSent = "SuccessfulEmailSent";
     }
 }

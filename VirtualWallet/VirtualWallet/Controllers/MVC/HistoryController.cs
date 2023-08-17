@@ -28,7 +28,7 @@ namespace VirtualWallet.Controllers.MVC
         public async Task<IActionResult> IndexAsync([FromQuery] HistoryQueryParameters parameters)
         {
 
-            var loggedUserResponse = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value);
+            var loggedUserResponse = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value!);
             if (!loggedUserResponse.IsSuccessful)
             {
                 return this.RedirectToAction("Login", "Account");
