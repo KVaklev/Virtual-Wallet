@@ -89,7 +89,7 @@
 
                             <p class="col-sm-4 text-muted text-sm-end fw-500 mb-0 mb-sm-3">Withdrawal amount:</p>
                             <p class="col-sm-8 text-4 fw-500">
-                                @Model.GetTransferDto.Amount.ToString("F2") @Model.GetTransferDto.CurrencyCode
+                                @Model.GetTransferDto.Amount.ToString("F2") @Model.GetTransferDto.Account.Currency.CurrencyCode
                             </p>
 
                         }
