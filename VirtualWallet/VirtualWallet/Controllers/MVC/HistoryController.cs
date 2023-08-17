@@ -31,7 +31,7 @@ namespace VirtualWallet.Controllers.MVC
             var loggedUserResponse = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value!);
             if (!loggedUserResponse.IsSuccessful)
             {
-                return this.RedirectToAction("Login", "Account");
+                return this.RedirectToAction(Constant.Action.Login, Constant.Controller.Account);
             }
 
             var result = await this.historyService.FilterByAsync(parameters, loggedUserResponse.Data);
@@ -48,7 +48,7 @@ namespace VirtualWallet.Controllers.MVC
                 }
                 else
                 {
-                    return View("ErrorMessage", result.Message);
+                    return View(Constant.View.ErrorMessage, result.Message);
                 }
             }
             indexHistoryViewModel.GetHistoryDtos = result.Data;
