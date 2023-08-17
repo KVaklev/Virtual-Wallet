@@ -58,7 +58,7 @@ namespace VirtualWallet.Controllers.MVC
             {
                 if (transferResult.Message == Constants.NoRecordsFound)
                 {
-                    this.ViewData[Constant.View.ErrorMessage] = transferResult.Message;
+                    this.ViewData[Constant.ViewData.ErrorMessage] = transferResult.Message;
 
                     return View(indexTransferViewModel);
                 }

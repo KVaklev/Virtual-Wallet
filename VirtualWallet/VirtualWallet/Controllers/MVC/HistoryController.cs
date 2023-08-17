@@ -43,7 +43,7 @@ namespace VirtualWallet.Controllers.MVC
             {
                 if(result.Message == Constants.NoRecordsFound)
                 {
-                    this.ViewData["ErrorMessage"] = result.Message;
+                    this.ViewData[Constant.ViewData.ErrorMessage] = result.Message;
                     return View(indexHistoryViewModel);
                 }
                 else
