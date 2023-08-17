@@ -154,8 +154,9 @@
                 <div class="transaction-item px-4 py-3" data-bs-toggle="modal" data-bs-target="#transaction-detail">
                     <div class="row align-items-center flex-row">
                             @{
-                                            var day = operation.EventTime.Day.ToString();
-                                            var month = operation.EventTime.ToString("MMM").ToUpper();
+                                               var day = operation.EventTime.Day.ToString();
+                                                var culture = new CultureInfo("en-US");
+                                                var month = operation.EventTime.ToString("MMM", culture).ToUpper();
 
                                             <div class="col-2 col-sm-1 text-center"> <span class="d-block text-4 fw-300">@day</span> <span class="d-block text-1 fw-300 text-uppercase">@month</span> </div>
                                             

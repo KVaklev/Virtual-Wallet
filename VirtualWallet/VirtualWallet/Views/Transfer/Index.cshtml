@@ -54,19 +54,24 @@
                         </form>
                     </div>
                     <!-- Profile Details End -->
-                    <!-- Available Balance
-                    =============================== -->
-                    <div class="bg-white shadow-sm rounded text-center p-3 mb-4">
-                        <div class="text-17 text-light my-3"><i class="fas fa-wallet text-primary"></i></div>
-                        <h3 class="text-9 fw-400">@Model.User.Account.Balance @Model.User.Account.Currency.CurrencyCode</h3>
-                        <p class="mb-2 text-muted opacity-8">Available Balance</p>
-                        <hr class="mx-n3">
-                        <div class="d-flex">
-                            <a asp-controller="Transfer" asp-action="Create" class="btn-link me-auto">Withdraw</a>
-                            <a asp-controller="Transfer" asp-action="Create" class="btn-link ms-auto">Deposit</a>
+                    @if (!Model.User.IsAdmin)
+                    {
+                        <!-- Available Balance
+                        =============================== -->
+                        <div class="bg-white shadow-sm rounded text-center p-3 mb-4">
+                            <div class="text-17 text-light my-3"><i class="fas fa-wallet text-primary"></i></div>
+                            <h3 class="text-9 fw-400">@Model.User.Account.Balance @Model.User.Account.Currency.CurrencyCode</h3>
+                            <p class="mb-2 text-muted opacity-8">Available Balance</p>
+                            <hr class="mx-n3">
+                            <div class="d-flex">
+                                <a asp-controller="Transfer" asp-action="Create" class="btn-link me-auto">Withdraw</a>
+                                <a asp-controller="Transfer" asp-action="Create" class="btn-link ms-auto">Deposit</a>
+                            </div>
                         </div>
-                    </div>
-                    <!-- Available Balance End -->
+                        <!-- Available Balance End -->
+
+                    }
+
                 </aside>
 
                 <!-- Left Panel End -->

@@ -76,7 +76,7 @@ namespace Business.Services.Models
             if (!transfers.Any())
             {
                 result.IsSuccessful = false;
-                result.Message = Constants.ModifyNoRecordsFound;
+                result.Message = Constants.NoRecordsFound;
                 return result;
             }
 

@@ -54,7 +54,7 @@ namespace VirtualWallet.Controllers.MVC
 
             if (!transferResult.IsSuccessful)
             {
-                if (transferResult.Message == Constants.ModifyNoRecordsFound)
+                if (transferResult.Message == Constants.NoRecordsFound)
                 {
                     this.ViewData[Constant.View.ErrorMessage] = transferResult.Message;
 
