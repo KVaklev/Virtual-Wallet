@@ -15,7 +15,6 @@ namespace VirtualWallet.Controllers.MVC
         private readonly IHistoryService historyService;
         private readonly IUserService userService;
 
-
         public HistoryController(
             IHistoryService historyService,
             IUserService userService)
