@@ -9,6 +9,11 @@ namespace VirtualWalletTests.TestHelpers
 {
     public static class TestHelpers
     {
+        //Constants for Tests
+
+        public const int NonExistingUserId = 666;
+        public const string RandomUsername = "Username";
+
         //Helpers for UserServices Tests
         public static User GetTestUser()
         {
@@ -98,7 +103,7 @@ namespace VirtualWalletTests.TestHelpers
                 //PhoneNumber = "0898568569",
                 //Password = "pa^3ddwp;z",
                 //CurrencyCode = "BGN", 
-               
+
             };
         }
         public static GetCreatedUserDto GetTestCreatedUserDto()
@@ -393,7 +398,7 @@ namespace VirtualWalletTests.TestHelpers
         {
             return new Transaction()
             {
-                Id=1,
+                Id = 1,
                 AccountSenderId = 1,
                 AccountRecepientId = 2,
                 Amount = 10,
@@ -404,7 +409,7 @@ namespace VirtualWalletTests.TestHelpers
                 Date = DateTime.Now,
                 Direction = DirectionType.Out,
                 ExchangeRate = Constants.ExchangeRateDefault,
-                AmountExchange=10
+                AmountExchange = 10
             };
         }
 
@@ -435,7 +440,7 @@ namespace VirtualWalletTests.TestHelpers
                 Description = "Test transaction.",
                 Amount = 10,
                 CurrencyCode = "BGN"
-            };    
+            };
         }
 
         public static Response<decimal> GerExchangeRateCorrect()
@@ -445,11 +450,71 @@ namespace VirtualWalletTests.TestHelpers
                 IsSuccessful = true,
                 Data = Constants.ExchangeRateDefault
             };
-        
+
         }
 
-        
-        
-        
+        //Helpers for TransferServices Tests
+        public static Transfer GetTransferTest()
+        {
+            return new Transfer()
+            {
+                Id = 1,
+                AccountId = 1,
+                CurrencyId = 2,
+                Amount = 10,
+                CardId = 1,
+                IsConfirmed = false,
+                IsCancelled = false,
+                DateCreated = DateTime.Now,
+                TransferType = TransferDirection.Deposit,
+            };
+        }
+
+        public static GetTransferDto GetTransferDtoTest()
+        {
+            return new GetTransferDto()
+            {
+                Id = 1,
+                Username = "mariicheto",
+                Amount = 10,
+                CurrencyCode = "BGN",
+                CardNumber = "1234567899875642",
+                TransferType = TransferDirection.Deposit.ToString(),
+                IsConfirmed = false,
+                IsCancelled = false
+            };
+        }
+
+        public static CreateTransferDto CreateTransferDtoTest()
+        {
+            return new CreateTransferDto()
+            {
+                Amount = 10,
+                CurrencyCode = "BGN",
+                CardNumber = "1234567899875642",
+                TransferType = TransferDirection.Deposit.ToString(),
+
+            };
+        }
+
+        public static Card GetCardTest()
+        {
+            return new Card()
+            {
+                Id = 1,
+                CardNumber = "1234567891011121",
+                ExpirationDate = DateTime.MaxValue,
+                CardHolder = "Ivancho Draganchov",
+                CheckNumber = "005",
+                AccountId = 1,
+                Balance = 750,
+                CurrencyId = 1,
+                IsDeleted = false,
+
+            };
+        }
+
+
+
     }
 }

@@ -1,6 +1,6 @@
-﻿namespace VirtualWallet.Helpers
+﻿namespace VirtualWallet.Constant
 {
-    public class Text
+    public static class HyperText
     {
         //Constant messages for About Us menu
 

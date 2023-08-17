@@ -10,12 +10,11 @@ using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
 using Business.Mappers;
 using Business.Services.Helpers;
-using System.Security.Claims;
 
 namespace VirtualWallet.Controllers.MVC
 {
     [Authorize]
-    public class TransferController : Controller
+    public class TransferController : Microsoft.AspNetCore.Mvc.Controller
     {
         private readonly ITransferService transferService;
         private readonly IUserService userService;
@@ -43,7 +42,8 @@ namespace VirtualWallet.Controllers.MVC
 
             if (!loggedUser.IsSuccessful)
             {
-                return this.RedirectToAction("Login", "Account");
+                return this.RedirectToAction(Constant.Action.Login, Constant.Controller.Account);
+
             }
 
             var transferResult = await transferService.FilterByAsync(parameters, loggedUser.Data);
@@ -56,34 +56,37 @@ namespace VirtualWallet.Controllers.MVC
             {
                 if (transferResult.Message == Constants.ModifyNoRecordsFound)
                 {
-                    this.ViewData["ErrorMessage"] = transferResult.Message;
+                    this.ViewData[Constant.View.ErrorMessage] = transferResult.Message;
+
                     return View(indexTransferViewModel);
                 }
                 else
                 {
-                    return View("ErrorMessage", transferResult.Message);
+                    return View(Constant.View.ErrorMessage, transferResult.Message);
                 }
             }
 
             indexTransferViewModel.TransferDtos = transferResult.Data;
+
             return View(indexTransferViewModel);
         }
 
         [HttpGet]
+
         public async Task<IActionResult> Details([FromRoute] int id)
         {
             var loggedUser = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value);
 
             if (!loggedUser.IsSuccessful)
             {
-                return this.RedirectToAction("Login", "Account");
+                return this.RedirectToAction(Constant.Action.Login, Constant.Controller.Account);
             }
 
             var transferResult = await this.transferService.GetByIdAsync(id, loggedUser.Data);
 
             if (!transferResult.IsSuccessful)
-            { 
-                return View("ErrorMessage", transferResult.Message);
+            {
+                return View(Constant.View.ErrorMessage, transferResult.Message);
             }
 
             var detailsTransferViewModel = new DetailsTransferViewModel();
@@ -96,13 +99,14 @@ namespace VirtualWallet.Controllers.MVC
         }
 
         [HttpGet]
+
         public async Task<IActionResult> Create()
         {
             var loggedUser = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value);
 
             if (!loggedUser.IsSuccessful)
             {
-                return this.RedirectToAction("Login", "Account");
+                return this.RedirectToAction(Constant.Action.Login, Constant.Controller.Account);
             }
 
             var createTransferViewModel = new CreateTransferViewModel();
@@ -111,14 +115,14 @@ namespace VirtualWallet.Controllers.MVC
 
             if (!cardsResult.IsSuccessful)
             {
-                return View("ErrorMessage", cardsResult.Message);
+                return View(Constant.View.ErrorMessage, cardsResult.Message);
             }
 
             var mappedCards = cardsResult.Data.Select(card => mapper.Map<GetCreatedCardDto>(card)).ToList();
 
-            TempData["Cards"] = JsonSerializer.Serialize(mappedCards);
+            TempData[Constant.TempData.Cards] = JsonSerializer.Serialize(mappedCards);
 
-            return View("Create", createTransferViewModel);
+            return View(Constant.View.Create, createTransferViewModel);
 
         }
 
@@ -134,34 +138,35 @@ namespace VirtualWallet.Controllers.MVC
 
             if (!loggedUser.IsSuccessful)
             {
-                return this.RedirectToAction("Login", "Account");
+                return this.RedirectToAction(Constant.Action.Login, Constant.Controller.Account);
             }
 
             var transferResult = await this.transferService.CreateAsync(transferDto.CreateTransferDto, loggedUser.Data);
 
             if (!transferResult.IsSuccessful)
             {
-               return View("ErrorMessage", transferResult.Message);
+                return View(Constant.View.ErrorMessage, transferResult.Message);
             }
 
-            return this.RedirectToAction("Confirm", "Transfer", new { id = transferResult.Data.Id });
+            return this.RedirectToAction(Constant.Action.Confirm, Constant.Controller.Transfer, new { id = transferResult.Data.Id });
 
         }
 
         [HttpGet]
+
         public async Task<IActionResult> Update([FromRoute] int id)
         {
             var loggedUser = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value);
 
             if (!loggedUser.IsSuccessful)
             {
-                return this.RedirectToAction("Login", "Account");
+                return this.RedirectToAction(Constant.Action.Login, Constant.Controller.Account);
             }
             var transferResult = await this.transferService.GetByIdAsync(id, loggedUser.Data);
 
             if (!transferResult.IsSuccessful)
             {
-                return View("ErrorMessage", transferResult.Message);
+                return View(Constant.View.ErrorMessage, transferResult.Message);
             }
 
             var createTransferViewModel = new CreateTransferViewModel();
@@ -172,17 +177,18 @@ namespace VirtualWallet.Controllers.MVC
 
             if (!cardsResult.IsSuccessful)
             {
-                return View("ErrorMessage", cardsResult.Message);
+                return View(Constant.View.ErrorMessage, cardsResult.Message);
             }
 
             var mappedCards = cardsResult.Data.Select(card => mapper.Map<GetCreatedCardDto>(card)).ToList();
 
-            TempData["Cards"] = JsonSerializer.Serialize(mappedCards);
+            TempData[Constant.TempData.Cards] = JsonSerializer.Serialize(mappedCards);
 
             return View(createTransferViewModel);
         }
 
         [HttpPost]
+
         public async Task<IActionResult> Update(int id, UpdateTransferDto transferDto)
         {
             if (!this.ModelState.IsValid)
@@ -194,16 +200,16 @@ namespace VirtualWallet.Controllers.MVC
 
             if (!loggedUser.IsSuccessful)
             {
-                return this.RedirectToAction("Login", "Account");
+                return this.RedirectToAction(Constant.Action.Login, Constant.Controller.Account);
             }
             var transferResult = await this.transferService.UpdateAsync(id, transferDto, loggedUser.Data);
 
             if (!transferResult.IsSuccessful)
             {
-                return View("ErrorMessage", transferResult.Message);
+                return View(Constant.View.ErrorMessage, transferResult.Message);
             }
 
-            return this.RedirectToAction("Confirm", "Transfer", new { Username = loggedUser.Data.Username });
+            return this.RedirectToAction(Constant.Action.Confirm, Constant.Controller.Transfer, new { Username = loggedUser.Data.Username });
 
         }
 
@@ -215,21 +221,21 @@ namespace VirtualWallet.Controllers.MVC
 
             if (!loggedUserresult.IsSuccessful)
             {
-                return this.RedirectToAction("Login", "Account");
+                return this.RedirectToAction(Constant.Action.Login, Constant.Controller.Account);
             }
 
             var transferResult = await this.transferService.GetByIdAsync(id, loggedUserresult.Data);
 
             if (!transferResult.IsSuccessful)
             {
-                return View("ErrorMessage", transferResult.Message);
+                return View(Constant.View.ErrorMessage, transferResult.Message);
             }
 
             var result = await ExecuteTransferAsync(transferResult.Data);
 
             if (!result.IsSuccessful)
             {
-                return View("ErrorMessage", result.Message);
+                return View(Constant.View.ErrorMessage, result.Message);
             }
 
             ConfirmTransferViewModel confirmTransferViewModel = result.Data;
@@ -246,42 +252,43 @@ namespace VirtualWallet.Controllers.MVC
 
             if (!loggedUser.IsSuccessful)
             {
-                return this.RedirectToAction("Login", "Account");
+                return this.RedirectToAction(Constant.Action.Login, Constant.Controller.Account);
             }
 
             var transferResult = await this.transferService.DeleteAsync(id, loggedUser.Data);
 
             if (!transferResult.IsSuccessful)
             {
-                return View("ErrorMessage", transferResult.Message);
+                return View(Constant.View.ErrorMessage, transferResult.Message);
             }
 
-            return this.View("SuccessfulCancellation");
+            return this.View(Constant.View.SuccessfulCancellation);
         }
 
 
         [HttpGet]
+
         public async Task<IActionResult> Confirm([FromRoute] int id)
         {
             var loggedUser = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value);
 
             if (!loggedUser.IsSuccessful)
             {
-                return this.RedirectToAction("Login", "Account");
+                return this.RedirectToAction(Constant.Action.Login, Constant.Controller.Account);
             }
 
             var transferResult = await this.transferService.GetByIdAsync(id, loggedUser.Data);
 
             if (!transferResult.IsSuccessful)
             {
-                return View("ErrorMessage", transferResult.Message);
+                return View(Constant.View.ErrorMessage, transferResult.Message);
             }
 
             var result = await ExecuteTransferAsync(transferResult.Data);
 
             if (!result.IsSuccessful)
             {
-                return View("ErrorMessage", result.Message);
+                return View(Constant.View.ErrorMessage, result.Message);
             }
 
             ConfirmTransferViewModel confirmTransferViewModel = result.Data;
@@ -290,20 +297,21 @@ namespace VirtualWallet.Controllers.MVC
         }
 
         [HttpPost]
+
         public async Task<IActionResult> Confirm([FromRoute] int id, ConfirmTransferViewModel confirmViewModel)
         {
             var loggedUser = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value);
 
             if (!loggedUser.IsSuccessful)
             {
-                return this.RedirectToAction("Login", "Account");
+                return this.RedirectToAction(Constant.Action.Login, Constant.Controller.Account);
             }
 
             var transferResult = await this.transferService.GetByIdAsync(id, loggedUser.Data);
 
             if (!transferResult.IsSuccessful)
             {
-                return View("ErrorMessage", transferResult.Message);
+                return View(Constant.View.ErrorMessage, transferResult.Message);
             }
 
             confirmViewModel.GetTransferDto = transferResult.Data;
@@ -312,7 +320,7 @@ namespace VirtualWallet.Controllers.MVC
 
             if (!userResult.IsSuccessful)
             {
-                return View("ErrorMessage", userResult.Message);
+                return View(Constant.View.ErrorMessage, userResult.Message);
             }
 
             confirmViewModel.UserDetails = userResult.Data;
@@ -321,27 +329,28 @@ namespace VirtualWallet.Controllers.MVC
 
             if (!result.IsSuccessful)
             {
-                return View("ErrorMessage", result.Message);
+                return View(Constant.View.ErrorMessage, result.Message);
             }
 
-            return RedirectToAction("SuccessfulConfirmation", "Transfer", new { id = transferResult.Data.Id });
+            return RedirectToAction(Constant.View.SuccessfulConfirmation, Constant.Controller.Transfer, new { id = transferResult.Data.Id });
 
         }
 
         [HttpGet]
+
         public async Task<IActionResult> SuccessfulConfirmation([FromRoute] int id)
         {
             var loggedUser = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value);
 
             if (!loggedUser.IsSuccessful)
             {
-                return this.RedirectToAction("Login", "Account");
+                return this.RedirectToAction(Constant.Action.Login, Constant.Controller.Account);
             }
             var transferResult = await this.transferService.GetByIdAsync(id, loggedUser.Data);
 
             if (!transferResult.IsSuccessful)
             {
-                return View("ErrorMessage", transferResult.Message);
+                return View(Constant.View.ErrorMessage, transferResult.Message);
             }
             return View(transferResult.Data);
 
@@ -360,7 +369,9 @@ namespace VirtualWallet.Controllers.MVC
             if (!user.IsSuccessful)
             {
                 result.IsSuccessful = false;
+
                 result.Message = user.Message;
+
                 return result;
             }
 
@@ -374,7 +385,9 @@ namespace VirtualWallet.Controllers.MVC
             if (!exchangeAmount.IsSuccessful)
             {
                 result.IsSuccessful = false;
+
                 result.Message = exchangeAmount.Message;
+
                 return result;
             }
 
