@@ -34,7 +34,7 @@ namespace VirtualWallet.Controllers.API
         [HttpGet("id"),Authorize]
         public async Task<IActionResult> GetByIdAsync(int id)
         {
-            var loggedUserResponse = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value);
+            var loggedUserResponse = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value!);
             if (!loggedUserResponse.IsSuccessful)
             {
                 return StatusCode(StatusCodes.Status404NotFound, loggedUserResponse.Message);
@@ -65,7 +65,7 @@ namespace VirtualWallet.Controllers.API
         [HttpPut("{id}"), Authorize]
         public async Task<IActionResult> UpdateUser(int id, [FromBody] UpdateUserDto updateUserDto)
         {
-            var loggedUserResponse = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value);
+            var loggedUserResponse = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value!);
             if (!loggedUserResponse.IsSuccessful)
             {
                 return StatusCode(StatusCodes.Status404NotFound, loggedUserResponse.Message);
@@ -83,7 +83,7 @@ namespace VirtualWallet.Controllers.API
         [HttpDelete("{id}"), Authorize]
         public async Task<IActionResult> DeleteUser(int id)
         {
-            var loggedUserResponse = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value);
+            var loggedUserResponse = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value!);
             if (!loggedUserResponse.IsSuccessful)
             {
                 return StatusCode(StatusCodes.Status404NotFound, loggedUserResponse.Message);
@@ -102,7 +102,7 @@ namespace VirtualWallet.Controllers.API
         [HttpPut("{id}/promote"), Authorize]
         public async Task<IActionResult> Promote(int id)
         {
-            var loggedUserResponse = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value);
+            var loggedUserResponse = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value!);
             if (!loggedUserResponse.IsSuccessful)
             {
                 return StatusCode(StatusCodes.Status404NotFound, loggedUserResponse.Message);
@@ -121,7 +121,7 @@ namespace VirtualWallet.Controllers.API
         [HttpPut("{id}/block"), Authorize]
         public async Task<IActionResult> BlockUser(int id)
         {
-            var loggedUserResponse = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value);
+            var loggedUserResponse = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value!);
             if (!loggedUserResponse.IsSuccessful)
             {
                 return StatusCode(StatusCodes.Status404NotFound, loggedUserResponse.Message);
@@ -142,7 +142,7 @@ namespace VirtualWallet.Controllers.API
         public async Task<IActionResult> UnblockUser(int id)
         {
 
-            var loggedUserResponse = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value);
+            var loggedUserResponse = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value!);
             if (!loggedUserResponse.IsSuccessful)
             {
                 return StatusCode(StatusCodes.Status404NotFound, loggedUserResponse.Message);

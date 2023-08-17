@@ -31,7 +31,7 @@ namespace Business.Services.Helpers
                 new Claim(JwtRegisteredClaimNames.Email, loggedUser.Email),
                 new Claim(JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString())
         },
-            expires: DateTime.Now.AddMinutes(15),
+            expires: DateTime.Now.AddMinutes(30),
                     signingCredentials: signinCredentials
                 );
 

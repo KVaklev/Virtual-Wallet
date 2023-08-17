@@ -168,10 +168,6 @@ namespace VirtualWalletTests.ServicesTests
             Assert.IsNotNull(result.Data);
             Assert.IsNull(result.Message);
         }
-
-
-
-
     }
 }
 

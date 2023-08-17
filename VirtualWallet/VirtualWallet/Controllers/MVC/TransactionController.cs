@@ -36,7 +36,7 @@ namespace VirtualWallet.Controllers.MVC
         [HttpGet]
         public async Task<IActionResult> Index([FromQuery] TransactionQueryParameters parameters)
         {
-            var loggedUser = await this.userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value);
+            var loggedUser = await this.userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value!);
             if (!loggedUser.IsSuccessful)
             {
                 return this.RedirectToAction("Login", "Account");
@@ -66,7 +66,7 @@ namespace VirtualWallet.Controllers.MVC
         [HttpGet]
         public async Task<IActionResult> Details([FromRoute]int id)
         {
-            var loggedUser = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value);
+            var loggedUser = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value!);
             if (!loggedUser.IsSuccessful)
             {
                 return this.RedirectToAction("Login", "Account");
@@ -103,7 +103,7 @@ namespace VirtualWallet.Controllers.MVC
         [HttpGet]
         public async Task<IActionResult> Create()
         {
-            var loggedUser = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value);
+            var loggedUser = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value!);
             if (!loggedUser.IsSuccessful)
             {
                 return this.RedirectToAction("Login", "Account");
@@ -123,7 +123,7 @@ namespace VirtualWallet.Controllers.MVC
         [HttpGet]
         public async Task<IActionResult> CreateWithUsername(string username)
         {
-            var loggedUser = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value);
+            var loggedUser = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value!);
             if (!loggedUser.IsSuccessful)
             {
                 return this.RedirectToAction("Login", "Account");
@@ -153,7 +153,7 @@ namespace VirtualWallet.Controllers.MVC
                 return this.View(transactionDto);
             }
             
-            var loggedUserResult = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value);
+            var loggedUserResult = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value!);
             if (!loggedUserResult.IsSuccessful)
             {
                 return this.RedirectToAction("Login", "Account");
@@ -172,7 +172,7 @@ namespace VirtualWallet.Controllers.MVC
         [HttpGet]
         public async Task<IActionResult> Update([FromRoute] int id)
         {
-            var loggedUser = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value);
+            var loggedUser = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value!);
             if (!loggedUser.IsSuccessful)
             {
                 return this.RedirectToAction("Login", "Account");
@@ -208,7 +208,7 @@ namespace VirtualWallet.Controllers.MVC
                     return View(createTransactionViewModel);
                 }
 
-                var loggedUserResult = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value);
+                var loggedUserResult = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value!);
             if (!loggedUserResult.IsSuccessful)
                 {
                     return this.RedirectToAction("Login", "Account");
@@ -229,7 +229,7 @@ namespace VirtualWallet.Controllers.MVC
         [HttpGet]
         public async Task<IActionResult> Delete([FromRoute] int id)
         {  
-                var loggedUserResult = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value);
+                var loggedUserResult = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value!);
                 if (!loggedUserResult.IsSuccessful)
                 {
                     return this.RedirectToAction("Login", "Account");
@@ -256,7 +256,7 @@ namespace VirtualWallet.Controllers.MVC
             [FromRoute] int id, 
             ConfirmTransactionViewModel executeTransactionViewModel)
         {
-             var loggedUserResult = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value);
+             var loggedUserResult = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value!);
             if (!loggedUserResult.IsSuccessful)
              {
                 return this.RedirectToAction("Login", "Account");
@@ -275,7 +275,7 @@ namespace VirtualWallet.Controllers.MVC
         [HttpGet]
         public async Task<IActionResult> Confirm([FromRoute] int id)
         {
-            var loggedUserResult = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value);
+            var loggedUserResult = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value!);
             if (!loggedUserResult.IsSuccessful)
             {
                 return this.RedirectToAction("Login", "Account");
@@ -302,7 +302,7 @@ namespace VirtualWallet.Controllers.MVC
             [FromRoute] int id,
             ConfirmTransactionViewModel executeTransactionViewModel)
         {
-            var loggedUserResult = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value);
+            var loggedUserResult = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value!);
             if (!loggedUserResult.IsSuccessful)
             {
                 return this.RedirectToAction("Login", "Account");
@@ -334,7 +334,7 @@ namespace VirtualWallet.Controllers.MVC
         [HttpGet]
         public async Task<IActionResult> SuccessfulConfirm([FromRoute] int id)
         {
-            var loggedUserResult = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name).Value);       
+            var loggedUserResult = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value!);       
             if (!loggedUserResult.IsSuccessful)
             {
                 return this.RedirectToAction("Login", "Account");
