@@ -225,7 +225,7 @@ namespace Business.Services.Models
 
             if (userToUpdate.Email != updateUserDto.Email)
             {
-                if (await EmailExistsAsync(updateUserDto.Email))
+                if (await EmailExistsAsync(updateUserDto.Email!))
                 {
                     result.IsSuccessful = false;
                     result.Message = EmailExistsErrorMessage;
@@ -236,7 +236,7 @@ namespace Business.Services.Models
 
             if (userToUpdate.PhoneNumber != updateUserDto.PhoneNumber)
             {
-                if (await PhoneNumberExistsAsync(updateUserDto.PhoneNumber))
+                if (await PhoneNumberExistsAsync(updateUserDto.PhoneNumber!))
                 {
                     result.IsSuccessful = false;
                     result.Message = PhoneNumberExistsErrorMessage;
