@@ -142,7 +142,7 @@ namespace VirtualWalletTests.ServicesTests
 
             var historyRepositoryMock = new Mock<IHistoryRepository>();
             var transactionServiceMock = new Mock<ITransactionService>();
-            var transactionCheckerServiceMock = new Mock<ITransactionCheckerService>();
+           
 
             var mapperMock = new Mock<IMapper>();
             mapperMock.Setup(m => m.Map<GetTransactionDto>(transaction)).Returns(getTransactionDto);
@@ -156,7 +156,7 @@ namespace VirtualWalletTests.ServicesTests
             exchangeRateServiceMock.Object,
             accountServiceMock.Object,
             historyRepositoryMock.Object,
-            transactionCheckerServiceMock.Object,
+            transactionCheckerMock.Object,
             mapperMock.Object);
 
             

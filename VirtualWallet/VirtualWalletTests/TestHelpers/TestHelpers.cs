@@ -300,6 +300,7 @@ namespace VirtualWalletTests.TestHelpers
                 Password = new byte[] { 0x65, 0x23, 0x25, 0x55 },
                 PhoneNumber = "0878558547",
                 AccountId = 1,
+                Account = GetAccountSender(),
                 IsAdmin = false,
                 IsBlocked = false,
                 Address = "Blvd Patriarh Evtimii 72",
@@ -316,6 +317,7 @@ namespace VirtualWalletTests.TestHelpers
                 Id = 1,
                 Balance = 1000,
                 CurrencyId = 1,
+                Currency = GetCurrency(),
                 IsDeleted = false,
                 DateCreated = DateTime.Now,
                 UserId = 1
@@ -332,7 +334,8 @@ namespace VirtualWalletTests.TestHelpers
                 CurrencyId = 2,
                 IsDeleted = false,
                 DateCreated = DateTime.Now,
-                UserId = 2
+                UserId = 2,
+                User = GetTestExpectedUserAsUnblocked()
             };
         }
         //Helpers for CurrencyServices Tests
