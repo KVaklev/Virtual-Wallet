@@ -1,6 +1,4 @@
 ﻿using AutoMapper;
-using Business.DTOs.Requests;
-using Business.DTOs.Responses;
 using Business.Services.Helpers;
 using Business.Services.Models;
 using DataAccess.Models.Models;
