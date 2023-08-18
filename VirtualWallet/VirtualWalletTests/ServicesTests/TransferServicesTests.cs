@@ -1,14 +1,11 @@
 ﻿using AutoMapper;
 using Business.DTOs.Responses;
-using Business.Mappers;
 using Business.QueryParameters;
 using Business.Services.Contracts;
 using Business.Services.Helpers;
 using Business.Services.Models;
 using DataAccess.Models.Models;
 using DataAccess.Repositories.Contracts;
-using DataAccess.Repositories.Data;
-using Microsoft.AspNetCore.Hosting;
 using Moq;
 using static VirtualWalletTests.TestHelpers.TestHelpers;
 
@@ -51,7 +48,6 @@ namespace VirtualWalletTests.ServicesTests
             var transferService = new TransferService(
                 transferRepositoryMock.Object,
                 cardRepositoryMock.Object,
-                new ApplicationContext(),
                 historyRepositoryMock.Object,
                 mapperMock.Object,
                 currencyRepositoryMock.Object,
@@ -96,8 +92,7 @@ namespace VirtualWalletTests.ServicesTests
             var transferService = new TransferService(
                 transferRepositoryMock.Object,
                 cardRepositoryMock.Object,
-                new ApplicationContext(),
-                historyRepositoryMock.Object,
+                                historyRepositoryMock.Object,
                 mapperMock.Object,
                 currencyRepositoryMock.Object,
                 accountServiceMock.Object,
@@ -136,7 +131,6 @@ namespace VirtualWalletTests.ServicesTests
             var transferService = new TransferService(
                  transferRepositoryMock.Object,
                  cardRepositoryMock.Object,
-                 new ApplicationContext(),
                  historyRepositoryMock.Object,
                  mapperMock.Object,
                  currencyRepositoryMock.Object,
@@ -185,7 +179,6 @@ namespace VirtualWalletTests.ServicesTests
             var transferService = new TransferService(
                  transferRepositoryMock.Object,
                  cardRepositoryMock.Object,
-                 new ApplicationContext(),
                  historyRepositoryMock.Object,
                  mapperMock.Object,
                  currencyRepositoryMock.Object,
@@ -227,7 +220,6 @@ namespace VirtualWalletTests.ServicesTests
             var transferService = new TransferService(
                  transferRepositoryMock.Object,
                  cardRepositoryMock.Object,
-                 new ApplicationContext(),
                  historyRepositoryMock.Object,
                  mapperMock.Object,
                  currencyRepositoryMock.Object,
@@ -277,7 +269,6 @@ namespace VirtualWalletTests.ServicesTests
             var transferService = new TransferService(
                  transferRepositoryMock.Object,
                  cardRepositoryMock.Object,
-                 new ApplicationContext(),
                  historyRepositoryMock.Object,
                  mapperMock.Object,
                  currencyRepositoryMock.Object,
@@ -326,7 +317,6 @@ namespace VirtualWalletTests.ServicesTests
             var transferService = new TransferService(
                  transferRepositoryMock.Object,
                  cardRepositoryMock.Object,
-                 new ApplicationContext(),
                  historyRepositoryMock.Object,
                  mapperMock.Object,
                  currencyRepositoryMock.Object,
@@ -389,7 +379,6 @@ namespace VirtualWalletTests.ServicesTests
             var transferService = new TransferService(
             transferRepositoryMock.Object,
             cardRepositoryMock.Object,
-            new ApplicationContext(),
             historyRepositoryMock.Object,
             mapperMock.Object,
             currencyRepositoryMock.Object,
@@ -445,7 +434,6 @@ namespace VirtualWalletTests.ServicesTests
             cardRepositoryMock.Setup(repo => repo.GetByAccountId(It.IsAny<int>()))
                              .Returns(new List<Card> { card }.AsQueryable());
 
-
             var mapperMock = new Mock<IMapper>();
 
             var securityMock = new Mock<ISecurityService>();
@@ -453,7 +441,6 @@ namespace VirtualWalletTests.ServicesTests
             var transferService = new TransferService(
             transferRepositoryMock.Object,
             cardRepositoryMock.Object,
-            new ApplicationContext(),
             historyRepositoryMock.Object,
             mapperMock.Object,
             currencyRepositoryMock.Object,

@@ -27,7 +27,6 @@ namespace Business.Services.Models
         public TransferService(
             ITransferRepository transferRepository,            
             ICardRepository cardRepository,
-            ApplicationContext @object,
             IHistoryRepository historyRepository,
             IMapper mapper,
             ICurrencyRepository currencyRepository,
