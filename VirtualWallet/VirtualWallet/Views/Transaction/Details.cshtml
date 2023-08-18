@@ -24,7 +24,7 @@
                                 }
 
                                 <div class="text-8 fw-500 text-white my-4">@Model.GetTransactionDto.Amount @Model.GetTransactionDto.CurrencyCode</div>
-                                <p class="text-white">@Model.GetTransactionDto.Date.ToString("dd MMMM yyyy hh:mm")</p>
+                                <p class="text-white">@Model.GetTransactionDto.Date.ToString("dd MMMM yyyy hh:mm", new System.Globalization.CultureInfo("en-US"))</p>
                             </div>
                         </div>
                         <div class="col-sm-7">

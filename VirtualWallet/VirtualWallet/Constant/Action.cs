@@ -19,5 +19,7 @@
         public const string Update = "Update";
 
         public const string SuccessfulEmailSent = "SuccessfulEmailSent";
+       
+        public const string SuccessfulConfirm = "SuccessfulConfirm";
     }
 }

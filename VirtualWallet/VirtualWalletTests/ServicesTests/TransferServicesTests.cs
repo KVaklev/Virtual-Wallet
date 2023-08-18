@@ -6,6 +6,7 @@ using Business.Services.Helpers;
 using Business.Services.Models;
 using DataAccess.Models.Models;
 using DataAccess.Repositories.Contracts;
+using static VirtualWalletTests.TestHelpers.TestHelpers;
 using Moq;
 
 namespace VirtualWalletTests.ServicesTests

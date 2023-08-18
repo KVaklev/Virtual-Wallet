@@ -15,7 +15,6 @@ namespace VirtualWallet.Controllers.MVC
         private readonly IHistoryService historyService;
         private readonly IUserService userService;
 
-
         public HistoryController(
             IHistoryService historyService,
             IUserService userService)
@@ -31,7 +30,7 @@ namespace VirtualWallet.Controllers.MVC
             var loggedUserResponse = await userService.FindLoggedUserAsync(User.FindFirst(ClaimTypes.Name)?.Value!);
             if (!loggedUserResponse.IsSuccessful)
             {
-                return this.RedirectToAction("Login", "Account");
+                return this.RedirectToAction(Constant.Action.Login, Constant.Controller.Account);
             }
 
             var result = await this.historyService.FilterByAsync(parameters, loggedUserResponse.Data);
@@ -43,12 +42,12 @@ namespace VirtualWallet.Controllers.MVC
             {
                 if(result.Message == Constants.NoRecordsFound)
                 {
-                    this.ViewData["ErrorMessage"] = result.Message;
+                    this.ViewData[Constant.ViewData.ErrorMessage] = result.Message;
                     return View(indexHistoryViewModel);
                 }
                 else
                 {
-                    return View("ErrorMessage", result.Message);
+                    return View(Constant.View.ErrorMessage, result.Message);
                 }
             }
             indexHistoryViewModel.GetHistoryDtos = result.Data;
