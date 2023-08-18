@@ -43,6 +43,7 @@
         public const string ModifyTransactionConfirmMessage = "The transaction has been successfully executed.";
         public const string ModifyTransactionDeleteMessage = "The transaction has been successfully deleted. If you have any questions or concerns, please feel free to contact our support team for assistance.Thank you.";
         public const string ModifyTransactionUsernameMessage = "You have chosen your username.";
+        public const string ModifyTransactionUserVerifiedMessage = "This user is not verified. you can't send money to it at the moment.";
 
         public const string ModifyTransactionNotExecuteErrorMessage = "You cannot update or delete a completed transaction!";
         public const string ModifyTransactionBlockedErrorMessage = "You are not allowed to make transactions while being blocked!";

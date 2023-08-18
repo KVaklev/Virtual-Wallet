@@ -120,6 +120,12 @@ namespace Business.Services.Models
                 result.Message = Constants.ModifyTransactionUsernameMessage;
                 return result;
             }
+            if (!recipient.User.IsVerified)
+            {
+                result.IsSuccessful = false;
+                result.Message = Constants.ModifyTransactionUserVerifiedMessage;
+                return result;
+            }
             var transaction = await TransactionsMapper.MapDtoТоTransactionAsync(transactionDto, loggedUser, recipient, currency, exchangeRate.Data);
             var newTransaction = await this.transactionRepository.CreateTransactionAsync(transaction);
             result.Data = this.mapper.Map<GetTransactionDto>(newTransaction);
