@@ -1786,5 +1786,134 @@ namespace VirtualWalletTests.ServicesTests
             //Assert
             Assert.IsTrue(actualResponse.IsSuccessful);
         }
+
+        [TestMethod]
+        public async Task FilterBy_Should_ReturnCorrectList_When_FilterSortByUsername()
+        {
+            //Arrange
+            var expectedUsers = GetTestListUsers();
+            var filterParameters = new UserQueryParameters { SortBy = SortByUsernameDuringFilter, };
+
+            var userRepositoryMock = new Mock<IUserRepository>();
+            var accountServiceMock = new Mock<IAccountService>();
+            var webHostEnvironmentMock = new Mock<IWebHostEnvironment>();
+            var mapperMock = new Mock<IMapper>();
+            var securityWrapperMock = new Mock<ISecurityService>();
+
+            userRepositoryMock
+                .Setup(repo => repo
+                .GetAll())
+                .Returns(expectedUsers
+                .AsQueryable());
+
+            var sut = new UserService(userRepositoryMock.Object,
+               accountServiceMock.Object,
+               mapperMock.Object,
+               webHostEnvironmentMock.Object,
+               securityWrapperMock.Object);
+
+            // Act
+            var actualResponse = await sut.FilterByAsync(filterParameters);
+
+            //Assert
+            Assert.IsTrue(actualResponse.IsSuccessful);
+        }
+
+        [TestMethod]
+        public async Task FilterBy_Should_ReturnCorrectList_When_FilterSortByEmail()
+        {
+            //Arrange
+            var expectedUsers = GetTestListUsers();
+            var filterParameters = new UserQueryParameters { SortBy = SortByEmailDuringFilter, };
+
+            var userRepositoryMock = new Mock<IUserRepository>();
+            var accountServiceMock = new Mock<IAccountService>();
+            var webHostEnvironmentMock = new Mock<IWebHostEnvironment>();
+            var mapperMock = new Mock<IMapper>();
+            var securityWrapperMock = new Mock<ISecurityService>();
+
+            userRepositoryMock
+                .Setup(repo => repo
+                .GetAll())
+                .Returns(expectedUsers
+                .AsQueryable());
+
+            var sut = new UserService(userRepositoryMock.Object,
+               accountServiceMock.Object,
+               mapperMock.Object,
+               webHostEnvironmentMock.Object,
+               securityWrapperMock.Object);
+
+            // Act
+            var actualResponse = await sut.FilterByAsync(filterParameters);
+
+            //Assert
+            Assert.IsTrue(actualResponse.IsSuccessful);
+        }
+
+        [TestMethod]
+        public async Task FilterBy_Should_ReturnCorrectList_When_FilterSortByPhoneNumber()
+        {
+            //Arrange
+            var expectedUsers = GetTestListUsers();
+            var filterParameters = new UserQueryParameters { SortBy = SortByPhoneNumberDuringFilter, };
+
+            var userRepositoryMock = new Mock<IUserRepository>();
+            var accountServiceMock = new Mock<IAccountService>();
+            var webHostEnvironmentMock = new Mock<IWebHostEnvironment>();
+            var mapperMock = new Mock<IMapper>();
+            var securityWrapperMock = new Mock<ISecurityService>();
+
+            userRepositoryMock
+                .Setup(repo => repo
+                .GetAll())
+                .Returns(expectedUsers
+                .AsQueryable());
+
+            var sut = new UserService(userRepositoryMock.Object,
+               accountServiceMock.Object,
+               mapperMock.Object,
+               webHostEnvironmentMock.Object,
+               securityWrapperMock.Object);
+
+            // Act
+            var actualResponse = await sut.FilterByAsync(filterParameters);
+
+            //Assert
+            Assert.IsTrue(actualResponse.IsSuccessful);
+        }
+
+        [TestMethod]
+        public async Task FilterBy_Should_ReturnCorrectList_When_FilterSortSortOrderDesc()
+        {
+            //Arrange
+            var expectedUsers = GetTestListUsers();
+            var filterParameters = new UserQueryParameters { SortOrder = SortOrderDescDuringFilter, };
+
+            var userRepositoryMock = new Mock<IUserRepository>();
+            var accountServiceMock = new Mock<IAccountService>();
+            var webHostEnvironmentMock = new Mock<IWebHostEnvironment>();
+            var mapperMock = new Mock<IMapper>();
+            var securityWrapperMock = new Mock<ISecurityService>();
+
+            userRepositoryMock
+                .Setup(repo => repo
+                .GetAll())
+                .Returns(expectedUsers
+                .AsQueryable());
+
+            var sut = new UserService(userRepositoryMock.Object,
+               accountServiceMock.Object,
+               mapperMock.Object,
+               webHostEnvironmentMock.Object,
+               securityWrapperMock.Object);
+
+            // Act
+            var actualResponse = await sut.FilterByAsync(filterParameters);
+
+            //Assert
+            Assert.IsTrue(actualResponse.IsSuccessful);
+        }
+
     }
 }
