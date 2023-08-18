@@ -19,10 +19,15 @@ namespace VirtualWalletTests.TestHelpers
         public const string LastNameAfterFilter = "Draganov";
         public const string EmailAfterFilter = "i.draganov@gmail.com";
         public const string PhoneNumberAfterFilter = "0897554285";
+        public const string SortByUsernameDuringFilter = "Username";
+        public const string SortByEmailDuringFilter = "Email";
+        public const string SortByPhoneNumberDuringFilter = "PhoneNumber";
+        public const string SortOrderDescDuringFilter = "Desc";
 
         public const string RandomUsername = "Username";
         public const string RandomPassword = "Password";
 
+        public const string BGNCurrency = "BGN";
 
         //Helpers for UserServices Tests
         public static User GetTestUser()
@@ -101,19 +106,9 @@ namespace VirtualWalletTests.TestHelpers
         {
             return new CreateUserModel
             {
-
-                //FirstName = "Dimitar",
-                //LastName = "Peev",
                 Email = "dim@gmail.com",
                 Username = "dimitarDimitrov",
                 PhoneNumber = "0887885778",
-
-                //Email = "m.petrova@gmail.com",
-                //Username = "mariicheto",
-                //PhoneNumber = "0898568569",
-                //Password = "pa^3ddwp;z",
-                //CurrencyCode = "BGN", 
-
             };
         }
         public static GetCreatedUserDto GetTestCreatedUserDto()
@@ -358,6 +353,7 @@ namespace VirtualWalletTests.TestHelpers
                 UserId = 2
             };
         }
+
         //Helpers for CurrencyServices Tests
         public static Currency GetCurrency()
         {
@@ -416,6 +412,7 @@ namespace VirtualWalletTests.TestHelpers
                 new Currency { IsDeleted = true }
             };
         }
+
         //Helpers for TransactionServices Tests
         public static Transaction GetTransaction()
         {
@@ -536,8 +533,5 @@ namespace VirtualWalletTests.TestHelpers
 
             };
         }
-
-
-
     }
 }
