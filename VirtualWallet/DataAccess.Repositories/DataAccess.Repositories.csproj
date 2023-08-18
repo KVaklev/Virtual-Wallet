@@ -22,7 +22,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Business.Exceptions\Business.Exceptions.csproj" />
     <ProjectReference Include="..\Business.QueryParameters\Business.QueryParameters.csproj" />
     <ProjectReference Include="..\DataAccess.Models\DataAccess.Models.csproj" />
   </ItemGroup>
