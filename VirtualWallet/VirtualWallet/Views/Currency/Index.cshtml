@@ -73,6 +73,19 @@
                 </div>
             </div>
             <!-- Title End -->
+
+             @if (ViewData["ErrorMessage"] != null)
+                        {
+                            <div class="row">
+                                <div class="col text-center">
+                                    <p>&nbsp;</p>
+                                    <p>@ViewData["ErrorMessage"]</p>
+                                </div>
+                            </div>
+
+                        }
+                        else
+                        {
             <!-- Transaction List
             =============================== -->
             @foreach (var curency in Model.Currencies)
@@ -114,5 +127,6 @@
                     </div>
                 
             </div>
+         }
          }
 </body>

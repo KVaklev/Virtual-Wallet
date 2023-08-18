@@ -1,5 +1,6 @@
 ﻿using Business.DTOs.Requests;
 using Business.Services.Contracts;
+using Business.Services.Helpers;
 using Business.ViewModels;
 using DataAccess.Models.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -30,14 +31,22 @@ namespace VirtualWallet.Controllers.MVC
             {
                 return this.RedirectToAction(Constant.Action.Login, Constant.Controller.Account);
             }
+            var currencyViwModel = new CurrencyViewModel();
+            currencyViwModel.User = loggedUser.Data;
             var result = await this.currencyService.GetAllAndDeletedAsync(loggedUser.Data);
             if (!result.IsSuccessful)
             {
-                return View(Constant.View.ErrorMessage, result.Message);
+                if (result.Message == Constants.NoRecordsFound)
+                {
+                    this.ViewData[Constant.ViewData.ErrorMessage] = result.Message;
+                    return View(currencyViwModel);
+                }
+                else
+                {
+                    return View(Constant.View.ErrorMessage, result.Message);
+                }
             }
-            var currencyViwModel = new CurrencyViewModel();
             currencyViwModel.Currencies = result.Data;
-            currencyViwModel.User = loggedUser.Data;
 
             return View(currencyViwModel);
         }

@@ -21,7 +21,6 @@ namespace Business.Services.Models
         private readonly IHistoryRepository historyRepository;
         private readonly ITransactionCheckerService transactionChecker;
         private readonly IMapper mapper;
-        private readonly ISecurityService security;
 
         public TransactionService(
             ITransactionRepository transactionRepository,
@@ -42,7 +41,6 @@ namespace Business.Services.Models
             this.historyRepository= historyRepository;
             this.transactionChecker = transactionChecker;
             this.mapper = mapper;
-            this.security = security;
         }
 
         public async Task<Response<GetTransactionDto>> GetByIdAsync(int id, User loggedUser)
@@ -114,6 +112,18 @@ namespace Business.Services.Models
             {
                 result.IsSuccessful = false;
                 result.Message = checksResult.Message;
+                return result;
+            }
+            if (recipient.User.Username==loggedUser.Username)
+            {
+                result.IsSuccessful = false;
+                result.Message = Constants.ModifyTransactionUsernameMessage;
+                return result;
+            }
+            if (!recipient.User.IsVerified)
+            {
+                result.IsSuccessful = false;
+                result.Message = Constants.ModifyTransactionUserVerifiedMessage;
                 return result;
             }
             var transaction = await TransactionsMapper.MapDtoТоTransactionAsync(transactionDto, loggedUser, recipient, currency, exchangeRate.Data);

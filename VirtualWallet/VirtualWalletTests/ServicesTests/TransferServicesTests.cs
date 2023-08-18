@@ -1,12 +1,10 @@
 ﻿using AutoMapper;
-using Business.DTOs.Requests;
 using Business.DTOs.Responses;
 using Business.Mappers;
 using Business.QueryParameters;
 using Business.Services.Contracts;
 using Business.Services.Helpers;
 using Business.Services.Models;
-using DataAccess.Models.Enums;
 using DataAccess.Models.Models;
 using DataAccess.Repositories.Contracts;
 using DataAccess.Repositories.Data;

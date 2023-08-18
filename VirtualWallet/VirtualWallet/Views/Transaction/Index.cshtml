@@ -183,7 +183,8 @@
                                             @{
 
                                                 var day = transaction.Date.Day.ToString();
-                                                var month = transaction.Date.ToString("MMM").ToUpper();
+                                                var culture = new CultureInfo("en-US");
+                                                var month = transaction.Date.ToString("MMM", culture).ToUpper();
 
                                                 <div class="col-2 col-sm-1 text-center"> <span class="d-block text-4 fw-300">@day</span> <span class="d-block text-1 fw-300 text-uppercase">@month</span> </div>
                                                 if (Model.User.IsAdmin)

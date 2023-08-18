@@ -12,7 +12,22 @@ namespace VirtualWalletTests.TestHelpers
         //Constants for Tests
 
         public const int NonExistingUserId = 666;
+        public const string WebRootPath = "D:\\Virtual Wallet\\VirtualWallet\\VirtualWallet\\wwwroot";
+
+        public const string UsernameAfterFilter = "ivanchoDraganchov";
+        public const string FirstNameAfterFilter = "Ivan";
+        public const string LastNameAfterFilter = "Draganov";
+        public const string EmailAfterFilter = "i.draganov@gmail.com";
+        public const string PhoneNumberAfterFilter = "0897554285";
+        public const string SortByUsernameDuringFilter = "Username";
+        public const string SortByEmailDuringFilter = "Email";
+        public const string SortByPhoneNumberDuringFilter = "PhoneNumber";
+        public const string SortOrderDescDuringFilter = "Desc";
+
         public const string RandomUsername = "Username";
+        public const string RandomPassword = "Password";
+
+        public const string BGNCurrency = "BGN";
 
         //Helpers for UserServices Tests
         public static User GetTestUser()
@@ -91,19 +106,9 @@ namespace VirtualWalletTests.TestHelpers
         {
             return new CreateUserModel
             {
-
-                //FirstName = "Dimitar",
-                //LastName = "Peev",
                 Email = "dim@gmail.com",
                 Username = "dimitarDimitrov",
                 PhoneNumber = "0887885778",
-
-                //Email = "m.petrova@gmail.com",
-                //Username = "mariicheto",
-                //PhoneNumber = "0898568569",
-                //Password = "pa^3ddwp;z",
-                //CurrencyCode = "BGN", 
-
             };
         }
         public static GetCreatedUserDto GetTestCreatedUserDto()
@@ -253,6 +258,19 @@ namespace VirtualWalletTests.TestHelpers
                     PhoneNumber = "0797556285",
                     IsAdmin = false,
                     IsBlocked = false
+                },
+
+                 new User
+                {
+                    Id = 4,
+                    FirstName = "Andreq",
+                    LastName = "Dobreva",
+                    Email = "aaee331@gmail.com",
+                    Username = "andreicheto",
+                    Password = new byte[] { 0x65, 0x23, 0x25, 0x55 },
+                    PhoneNumber = "0697556285",
+                    IsAdmin = false,
+                    IsBlocked = true
                 }
             };
         }
@@ -300,6 +318,7 @@ namespace VirtualWalletTests.TestHelpers
                 Password = new byte[] { 0x65, 0x23, 0x25, 0x55 },
                 PhoneNumber = "0878558547",
                 AccountId = 1,
+                Account = GetAccountSender(),
                 IsAdmin = false,
                 IsBlocked = false,
                 Address = "Blvd Patriarh Evtimii 72",
@@ -316,6 +335,7 @@ namespace VirtualWalletTests.TestHelpers
                 Id = 1,
                 Balance = 1000,
                 CurrencyId = 1,
+                Currency = GetCurrency(),
                 IsDeleted = false,
                 DateCreated = DateTime.Now,
                 UserId = 1
@@ -332,9 +352,11 @@ namespace VirtualWalletTests.TestHelpers
                 CurrencyId = 2,
                 IsDeleted = false,
                 DateCreated = DateTime.Now,
-                UserId = 2
+                UserId = 2,
+                User = GetTestExpectedUserAsUnblocked()
             };
         }
+
         //Helpers for CurrencyServices Tests
         public static Currency GetCurrency()
         {
@@ -393,6 +415,7 @@ namespace VirtualWalletTests.TestHelpers
                 new Currency { IsDeleted = true }
             };
         }
+
         //Helpers for TransactionServices Tests
         public static Transaction GetTransaction()
         {
@@ -513,8 +536,5 @@ namespace VirtualWalletTests.TestHelpers
 
             };
         }
-
-
-
     }
 }

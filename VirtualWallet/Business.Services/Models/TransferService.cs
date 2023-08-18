@@ -1,8 +1,6 @@
 ﻿using AutoMapper;
-using Business.DTOs;
 using Business.DTOs.Requests;
 using Business.DTOs.Responses;
-using Business.Exceptions;
 using Business.Mappers;
 using Business.QueryParameters;
 using Business.Services.Contracts;
@@ -10,8 +8,6 @@ using Business.Services.Helpers;
 using DataAccess.Models.Enums;
 using DataAccess.Models.Models;
 using DataAccess.Repositories.Contracts;
-using DataAccess.Repositories.Data;
-using Microsoft.EntityFrameworkCore;
 
 
 namespace Business.Services.Models
@@ -77,7 +73,7 @@ namespace Business.Services.Models
             if (!transfers.Any())
             {
                 result.IsSuccessful = false;
-                result.Message = Constants.ModifyNoRecordsFound;
+                result.Message = Constants.NoRecordsFound;
                 return result;
             }
 
