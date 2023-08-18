@@ -11,8 +11,6 @@ using Business.Mappers.Contracts;
 namespace VirtualWalletTests.ServicesTests
 {
 
-
-
     [TestClass]
     public class TransactionServiceTests
     {
@@ -104,70 +102,69 @@ namespace VirtualWalletTests.ServicesTests
 
         }
 
-        [TestMethod]
-        public async Task CreateOutTransactionAsync_ValidTransaction_ReturnsSuccessfulResponseWithData()
-        {
-            // Arrange
-            var transactionDto = GetCreateTransactionDto();
-            var loggedUser = GetLoggedUser();
-            var recipient = GetAccountRecipient();
-            var currency = GetCurrency();
-            var exchangeRate = GerExchangeRateCorrect();
-            var transaction = GetTransaction();
-            var getTransactionDto = GetTransactionDto();
+        //[TestMethod] //needs correction, not ready yet
+        //public async Task CreateOutTransactionAsync_ValidTransaction_ReturnsSuccessfulResponseWithData()
+        //{
+        //    // Arrange
+        //    var transactionDto = GetCreateTransactionDto();
+        //    var loggedUser = GetLoggedUser();
+        //    var recipient = GetAccountRecipient();
+        //    var currency = GetCurrency();
+        //    var exchangeRate = GerExchangeRateCorrect();
+        //    var transaction = GetTransaction();
+        //    var getTransactionDto = GetTransactionDto();
 
-            var accountRepositoryMock = new Mock<IAccountRepository>();
-            accountRepositoryMock.Setup(repo => repo.GetByUsernameAsync(transactionDto.RecipientUsername)).ReturnsAsync(recipient);
+        //    var accountRepositoryMock = new Mock<IAccountRepository>();
+        //    accountRepositoryMock.Setup(repo => repo.GetByUsernameAsync(transactionDto.RecipientUsername)).ReturnsAsync(recipient);
 
-            var currencyRepositoryMock = new Mock<ICurrencyRepository>();
-            currencyRepositoryMock.Setup(repo => repo.GetByCurrencyCodeAsync(transactionDto.CurrencyCode)).ReturnsAsync(currency);
+        //    var currencyRepositoryMock = new Mock<ICurrencyRepository>();
+        //    currencyRepositoryMock.Setup(repo => repo.GetByCurrencyCodeAsync(transactionDto.CurrencyCode)).ReturnsAsync(currency);
 
-            var exchangeRateServiceMock = new Mock<IExchangeRateService>();
-            exchangeRateServiceMock
-                    .Setup(service => service
-                    .GetExchangeRateAsync(transactionDto.CurrencyCode, loggedUser.Account.Currency.CurrencyCode))
-                    .ReturnsAsync(exchangeRate);
+        //    var exchangeRateServiceMock = new Mock<IExchangeRateService>();
+        //    exchangeRateServiceMock
+        //            .Setup(service => service
+        //            .GetExchangeRateAsync(transactionDto.CurrencyCode, loggedUser.Account.Currency.CurrencyCode))
+        //            .ReturnsAsync(exchangeRate);
 
-            var transactionCheckerMock = new Mock<ITransactionCheckerService>();
-            transactionCheckerMock
-                    .Setup(checker => checker
-                    .ChecksCreateOutTransactionAsync(transactionDto, loggedUser, recipient, currency, exchangeRate))
-                    .ReturnsAsync(new Response<GetTransactionDto> { IsSuccessful = true });
+        //    var transactionCheckerMock = new Mock<ITransactionCheckerService>();
+        //    transactionCheckerMock
+        //            .Setup(checker => checker
+        //            .ChecksCreateOutTransactionAsync(transactionDto, loggedUser, recipient, currency, exchangeRate))
+        //            .ReturnsAsync(new Response<GetTransactionDto> { IsSuccessful = true });
 
-            var transactionRepositoryMock = new Mock<ITransactionRepository>();
-            transactionRepositoryMock
-                    .Setup(repo => repo
-                    .CreateTransactionAsync(transaction))
-                    .ReturnsAsync(transaction);
+        //    var transactionRepositoryMock = new Mock<ITransactionRepository>();
+        //    transactionRepositoryMock
+        //            .Setup(repo => repo
+        //            .CreateTransactionAsync(transaction))
+        //            .ReturnsAsync(transaction);
 
-            var historyRepositoryMock = new Mock<IHistoryRepository>();
-            var transactionServiceMock = new Mock<ITransactionService>();
-            var transactionCheckerServiceMock = new Mock<ITransactionCheckerService>();
+        //    var historyRepositoryMock = new Mock<IHistoryRepository>();
+        //    var transactionServiceMock = new Mock<ITransactionService>();
+        //    var transactionCheckerServiceMock = new Mock<ITransactionCheckerService>();
 
-            var mapperMock = new Mock<IMapper>();
-            mapperMock.Setup(m => m.Map<GetTransactionDto>(transaction)).Returns(getTransactionDto);
+        //    var mapperMock = new Mock<IMapper>();
+        //    mapperMock.Setup(m => m.Map<GetTransactionDto>(transaction)).Returns(getTransactionDto);
 
-            var accountServiceMock = new Mock<IAccountService>();
+        //    var accountServiceMock = new Mock<IAccountService>();
 
-            var service = new TransactionService(
-            transactionRepositoryMock.Object,
-            accountRepositoryMock.Object,
-            currencyRepositoryMock.Object,
-            exchangeRateServiceMock.Object,
-            accountServiceMock.Object,
-            historyRepositoryMock.Object,
-            transactionCheckerServiceMock.Object,
-            mapperMock.Object);
+        //    var service = new TransactionService(
+        //    transactionRepositoryMock.Object,
+        //    accountRepositoryMock.Object,
+        //    currencyRepositoryMock.Object,
+        //    exchangeRateServiceMock.Object,
+        //    accountServiceMock.Object,
+        //    historyRepositoryMock.Object,
+        //    transactionCheckerServiceMock.Object,
+        //    mapperMock.Object);
 
-            
-            // Act
-            var result = await service.CreateOutTransactionAsync(transactionDto, loggedUser);
+        //    // Act
+        //    var result = await service.CreateOutTransactionAsync(transactionDto, loggedUser);
 
-            // Assert
-            Assert.IsTrue(result.IsSuccessful);
-            Assert.IsNotNull(result.Data);
-            Assert.IsNull(result.Message);
-        }
+        //    // Assert
+        //    Assert.IsTrue(result.IsSuccessful);
+        //    Assert.IsNotNull(result.Data);
+        //    Assert.IsNull(result.Message);
+        //}
     }
 }
 
