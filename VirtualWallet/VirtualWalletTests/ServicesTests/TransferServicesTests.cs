@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Business.DTOs.Requests;
 using Business.DTOs.Responses;
+using Business.Mappers;
 using Business.QueryParameters;
 using Business.Services.Contracts;
 using Business.Services.Helpers;
@@ -8,8 +9,11 @@ using Business.Services.Models;
 using DataAccess.Models.Enums;
 using DataAccess.Models.Models;
 using DataAccess.Repositories.Contracts;
-using static VirtualWalletTests.TestHelpers.TestHelpers;
+using DataAccess.Repositories.Data;
+using Microsoft.AspNetCore.Hosting;
 using Moq;
+using static VirtualWalletTests.TestHelpers.TestHelpers;
+
 
 namespace VirtualWalletTests.ServicesTests
 {
@@ -34,33 +38,33 @@ namespace VirtualWalletTests.ServicesTests
             Assert.IsNull(result.Data);
         }
 
-        private TransferService CreateTransferServiceWithMocks()
+        public TransferService CreateTransferServiceWithMocks()
         {
             var transferRepositoryMock = new Mock<ITransferRepository>();
-
-
-            var currencyRepositoryMock = new Mock<ICurrencyRepository>();
-
-
+            var cardRepositoryMock = new Mock<ICardRepository>();
+            var historyRepositoryMock = new Mock<IHistoryRepository>();
             var mapperMock = new Mock<IMapper>();
-
-
-            var securityMock = new Mock<ISecurityService>();
-
+            var currencyRepositoryMock = new Mock<ICurrencyRepository>();
+            var accountServiceMock = new Mock<IAccountService>();
+            var cardServiceMock = new Mock<ICardService>();
+            var exchangeRateServiceMock = new Mock<IExchangeRateService>();
+            var securityServiceMock = new Mock<ISecurityService>();
 
             var transferService = new TransferService(
                 transferRepositoryMock.Object,
-                new Mock<ICardRepository>().Object,
-                new Mock<IHistoryRepository>().Object,
+                cardRepositoryMock.Object,
+                new ApplicationContext(),
+                historyRepositoryMock.Object,
                 mapperMock.Object,
                 currencyRepositoryMock.Object,
-                new Mock<IAccountService>().Object,
-                new Mock<ICardService>().Object,
-                new Mock<IExchangeRateService>().Object,
-                securityMock.Object);
+                accountServiceMock.Object,
+                cardServiceMock.Object,
+                exchangeRateServiceMock.Object,
+                securityServiceMock.Object);
 
             return transferService;
         }
+
 
         [TestMethod]
         public async Task GetByIdAsync_ValidIdUser_ReturnsValidResponseWithData()
@@ -69,8 +73,18 @@ namespace VirtualWalletTests.ServicesTests
             int id = 1;
             User user = new User { IsAdmin = false };
             var transfer = GetTransferTest();
+            var getTransferDto = GetTransferDtoTest();
 
             var transferRepositoryMock = new Mock<ITransferRepository>();
+            var cardRepositoryMock = new Mock<ICardRepository>();
+            var historyRepositoryMock = new Mock<IHistoryRepository>();
+            var mapperMock = new Mock<IMapper>();
+            var currencyRepositoryMock = new Mock<ICurrencyRepository>();
+            var accountServiceMock = new Mock<IAccountService>();
+            var cardServiceMock = new Mock<ICardService>();
+            var exchangeRateServiceMock = new Mock<IExchangeRateService>();
+            var securityServiceMock = new Mock<ISecurityService>();
+
             transferRepositoryMock.Setup(repo => repo.GetByIdAsync(id))
                                  .ReturnsAsync(transfer);
 
@@ -78,27 +92,20 @@ namespace VirtualWalletTests.ServicesTests
             securityMock.Setup(security => security.IsUserAuthorizedAsync(It.IsAny<Transfer>(), user))
                         .ReturnsAsync(true);
 
-            var getTransferDto = GetTransferDtoTest();
-
-            var mapperMock = new Mock<IMapper>();
             mapperMock.Setup(mapper => mapper.Map<GetTransferDto>(It.IsAny<Transfer>()))
                       .Returns(getTransferDto);
 
-            var cardRepositoryMock = new Mock<ICardRepository>();
-            var historyRepositoryMock = new Mock<IHistoryRepository>();
-            var currencyRepositoryMock = new Mock<ICurrencyRepository>();
-            var accountServiceMock = new Mock<IAccountService>();
-            var cardServiceMock = new Mock<ICardService>();
-            var exchangeRateServiceMock = new Mock<IExchangeRateService>();
-
-            cardRepositoryMock.Object,               
-                                                historyRepositoryMock.Object,
+            var transferService = new TransferService(
+                transferRepositoryMock.Object,
+                cardRepositoryMock.Object,
+                new ApplicationContext(),
+                historyRepositoryMock.Object,
                 mapperMock.Object,
                 currencyRepositoryMock.Object,
                 accountServiceMock.Object,
                 cardServiceMock.Object,
                 exchangeRateServiceMock.Object,
-                securityMock.Object);
+                securityServiceMock.Object);
 
             // Act
             var result = await transferService.GetByIdAsync(id, user);
@@ -108,7 +115,6 @@ namespace VirtualWalletTests.ServicesTests
             Assert.IsNotNull(result.Data);
 
         }
-
 
         [TestMethod]
         public async Task CreateAsync_UserIsBlocked_ReturnsErrorResponse()
@@ -121,23 +127,25 @@ namespace VirtualWalletTests.ServicesTests
 
             var transferRepositoryMock = new Mock<ITransferRepository>();
             var cardRepositoryMock = new Mock<ICardRepository>();
-            var currencyRepositoryMock = new Mock<ICurrencyRepository>();
+            var historyRepositoryMock = new Mock<IHistoryRepository>();
             var mapperMock = new Mock<IMapper>();
+            var currencyRepositoryMock = new Mock<ICurrencyRepository>();
             var accountServiceMock = new Mock<IAccountService>();
             var cardServiceMock = new Mock<ICardService>();
             var exchangeRateServiceMock = new Mock<IExchangeRateService>();
-            var securityMock = new Mock<ISecurityService>();
+            var securityServiceMock = new Mock<ISecurityService>();
 
             var transferService = new TransferService(
-                transferRepositoryMock.Object,
-                cardRepositoryMock.Object,
-                new Mock<IHistoryRepository>().Object,
-                mapperMock.Object,
-                currencyRepositoryMock.Object,
-                accountServiceMock.Object,
-                cardServiceMock.Object,
-                exchangeRateServiceMock.Object,
-                securityMock.Object);
+                 transferRepositoryMock.Object,
+                 cardRepositoryMock.Object,
+                 new ApplicationContext(),
+                 historyRepositoryMock.Object,
+                 mapperMock.Object,
+                 currencyRepositoryMock.Object,
+                 accountServiceMock.Object,
+                 cardServiceMock.Object,
+                 exchangeRateServiceMock.Object,
+                 securityServiceMock.Object);
 
             // Act
             var result = await transferService.CreateAsync(transferDto, user);
@@ -148,8 +156,6 @@ namespace VirtualWalletTests.ServicesTests
             Assert.IsNull(result.Data);
 
         }
-
-
 
         [TestMethod]
         public async Task GetByIdAsync_UserNotAuthorizedAndNotAdmin_ReturnsErrorResponse()
@@ -162,36 +168,41 @@ namespace VirtualWalletTests.ServicesTests
 
             var transferToGet = transfer;
 
+            var cardRepositoryMock = new Mock<ICardRepository>();
+            var historyRepositoryMock = new Mock<IHistoryRepository>();
+            var currencyRepositoryMock = new Mock<ICurrencyRepository>();
+            var accountServiceMock = new Mock<IAccountService>();
+            var cardServiceMock = new Mock<ICardService>();
+            var exchangeRateServiceMock = new Mock<IExchangeRateService>();
+            var securityServiceMock = new Mock<ISecurityService>();
             var transferRepositoryMock = new Mock<ITransferRepository>();
             transferRepositoryMock.Setup(repo => repo.GetByIdAsync(id))
-                        .ReturnsAsync(false); 
-
-                        .ReturnsAsync(false); // User is not authorized
+                                .ReturnsAsync(transferToGet);
+            var securityMock = new Mock<ISecurityService>();
             securityMock.Setup(security => security.IsUserAuthorizedAsync(transferToGet, user))
-                        .ReturnsAsync(false); // User is not authorized
+                        .ReturnsAsync(false);
 
-            new Mock<ICardRepository>().Object,                
+            var mapperMock = new Mock<IMapper>();
 
-                new Mock<ICardRepository>().Object,
-                transferRepositoryMock.Object,
-                new Mock<ICardRepository>().Object,
-                new Mock<ApplicationContext>().Object,
-                new Mock<IHistoryRepository>().Object,
-                mapperMock.Object,
-                new Mock<ICurrencyRepository>().Object,
-                new Mock<IAccountService>().Object,
-                new Mock<ICardService>().Object,
-                new Mock<IExchangeRateService>().Object,
+            var transferService = new TransferService(
+                 transferRepositoryMock.Object,
+                 cardRepositoryMock.Object,
+                 new ApplicationContext(),
+                 historyRepositoryMock.Object,
+                 mapperMock.Object,
+                 currencyRepositoryMock.Object,
+                 accountServiceMock.Object,
+                 cardServiceMock.Object,
+                 exchangeRateServiceMock.Object,
+                 securityServiceMock.Object);
+
+            // Act
+            var result = await transferService.GetByIdAsync(id, user);
+
+            // Assert
             Assert.IsTrue(result.IsSuccessful);
             Assert.AreEqual(Constants.ModifyTransferGetByIdErrorMessage, result.Message);
-            // Act
-
-            Assert.AreEqual("You are not authorized for the specified action.", result.Message);
-            // Assert
-            // Additional assertions can be added based on your specific requirements
-            Assert.AreEqual("You are not authorized for the specified action.", result.Message);
             Assert.IsNull(result.Data);
-            // Additional assertions can be added based on your specific requirements
         }
 
         [TestMethod]
@@ -201,23 +212,31 @@ namespace VirtualWalletTests.ServicesTests
             int id = 1;
             User user = new User { IsAdmin = false };
 
+            var cardRepositoryMock = new Mock<ICardRepository>();
+            var historyRepositoryMock = new Mock<IHistoryRepository>();
+            var currencyRepositoryMock = new Mock<ICurrencyRepository>();
+            var accountServiceMock = new Mock<IAccountService>();
+            var cardServiceMock = new Mock<ICardService>();
+            var exchangeRateServiceMock = new Mock<IExchangeRateService>();
+            var securityServiceMock = new Mock<ISecurityService>();
             var transferRepositoryMock = new Mock<ITransferRepository>();
             transferRepositoryMock.Setup(repo => repo.GetByIdAsync(id))
                                  .ReturnsAsync((Transfer)null);
-            new Mock<ICardRepository>().Object,                
+
             var securityMock = new Mock<ISecurityService>();
             var mapperMock = new Mock<IMapper>();
-            new Mock<ICardRepository>().Object,
-                            var transferService = new TransferService(
-                transferRepositoryMock.Object,
-                new Mock<ICardRepository>().Object,
-                                new Mock<IHistoryRepository>().Object,
-                mapperMock.Object,
-                new Mock<ICurrencyRepository>().Object,
-                new Mock<IAccountService>().Object,
-                new Mock<ICardService>().Object,
-                new Mock<IExchangeRateService>().Object,
-                securityMock.Object);
+
+            var transferService = new TransferService(
+                 transferRepositoryMock.Object,
+                 cardRepositoryMock.Object,
+                 new ApplicationContext(),
+                 historyRepositoryMock.Object,
+                 mapperMock.Object,
+                 currencyRepositoryMock.Object,
+                 accountServiceMock.Object,
+                 cardServiceMock.Object,
+                 exchangeRateServiceMock.Object,
+                 securityServiceMock.Object);
 
             // Act
             var result = await transferService.GetByIdAsync(id, user);
@@ -240,27 +259,34 @@ namespace VirtualWalletTests.ServicesTests
 
             var transferToGet = transfer;
 
+            var cardRepositoryMock = new Mock<ICardRepository>();
+            var historyRepositoryMock = new Mock<IHistoryRepository>();
+            var currencyRepositoryMock = new Mock<ICurrencyRepository>();
+            var accountServiceMock = new Mock<IAccountService>();
+            var cardServiceMock = new Mock<ICardService>();
+            var exchangeRateServiceMock = new Mock<IExchangeRateService>();
+            var securityServiceMock = new Mock<ISecurityService>();
             var transferRepositoryMock = new Mock<ITransferRepository>();
             transferRepositoryMock.Setup(repo => repo.GetByIdAsync(id))
                                  .ReturnsAsync(transferToGet);
 
-            new Mock<ICardRepository>().Object,                
+            var securityMock = new Mock<ISecurityService>();
             securityMock.Setup(security => security.IsUserAuthorizedAsync(transferToGet, user))
                         .ReturnsAsync(false);
 
-            new Mock<ICardRepository>().Object,
-                new Mock<ApplicationContext>().Object,
+            var mapperMock = new Mock<IMapper>();
 
             var transferService = new TransferService(
-                transferRepositoryMock.Object,
-                new Mock<ICardRepository>().Object,
-                                new Mock<IHistoryRepository>().Object,
-                mapperMock.Object,
-                new Mock<ICurrencyRepository>().Object,
-                new Mock<IAccountService>().Object,
-                new Mock<ICardService>().Object,
-                new Mock<IExchangeRateService>().Object,
-                securityMock.Object);
+                 transferRepositoryMock.Object,
+                 cardRepositoryMock.Object,
+                 new ApplicationContext(),
+                 historyRepositoryMock.Object,
+                 mapperMock.Object,
+                 currencyRepositoryMock.Object,
+                 accountServiceMock.Object,
+                 cardServiceMock.Object,
+                 exchangeRateServiceMock.Object,
+                 securityServiceMock.Object);
 
             // Act
             var result = await transferService.GetByIdAsync(id, user);
@@ -282,30 +308,35 @@ namespace VirtualWalletTests.ServicesTests
             var user = new User { IsBlocked = false, AccountId = 1 };
 
             var cardRepositoryMock = new Mock<ICardRepository>();
+            var historyRepositoryMock = new Mock<IHistoryRepository>();
+            var accountServiceMock = new Mock<IAccountService>();
+            var cardServiceMock = new Mock<ICardService>();
+            var exchangeRateServiceMock = new Mock<IExchangeRateService>();
+            var securityServiceMock = new Mock<ISecurityService>();
+
             cardRepositoryMock.Setup(repo => repo.GetByAccountId(It.IsAny<int>()))
                              .Returns(Enumerable.Empty<Card>().AsQueryable());
 
             var currencyRepositoryMock = new Mock<ICurrencyRepository>();
             currencyRepositoryMock.Setup(repo => repo.GetByCurrencyCodeAsync(transferDto.CurrencyCode))
                                   .ReturnsAsync((Currency)null);
-            cardRepositoryMock.Object,                
+
             var transferRepositoryMock = new Mock<ITransferRepository>();
             var mapperMock = new Mock<IMapper>();
-            var accountServiceMock = new Mock<IAccountService>();
-            var cardServiceMock = new Mock<ICardService>();
-            cardRepositoryMock.Object,
-                           var securityMock = new Mock<ISecurityService>();
+            var securityMock = new Mock<ISecurityService>();
 
             var transferService = new TransferService(
-                transferRepositoryMock.Object,
-                cardRepositoryMock.Object,                
-                new Mock<IHistoryRepository>().Object,
-                mapperMock.Object,
-                currencyRepositoryMock.Object,
-                accountServiceMock.Object,
-                cardServiceMock.Object,
-                exchangeRateServiceMock.Object,
-                securityMock.Object);
+                 transferRepositoryMock.Object,
+                 cardRepositoryMock.Object,
+                 new ApplicationContext(),
+                 historyRepositoryMock.Object,
+                 mapperMock.Object,
+                 currencyRepositoryMock.Object,
+                 accountServiceMock.Object,
+                 cardServiceMock.Object,
+                 exchangeRateServiceMock.Object,
+                 securityServiceMock.Object);
+
 
             // Act
             var result = await transferService.CreateAsync(transferDto, user);
@@ -339,47 +370,50 @@ namespace VirtualWalletTests.ServicesTests
 
             var transfer = transferToGet;
 
+            var historyRepositoryMock = new Mock<IHistoryRepository>();
+            var currencyRepositoryMock = new Mock<ICurrencyRepository>();
+            var accountServiceMock = new Mock<IAccountService>();
+            var cardServiceMock = new Mock<ICardService>();
+            var exchangeRateServiceMock = new Mock<IExchangeRateService>();
+            var securityServiceMock = new Mock<ISecurityService>();
+
             var cardRepositoryMock = new Mock<ICardRepository>();
             cardRepositoryMock.Setup(repo => repo.GetByAccountId(It.IsAny<int>()))
                              .Returns(new List<Card> { card }.AsQueryable());
 
             var transferRepositoryMock = new Mock<ITransferRepository>();
             transferRepositoryMock.Setup(repo => repo.CreateAsync(It.IsAny<Transfer>()))
-                                new Mock<IHistoryRepository>().Object,
-
-            var currencyRepositoryMock = new Mock<ICurrencyRepository>();
+                                 .ReturnsAsync(transfer);
             var mapperMock = new Mock<IMapper>();
-            var accountServiceMock = new Mock<IAccountService>();
-            var cardServiceMock = new Mock<ICardService>();            
-                new Mock<IHistoryRepository>().Object,
+
             var securityMock = new Mock<ISecurityService>();
 
             var transferService = new TransferService(
-                transferRepositoryMock.Object,
-                cardRepositoryMock.Object,                
-                new Mock<IHistoryRepository>().Object,
+            transferRepositoryMock.Object,
+            cardRepositoryMock.Object,
+            new ApplicationContext(),
+            historyRepositoryMock.Object,
+            mapperMock.Object,
+            currencyRepositoryMock.Object,
+            accountServiceMock.Object,
+            cardServiceMock.Object,
+            exchangeRateServiceMock.Object,
+            securityServiceMock.Object);
 
-                currencyRepositoryMock.Object,
-                accountServiceMock.Object,
-                cardServiceMock.Object,
-                exchangeRateServiceMock.Object,
-                securityMock.Object);
-
-            // Additional assertions can be added based on your specific requirements
+            // Act
             var result = await transferService.CreateAsync(transferDto, user);
 
             // Assert
             Assert.IsFalse(result.IsSuccessful);
             Assert.AreEqual(Constants.ModifyAccountBalancetErrorMessage, result.Message);
             Assert.IsNull(result.Data);
-            // Additional assertions can be added based on your specific requirements
+
         }
 
         [TestMethod]
         public async Task CreateAsync_TransferCreation_ReturnsSuccessResponse()
         {
             // Arrange
-
             var transferDtoToGet = CreateTransferDtoTest();
 
             var transferDto = transferDtoToGet;
@@ -397,28 +431,38 @@ namespace VirtualWalletTests.ServicesTests
             var transferToGet = GetTransferTest();
 
             var transfer = transferToGet;
-            new Mock<ICardRepository>().Object,                
+
+            var historyRepositoryMock = new Mock<IHistoryRepository>();
+            var currencyRepositoryMock = new Mock<ICurrencyRepository>();
+            var accountServiceMock = new Mock<IAccountService>();
+            var cardServiceMock = new Mock<ICardService>();
+            var exchangeRateServiceMock = new Mock<IExchangeRateService>();
+            var securityServiceMock = new Mock<ISecurityService>();
+
             var transferRepositoryMock = new Mock<ITransferRepository>();
             transferRepositoryMock.Setup(repo => repo.CreateAsync(It.IsAny<Transfer>()))
                                  .ReturnsAsync(transfer);
 
-            var currencyRepositoryMock = new Mock<ICurrencyRepository>();
+            var cardRepositoryMock = new Mock<ICardRepository>();
+            cardRepositoryMock.Setup(repo => repo.GetByAccountId(It.IsAny<int>()))
+                             .Returns(new List<Card> { card }.AsQueryable());
+
+
             var mapperMock = new Mock<IMapper>();
-            new Mock<ICardRepository>().Object,                
-            var cardServiceMock = new Mock<ICardService>();
-            var exchangeRateServiceMock = new Mock<IExchangeRateService>();
+
             var securityMock = new Mock<ISecurityService>();
 
             var transferService = new TransferService(
-                transferRepositoryMock.Object,
-                new Mock<ICardRepository>().Object,                
-                new Mock<IHistoryRepository>().Object,
-                mapperMock.Object,
-                currencyRepositoryMock.Object,
-                accountServiceMock.Object,
-                cardServiceMock.Object,
-                exchangeRateServiceMock.Object,
-                securityMock.Object);
+            transferRepositoryMock.Object,
+            cardRepositoryMock.Object,
+            new ApplicationContext(),
+            historyRepositoryMock.Object,
+            mapperMock.Object,
+            currencyRepositoryMock.Object,
+            accountServiceMock.Object,
+            cardServiceMock.Object,
+            exchangeRateServiceMock.Object,
+            securityServiceMock.Object);
 
             // Act
             var result = await transferService.CreateAsync(transferDto, user);
@@ -430,3 +474,4 @@ namespace VirtualWalletTests.ServicesTests
         }
     }
 }
+
