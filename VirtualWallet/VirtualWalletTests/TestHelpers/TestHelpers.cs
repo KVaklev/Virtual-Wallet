@@ -12,7 +12,17 @@ namespace VirtualWalletTests.TestHelpers
         //Constants for Tests
 
         public const int NonExistingUserId = 666;
+        public const string WebRootPath = "D:\\Virtual Wallet\\VirtualWallet\\VirtualWallet\\wwwroot";
+
+        public const string UsernameAfterFilter = "ivanchoDraganchov";
+        public const string FirstNameAfterFilter = "Ivan";
+        public const string LastNameAfterFilter = "Draganov";
+        public const string EmailAfterFilter = "i.draganov@gmail.com";
+        public const string PhoneNumberAfterFilter = "0897554285";
+
         public const string RandomUsername = "Username";
+        public const string RandomPassword = "Password";
+
 
         //Helpers for UserServices Tests
         public static User GetTestUser()
@@ -253,6 +263,19 @@ namespace VirtualWalletTests.TestHelpers
                     PhoneNumber = "0797556285",
                     IsAdmin = false,
                     IsBlocked = false
+                },
+
+                 new User
+                {
+                    Id = 4,
+                    FirstName = "Andreq",
+                    LastName = "Dobreva",
+                    Email = "aaee331@gmail.com",
+                    Username = "andreicheto",
+                    Password = new byte[] { 0x65, 0x23, 0x25, 0x55 },
+                    PhoneNumber = "0697556285",
+                    IsAdmin = false,
+                    IsBlocked = true
                 }
             };
         }
