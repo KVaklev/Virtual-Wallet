@@ -47,13 +47,16 @@ Documentation: Swagger
 ## How to Set Up and Run the Project Locally - follow these steps:
 
 1. Clone the GitLab Repository
-2. Install Dependencies and Packages
+2. Install Dependencies and Packages (already done in the project)
 3. Ensure that you have Microsoft SQL Server Management Studio installed and running on your local machine. 
 4. Configure the Connection String - locate the configuration file where the database connection string is stored. It is usually found in a configuration file like appsettings.json. 
 	Update the connection string with the appropriate details for your SQL Server database. 
 	Provide the server name, database name, connection.=> "DefaultConnection":"Server=....;Database=....;Trusted_Connection=True;"
-4. Build and Run the Project - use the appropriate commands to build and run the project.
-5. Access the Application - once the project is running locally, you can access the application by opening a web browser and entering the appropriate URL.
+5. Our project utilizes Entity Framework Core for database operations. Steps to follow:
+	- You need to open the Command console and choose for Default project from the drop-down menu on top of the console: **DataAccess.Repositories** 
+	- Write the following commands: 1) add-migration <choose name>; 2) update-database
+6. Build and Run the Project - use the appropriate commands to build and run the project (F5).
+7. Access the Application - once the project is running locally, you can access the application by opening a web browser and entering the appropriate URL.
 
 ## Database Relations
 
